@@ -1,0 +1,867 @@
+%---------- Segundo Capitulo ----------
+\chapter{Desenvolvimento}
+\label{chap:desenv}
+
+Este capítulo contém, em detalhes, o desenvolvimento do trabalho realizado pela equipe, dividido nas seguintes seções:
+\begin{itemize}
+    \item[-] Reconstrução da Plataforma Robótica Bellator: Todos os passos realizados para re\-cons\-tru\-ir e adaptar a plataforma robótica para utilização no projeto.
+    \item[-] Algoritmos de Navegação: Detalha a implementação dos algoritmos de navegação \emph{fuzzy} e ED-FCM, de acordo com a revisão bibliográfica apresentada no capítulo \ref{chap:fundteor}.
+    \item[-] Testes e Análise de Resultados: Apresenta a metodologia, elaboração dos testes dos algoritmos e a análise dos resultados obtidos para ambos os algoritmos de navegação.
+    \item[-] Considerações: Conclusão do capítulo e considerações sobre o desenvolvimento do projeto.
+\end{itemize}
+
+\section{Reconstrução da Plataforma Robótica Bellator}
+\label{sec:recplat}
+A reconstrução e adaptação da plataforma robótica Bellator, bem como a documentação da mesma para facilitar utilização em trabalhos futuros, são objetivos deste trabalho de conclusão de curso. Assim sendo, esta seção irá descrever de forma detalhada os passos realizados pela equipe no processo de reconstrução, incluindo os testes dos componentes recebidos no início do projeto, elaboração e instalação de novos componentes de \emph{hardware} para o robô, documentação de componentes de \emph{software} necessários para o funcionamento da plataforma robótica e para possibilitar a execução autônoma de algoritmos de navegação na mesma.
+
+\subsection{Teste dos Componentes}
+\label{sec:testecomp}
+
+Após o recebimento do robô, foram realizados testes para garantir a funcionalidade dos componentes recebidos, já que o robô
+estava com suas peças empilhadas numa caixa e não era possível confiar no funcionamento adequado de nenhum dos componentes, além de que a falha de alguns componentes implicaria na impossibilidade de continuar o projeto ou em atrasos significativos. Estes testes também foram necessários para determinar de forma mais precisa o que poderia ser reaproveitado do projeto Bellator. De acordo com a documentação do projeto Bellator~\cite{BELLATOR}, o robô deveria ser capaz de funcionar como um sistema controlado remotamente. Como o objetivo deste projeto não envolve controlar
+o robô remotamente, foi testada apenas a camada de baixo nível.
+
+O primeiro passo da etapa de testes foi verificar o funcionamento da placa C8051F340, peça fundamental para o desenvolvimento do projeto, que apresentou o funcionamento adequado, gerando os PWMs, cujo conceito é descrito na seção \ref{sec:pwm}, dos motores conforme necessário (visualizados no osciloscópio), e realizando a leitura dos sensores e conversão A/D conforme esperado. Em seguida, foram iniciados os testes utilizando a placa de roteamento já existente, que apresentou defeito. Após alguns testes, foi constatado que a placa havia sido des\-con\-fi\-gu\-ra\-da, sendo que várias soldas foram removidas e o circuito em si estava alterado. Então, a equipe reorganizou a placa, realizou novos testes, mas não obteve sucesso. Foi então verificado que
+o regulador de tensão não estava funcionando. Este foi substituído e a placa finalmente funcionou conforme esperado.
+
+Com a placa de roteamento antiga funcionando, foi possível realizar o teste dos motores, utilizando os PWMs gerados pelo
+microcontrolador C8051F340 (entrada do \emph{buffer} da placa de roteamento). Nesse teste, não ocorreram problemas, os motores funcionaram conforme esperado.
+
+Das duas baterias inicialmente disponíveis, uma não estava funcionando conforme a especifica\-ção, o que levou a equipe
+a adquirir uma nova bateria de 12V para reposição da bateria danificada.
+
+Com todos os componentes acima citados testados, o que faltava para completar os testes da camada de baixo nível era apenas
+o teste dos \emph{encoders}. Esta etapa foi uma das mais difíceis, pois a equipe não tinha informação nem do modelo do \emph{encoder}.
+Depois de muito procurar, foi encontrado um \emph{datasheet} de um \emph{encoder} equivalente ao presente no robô, \emph{datasheet} este que foi fundamental para determinar como alimentar e testar o \emph{encoder}. Em posse da informação de como usar o \emph{encoder}, o teste foi realizado tanto para o \emph{encoder} esquerdo como o direito. O \emph{encoder} direito funcionou normalmente, porém o esquerdo não. Então, a equipe percebeu que a solda dos fios do \emph{encoder} não estava boa. Após refazer as soldas, o \emph{encoder} esquerdo foi testado
+novamente e funcionou.
+
+Tendo realizado os testes dos componentes mais críticos, o passo seguinte foi tentar utilizar o PC Embarcado VIA EPIA ME6000.
+Após muitas tentativas falhas e busca por informações sem resultados, a equipe optou por não utilizar este componente, já que
+sua documentação era escassa e o tempo perdido na tentativa de utilizá-la já estava acima do planejado (praticamente um mês
+foi gasto em tentativas frustradas). O PC Embarcado foi substituído pela placa TS-7260, que possui uma documentação muito
+melhor, poder de processamento superior, e funcionou nos primeiros testes. Esta substituição não gerou custos para o projeto,
+pois a placa TS-7260 já havia sido adquirida para um projeto anterior e não estava sendo utilizada,
+e foi então disponibilizada à equipe pelo professor orientador.
+
+\subsection{Levantamento da curva dos sensores}
+\label{sec:curvasensores}
+Esta seção apresenta como foi levantada a curva dos sensores, ponto fundamental para utilizar os
+dados de conversão, transformando-os para a distância em centímetros, que então pode ser passada
+aos algoritmos de navegação.
+
+Primeiramente, foi montada uma tabela, contendo os valores de conversão para cada distância, de 5
+em 5cm, começando em 15cm até 115cm, totalizando 21 medidas. Os valores obtidos estão na tabela \ref{tab:curvasensores}.
+
+\begin{table}[H]
+\centering
+\caption[Valores de conversão dos sensores x distância]{Valores de conversão dos sensores x distância}
+\begin{tabular}{l l}
+\hline
+Valor da conversão & Distância (cm) \\
+\hline
+207 & 15 \\
+191 & 20 \\
+173 & 25 \\
+150 & 30 \\
+134 & 35 \\
+120 & 40 \\
+110 & 45 \\
+100 & 50 \\
+91 & 55 \\
+86 & 60 \\
+81 & 65 \\
+75 & 70 \\
+71 & 75 \\
+68 & 80 \\
+66 & 85 \\
+65 & 90 \\
+62 & 95 \\
+59 & 100 \\
+56 & 105 \\
+54 & 110 \\
+50 & 115 \\
+\hline
+
+\end{tabular}
+\label{tab:curvasensores}
+\end{table}
+
+A partir destes valores, foi realizada uma interpolação polinomial para obtenção da equação aproximada
+da curva. O grau do polinômio interpolador escolhido foi o de grau 4 (graus in\-fe\-rio\-res traziam uma aproximação
+com erro muito elevado, enquanto graus superiores praticamente não alteravam o erro), que aproximou-se bem da curva
+real (medida), conforme é possível visualizar na figura~\ref{fig:curvasensores}, onde o eixo das abscissas
+contém os valores de conversão, e o eixo das ordenadas a distância cor\-res\-pon\-den\-te. Segue a equação
+da interpolação polinomial:
+
+\begin{equation}
+y = 3.6404 \cdot 10^{-7} x^4 - 2.4435 \cdot 10^{-4} x^3 + 6.0732 \cdot 10^{-2} x^2 - 6.8962x + 339.361
+\end{equation}
+
+onde \emph{y} representa a distância em centímetros e \emph{x} o valor da conversão analógica/digital.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{./figs/curvaresp_poli.png}
+\caption[Curva real dos sensores e interpolação polinomial]{Curva real dos sensores e interpolação polinomial}
+\fonte{Autoria própria}
+\label{fig:curvasensores}
+\end{figure}
+
+Com esta equação, só foi necessário iterar pelos valores \emph{x} possíveis de conversão (0 a 255, pois a conversão
+analógica/digital usa 8 bits) e montar a tabela para acessar com os valores de conversão e obter
+a distância em centímetros.
+Para exemplificar, suponha que a conversão analógica digital de algum sensor
+resultou num valor de \emph{x = 120}. Para obter a distância cor\-res\-pon\-den\-te em centímetros, basta
+acessar a tabela na posição 120, e o valor armazenado nesta posição é a distância em centímetros, que
+foi obtido diretamente da substituição de \emph{x} na equação, ou seja, sendo \emph{y = f(x)}, a distância
+em centímetros para a conversão analógica digital com valor 120 é f(120). A tabela foi montada simplesmente
+para evitar recálculos através da equação, e foi inserida no código da placa TS-7260, que será explicado em detalhes na seção~\ref{sec:softwarets}.
+
+\subsection{Repositório de trabalho}
+Nesta seção será apresentado um dos pontos mais importantes do projeto: a ferramenta de controle
+de versão e armazenamento de arquivos \emph{git}.
+
+Para realizar o trabalho de forma mais organizada, garantir versionamento e sincronia dos arquivos relacionados
+ao projeto, foi utilizado um repositório \emph{git}~\cite{GIT}. Este repositório foi armazenado no GitHub~\cite{GITHUB},
+site cujo propósito é disponibilizar uma \emph{interface} para criação, administração e armazenamento remoto
+de repositórios \emph{git}. Dentre os arquivos armazenados neste repositório, os principais são:
+códigos que foram utilizados neste projeto (microcontrolador C8051F340, TS-7260, algoritmos Fuzzy e ED-FCM);
+\emph{datasheets} dos componentes utilizados; diversas referências da monografia; o texto da monografia em si; figuras
+utilizadas na monografia. O repositório está disponível para cópia, podendo ser obtido através do
+seguinte comando:
+
+\begin{verbatim}
+git clone git@github.com:jcnborges/TCC.git
+\end{verbatim}
+
+Para tal, é necessário antes configurar o \emph{git} na máquina em que for utilizar, tarefa esta que pode ser
+realizada através do tutorial disponível no site do GitHub~\cite{GITHELP}. Após configuração e execução do comando
+acima, todos os arquivos armazenados no repositório serão copiados (em sua versão mais recente). Após
+configuração do \emph{git} e execução do comando acima, todos os arquivos do repositório (na sua versão mais recente)
+serão copiados para a máquina em que o comando foi executado, e imediatamente disponíveis para alterações.
+
+Esta seção apresentou a ferramenta \emph{git}, utilizada para versionamento dos arquivos relacionados ao projeto,
+armazenados em um ambiente remoto, reduzindo significativamente os riscos de perda de trabalho e a consequente
+necessidade de retrabalho. Por este motivo, sua utilização foi peça fundamental para realização de
+um trabalho organizado e seguro. A equipe também considera que esta praticidade é fundamental para
+trabalhos futuros, sendo uma maneira muito simples e direta de obter os resultados deste trabalho para
+uma possível continuação do projeto.
+
+\subsection{Código do microcontrolador C8051F340}
+\label{sec:codmicro}
+Esta seção apresentará as funções do código do microcontrolador, quais funções foram aproveitadas
+do projeto Bellator, quais foram modificadas e quais foram implementadas por completo.
+
+O código que executa no microcontrolador C8051F340 tem diversas funcionalidades fundamentais do robô, sendo elas:
+leitura dos sensores de distância e conversão analógica/digital dos sinais dos mesmos, geração dos
+PWMs para ambos os motores, contagem dos pulsos dos \emph{encoders}, recepção e envio de mensagens através
+da conexão serial.
+
+A única funcionalidade que foi implementada no microcontrolador neste projeto foi o tratamento dos sinais dos \emph{encoders} (para obter
+informações de odometria), informações estas essenciais para a execução dos algoritmos e consequente
+navegação autônoma. O código do projeto Bellator~\cite{BELLATOR} não continha o tratamento
+dos sinais dos \emph{encoders} (os \emph{encoders} não haviam sido utilizados no projeto Bellator). Portanto,
+foi necessário alterar o código do microcontrolador para tratar os sinais
+dos \emph{encoders} e enviar informações de odometria. Para tal tarefa, foram utilizadas duas interrupções
+externas da placa C8051F340 (uma para cada\emph{encoder}). Nestas interrupções, cada pulso do \emph{encoder} é
+contado (obviamente cada \emph{encoder} possui seu contador separadamente). A informação de contagem é
+então enviada através da comunicação serial com a placa TS-7260 quando requerida pela mesma.
+Os \emph{encoders} estão conectados à placa de roteamento, devido à necessidade de amplificação de seus
+sinais para utilização no microcontrolador. Na placa de roteamento, os sinais dos \emph{encoders} são
+amplificados em um amplificador operacional LM324~\cite{LM324}, e o sinal amplificado é então conectado
+ao Port 0 do microcontrolador.
+
+A geração dos PWMs foi mantida como estava no projeto Bellator~\cite{BELLATOR}, com 76 níveis possíveis de PWM
+(este número de níveis é resultado da forma como foi definida a frequencia da forma de onda resultante).
+Os PWMs são gerados através do Timer0 do microcontrolador C8051F340 e disponibilizados no Port 1 do mesmo, que é então conectado à placa de
+roteamento, onde os PWMs são utilizados como entrada para um \emph{buffer} 74LS244~\cite{74LS244}, cujas saídas
+são utilizadas como PWM para as pontes H dos motores. Este \emph{buffer} é necessário pois as saídas
+do microcontrolador não possuem corrente suficiente para os motores.
+
+A leitura dos sensores de distância, que é realizada através de uma varredura (ao fim de cada conversão,
+o próximo sensor é selecionado), teve seu período (este período inclui a conversão
+de todas as leituras) alterado (de 1s para 50ms). Esta mudança foi necessária para permitir que
+dados mais recentes sejam enviados ao robô, para este poder reagir de forma mais adequada ao ambiente
+(com o intervalo de 1s entre as conversões o robô demorava para desviar de obstáculos).
+Os sensores estão conectados à placa de roteamento, onde seus sinais de leitura são roteados para o
+Port 2 do microcontrolador, que, por sua vez, realiza as conversões A/D. Os valores obtidos são
+simplesmente a conversão do sinal de analógico para digital. Estes valores são enviados para a placa TS-7260
+quando requeridos pela mesma, e somente na TS-7260 cada valor é utilizado para consultar a tabela (para obter
+o valor da distância em centímetros), obtida
+de acordo com o que foi descrito na seção~\ref{sec:curvasensores}, mapeando o valor da conversão
+para a distância em centímetros.
+
+A parte de recepção e envio de mensagens do código do microcontrolador foi vastamente alterada,
+para adequação ao protocolo descrito na seção seguinte.
+
+
+
+\subsection{Protocolo de comunicação}
+Esta seção tem como objetivo explicar como funciona o protocolo de comunicação, que foi desenvolvido
+para padronizar a troca de mensagens entre o microcontrolador C8051F340 e a TS-7260.
+
+O protocolo de comunicação define quais são os bytes para cada tipo
+de mensagem. Todas as mensagens, sejam elas recebidas ou enviadas pelo C8051F340, possuem o byte \emph{END\_CMD}
+para sinalizar o fim de um comando/mensagem. As mensagens reconhecidas pelo microcontrolador C8051F340 são as seguintes:
+
+\begin{itemize}
+	\item \textbf{SYNC END\_CMD}: quando o microcontrolador C8051F340 recebe esta mensagem, res\-pon\-de
+com as leituras mais recentes de cada sensor de distância, em seguida as leituras dos \emph{encoders};
+	\item \textbf{LEFT\_WHEEL valor END\_CMD}: ao receber este comando, o microcontrolador utiliza o valor
+para definir o nível de PWM para a roda esquerda do robô. valor é representado por apenas um byte,
+onde o bit mais significativo indica o sentido de rotação da roda e os restantes a intensidade do PWM;
+	\item \textbf{RIGHT\_WHEEL valor END\_CMD}: funcionamento idêntico ao comando LEFT\_WHEEL, mas para a roda direita.
+\end{itemize}
+
+As mensagens enviadas pelo microcontrolador C8051F340 são apenas as respostas do comando SYNC:
+
+\begin{itemize}
+	\item \textbf{OPTICAL\_SENSOR\_[0-5] valor END\_CMD}: representa a leitura de cada sensor, onde
+valor é um byte, cuja faixa de variação é [0, 255].
+	\item \textbf{ENCODER\_[0-1] valor\_high valor\_low END\_CMD}: representa a leitura de cada \emph{encoder},
+valor\_high e valor\_low juntos formam um inteiro de 16 bits que contém o valor da contagem do \emph{encoder}.
+\end{itemize}
+
+\subsection{Placa de Roteamento}
+\label{sec:desroteamento}
+
+A placa de roteamento é um componente fundamental do projeto, responsável por realizar a interligação entre a placa C8051F340 e os componentes de \emph{hardware} do robô. A equipe constatou a necessidade deste componente devido aos seguintes fatores:
+
+\begin{itemize}
+    \item[-] Necessidade de alimentação dedicada para alguns componentes;
+    \item[-] Necessidade de tratamento dos sinais dos \emph{encoders};
+    \item[-] Roteamento das leituras de cada sensor para o pino de E/S correto da C8051F340;
+    \item[-] Necessidade de um \emph{buffer} para o PWM;
+    \item[-] Melhor organização do robô.
+\end{itemize}
+
+Como descrito nas especificações do robô (seção \ref{sec:esprob}), o robô Bellator possui, dentre outros componentes, cinco sensores, dois \emph{encoders} e duas pontes H. Os cinco sensores e dois \emph{encoders} necessitam de alimentação de aproximadamente 5 Volts para operação. Os \emph{encoders} produzem um sinal que precisa ser amplificado antes da utilização, e as duas pontes H necessitam de um sinal de PWM de baixa impedância. Além disso, o consumo de corrente total destes componentes ultrapassa a capacidade de fornecimento de corrente da C8051F340. Medições durante os testes com os componentes foram realizadas, e foi constatado que cada sensor de distância utiliza cerca de 30mA de corrente, enquanto os \emph{encoders} utilizam 20mA cada, totalizando quase 200mA para estes componentes.
+
+Por fim, a dificuldade de conectar, de forma prática, todos os componentes do robô com a C8051F340 bem como a quantidade excessiva de fios resultante fez com que a equipe concluísse que a placa de roteamento é indispensável.
+
+De acordo com os fatores descritos, a equipe construiu uma lista de requisitos para a placa de roteamento:
+
+\begin{itemize}
+    \item[-] Fornecer alimentação de aproximadamente 5 Volts DC;
+    \item[-] Capacidade de corrente suficiente; %Atualizar com valores!
+    \item[-] Conectores práticos para \emph{interface} com a C8051F340 e o resto do robô;
+    \item[-] Fornecer um \emph{buffer} para o sinal de PWM;
+    \item[-] Fornecer amplificação para o sinal do \emph{encoder}.
+\end{itemize}
+
+Após a análise dos requisitos, a equipe iniciou o desenvolvimento de uma placa de circuito impresso para atender a todos os requisitos. A necessidade de uma alimentação de 5 Volts tornou essencial a utilização de um regulador de tensão, o LM317, que era o mesmo utilizado na versão antiga da placa, e suporta corrente de até 1.5A, valor suficiente para alimentar os componentes da placa. Também foi utilizado um \emph{driver} de corrente (74LS244N) para o sinal de PWM (o sinal de saída do microcontrolador não possuía corrente suficiente para acionar as pontes H). Para a amplificação dos sinais dos \emph{encoders} foi utilizado um amplificador operacional LM324N. O restante da placa consiste de pinos para conectar cabos \emph{flat}, para a interação com a C8051F340, bem como pinos para conectores do \emph{hardware} do robô Bellator. O diagrama esquemático de tal placa foi produzido com o auxílio da versão gratuita, de uso exclusivamente não comercial do \emph{software} Eagle \cite{EAGLE}, versão 5.11.0, que mostrou-se suficiente para a elaboração da placa. O resultado pode ser visualizado na figura \ref{fig:roteamento_sch}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/roteamento_sch.png}
+  \caption[Diagrama esquemático da placa de roteamento.]
+  {Diagrama esquemático da placa de roteamento.}
+  \label{fig:roteamento_sch}
+  \fonte{Autoria própria}
+\end{figure}
+
+De posse do diagrama esquemático apresentado na figura \ref{fig:roteamento_sch} a equipe realizou o roteamento de uma placa de circuito impresso que atenda ao mesmo diagrama esquemático, também utilizando o \emph{software} Eagle.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/roteamento_brd.png}
+  \caption[Roteamento final produzido pela equipe.]
+  {Roteamento final produzido pela equipe.}
+  \label{fig:roteamento_brd}
+  \fonte{Autoria própria}
+\end{figure}
+
+A placa de roteamento foi confeccionada manualmente em uma placa de circuito impresso. O desenho da placa foi impresso em uma folha de transparência A4 com uma impressora à laser. Esse desenho foi passado da transparência para a placa com o auxílio de um ferro de passar roupa e a placa foi corroída usando-se percloreto de ferro. A placa foi perfurada com broca e perfurador de placa e os componentes eletrônicos foram soldados com ferro de solda, estanho e pasta de solda. A figura \ref{fig:confeccao} ilustra o resultado do processo de confecção da placa.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/placa-confeccao.jpg}
+  \caption[Resultado do processo de confecção da placa de roteamento.]
+  {Resultado do processo de confecção da placa de roteamento.}
+  \label{fig:confeccao}
+  \fonte{Autoria própria}
+\end{figure}
+
+A placa em utilização pode ser visualizada no Apêndice A, que mostra por meio de fotos como a placa de roteamento estava conectada ao restante do robô, ao final do projeto.
+
+\subsection{Placa TS-7260}
+\label{sec:ts}
+Esta seção explicará como foi estruturado o \emph{software} desenvolvido para a placa
+TS-7260, cuja função principal é realizar a \emph{interface} entre o \emph{software} do microcontrolador
+C8051F340 e o algoritmo de navegação (Fuzzy ou ED-FCM).
+
+\subsection{Configuração da TS-7260}
+O \emph{software} da TS-7260 foi desenvolvido em C++, assim como os algoritmos de navegação, a serem
+explicados em detalhes na seção~\ref{sec:algs}. A programação foi realizada em um computador comum.
+Para realização de testes na placa, o código foi compilado para a TS-7260 através da utilização de um
+\emph{cross-compiler}, que pode ser baixado em~\cite{CC}. O arquivo binário gerado pela compilação
+foi então movido para uma pasta com\-par\-ti\-lha\-da na rede. Esta pasta foi disponibilizada através de um
+servidor NFS (\emph{Network File System}) instalado no computador
+onde o código foi desenvolvido. A placa TS-7260 contém em um pendrive um linux compilado para a sua
+arquitetura, que disponibiliza o cliente NFS, através do qual foi possível montar a pasta compartilhada e executar
+o algoritmo. Posteriormente, para testes totalmente autônomos, o arquivo binário foi copiado da pasta
+compartilhada para o pendrive conectado à TS-7260, o que permite que o robô execute a navegação sem
+necessidade de conexão com o computador. O comando utilizado no terminal da TS-7260 para montar a pasta
+compartilhada foi:
+
+\begin{verbatim}
+mount 192.168.0.3:/files /mnt
+\end{verbatim}
+
+onde \mbox{192.168.0.3} era o IP local da máquina onde o \emph{software} foi desenvolvido, \emph{/files}
+o diretório compartilhado por rede e \emph{/mnt} a pasta onde deveria ser montado. Após montar a pasta,
+os seguintes comandos são executados:
+
+\begin{verbatim}
+cd /mnt
+./tslogic fcm
+\end{verbatim}
+ou
+\begin{verbatim}
+./tslogic fuzzy
+\end{verbatim}
+
+Todas as configurações da TS-7260 foram realizadas através de um terminal disponibilizado pela porta
+serial. Através de um \emph{software} como o HyperTerminal (Windows) ou o minicom (Linux) é possível receber/enviar
+dados. A placa TS-7260 possui três portas de comunicação serial, das quais duas foram utilizadas:
+COM1 e COM2. A porta COM2 foi utilizada para conectar a TS-7260 ao microcontrolador C8051F340, para possibilitar
+a troca de mensagens de comando com o microcontrolador (para alterar os níveis de PWM dos motores), assim
+como o recebimento das leituras dos sensores. A porta COM1, por sua vez, foi configurada para ser o terminal
+mencionado anteriormente. Basta conectar um cabo serial da COM1 da TS-7260 ao computador para utilizá-lo.
+As configurações da serial utilizadas foram (tanto COM1 quanto COM2): 115200 8N1, ou seja, \emph{baud-rate}
+de 115200, caracteres de 8 (oito) bits, sem bit de paridade e com 1 (um) bit de parada. Através do terminal
+disponibilizado na COM1, é possível montar e acessar a pasta de rede compartilhada, conforme descrito no parágrafo
+anterior. As conexões seriais e \emph{interface} com o restante do robô podem ser visualizadas no Apêndice A, em fotos do robô após o final do projeto.
+
+\subsection{Software da TS-7260}
+\label{sec:softwarets}
+Os algoritmos de controle gravados no pen-drive conectado à placa TS-7260 são o que efetivamente controla o robô. A parte principal do código consiste
+de um loop infinito, que executa os seguintes passos:
+
+\begin{itemize}
+	\item Envio de um comando SYNC para o microcontrolador C8051F340: isto faz com que o C8051F340 responda enviando
+		um pacote com as leituras mais recentes dos sensores de distância, juntamente com as leituras
+		dos \emph{encoders} (esta comunicação é realizada via porta serial);
+	\item Leitura do pacote enviado pelo C8051F340: o programa recebe os dados do C8051F340 e
+		utiliza os dados de conversão dos sensores para acessar a tabela que mapeia
+		o valor da conversão para a distância em centímetros, tabela esta que foi obtida conforme
+		o procedimento especificado na seção~\ref{sec:curvasensores}. Os valores de distância para
+		cada sensor são então armazenados, assim como as leituras dos \emph{encoders};
+	\item Execução do algoritmo de navegação: utiliza os dados armazenados para executar o algoritmo
+		de navegação, passando os valores de leitura dos sensores de distância. O algoritmo utiliza
+		os dados para realizar a inferência, retornando valores que indicam qual ação o robô deve tomar.
+		O algoritmo de navegação é executado também na placa TS-7260, mas não faz parte do mesmo \emph{software}.
+		Cada algoritmo representa uma biblioteca externa ao software de controle e implementa um método
+		que recebe como parâmetros as distâncias lidas e retorna valores que definem como o robô deve
+		se locomover (velocidade e direção);
+	\item Ajuste dos \emph{setpoints}: nesta etapa, os dados retornados pelo algoritmo de navegação são
+		utilizados para o cálculo do \emph{setpoint} de cada roda (velocidade desejada), o \emph{setpoint} é então
+		alterado de acordo com o valor calculado;
+	\item Ajuste de velocidade: esta etapa consiste no ajuste dos níveis de PWM de cada roda, e utiliza
+		para tal os valores de leitura dos \emph{encoders} e o \emph{setpoint} do passo anterior.
+		O objetivo do ajuste de velocidade é fazer com que cada motor fique o mais próximo possível
+		do \emph{setpoint} estabelecido previamente. Este ajuste é apenas proporcional, simplesmente aumentando
+		a velocidade caso a contagem do \emph{encoder} esteja abaixo do \emph{setpoint} ou di\-mi\-nu\-in\-do caso esteja
+		acima;
+	\item Envio das ações: os níveis de PWM definidos pelo ajuste de velocidade são enviados para
+		o microcontrolador C8051F340, que efetiva a mudança.
+\end{itemize}
+
+O diagrama em blocos a seguir representa o funcionamento do \emph{software}, demonstrando
+também em que etapas ocorre a comunicação com o microcontrolador (setas tracejadas) e quando o algoritmo
+de navegação é executado. Vale lembrar que o algoritmo de navegação (Fuzzy ou ED-FCM) executa na placa
+TS-7260 também, mas seu código não faz parte do \emph{software} de controle do robô (conforme explicado acima),
+por este motivo está em um bloco separado no diagrama. As ações descritas no bloco C8051F340 são executadas no
+microcontrolador C8051F340.
+
+\tikzstyle{tsb} = [rectangle, draw=black!100, fill=blue!15!green!10,
+    text width=8em, text centered, rounded corners, minimum height=1cm]
+\tikzstyle{transition} = [rectangle, thick, draw=black!75, fill=black!20,
+	minimum size=4mm]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{8051b} = [rectangle, draw=black!100, fill=red!15, rounded corners,
+	minimum height=1cm, text width=8em, text centered]
+\tikzstyle{navb} = [rectangle, draw=black!100, fill=yellow!30, rounded corners,
+	text width=8em, minimum height=1cm, text centered]
+\tikzstyle{background} = [rectangle, fill=gray!50, inner sep=8mm, rounded corners=5mm]
+	\tikzstyle{backgroundb} = [rectangle, fill=black!50, inner sep=2mm, rounded corners=5mm]
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[node distance = 1.5cm, auto]
+		% Nós e conexões do diagrama
+		\node [tsb] (opentty) {Configura serial};
+		\node [tsb, below of=opentty] (sync) {Envia SYNC} edge [pre] (opentty);
+		\node [tsb, below of=sync] (read) {Leitura do pacote} edge [pre] (sync);
+		\node [tsb, below of=read] (alg) {Executa algoritmo de navegação} edge [pre] (read);
+		\node [navb, left=2cm of alg] (nrcv) {Recebe dados} edge [pre] (alg);
+		\node [navb, below of=nrcv] (ninf) {Realiza a inferência} edge [pre] (nrcv);
+		\node [navb, below of=ninf] (nret) {Retorna as ações} edge [pre] (ninf);
+		\node [tsb, right=2cm of nret] (sadj) {Ajuste dos setpoints} edge [pre] (nret);
+		\node [tsb, below of=sadj] (vadj) {Ajuste da velocidade} edge [pre] (sadj);
+		\node [tsb, below of=vadj] (act) {Envia as ações} edge [pre] (vadj);
+		\node [8051b, right=2cm of sync] (rcv) {Recebe SYNC} edge [pre, dashed] (sync);
+		\node [8051b, below of=rcv] (spkg) {Envia pacote}
+			edge [pre] (rcv)
+			edge [post, dashed] (read);
+		\node [8051b, right=2cm of act] (pwm) {Ajuste dos PWMs} edge [pre, dashed] (act);
+		\path [line] (act) -- +(-2.5,0) |- (sync);
+		% Background
+		\begin{pgfonlayer}{background}
+			\node [background, fit=(nrcv) (act) (opentty), label=above:TS-7260] {};
+			\node [backgroundb, fit=(opentty) (act), label=below:tslogic] {};
+			\node [backgroundb, fit=(nrcv) (nret), label=below:Fuzzy/ED-FCM] {};
+			\node [background, fit=(rcv) (pwm), label=above:C8051F340] {};
+		\end{pgfonlayer}
+	\end{tikzpicture}
+	\caption[Diagrama em blocos \emph{software} TS-7260]
+	{Diagrama em blocos demonstrando o funcionamento do software da placa TS-7260.}
+	\fonte{Autoria própria}
+\end{figure}
+
+\subsection{Considerações}
+
+Nesta seção foram descritos os passos da equipe para alcançar o primeiro objetivo do projeto, a reconstrução da plataforma robótica Bellator, tornando-a apta para utilização no teste e comparação de algoritmos de navegação. Foram descritos os testes iniciais com o robô, o projeto da nova placa de roteamento e a implementação do \emph{software} da placa TS-7260.
+
+\section{Algoritmos de Navegação}
+\label{sec:algs}
+Esta seção dedica-se à descrição da implementação dos algoritmos de navegação conforme descrição teórica dos mesmos apresentada na fundamentação teórica. Mais especificamente, serão descritos os códigos responsáveis pela tomada de decisões de ambos os algoritmos de navegação que executam na placa TS-7260, o algoritmo de navegação de lógica Fuzzy clássica, utilizando os mecanismos de inferência propostos por \cite{MAMDAMI} e o ED-FCM, proposto por \cite{MENDONCA}.
+
+\subsection{Algoritmo de Navegação Fuzzy}
+\label{sec:algfuzzy}
+%Descrição e referencia básica da biblioteca do fabro, adaptação e utilização. Descrição das regras. INCOMPLETO
+O algoritmo de Navegação \emph{Fuzzy} foi desenvolvido utilizando-se a biblioteca FLIE(\emph{Fuzzy Logic Inference Engine}), ~\cite{FABRO}, que já implementa um ambiente para a definição de conjuntos \emph{fuzzy} e regras de inferência sobre os mesmos, proporcionando à equipe mais tempo para o aprimoramento das regras e conjuntos e o teste dos mesmos. Este algoritmo será utilizado como base de comparação para determinação da eficiência do ED-FCM, descrito na seção \ref{sec:algedfcm}. Nesta seção, será descrito como a biblioteca FLIE foi utilizada neste projeto e como foram definidos os conjuntos \emph{fuzzy} e as regras de inferência, seguindo a fundamentação teórica sobre o assunto apresentada na seção \ref{sec:logfuzzy}.
+
+\subsubsection{Variáveis Linguísticas}
+\label{sec:devarling}
+A biblioteca FLIE possui estruturas de dados, ou classes, prontas para serem utilizadas para definição de variáveis linguísticas, bem como estruturas para a definição de regras de inferência baseadas neste conjunto de variáveis linguísticas, sendo apropriada para a elaboração de sistemas de controle \emph{fuzzy}. A biblioteca funciona de acordo com os princípios teóricos apresentados na seção \ref{sec:logfuzzy}.
+
+Para elaborar o controle \emph{fuzzy} responsável pelo algoritmo de navegação, é necessário, pri\-mei\-ra\-men\-te, definir as variáveis linguísticas e os conjuntos \emph{fuzzy} associados às mesmas. Posteriormente, deve-se definir as variáveis linguísticas de entrada e saída do sistema e as associar apropriadamente. Em seguida, é necessário definir o método de defuzzificação e, finalmente, as regras de inferência. Cada um destes passos será descrito em detalhes a seguir.
+
+A biblioteca FLIE permite a definição de variáveis linguísticas na classe \emph{linguisticvariable}, que pode ser composta por diversos conjuntos \emph{fuzzy}, definidos a partir da classe \emph{category}. Cada \emph{category} é definida por uma faixa de valores válidos (\emph{range}), por quatro pontos que definem um trapézio com os intervalos de subida, máximo e descida do nível de pertinência do conjunto de entrada, para fuzzificação dos dados, e um nome apropriado, tal como Perto, Longe, Rápido, dependendo do contexto. Ou seja, cada valor de entrada é fuzzificado de acordo com seu nível de pertinência a cada categoria (conjunto \emph{fuzzy}) pertencente à variável linguística. A figura \ref{lingvar} demonstra de forma gráfica esta estrutura.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/lingvar.png}
+  \caption[Estrutura de uma Variável Linguística no FLIE.]
+  {Estrutura de uma Variável Linguística no FLIE.}
+  \label{lingvar}
+  \fonte{Autoria própria}
+\end{figure}
+
+Utilizando esta estrutura, foram desenvolvidas três variáveis linguísticas para a entrada do sistema e duas variáveis linguísticas para a saída do sistema. Deve-se observar que foram definidas apenas três variáveis linguísticas de entrada por dois motivos: A biblioteca FLIE não aceita mais que três entradas em uma regra de inferência e um número maior de entradas levaria à uma quantidade excessiva de regras de inferência. As variáveis linguísticas de entrada correspondem aos cinco sensores do robô, sendo que o sensor frontal utiliza uma variável linguística, ``SensorFrente"~ e os dois pares de sensores laterais são agrupados em duas variáveis linguísticas, ``SensorEsquerda"~ e ``SensorDireita"~ sendo que apenas o menor valor de leitura válida é selecionado nos pares de sensores laterais para ser fuzzificado. Cada uma destas variáveis linguísticas está definida com três conjuntos \emph{fuzzy}, totalizando nove conjuntos \emph{fuzzy} organizados de acordo com a tabela \ref{tab:varsfuzzy}.
+
+\begin{table}[H]
+\centering
+\caption[Funções de Pertinência e Conjuntos Fuzzy dos Sensores]{Funções de Pertinência e Conjuntos Fuzzy dos Sensores.}
+\begin{tabular}{l l l}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  \textbf{Variável Linguística} & \textbf{Conjunto Fuzzy} & \textbf{Função de Pertinência} \\
+  \hline
+  SensorEsquerda & PertoEsquerda & sp(d) \\
+  SensorEsquerda & MedioEsquerda & sm(d) \\
+  SensorEsquerda & LongeEsquerda & sl(d) \\
+  SensorFrente & Perto & sp(d) \\
+  SensorFrente & Medio & sm(d) \\
+  SensorFrente & Longe & sl(d) \\
+  SensorDireita & PertoDireita & sp(d) \\
+  SensorDireita & MedioDireita & sm(d) \\
+  SensorDireita & LongeDireita & sl(d) \\
+  \hline
+\end{tabular}
+\label{tab:varsfuzzy}
+\end{table}
+As funções de pertinência sp(d), sm(d), sl(d), correspondentes a perto, médio e longe, são definidas pelos trapézios da figura \ref{fuzzygraph_des}:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/fuzzygraph_des.png}
+  \caption[Definição das Funções de Pertinência perto, médio e longe.]
+  {Definição das Funções de Pertinência perto, médio e longe.}
+  \label{fuzzygraph_des}
+  \fonte{Autoria própria}
+\end{figure}
+
+Embora as funções de pertinência sejam as mesmas para os conjuntos \emph{fuzzy} representando perto, médio e longe para as três variáveis linguísticas, cada variável linguística necessita de objetos da classe \emph{category} exclusivos e únicos, por uma restrição da biblioteca FLIE, e não é possível utilizar o mesmo conjunto \emph{fuzzy} para duas ou mais variáveis linguísticas diferentes.
+
+De forma análoga, as variáveis linguísticas de saída do sistema são definidas pelas variáveis linguísticas ``Velocidade Motor"~ e ``Direção", representando a velocidade e a direção do deslocamento do robô. Os conjuntos \emph{fuzzy} associados à variável linguística Velocidade Motor foram definidos de forma a distribuir igualmente as faixas de PWM de 0 a 100\% da capacidade do motor em três categorias: Lento, Médio e Rápido. As funções de pertinência que definem estes conjuntos \emph{fuzzy} são pl(p), pm(p), pr(p), onde p é a percentagem do PWM. Pode-se visualizar estas funções na figura \ref{defuzzygraph_velmotor}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/defuzzygraph_velmotor.png}
+  \caption[Definição das Funções de Pertinência lento, médio e rápido.]
+  {Definição das Funções de Pertinência lento, médio e rápido.}
+  \label{defuzzygraph_velmotor}
+  \fonte{Autoria própria}
+\end{figure}
+
+Similarmente, foram definidos 5 conjuntos \emph{fuzzy} para a variável linguística ``Direção": ViraEsquerda, ViraPoucoEsquerda, Reto, ViraPoucoDireita, ViraDireita, distribuindo igualmente entre estas classes todas as possibilidades de direção, desde virar totalmente para a esquerda (0º) até totalmente para direita(180º), sendo que 90º representa movimento em linha reta. As funções de pertinência que definem estes conjuntos \emph{fuzzy} são ve(a), vpe(a), rt(a), vpd(a), vd(a). O gráfico da figura \ref{defuzzygraph_ang} ilustra estas funções.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/defuzzygraph_ang.png}
+  \caption[Definição das Funções de Pertinência de Direção]
+  {Definição das Funções de Pertinência de Direção.}
+  \label{defuzzygraph_ang}
+  \fonte{Autoria própria}
+\end{figure}
+
+
+\subsubsection{Regras de Inferência}
+
+Após definidas as variáveis linguísticas, regras de inferência podem ser elaboradas através da classe \emph{infrule}. Esta classe é composta de, no máximo, três variáveis linguísticas de entrada e uma variável linguística de saída, todas definidas pela classe \emph{linguisticvariable}, seguindo a estrutura na figura \ref{infrule}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./figs/infrule.png}
+  \caption[Estrutura de uma regra de inferência no FLIE.]
+  {Estrutura de uma regra de inferência no FLIE.}
+  \label{infrule}
+  \fonte{Autoria própria}
+\end{figure}
+
+Com as variáveis linguísticas de entrada e saída pode-se criar
+regras de inferência. Primeiramente, é necessário associar as
+variáveis linguísticas que compõem as regras de inferência de
+entrada e saída à um objeto da classe \emph{fuzzy\_control}. Em
+seguida, cada regra é definida por uma sequência de valores
+\emph{fuzzy} pertencentes às variáveis linguísticas de entrada e
+saída associadas com o objeto da classe \emph{fuzzy\_control}, sendo o
+último valor da sequência a saída \emph{fuzzy} desejada para uma
+entrada correspondente a um, dois ou três valores antecedentes, que é o limite de entradas da biblioteca FLIE, como mencionado em \ref{sec:devarling}. Como deseja-se obter duas saídas, uma para a velocidade e outra para a direção, foram necessários dois objetos desta classe, ambos com as mesmas entradas. Além disso, é necessário definir o método de defuzzificação a ser utilizado pelo controle \emph{fuzzy}. A equipe utilizou o método da Média do Máximo, descrito na seção \ref{sec:fuzzycontrol}. Assim, as regras de inferência seguem o padrão abaixo, de acordo com as variáveis linguísticas definidas na seção \ref{sec:devarling}:
+\begin{center}
+SensorEsquerda, SensorFrente, SensorDireita, Velocidade Motor\\
+SensorEsquerda, SensorFrente, SensorDireita, Direção
+\end{center}
+
+Em seguida, pode-se definir as regras através dos valores \emph{fuzzy} válidos para cada variável linguística associada aos objetos \emph{fuzzy\_control}. A definição das regras é bastante intuitiva, empírica e altamente dependente da aplicação. A equipe optou por definir um conjunto de regras arbitrário, realizar testes e, analisando os resultados preliminares, aprimorar o conjunto de regras. A tabela \ref{tab:regrasinf} representa o conjunto definitivo de 27 regras elaboradas pela equipe, que correspondem a todas as combinações possíveis de entradas para o controle \emph{fuzzy} (3 opções de classificação para cada entrada, sendo 3 entradas). Algumas regras podem ser redundantes, tendo em vista que, a partir dos testes, o melhor curso de ação observado para algumas situações diferentes é o mesmo.
+
+\begin{table}[H]
+\centering
+\caption[Regras de Inferência - Algoritmo Fuzzy]{Regras de Inferência - Algoritmo Fuzzy.}
+\begin{tabular}{l l l l l}
+\hline
+\textbf{SensorEsquerda} & \textbf{SensorFrente} & \textbf{SensorDireita} & \textbf{VelocidadeMotor} & \textbf{Direção} \\
+\hline
+PertoEsquerda & Perto & PertoDireita & Lento & ViraDireita \\
+PertoEsquerda & Perto & MedioDireita & Lento & ViraDireita \\
+PertoEsquerda & Perto & LongeDireita & Lento & ViraDireita \\
+PertoEsquerda & Medio & PertoDireita & Lento & Reto \\
+PertoEsquerda & Medio & MedioDireita & Lento & ViraDireita \\
+PertoEsquerda & Medio & LongeDireita & Lento & ViraPoucoDireita \\
+PertoEsquerda & Longe & PertoDireita & Medio & Reto \\
+PertoEsquerda & Longe & MedioDireita & Lento & ViraPoucoDireita \\
+PertoEsquerda & Longe & LongeDireita & Lento & ViraDireita \\
+MedioEsquerda & Perto & PertoDireita & Lento & ViraEsquerda \\
+MedioEsquerda & Perto & MedioDireita & Lento & ViraDireita \\
+MedioEsquerda & Perto & LongeDireita & Lento & ViraPoucoDireita \\
+MedioEsquerda & Medio & PertoDireita & Lento & ViraEsquerda \\
+MedioEsquerda & Medio & MedioDireita & Medio & Reto \\
+MedioEsquerda & Medio & LongeDireita & Medio & Reto \\
+MedioEsquerda & Longe & PertoDireita & Lento & ViraPoucoEsquerda \\
+MedioEsquerda & Longe & MedioDireita & Rapido & Reto \\
+MedioEsquerda & Longe & LongeDireita & Medio & Reto \\
+LongeEsquerda & Perto & PertoDireita & Lento & ViraEsquerda \\
+LongeEsquerda & Perto & MedioDireita & Lento & ViraPoucoEsquerda \\
+LongeEsquerda & Perto & LongeDireita & Lento & ViraDireita \\
+LongeEsquerda & Medio & PertoDireita & Lento & ViraPoucoEsquerda \\
+LongeEsquerda & Medio & MedioDireita & Medio & Reto \\
+LongeEsquerda & Medio & LongeDireita & Rapido & ViraDireita \\
+LongeEsquerda & Longe & PertoDireita & Lento & ViraEsquerda \\
+LongeEsquerda & Longe & MedioDireita & Medio & Reto \\
+LongeEsquerda & Longe & LongeDireita & Rapido & Reto \\
+\hline
+\end{tabular}
+\label{tab:regrasinf}
+\end{table}
+
+Finalmente, as regras definidas podem ser utilizadas para realizar as inferências. A bilioteca FLIE recebe os dados de entrada não fuzzificados, os fuzzifica, atribuindo valores de pertinência para cada categoria definida pelo desenvolvedor e determina o nível de ativação de cada regra de inferência definida. Após esta etapa, a FLIE defuzzifica o resultado seguindo o modelo de defuzzificação escolhido (neste caso a média do máximo) e retorna o resultado final, que pode ser utilizado para controlar a navegação do robô. Este resultado possui dois valores: a velocidade do motor, que é um valor percentual de 0 a 100\%, e a direção, um valor de 0º (que representa virar à esquerda) a 180º (que representa virar à direita), sendo que 90º seria reto.
+
+\subsubsection{Considerações}
+
+O algoritmo \emph{fuzzy} produziu o comportamento adequado em navegação robótica permitindo que o robô fosse capaz de desviar obstáculos posicionados à direita, à esquerda e à frente do mesmo. Conforme será descrito na seção de testes, seção \ref{sec:testes}, esse algoritmo possibilitou o robô a navegar de forma autônoma recebendo como entrada as leituras dos sensores. A versão des\-cri\-ta nessa seção foi produzida após a execução e conclusão dos testes iniciais e avançados, seções \ref{sec:testesini} e \ref{sec:testesavan}, respectivamente. Durante esses testes, o algoritmo foi submetido a uma série de experimentos visando detectar erros de navegação, isolá-los e corrigí-los. Esse processo foi realizado repetidas vezes e as funções de pertinência e regras \emph{fuzzy} foram aprimoradas gradualmente. A tabela de funções (tabela \ref{tab:varsfuzzy}) e a tabela de regras (tabela \ref{tab:regrasinf}) representam a versão utilizada nos testes comparativos, descritos na seção \ref{sec:testescomp}, que foi utilizada para obtenção do resultado final.
+
+\subsection{Algoritmo de Navegação Baseado em ED-FCM}
+\label{sec:algedfcm}
+
+Esta seção tem por objetivo descrever o projeto e a implementação do algoritmo de navegação baseado na abordagem ED-FCM, apresentada na seção \ref{sec:fcm} da fundamentação teórica. O projeto consistiu na definição dos conceitos de entrada, nível e saída, relações causais, respectivos pesos e um evento. A implementação foi desenvolvida em linguagem C++ e compilada para ser executada na placa TS-7260.
+
+A idéia do algoritmo foi controlar a direção do robô ajustando a potência aplicada em cada roda, de forma independente, sendo que esta pode ser aplicada para a roda girar em ambos os sentidos. As seguintes hipóteses foram elaboradas para projetar o algoritmo:
+
+\begin{enumerate}
+\item Quando o robô detectar um objeto à esquerda, deve desviar para a direita;
+\item Quando o robô detectar um objeto à direita, deve desviar para a esquerda;
+\item Quando o robô não detectar objetos nas laterais, este deve seguir em frente.
+\end{enumerate}
+
+Os movimentos ``desviar para a direita", ``desviar para a esquerda"~ e ``seguir em frente"~ podem ser obtidos controlando-se a potência e o sentido de giro aplicado em cada roda. Desse modo, duas hipóteses foram imaginadas: as duas rodas girando para frente e as duas rotas girando em sentidos opostos. Os movimentos produzidos na primeira situação são:
+
+\begin{enumerate}
+\item Quando a roda direita girar mais rápido que a roda esquerda (no mesmo sentido), a mudança de direção é ``desviar para a esquerda";
+\item Quando a roda esquerda girar mais rápido que a roda direita (no mesmo sentido), a mudança de direção é ``desviar para a direita";
+\item Quando a roda esquerda girar na mesma intensidade e sentido que a roda direita, o movimento é ``seguir em frente".
+\end{enumerate}
+
+Os movimentos produzidos na segunda situação são:
+\begin{enumerate}
+\item Quando a roda direita girar para frente e a roda esquerda girar para trás, o movimento é ``desviar para a esquerda";
+\item Quando a roda esquerda girar para frente e a roda direita girar para trás, o movimento é ``desviar para a direita".
+\end{enumerate}
+
+Deste modo, o algoritmo controla a direção do robô calculando a ``intensidade de girar"~ a roda direita para trás ou para frente e a ``intensidade de girar"~ a roda esquerda para trás ou para frente, sendo que esse cálculo recebe como entradas as distâncias registradas pelos sensores de distância na lateral direita, na frente e na lateral esquerda do robô. O mesmo agrupamento realizado para o algoritmo Fuzzy foi utilizado para o ED-FCM, tomando o mínimo de cada par de sensores laterais como uma entrada, totalizando 2 entradas, e o sensor frontal representando a terceira entrada.
+
+\subsubsection{Conceitos}
+\label{subsec:conceitos}
+Primeiramente, definiu-se a entrada do sistema de navegação, a qual correspondeu às leituras dos sensores de distância. Desse modo, foram criados três conceitos de entrada:
+
+\begin{enumerate}
+\item SE - Representa a leitura do sensor lateral esquerdo;
+\item SF - Representa a leitura do sensor frontal;
+\item SD - Representa a leitura do sensor lateral direito.
+\end{enumerate}
+
+Esses conceitos guardam o valor da leitura da distância normalizada na faixa de 0 a 1, através da equação \ref{eq:normaliza}, sendo x o valor absoluto da distância (cm), MIN o valor mínimo suportado pelo sensor e MAX o valor máximo.
+
+\begin{equation}
+\label{eq:normaliza}
+y=\frac {x-MIN} {MAX-MIN}
+\end{equation}
+
+Em seguida, foram determinados os conceitos de nível do ED-FCM, os quais estabelecem as inferências resultantes dos valores dos conceitos de entrada. Foram definidos quatro conceitos de nível:
+
+\begin{enumerate}
+\item GDF - Representa a intensidade da decisão de girar a roda direita para frente;
+\item GDT - Representa a intensidade da decisão de girar a roda direita para trás;
+\item GEF - Representa a intensidade da decisão de girar a roda esquerda para frente;
+\item GET - Representa a intensidade da decisão de girar a roda esquerda para trás.
+\end{enumerate}
+
+Os níveis desses conceitos são ativados através de uma função sigmoidal dependente dos valores dos conceitos de entrada. As equações \ref{eq:sig_frente} e \ref{eq:sig_tras} foram adaptadas da equação \ref{sigmoide}, apresentada na fundamentação teórica, e operam em domínio $[0, 1]$ e imagem $[0, 1]$.
+
+\begin{equation}
+\label{eq:sig_frente}
+f_1(x)=\frac{1} {1+e^{(-10x+4,5)}}
+\end{equation}
+
+\begin{equation}
+\label{eq:sig_tras}
+f_2(x)=1-\frac{1} {1+e^{(-10x+4,5)}}
+\end{equation}
+
+Por fim, definiu-se a saída do sistema de navegação, a qual são os níveis percentuais de potência de cada roda. Esse nível varia na faixa de -100\% a +100\% e o sinal indica o sentido de giro, sendo o sinal positivo  ``girar para frente"~ e o sinal negativo ``girar para trás"~. Desse modo, foram estabelecidos dois conceitos de saída:
+
+\begin{enumerate}
+\item RD Out - Representa o nível percentual de potência da roda direita;
+\item RE Out - Representa o nível percentual de potência da roda esquerda.
+\end{enumerate}
+
+\subsubsection{Relações Causais}
+\label{subsec:rel-causal}
+Os conceitos foram interligados através das relações causais ilustradas na figura \ref{fig:fcm-proposto}. Esse ED-FCM conecta os conceitos de entrada SD, SF e SE, através dos conceitos de nível GDF, GDT, GEF e GET, aos conceitos de saída RD Out e RE Out.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[node distance=1.3cm,>=stealth',bend angle=45,auto]
+
+		\tikzstyle{place}=[circle,thick,draw=black!75,fill=blue!30,minimum size=6mm]
+		\tikzstyle{red place}=[place,draw=red!75,fill=red!20]
+		\tikzstyle{transition}=[rectangle,thick,draw=black!75,
+			fill=black!20,minimum size=4mm]
+
+		\tikzstyle{every label}=[red]
+		\tikzstyle{weight}=[rectangle,draw=black!75,minimum size=5mm]
+
+		\node [place, fill=red!30] (SE) {SE};
+		\node [place, below=1cm of SE] (SF) {SF};
+		\node [place, fill=green!30, below=1cm of SF] (SD) {SD};
+		\node [place, fill=orange!30, below right=.75cm and 4cm of SD] (GET) {GET};
+		\node [place, fill=orange!30, above=1cm of GET] (GEF) {GEF};
+		\node [place, fill=orange!30, right=2cm of GEF] (REO) {RE Out};
+		\node [place, fill=yellow!30, above right=.75cm and 4cm of SE] (GDT) {GDT};
+		\node [place, fill=yellow!30, below=1cm of GDT] (GDF) {GDF};
+		\node [place, fill=yellow!30, right=2cm of GDF] (RDO) {RD Out};
+		\node [weight, fill=blue!30, left=1cm of GEF] (w9) {w9}
+			edge [thick] (SF)
+			edge [post,thick] (GEF);
+		\node [weight, fill=green!30, below=.2cm of w9] (w2) {w2}
+			edge [thick] (SD)
+			edge [post,thick] (GEF);
+		\node [weight, fill=green!30, left=1cm of GET] (w3) {w3}
+			edge [thick] (SD)
+			edge [post,thick] (GET);
+		\node [weight, fill=red!30, above=.2cm of w9] (w4) {w4}
+			edge [thick] (SE)
+			edge [post,thick] (GEF);
+		\node [weight, fill=red!30, left=1cm of GDT] (w6) {w6}
+			edge [thick] (SE)
+			edge [post,thick] (GDT);
+		\node [weight, fill=blue!30, left=1cm of GDF] (w7) {w7}
+			edge [thick] (SF)
+			edge [post,thick] (GDF);
+		\node [weight, fill=green!30, below=.2cm of w7] (w1) {w1}
+			edge [thick] (SD)
+			edge [post,thick] (GDF);
+		\node [weight, fill=red!30, above=.2cm of w7] (w5) {w5}
+			edge [thick] (SE)
+			edge [post,thick] (GDF);
+		\node [weight, fill=blue!30, below=.2cm of w6] (w8) {w8}
+			edge [thick] (SF)
+			edge [post,thick] (GDT);
+		\node [weight, fill=blue!30, above=.2cm of w3] (w10) {w10}
+			edge [thick] (SF)
+			edge [post,thick] (GET);
+		\node [weight, fill=yellow!30, left=.5cm of RDO] (w11) {w11}
+			edge [thick] (GDF)
+			edge [post,thick] (RDO);
+		\node [weight, fill=yellow!30, above=.5cm of w11] (w12) {w12}
+			edge [thick] (GDT)
+			edge [post,thick] (RDO);
+		\node [weight, fill=orange!30, left=.5cm of REO] (w13) {w13}
+			edge [thick] (GEF)
+			edge [post,thick] (REO);
+		\node [weight, fill=orange!30, below=.5cm of w13] (w14) {w14}
+			edge [thick] (GET)
+			edge [post,thick] (REO);
+	\end{tikzpicture}
+	\caption[ED-FCM proposto]{ED-FCM proposto.}
+	\fonte{Autoria própria.}
+	\label{fig:fcm-proposto}
+\end{figure}
+
+Para modificar o valor dos pesos em tempo de execução, introduziu-se ao sistema um conceito de estado que influencia os pesos de todas as relações causais. Os estados que o ED-FCM proposto pode assumir são ``FRENTE"~ e ``TRÁS", sendo que os pesos das relações causais quando o ED-FCM estiver no primeiro estado estão de acordo com a tabela \ref{tab:fcm-relacoes-frente} e os pesos no segundo estado, com a tabela \ref{tab:fcm-relacoes-tras}. O valor numérico das intensidades das relações causais estão de acordo com a tabela \ref{tab:pesos}.
+
+\begin{table}[htb!]
+	\centering
+	\caption[Relações causais do controlador ED-FCM proposto (Estado = FRENTE)]{Relações causais do controlador ED-FCM proposto (Estado = FRENTE).}		 
+	\begin{tabular}[H]{ l l l l }
+	  \hline
+	  Relação causal & Descrição & Efeito & Intensidade \\
+	  \hline
+		$w_1$ & SD influencia GDF & Positivo & Forte \\
+		$w_2$ & SD influencia GEF & Positivo & Fraca \\
+		$w_3$ & SD influencia GET & Positivo & Média \\
+		
+		$w_4$ & SE influencia GEF & Positivo & Forte \\
+		$w_5$ & SE influencia GDF & Positivo & Fraca \\
+		$w_6$ & SE influencia GDT & Positivo & Média \\
+		
+		$w_7$ & SF influencia GDF & Negativo & Média \\
+		$w_8$ & SF influencia GDT & Positivo & Forte \\
+		$w_9$ & SF influencia GEF & Negativo & Média \\
+		$w_{10}$ & SF influencia GET & Positivo & Fraca \\
+		
+		$w_{11}$ & GDF influencia RD Out & Positivo & Forte \\
+		$w_{12}$ & GDT influencia RD Out & Negativo & Média \\
+		$w_{13}$ & GEF influencia RE Out & Positivo & Forte \\
+		$w_{14}$ & GET influencia RE Out & Negativo & Média \\
+	  \hline  	
+	\end{tabular}
+	\label{tab:fcm-relacoes-frente}
+\end{table}
+
+\begin{table}[htb!]
+	\centering
+	\caption[Relações causais do controlador ED-FCM proposto (Estado = TRÁS)]{Relações causais do controlador ED-FCM proposto (Estado = TRÁS).}		
+	\begin{tabular}[H]{ l l l l }
+	  \hline
+	  Relação causal & Descrição & Efeito & Intensidade \\
+	  \hline
+		$w_1$ & SD influencia GDF & Positivo & Fraca \\
+		$w_2$ & SD influencia GEF & Positivo & Fraca \\
+		$w_3$ & SD influencia GET & Positivo & Forte \\
+		
+		$w_4$ & SE influencia GEF & Positivo & Fraca \\
+		$w_5$ & SE influencia GDF & Positivo & Fraca \\
+		$w_6$ & SE influencia GDT & Positivo & Forte \\
+		
+		$w_7$ & SF influencia GDF & Negativo & Fraca \\
+		$w_8$ & SF influencia GDT & Positivo & Média \\
+		$w_9$ & SF influencia GEF & Negativo & Média \\
+		$w_{10}$ & SF influencia GET & Positivo & Fraca \\
+		
+		$w_{11}$ & GDF influencia RD Out & Positivo & Fraca \\
+		$w_{12}$ & GDT influencia RD Out & Negativo & Forte \\
+		$w_{13}$ & GEF influencia RE Out & Positivo & Forte \\
+		$w_{14}$ & GET influencia RE Out & Negativo & Fraca \\
+	  \hline  	
+	\end{tabular}
+	\label{tab:fcm-relacoes-tras}
+\end{table}
+
+\begin{table}[htb!]
+	\centering
+	\caption[Valor numérico dos pesos]{Valor numérico dos pesos.}		
+	\begin{tabular}[H]{ l l l l }
+	  \hline
+	  Intensidade & Valor numérico \\
+	  \hline
+		FRACA & 0,125 \\
+		MÉDIA & 0,5 \\
+		FORTE & 1,0 \\
+	  \hline  	
+	\end{tabular}
+	\label{tab:pesos}
+\end{table}
+
+A transição de estado é feita através de uma regra ``SE-ENTÃO"~, sendo que os valores de L0 e L1 estão de acordo com a tabela \ref{tab:limiar-values}.
+
+\begin{itemize}
+\item SE o conceito SF for menor que o limiar L0 e o estado for igual a FRENTE ENTÃO o estado muda para TRÁS.
+\item SENÃO SE o conceito SF for maior que o limiar L1 e o estado for igual a TRÁS ENTÃO o estado muda para FRENTE.
+\end{itemize}
+
+\begin{table}[htb!]
+	\centering
+	\caption[Valor numérico dos limiares L0 e L1]{Valor numérico dos limiares L0 e L1.}		
+	\begin{tabular}[H]{ l l l l }
+	  \hline
+	  Limiar & Valor numérico \\
+	  \hline
+		L0 & 0,15 \\
+		L1 & 0,25 \\
+	  \hline  	
+	\end{tabular}
+	\label{tab:limiar-values}
+\end{table}
+
+\subsubsection{Ativação dos Conceitos}
+
+As equações \ref{eq:gdf} a \ref{eq:get} determinam a ativação dos conceitos de nível GDF, GDT, GEF e GET, respectivamente. Essa ativação é gradual e herda a característica de suavidade das funções sigmoidais \ref{eq:sig_frente} e \ref{eq:sig_tras}. Os conceitos de saída $RD_{Out}$ e $RE_{Out}$ são uma média ponderada entre os conceitos ``girar para frente"~ e ``girar para trás", aplicada às rodas direita e esquerda, conforme as equações \ref{eq:rd_out} e \ref{eq:re_out}, respectivamente.
+
+\begin{equation}
+\label{eq:gdf}
+GDF=\frac {w_1f_2(SD)+w_5f_1(SE)-w_7f_2(SF)} {w_1+w_5}
+\end{equation}
+
+\begin{equation}
+\label{eq:gdt}
+GDT=\frac {w_6f_2(SE)+w_8f_2(SF)} {w_6+w_8}
+\end{equation}
+
+\begin{equation}
+\label{eq:gef}
+GEF=\frac {w_4f_2(SE)+w_2f_1(SD)-w_9f_2(SF)} {w_4+w_2}
+\end{equation}
+
+\begin{equation}
+\label{eq:get}
+GET=\frac {w_3f_2(SD)+w_{10}f_2(SF)} {w_3+w_{10}}
+\end{equation}
+
+\begin{equation}
+\label{eq:rd_out}
+RD_{Out}=100 \times \frac {w_{11}GDF-w_{12}GDT} {FORTE}
+\end{equation}
+
+\begin{equation}
+\label{eq:re_out}
+RD_{Out}=100 \times \frac {w_{13}GEF-w_{14}GET} {FORTE}
+\end{equation}
+
+\subsubsection{Considerações}
+
+O ED-FCM projetado ofereceu a capacidade de o robô desviar obstáculos posicionados à direita, à esquerda e à frente do mesmo. Conforme será descrito na seção de testes, seção \ref{sec:testes}, esse algoritmo possibilitou ao robô navegar de forma autônoma recebendo como entrada as leituras dos sensores. Contudo, a versão final do ED-FCM foi obtida após diversos testes, nos quais erros de navegação foram encontrados, isolados e corrigidos repetidas vezes. Nesse processo, os pesos das relações causais foram modificados até chegarem aos valores das tabelas \ref{tab:fcm-relacoes-frente} e \ref{tab:fcm-relacoes-tras}. A necessidade de implementação de um ED-FCM com evento surgiu durante a execução de um experimento dos testes avançados, como é descrito na seção \ref{sec:testesavan}. O evento foi implementado para resolver especificamente aquele problema de indecisão. Com isso, a versão final do projeto de ED-FCM apresentada nessa seção foi capaz de resolver os problemas propostos nos experimentos dos testes comparativos, seção \ref{sec:testescomp}, gerando resultados adequados para a comparação com o algoritmo \emph{fuzzy}, apresentado na seção \ref{sec:algfuzzy}.
+
+\input{testesresultados}
+
+

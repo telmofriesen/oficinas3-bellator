@@ -1,0 +1,67 @@
+% ---------- Preambulo ----------
+\instituicao{Universidade Tecnológica Federal do Paraná} % nome da instituicao
+\departamento{Departamento Acadêmico de Informática} % nome do departamento
+\programa{Bacharelado em Engenharia de Computação} % nome do curso
+
+\documento{Trabalho de Conclusão de Curso} % [Trabalho de Conclus\~ao de Curso] ou [Relat\'orio de Est\'agio]
+\titulacao{Engenheiro} % [T\'ecnico], [Tecn\'ologo] ou [Engenheiro]
+
+\titulo{Desenvolvimento de Robô Móvel e Análise Qualitativa de Algoritmos de Navegação Fuzzy} % titulo do trabalho em portugues
+\title{Mobile Robot Development and Qualitative Analysis of Fuzzy Navigation Algorithms} % titulo do trabalho em ingles
+
+\autor{Alexandre Jacques Marin} % primeiro autor do trabalho
+\autordois{Júlio Cesar Nardelli Borges} % segundo autor do trabalho, caso exista
+\autortres{Yuri Antin Wergrzn} % terceiro autor do trabalho, caso exista
+%\autorquatro{Nome do Quarto Autor} % quarto autor do trabalho, caso exista
+\cita{MARIN, Alexandre; BORGES, Júlio; WERGRZN, Yuri } % sobrenome (maiusculas) e nome do(s) autor(es) do trabalho, separados por ponto-e-virgula (ate quatro autores para TCC)
+
+\palavraschave{Navegação Robótica, Lógica Fuzzy, Robôs Autônomos, Mapas Cognitivos Fuzzy e Sistema de Controle} % palavras-chave do trabalho
+\keywords{Robotic Navigation, Fuzzy Logic, Autonomous Robots, Fuzzy Cognitive Maps and Control System} % palavras-chave do trabalho em ingles
+
+\comentario{\UTFPRdocumentodata\ apresentado ao \UTFPRdepartamentodata\ como requisito parcial para obten\c{c}\~ao do grau de \UTFPRtitulacaodata\ no \UTFPRprogramadata\ da \ABNTinstituicaodata.}
+
+\orientador{João Alberto Fabro} % nome do orientador do trabalho
+%\orientador[Orientadora:]{Nome da Orientadora} % <- no caso de orientadora, usar esta sintaxe
+\coorientador{Heitor Silvério Lopes} % nome do co-orientador do trabalho, caso exista
+%\coorientador[Co-orientadora:]{Nome da Co-orientadora} % <- no caso de co-orientadora, usar esta sintaxe
+
+\local{Curitiba} % cidade
+\data{2012} % ano
+%---------- Inicio do Documento ----------
+\begin{document}
+
+\capa % geracao automatica da capa
+\folhaderosto % geracao automatica da folha de rosto
+%\termodeaprovacao % <- ainda a ser implementado corretamente
+
+% agradecimentos (opcional)
+\begin{agradecimentos}
+Agradecemos à Universidade Tecnológica Federal do Paraná, Campus de Curitiba, especialmente ao nosso
+orientador, professor João Alberto Fabro, do Departamento Acadêmico de Informática (DAINF), por ter
+proposto o tema desse trabalho, pela orientação, acompanhamento das atividades e pelo empenho em
+disponibilizar os materiais para a sua execução. Agradecemos também ao professor Heitor
+Silvério Lopes, do Departamento Acadêmico de Eletrônica (DAELN), por ter fornecido à equipe o robô
+Bellator e ao professor Márcio Mendonça, do Campus da UTFPR de Cornélio Procópio, cuja tese de
+doutorado nos inspirou a utilizar a abordagem ED-FCM. Finalmente, agradecemos aos nossos pais pelo
+amor e dedicação ao nos darem a oportunidade de cursar Engenharia de Computação.
+\end{agradecimentos}
+
+%resumo
+\begin{resumo}
+
+Este documento apresenta uma descrição completa da reconstrução de uma plataforma robótica, elaboração e testes de dois algoritmos de navegação autônomos para a mesma, visando analisar e comparar o comportamento da abordagem ED-FCM, em inglês \emph{Event-Driven Fuzzy Cognitive Maps}, para navegação robótica, com relação a um controle baseado em lógica \emph{Fuzzy} clássica. Foram descritas todas as etapas de reconstrução da plataforma robótica, juntamente com a documentação necessária para utilização futura de tal. Também é apresentada toda fundamentação teórica necessária para o entendimento de ambos os algoritmos de navegação avaliados, bem como a descrição de todo o processo de implementação, teste e comparação dos algoritmos.
+\end{resumo}
+
+%abstract
+\begin{abstract}
+This document presents a complete description of the reconstruction of a robotic platform, in addition to the development and test of two autonomous navigation algorithms for it, aiming to analyze and compare the behavior of the ED-FCM approach to robotic navigation (Event-Driven Fuzzy Cognitive Maps) against a classic Fuzzy logic based navigation. In this document, all steps of the reconstruction of the robotic platform, including all needed documentation for any future use, are described. Additionally, all theoretical knowledge necessary to understand both navigation algorithms is provided, together with all description of the implementation, test and comparison of the algorithms.
+\end{abstract}
+
+% listas (opcionais, mas recomenda-se a partir de 5 elementos)
+\listadefiguras % geracao automatica da lista de figuras
+\listadetabelas % geracao automatica da lista de tabelas
+%\listadesiglas % geracao automatica da lista de siglas
+%\listadesimbolos % geracao automatica da lista de simbolos
+
+% sumario
+\sumario % geracao automatica do sumario
