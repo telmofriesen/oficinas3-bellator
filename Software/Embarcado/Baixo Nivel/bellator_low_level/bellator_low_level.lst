@@ -1,0 +1,2389 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 2
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 18, 4
+  11              		.file	"bellator_low_level.c"
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.align	2
+  23              	ua_outchar:
+  24              		.fnstart
+  25              	.LFB1:
+  26              		.file 1 "logger.c"
+   1:logger.c      **** /*
+   2:logger.c      ****  * logger.c
+   3:logger.c      ****  *
+   4:logger.c      ****  *  Created on: Jul 14, 2009
+   5:logger.c      ****  *      Author: telmo
+   6:logger.c      ****  */
+   7:logger.c      **** #include "lpc2103.h"
+   8:logger.c      **** #include "logger.h"
+   9:logger.c      **** 
+  10:logger.c      **** /**
+  11:logger.c      ****  * Start logger using UART0
+  12:logger.c      ****  * 8N1 (8 data, Non parity, 1 stop)
+  13:logger.c      ****  * 115200 bps
+  14:logger.c      ****  *
+  15:logger.c      ****  * UARTn_baudrate = PCLK / ( 16 * ( 256 * UnDLM + UnDLL) * ( 1 + DivAddVal/MulVal))
+  16:logger.c      ****  * ou UARTn_baudrate = PCLK / ( 16 * ( 256 * UnDLM + UnDLL))
+  17:logger.c      ****  * 115131 = 15MHz / ( 16 * ( 256*0 + 6) * ( 1 + 5/14) )
+  18:logger.c      ****  * 115200 = 14.7456MHz / ( 16 * ( 256*0 + 8) )
+  19:logger.c      ****  *
+  20:logger.c      ****  */
+  21:logger.c      **** void logger_init(void){ // using UART0
+  22:logger.c      **** 	PINSEL0 |= 0x05; // Set the pins function
+  23:logger.c      **** 	U0FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable
+  24:logger.c      **** 	U0LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+  25:logger.c      **** 
+  26:logger.c      **** #ifdef CRYSTAL12MHz
+  27:logger.c      **** 	U0DLL	 = 0x06; // DivisorLatchLow bit
+  28:logger.c      **** 	U0DLM	 = 0x00; // DivisorLatchHigh bit
+  29:logger.c      **** 	U0FDR	|= 0x05; // DivAddVal
+  30:logger.c      **** 	U0FDR	|= 0x0E << 4; // MulVal = 14
+  31:logger.c      **** #endif
+  32:logger.c      **** #ifdef CRYSTAL14.7456MHz
+  33:logger.c      **** 	U0DLL	 = 0x08; // DivisorLatchLow bit
+  34:logger.c      **** 	U0DLM	 = 0x00; // DivisorLatchHigh bit
+  35:logger.c      **** #endif
+  36:logger.c      **** 
+  37:logger.c      **** 	U0LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+  38:logger.c      **** }
+  39:logger.c      **** 
+  40:logger.c      **** static void ua_outchar(char c){
+  27              		.loc 1 40 0
+  28              		.cfi_startproc
+  29              		@ Function supports interworking.
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  41:logger.c      **** 	U0THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
+  34              		.loc 1 41 0
+  35 0000 10309FE5 		ldr	r3, .L3
+  36 0004 0000C3E5 		strb	r0, [r3, #0]
+  37              	.L2:
+  42:logger.c      **** 	while(!(U0LSR & 0x40));
+  38              		.loc 1 42 0 discriminator 1
+  39 0008 1420D3E5 		ldrb	r2, [r3, #20]	@ zero_extendqisi2
+  40 000c 400012E3 		tst	r2, #64
+  41 0010 FCFFFF0A 		beq	.L2
+  43:logger.c      **** }
+  42              		.loc 1 43 0
+  43 0014 1EFF2FE1 		bx	lr
+  44              	.L4:
+  45              		.align	2
+  46              	.L3:
+  47 0018 00C000E0 		.word	-536821760
+  48              		.cfi_endproc
+  49              	.LFE1:
+  50              		.fnend
+  52              		.align	2
+  53              		.global	protocol_in
+  55              	protocol_in:
+  56              		.fnstart
+  57              	.LFB20:
+  58              		.file 2 "bellator_low_level.c"
+   1:bellator_low_level.c **** /**
+   2:bellator_low_level.c ****  * TODO: Usar TCON para fazer o gerenciamento do consumo
+   3:bellator_low_level.c ****  *
+   4:bellator_low_level.c ****  *
+   5:bellator_low_level.c ****  */
+   6:bellator_low_level.c **** #include "lpc2103.h"
+   7:bellator_low_level.c **** #include "logger.h"
+   8:bellator_low_level.c **** #include "logger.c"
+   9:bellator_low_level.c **** #include "irq.h"
+  10:bellator_low_level.c **** #include "irq.c"
+  11:bellator_low_level.c **** 
+  12:bellator_low_level.c **** 
+  13:bellator_low_level.c **** #define CRYSTAL12MHz
+  14:bellator_low_level.c **** //#define CRYSTAL14.7456MHz
+  15:bellator_low_level.c **** #define CMD_BUFF_SIZE 16 // must be a power of 2
+  16:bellator_low_level.c **** 
+  17:bellator_low_level.c **** void __attribute__ ((interrupt("IRQ"))) pwm_in_handler(void);
+  18:bellator_low_level.c **** void __attribute__ ((interrupt("IRQ"))) protocol_in(void);
+  19:bellator_low_level.c **** void __attribute__ ((interrupt("FIQ"))) update_position(void);
+  20:bellator_low_level.c **** void __attribute__ ((interrupt("IRQ"))) error(void);
+  21:bellator_low_level.c **** //para dizer ao compilador que é um handler para que ele retorne de onde parrou quando ocorreu a i
+  22:bellator_low_level.c **** 
+  23:bellator_low_level.c **** inline void PLL_Init(void);
+  24:bellator_low_level.c **** inline void MAM_Init(void);
+  25:bellator_low_level.c **** inline void APB_Init(void);
+  26:bellator_low_level.c **** 
+  27:bellator_low_level.c **** inline void protocol_init();
+  28:bellator_low_level.c **** int com_getchar (void);
+  29:bellator_low_level.c **** int com_putchar (int c);
+  30:bellator_low_level.c **** 
+  31:bellator_low_level.c **** inline void pwm_in_init(void);
+  32:bellator_low_level.c **** inline void pwm_out_init(void);
+  33:bellator_low_level.c **** static void Delay(short max);
+  34:bellator_low_level.c **** 
+  35:bellator_low_level.c **** inline void positioning_init(void);
+  36:bellator_low_level.c **** static inline int ADC0_Read(void);
+  37:bellator_low_level.c **** static inline int ADC1_Read(void);
+  38:bellator_low_level.c **** int CalibrateGyroX(void);
+  39:bellator_low_level.c **** int CalibrateGyroY(void);
+  40:bellator_low_level.c **** 
+  41:bellator_low_level.c **** short pwm0in, pwm1in, tmp0, tmp1, pwm0out = 500, pwm1out = 500, calcountx = 256, calcounty = 256, c
+  42:bellator_low_level.c **** int calx, caly, calpx = 0, calpy = 0, vposx, vposy, diffx, diffy;
+  43:bellator_low_level.c **** int velx = 0, vely = 0, posx = 0, posy = 0;
+  44:bellator_low_level.c **** 
+  45:bellator_low_level.c **** 
+  46:bellator_low_level.c **** struct cmd_buff {
+  47:bellator_low_level.c ****   unsigned int in;          // Next In Index
+  48:bellator_low_level.c ****   unsigned int out;         // Next Out Index
+  49:bellator_low_level.c ****   char buff [CMD_BUFF_SIZE];      // Circular Buffer
+  50:bellator_low_level.c **** };
+  51:bellator_low_level.c **** static struct cmd_buff cmd_out = { 0, 0, };
+  52:bellator_low_level.c **** static struct cmd_buff cmd_in = { 0, 0, };
+  53:bellator_low_level.c **** static unsigned int tx_restart = 1;
+  54:bellator_low_level.c **** 
+  55:bellator_low_level.c **** int main(void){
+  56:bellator_low_level.c **** 
+  57:bellator_low_level.c **** 	PLL_Init(); // Turn on PLL clock
+  58:bellator_low_level.c **** 	MAM_Init(); // Turn on MAM pre-fetcher
+  59:bellator_low_level.c **** 	APB_Init(); // Turn on the peripheral devices clock divider
+  60:bellator_low_level.c **** 
+  61:bellator_low_level.c **** 	logger_init();
+  62:bellator_low_level.c **** 	log_string("iniciando\n");
+  63:bellator_low_level.c **** 
+  64:bellator_low_level.c **** 	enableIRQ();
+  65:bellator_low_level.c **** 
+  66:bellator_low_level.c **** 	protocol_init();
+  67:bellator_low_level.c **** 
+  68:bellator_low_level.c **** 	//pwm_in_init();
+  69:bellator_low_level.c **** 	//pwm_out_init();
+  70:bellator_low_level.c **** 
+  71:bellator_low_level.c **** 	//enableFIQ();
+  72:bellator_low_level.c **** 	//positioning_init();
+  73:bellator_low_level.c **** 
+  74:bellator_low_level.c **** 	VICDefVectAddr = (unsigned int) &error;
+  75:bellator_low_level.c **** 
+  76:bellator_low_level.c **** //	while(1){
+  77:bellator_low_level.c **** //		com_putchar('i');
+  78:bellator_low_level.c **** //		char c = com_getchar();
+  79:bellator_low_level.c **** //		com_putchar('c');
+  80:bellator_low_level.c **** //		com_putchar('=');
+  81:bellator_low_level.c **** //		com_putchar(c);
+  82:bellator_low_level.c **** //	}
+  83:bellator_low_level.c **** 	return 0;
+  84:bellator_low_level.c **** }
+  85:bellator_low_level.c **** 
+  86:bellator_low_level.c **** static void Delay(short max){
+  87:bellator_low_level.c **** 	for(volatile int i=0; i<max; i++)
+  88:bellator_low_level.c **** 		for(volatile int j=0; j<max; j++);
+  89:bellator_low_level.c **** }
+  90:bellator_low_level.c **** 
+  91:bellator_low_level.c **** /**
+  92:bellator_low_level.c ****  * Sets the processor clock
+  93:bellator_low_level.c ****  *
+  94:bellator_low_level.c ****  * Fosc = External oscilator =	12MHz | 14.7456MHz
+  95:bellator_low_level.c ****  * CCLK = PLL Clock output =	60MHz | 58.9824MHz  (desired system clock)
+  96:bellator_low_level.c ****  * MSEL = Clock multiplier =	4	  | 3			(MSEL = CCLK/Fosc -1)
+  97:bellator_low_level.c ****  * PSEL = Clock divider = 		1	  | 1			(P | 156MHz < Fcco < 320MHz, Fcco = CCLK * 2 * P)
+  98:bellator_low_level.c ****  * 													(P=1 -> PSEL=00, P=2 -> PSEL=01, P=4 -> PSEL=10, P=8 -> PSEL=11)
+  99:bellator_low_level.c ****  */
+ 100:bellator_low_level.c **** inline void PLL_Init(void){
+ 101:bellator_low_level.c **** 
+ 102:bellator_low_level.c **** #ifdef CRYSTAL12MHz
+ 103:bellator_low_level.c **** 	PLLCFG=0x24;                // 12MHz crystal      -> 60MHz
+ 104:bellator_low_level.c **** #endif
+ 105:bellator_low_level.c **** #ifdef CRYSTAL14.7456MHz
+ 106:bellator_low_level.c **** 	PLLCFG=0x23;                // 14.7456MHz crystal -> 58.9824MHz
+ 107:bellator_low_level.c **** #endif
+ 108:bellator_low_level.c **** 
+ 109:bellator_low_level.c **** 	PLLCON=0x1;                 //PLLE = 1, PLLEnable
+ 110:bellator_low_level.c **** 	PLLFEED=0xAA;               // Validation sequence
+ 111:bellator_low_level.c **** 	PLLFEED=0x55;               // Validation sequence
+ 112:bellator_low_level.c **** 	while(!(PLLSTAT & 0x400)); // Wait PLL to lock
+ 113:bellator_low_level.c **** 	PLLCON=0x3;                 // PLLC = 1, PLLConnect, Assert the PLL to be the cclk
+ 114:bellator_low_level.c **** 	PLLFEED=0xAA;               // Validation sequence
+ 115:bellator_low_level.c **** 	PLLFEED=0x55;               // Validation sequence
+ 116:bellator_low_level.c **** }
+ 117:bellator_low_level.c **** 
+ 118:bellator_low_level.c **** /**
+ 119:bellator_low_level.c ****  * Starts the Memory Acceleration Module
+ 120:bellator_low_level.c ****  * System clock
+ 121:bellator_low_level.c ****  * < 20MHz         -> MAMTIM = 1 CCLK
+ 122:bellator_low_level.c ****  * 20MHz to 40MHz  -> MAMTIM = 2 CCLK
+ 123:bellator_low_level.c ****  * 40MHz to 60MHz  -> MAMTIM = 3 CCLK
+ 124:bellator_low_level.c ****  * > 60MHz         -> MAMTIM = 4 CCLK
+ 125:bellator_low_level.c ****  */
+ 126:bellator_low_level.c **** inline void MAM_Init(void){
+ 127:bellator_low_level.c **** 
+ 128:bellator_low_level.c **** #ifdef CRYSTAL12MHz
+ 129:bellator_low_level.c **** 	MAMTIM = 4; // 4 clock fetches
+ 130:bellator_low_level.c **** #endif
+ 131:bellator_low_level.c **** #ifdef CRYSTAL14.7456MHz
+ 132:bellator_low_level.c **** 	MAMTIM = 3; // 3 clock fetches
+ 133:bellator_low_level.c **** #endif
+ 134:bellator_low_level.c **** 	MAMCR = 2;	// MAM functions fully enabled
+ 135:bellator_low_level.c **** }
+ 136:bellator_low_level.c **** 
+ 137:bellator_low_level.c **** /**
+ 138:bellator_low_level.c ****  * Configure the peripheral devices clock divider
+ 139:bellator_low_level.c ****  */
+ 140:bellator_low_level.c **** inline void APB_Init(void){
+ 141:bellator_low_level.c **** 	// peripheral clock = PCLK = CCLK/4
+ 142:bellator_low_level.c **** 	//APBDIV |= 0x02;
+ 143:bellator_low_level.c **** 	APBDIV &= ~0x03;
+ 144:bellator_low_level.c **** }
+ 145:bellator_low_level.c **** 
+ 146:bellator_low_level.c **** /**
+ 147:bellator_low_level.c ****  * Set up the protocol using UART1 to communicate with TS-7260
+ 148:bellator_low_level.c ****  *
+ 149:bellator_low_level.c ****  * 8N1 (8 data, Non parity, 1 stop)
+ 150:bellator_low_level.c ****  * 115200 bps
+ 151:bellator_low_level.c ****  *
+ 152:bellator_low_level.c ****  * UARTn_baudrate = PCLK / ( 16 * ( 256 * UnDLM + UnDLL) * ( 1 + DivAddVal/MulVal))
+ 153:bellator_low_level.c ****  * ou UARTn_baudrate = PCLK / ( 16 * ( 256 * UnDLM + UnDLL))
+ 154:bellator_low_level.c ****  * 115131 = 15MHz / ( 16 * ( 256*0 + 6) * ( 1 + 5/14) )
+ 155:bellator_low_level.c ****  * 115200 = 14.7456MHz / ( 16 * ( 256*0 + 8) )
+ 156:bellator_low_level.c ****  *
+ 157:bellator_low_level.c ****  * Set UART1 interrupt to the third slot in the vectored interrupts.
+ 158:bellator_low_level.c ****  */
+ 159:bellator_low_level.c **** inline void protocol_init(void){
+ 160:bellator_low_level.c **** 	volatile char dummy;
+ 161:bellator_low_level.c **** 
+ 162:bellator_low_level.c **** 	PINSEL0 |= 0x05 << 16; // Set the pins function
+ 163:bellator_low_level.c **** 	U1FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable, Rx trigger = 1
+ 164:bellator_low_level.c **** 	U1LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+ 165:bellator_low_level.c **** 
+ 166:bellator_low_level.c **** #ifdef CRYSTAL12MHz
+ 167:bellator_low_level.c **** 	U1DLL	 = 0x06; // DivisorLatchLow bit
+ 168:bellator_low_level.c **** 	U1DLM	 = 0x00; // DivisorLatchHigh bit
+ 169:bellator_low_level.c **** 	U1FDR	|= 0x05; // DivAddVal
+ 170:bellator_low_level.c **** 	U1FDR	|= 0x0E << 4; // MulVal = 14
+ 171:bellator_low_level.c **** #endif
+ 172:bellator_low_level.c **** #ifdef CRYSTAL14.7456MHz
+ 173:bellator_low_level.c **** 	U1DLL	 = 0x08; // DivisorLatchLow bit
+ 174:bellator_low_level.c **** 	U1DLM	 = 0x00; // DivisorLatchHigh bit
+ 175:bellator_low_level.c **** #endif
+ 176:bellator_low_level.c **** 
+ 177:bellator_low_level.c **** 	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+ 178:bellator_low_level.c **** 
+ 179:bellator_low_level.c **** 	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the first 
+ 180:bellator_low_level.c **** 	VICVectCntl2 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
+ 181:bellator_low_level.c **** 	VICIntEnable |= 0x00000080; //source #7 enabled as FIQ or IRQ
+ 182:bellator_low_level.c **** 
+ 183:bellator_low_level.c **** 	cmd_out.in = 0;
+ 184:bellator_low_level.c **** 	cmd_out.out = 0;
+ 185:bellator_low_level.c **** 	tx_restart = 1;
+ 186:bellator_low_level.c **** 
+ 187:bellator_low_level.c **** 	cmd_in.in = 0;
+ 188:bellator_low_level.c **** 	cmd_in.out = 0;
+ 189:bellator_low_level.c **** 
+ 190:bellator_low_level.c **** 	dummy = U1IIR;   // Read IrqID - Required to Get Interrupts Started
+ 191:bellator_low_level.c **** 	U1IER = 3;       // Enable UART1 RX and THRE Interrupts
+ 192:bellator_low_level.c **** }
+ 193:bellator_low_level.c **** 
+ 194:bellator_low_level.c **** void protocol_in(void){
+  59              		.loc 2 194 0
+  60              		.cfi_startproc
+  61              		@ Interrupt Service Routine.
+  62              		@ args = 0, pretend = 0, frame = 8
+  63              		@ frame_needed = 0, uses_anonymous_args = 0
+  64              		@ link register save eliminated.
+  65 001c 7F102DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, r5, r6, ip}
+  66              		.save {r0, r1, r2, r3, r4, r5, r6, ip}
+  67              	.LCFI0:
+  68              		.cfi_def_cfa_offset 32
+ 195:bellator_low_level.c **** 	volatile char dummy;
+ 196:bellator_low_level.c **** 	volatile char iir;
+ 197:bellator_low_level.c **** 	struct cmd_buff *cmd;
+ 198:bellator_low_level.c **** 
+ 199:bellator_low_level.c **** 	// Repeat while there is at least one interrupt source.
+ 200:bellator_low_level.c **** 	while (((iir = U1IIR) & 0x01) == 0) {
+ 201:bellator_low_level.c **** 		switch (iir & 0x0E) {
+ 202:bellator_low_level.c **** 		case 0x06: // Receive Line Status
+ 203:bellator_low_level.c **** 			dummy = U1LSR; // Just clear the interrupt source
+ 204:bellator_low_level.c **** 			break;
+ 205:bellator_low_level.c **** 
+ 206:bellator_low_level.c **** 		case 0x04: // Receive Data Available
+ 207:bellator_low_level.c **** 		case 0x0C: // Character Time-Out
+ 208:bellator_low_level.c **** 			cmd = &cmd_in;
+ 209:bellator_low_level.c **** 
+ 210:bellator_low_level.c **** 			if (((cmd->in - cmd->out) & ~(CMD_BUFF_SIZE - 1)) == 0) {
+  69              		.loc 2 210 0
+  70 0020 14319FE5 		ldr	r3, .L18
+  71              		.cfi_offset 12, -4
+  72              		.cfi_offset 6, -8
+  73              		.cfi_offset 5, -12
+  74              		.cfi_offset 4, -16
+  75              		.cfi_offset 3, -20
+  76              		.cfi_offset 2, -24
+  77              		.cfi_offset 1, -28
+  78              		.cfi_offset 0, -32
+ 211:bellator_low_level.c **** 				cmd->buff[cmd->in & (CMD_BUFF_SIZE - 1)] = U1RBR;
+ 212:bellator_low_level.c **** 				cmd->in++;
+ 213:bellator_low_level.c **** 			}
+ 214:bellator_low_level.c **** 			break;
+ 215:bellator_low_level.c **** 
+ 216:bellator_low_level.c **** 		case 0x02: // THRE Interrupt, transmit interrupt
+ 217:bellator_low_level.c **** 			cmd = &cmd_out;
+ 218:bellator_low_level.c **** 
+ 219:bellator_low_level.c **** 			if (cmd->in != cmd->out) {
+  79              		.loc 2 219 0
+  80 0024 14119FE5 		ldr	r1, .L18+4
+ 210:bellator_low_level.c **** 			if (((cmd->in - cmd->out) & ~(CMD_BUFF_SIZE - 1)) == 0) {
+  81              		.loc 2 210 0
+  82 0028 045093E5 		ldr	r5, [r3, #4]
+  83              		.loc 2 219 0
+  84 002c 18C093E5 		ldr	ip, [r3, #24]
+  85 0030 002093E5 		ldr	r2, [r3, #0]
+ 194:bellator_low_level.c **** void protocol_in(void){
+  86              		.loc 2 194 0
+  87              		.pad #8
+  88 0034 08D04DE2 		sub	sp, sp, #8
+  89              	.LCFI1:
+  90              		.cfi_def_cfa_offset 40
+  91              		.loc 2 219 0
+  92 0038 1C3093E5 		ldr	r3, [r3, #28]
+  93 003c 000091E5 		ldr	r0, [r1, #0]
+ 200:bellator_low_level.c **** 	while (((iir = U1IIR) & 0x01) == 0) {
+  94              		.loc 2 200 0
+  95 0040 2C0000EA 		b	.L16
+  96              	.LVL1:
+  97              	.L13:
+ 201:bellator_low_level.c **** 		switch (iir & 0x0E) {
+  98              		.loc 2 201 0
+  99 0044 0640DDE5 		ldrb	r4, [sp, #6]	@ zero_extendqisi2
+ 100 0048 0E4004E2 		and	r4, r4, #14
+ 101              	.LVL2:
+ 102 004c 0C0054E3 		cmp	r4, #12
+ 103 0050 04F19F97 		ldrls	pc, [pc, r4, asl #2]
+ 104 0054 270000EA 		b	.L16
+ 105              	.L12:
+ 106 0058 F0000000 		.word	.L8
+ 107 005c F8000000 		.word	.L16
+ 108 0060 BC000000 		.word	.L9
+ 109 0064 F8000000 		.word	.L16
+ 110 0068 94000000 		.word	.L10
+ 111 006c F8000000 		.word	.L16
+ 112 0070 8C000000 		.word	.L11
+ 113 0074 F8000000 		.word	.L16
+ 114 0078 F8000000 		.word	.L16
+ 115 007c F8000000 		.word	.L16
+ 116 0080 F8000000 		.word	.L16
+ 117 0084 F8000000 		.word	.L16
+ 118 0088 94000000 		.word	.L10
+ 119              	.L11:
+ 203:bellator_low_level.c **** 			dummy = U1LSR; // Just clear the interrupt source
+ 120              		.loc 2 203 0
+ 121 008c 1410D1E5 		ldrb	r1, [r1, #20]	@ zero_extendqisi2
+ 122 0090 170000EA 		b	.L17
+ 123              	.L10:
+ 124              	.LVL3:
+ 210:bellator_low_level.c **** 			if (((cmd->in - cmd->out) & ~(CMD_BUFF_SIZE - 1)) == 0) {
+ 125              		.loc 2 210 0
+ 126 0094 024065E0 		rsb	r4, r5, r2
+ 127 0098 0F60D4E3 		bics	r6, r4, #15
+ 128 009c 1500001A 		bne	.L16
+ 211:bellator_low_level.c **** 				cmd->buff[cmd->in & (CMD_BUFF_SIZE - 1)] = U1RBR;
+ 129              		.loc 2 211 0
+ 130 00a0 94609FE5 		ldr	r6, .L18
+ 131 00a4 0040D1E5 		ldrb	r4, [r1, #0]	@ zero_extendqisi2
+ 132 00a8 0F1002E2 		and	r1, r2, #15
+ 133 00ac 011086E0 		add	r1, r6, r1
+ 134 00b0 0840C1E5 		strb	r4, [r1, #8]
+ 212:bellator_low_level.c **** 				cmd->in++;
+ 135              		.loc 2 212 0
+ 136 00b4 012082E2 		add	r2, r2, #1
+ 137 00b8 0E0000EA 		b	.L16
+ 138              	.LVL4:
+ 139              	.L9:
+ 140              		.loc 2 219 0
+ 141 00bc 03005CE1 		cmp	ip, r3
+ 142 00c0 0C30A001 		moveq	r3, ip
+ 220:bellator_low_level.c **** 				U1THR = cmd->buff[cmd->out & (CMD_BUFF_SIZE - 1)];
+ 221:bellator_low_level.c **** 				cmd->out++;
+ 222:bellator_low_level.c **** 				tx_restart = 0;
+ 223:bellator_low_level.c **** 			} else {
+ 224:bellator_low_level.c **** 				tx_restart = 1;
+ 143              		.loc 2 224 0
+ 144 00c4 0100A003 		moveq	r0, #1
+ 219:bellator_low_level.c **** 			if (cmd->in != cmd->out) {
+ 145              		.loc 2 219 0
+ 146 00c8 0A00000A 		beq	.L16
+ 220:bellator_low_level.c **** 				U1THR = cmd->buff[cmd->out & (CMD_BUFF_SIZE - 1)];
+ 147              		.loc 2 220 0
+ 148 00cc 68009FE5 		ldr	r0, .L18
+ 149 00d0 0F1003E2 		and	r1, r3, #15
+ 150 00d4 011080E0 		add	r1, r0, r1
+ 151 00d8 2000D1E5 		ldrb	r0, [r1, #32]	@ zero_extendqisi2
+ 152 00dc 60109FE5 		ldr	r1, .L18+8
+ 221:bellator_low_level.c **** 				cmd->out++;
+ 153              		.loc 2 221 0
+ 154 00e0 013083E2 		add	r3, r3, #1
+ 220:bellator_low_level.c **** 				U1THR = cmd->buff[cmd->out & (CMD_BUFF_SIZE - 1)];
+ 155              		.loc 2 220 0
+ 156 00e4 0000C1E5 		strb	r0, [r1, #0]
+ 222:bellator_low_level.c **** 				tx_restart = 0;
+ 157              		.loc 2 222 0
+ 158 00e8 0000A0E3 		mov	r0, #0
+ 159 00ec 010000EA 		b	.L16
+ 160              	.LVL5:
+ 161              	.L8:
+ 225:bellator_low_level.c **** 			}
+ 226:bellator_low_level.c **** 			break;
+ 227:bellator_low_level.c **** 		case 0x00: // Modem Interrupt
+ 228:bellator_low_level.c **** 			dummy = U1MSR; // Just clear the interrupt source
+ 162              		.loc 2 228 0
+ 163 00f0 1810D1E5 		ldrb	r1, [r1, #24]	@ zero_extendqisi2
+ 164              	.L17:
+ 165 00f4 0710CDE5 		strb	r1, [sp, #7]
+ 166              	.L16:
+ 200:bellator_low_level.c **** 	while (((iir = U1IIR) & 0x01) == 0) {
+ 167              		.loc 2 200 0 discriminator 1
+ 168 00f8 44109FE5 		ldr	r1, .L18+8
+ 169 00fc 0840D1E5 		ldrb	r4, [r1, #8]	@ zero_extendqisi2
+ 170              	.LVL6:
+ 171 0100 0640CDE5 		strb	r4, [sp, #6]
+ 172 0104 0640DDE5 		ldrb	r4, [sp, #6]	@ zero_extendqisi2
+ 173 0108 010014E3 		tst	r4, #1
+ 174 010c CCFFFF0A 		beq	.L13
+ 200:bellator_low_level.c **** 	while (((iir = U1IIR) & 0x01) == 0) {
+ 175              		.loc 2 200 0 is_stmt 0
+ 176 0110 24109FE5 		ldr	r1, .L18
+ 177 0114 1C3081E5 		str	r3, [r1, #28]
+ 178 0118 20309FE5 		ldr	r3, .L18+4
+ 179 011c 002081E5 		str	r2, [r1, #0]
+ 180 0120 000083E5 		str	r0, [r3, #0]
+ 229:bellator_low_level.c **** 			break;
+ 230:bellator_low_level.c **** 
+ 231:bellator_low_level.c **** 		default:
+ 232:bellator_low_level.c **** 			break;
+ 233:bellator_low_level.c **** 		}
+ 234:bellator_low_level.c **** 	}
+ 235:bellator_low_level.c **** 
+ 236:bellator_low_level.c **** 	VICVectAddr = 0;
+ 181              		.loc 2 236 0 is_stmt 1
+ 182 0124 0020A0E3 		mov	r2, #0
+ 183 0128 0030E0E3 		mvn	r3, #0
+ 184 012c CF2F03E5 		str	r2, [r3, #-4047]
+ 237:bellator_low_level.c **** }
+ 185              		.loc 2 237 0
+ 186 0130 08D08DE2 		add	sp, sp, #8
+ 187 0134 7F10BDE8 		ldmfd	sp!, {r0, r1, r2, r3, r4, r5, r6, ip}
+ 188 0138 04F05EE2 		subs	pc, lr, #4
+ 189              	.L19:
+ 190              		.align	2
+ 191              	.L18:
+ 192 013c 00000000 		.word	.LANCHOR0
+ 193 0140 00000000 		.word	.LANCHOR1
+ 194 0144 000001E0 		.word	-536805376
+ 195              		.cfi_endproc
+ 196              	.LFE20:
+ 197              		.fnend
+ 199              		.align	2
+ 201              	ADC0_Read:
+ 202              		.fnstart
+ 203              	.LFB24:
+ 238:bellator_low_level.c **** 
+ 239:bellator_low_level.c **** int com_putchar (int c){
+ 240:bellator_low_level.c **** 	struct cmd_buff *cmd = &cmd_out;
+ 241:bellator_low_level.c **** 
+ 242:bellator_low_level.c **** 	/*------------------------------------------------
+ 243:bellator_low_level.c **** 	 If the buffer is full, return an error value.
+ 244:bellator_low_level.c **** 	 ------------------------------------------------*/
+ 245:bellator_low_level.c **** 	if ((cmd->in - cmd->out) >= CMD_BUFF_SIZE)
+ 246:bellator_low_level.c **** 		return (-1);
+ 247:bellator_low_level.c **** 
+ 248:bellator_low_level.c **** 	/*------------------------------------------------
+ 249:bellator_low_level.c **** 	 Add the data to the transmit buffer.  If the
+ 250:bellator_low_level.c **** 	 transmit interrupt is disabled, then enable it.
+ 251:bellator_low_level.c **** 	 ------------------------------------------------*/
+ 252:bellator_low_level.c **** 	if (tx_restart) {
+ 253:bellator_low_level.c **** 		tx_restart = 0;
+ 254:bellator_low_level.c **** 		U1THR = c;
+ 255:bellator_low_level.c **** 	} else {
+ 256:bellator_low_level.c **** 		cmd->buff[cmd->in & (CMD_BUFF_SIZE - 1)] = c;
+ 257:bellator_low_level.c **** 		cmd->in++;
+ 258:bellator_low_level.c **** 	}
+ 259:bellator_low_level.c **** 
+ 260:bellator_low_level.c **** 	return (0);
+ 261:bellator_low_level.c **** }
+ 262:bellator_low_level.c **** 
+ 263:bellator_low_level.c **** /*------------------------------------------------------------------------------
+ 264:bellator_low_level.c ****  ------------------------------------------------------------------------------*/
+ 265:bellator_low_level.c **** int com_getchar (void){
+ 266:bellator_low_level.c **** 	struct cmd_buff *cmd = &cmd_in;
+ 267:bellator_low_level.c **** 
+ 268:bellator_low_level.c **** 	if ((cmd->in - cmd->out) == 0)
+ 269:bellator_low_level.c **** 		return (-1);
+ 270:bellator_low_level.c **** 
+ 271:bellator_low_level.c **** 	return (cmd->buff[(cmd->out++) & (CMD_BUFF_SIZE - 1)]);
+ 272:bellator_low_level.c **** }
+ 273:bellator_low_level.c **** 
+ 274:bellator_low_level.c **** 
+ 275:bellator_low_level.c **** 
+ 276:bellator_low_level.c **** inline void positioning_init(void){
+ 277:bellator_low_level.c ****     //ADC
+ 278:bellator_low_level.c **** 	PINSEL1 |= 0x0000F000; // Set the pin function
+ 279:bellator_low_level.c **** 
+ 280:bellator_low_level.c **** 	//FIQ
+ 281:bellator_low_level.c **** 	VICIntSelect |= 0x08000000;//Timer 3 as FIQ
+ 282:bellator_low_level.c **** 	VICIntEnable |= 0x08000000;//source #27 enabled as FIQ or IRQ
+ 283:bellator_low_level.c **** 
+ 284:bellator_low_level.c **** 	//TIMER
+ 285:bellator_low_level.c **** 	T3MR0 = 10000;//10000;//5ms -> 200Hz
+ 286:bellator_low_level.c **** 	T3MCR = 0x03;//reset and interrupt on match0
+ 287:bellator_low_level.c **** 	T3PC = 0;//Prescale = 0
+ 288:bellator_low_level.c **** 	T3PR = 0x1C;//Prescale increments in 30 cclk cycles
+ 289:bellator_low_level.c **** 	T3TC = 0;//Reset T3
+ 290:bellator_low_level.c **** 	T3TCR = 1;//enable T3
+ 291:bellator_low_level.c **** 	//T3TC = T2TC;
+ 292:bellator_low_level.c **** }
+ 293:bellator_low_level.c **** 
+ 294:bellator_low_level.c **** static inline int ADC0_Read(void){
+ 204              		.loc 2 294 0
+ 205              		.cfi_startproc
+ 206              		@ Function supports interworking.
+ 207              		@ args = 0, pretend = 0, frame = 0
+ 208              		@ frame_needed = 0, uses_anonymous_args = 0
+ 209              		@ link register save eliminated.
+ 295:bellator_low_level.c **** 	int i;
+ 296:bellator_low_level.c **** 	ADCR |= 0x01200601; // Start A/D Conversion Enabled, No Burst, 4,28MHz se pclk=30MHz
+ 210              		.loc 2 296 0
+ 211 0148 3C309FE5 		ldr	r3, .L22
+ 212 014c 3C209FE5 		ldr	r2, .L22+4
+ 213 0150 001093E5 		ldr	r1, [r3, #0]
+ 214 0154 022081E1 		orr	r2, r1, r2
+ 215 0158 002083E5 		str	r2, [r3, #0]
+ 216 015c 0320A0E1 		mov	r2, r3
+ 217              	.L21:
+ 297:bellator_low_level.c **** 	while(!(ADSTAT & 0x00000001)); // Wait for end of A/D Conversion
+ 218              		.loc 2 297 0 discriminator 1
+ 219 0160 301092E5 		ldr	r1, [r2, #48]
+ 220 0164 010011E3 		tst	r1, #1
+ 221 0168 1C309FE5 		ldr	r3, .L22
+ 222 016c FBFFFF0A 		beq	.L21
+ 298:bellator_low_level.c **** 	i = ADDR0; // Read A/D Data Register
+ 223              		.loc 2 298 0
+ 224 0170 100093E5 		ldr	r0, [r3, #16]
+ 225              	.LVL7:
+ 299:bellator_low_level.c **** 	ADCR &= 0xFEDFF9FE; // Stop A/D Conversion
+ 226              		.loc 2 299 0
+ 227 0174 18209FE5 		ldr	r2, .L22+8
+ 228 0178 001093E5 		ldr	r1, [r3, #0]
+ 229 017c 022001E0 		and	r2, r1, r2
+ 230 0180 002083E5 		str	r2, [r3, #0]
+ 300:bellator_low_level.c **** 	return (i >> 6); // bit 6:15 is 10 bit AD value
+ 301:bellator_low_level.c **** }
+ 231              		.loc 2 301 0
+ 232 0184 4003A0E1 		mov	r0, r0, asr #6
+ 233              	.LVL8:
+ 234 0188 1EFF2FE1 		bx	lr
+ 235              	.L23:
+ 236              		.align	2
+ 237              	.L22:
+ 238 018c 004003E0 		.word	-536657920
+ 239 0190 01062001 		.word	18875905
+ 240 0194 FEF9DFFE 		.word	-18875906
+ 241              		.cfi_endproc
+ 242              	.LFE24:
+ 243              		.fnend
+ 245              		.align	2
+ 247              	ADC1_Read:
+ 248              		.fnstart
+ 249              	.LFB25:
+ 302:bellator_low_level.c **** 
+ 303:bellator_low_level.c **** static inline int ADC1_Read(void){
+ 250              		.loc 2 303 0
+ 251              		.cfi_startproc
+ 252              		@ Function supports interworking.
+ 253              		@ args = 0, pretend = 0, frame = 0
+ 254              		@ frame_needed = 0, uses_anonymous_args = 0
+ 255              		@ link register save eliminated.
+ 304:bellator_low_level.c **** 	int i;
+ 305:bellator_low_level.c **** 	ADCR |= 0x01200602; // Start A/D Conversion Enabled, No Burst, 4,28MHz se pclk=30MHz
+ 256              		.loc 2 305 0
+ 257 0198 3C309FE5 		ldr	r3, .L26
+ 258 019c 3C209FE5 		ldr	r2, .L26+4
+ 259 01a0 001093E5 		ldr	r1, [r3, #0]
+ 260 01a4 022081E1 		orr	r2, r1, r2
+ 261 01a8 002083E5 		str	r2, [r3, #0]
+ 262 01ac 0320A0E1 		mov	r2, r3
+ 263              	.L25:
+ 306:bellator_low_level.c **** 	while(!(ADSTAT & 0x00000002)); // Wait for end of A/D Conversion
+ 264              		.loc 2 306 0 discriminator 1
+ 265 01b0 301092E5 		ldr	r1, [r2, #48]
+ 266 01b4 020011E3 		tst	r1, #2
+ 267 01b8 1C309FE5 		ldr	r3, .L26
+ 268 01bc FBFFFF0A 		beq	.L25
+ 307:bellator_low_level.c **** 	i = ADDR1; // Read A/D Data Register
+ 269              		.loc 2 307 0
+ 270 01c0 140093E5 		ldr	r0, [r3, #20]
+ 271              	.LVL9:
+ 308:bellator_low_level.c **** 	ADCR &= 0xFEDFF9FD; // Stop A/D Conversion
+ 272              		.loc 2 308 0
+ 273 01c4 18209FE5 		ldr	r2, .L26+8
+ 274 01c8 001093E5 		ldr	r1, [r3, #0]
+ 275 01cc 022001E0 		and	r2, r1, r2
+ 276 01d0 002083E5 		str	r2, [r3, #0]
+ 309:bellator_low_level.c **** 	return (i >> 6); // bit 6:15 is 10 bit AD value
+ 310:bellator_low_level.c **** }
+ 277              		.loc 2 310 0
+ 278 01d4 4003A0E1 		mov	r0, r0, asr #6
+ 279              	.LVL10:
+ 280 01d8 1EFF2FE1 		bx	lr
+ 281              	.L27:
+ 282              		.align	2
+ 283              	.L26:
+ 284 01dc 004003E0 		.word	-536657920
+ 285 01e0 02062001 		.word	18875906
+ 286 01e4 FDF9DFFE 		.word	-18875907
+ 287              		.cfi_endproc
+ 288              	.LFE25:
+ 289              		.fnend
+ 291              		.align	2
+ 292              		.global	logger_init
+ 294              	logger_init:
+ 295              		.fnstart
+ 296              	.LFB0:
+  21:logger.c      **** void logger_init(void){ // using UART0
+ 297              		.loc 1 21 0
+ 298              		.cfi_startproc
+ 299              		@ Function supports interworking.
+ 300              		@ args = 0, pretend = 0, frame = 0
+ 301              		@ frame_needed = 0, uses_anonymous_args = 0
+ 302              		@ link register save eliminated.
+  22:logger.c      **** 	PINSEL0 |= 0x05; // Set the pins function
+ 303              		.loc 1 22 0
+ 304 01e8 28309FE5 		ldr	r3, .L29
+ 305 01ec 002093E5 		ldr	r2, [r3, #0]
+ 306 01f0 052082E3 		orr	r2, r2, #5
+ 307 01f4 002083E5 		str	r2, [r3, #0]
+  23:logger.c      **** 	U0FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable
+ 308              		.loc 1 23 0
+ 309 01f8 023843E2 		sub	r3, r3, #131072
+ 310 01fc 0720A0E3 		mov	r2, #7
+ 311 0200 0820C3E5 		strb	r2, [r3, #8]
+  24:logger.c      **** 	U0LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+ 312              		.loc 1 24 0
+ 313 0204 7C20E0E3 		mvn	r2, #124
+ 314 0208 0C20C3E5 		strb	r2, [r3, #12]
+  37:logger.c      **** 	U0LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+ 315              		.loc 1 37 0
+ 316 020c 802082E2 		add	r2, r2, #128
+ 317 0210 0C20C3E5 		strb	r2, [r3, #12]
+  38:logger.c      **** }
+ 318              		.loc 1 38 0
+ 319 0214 1EFF2FE1 		bx	lr
+ 320              	.L30:
+ 321              		.align	2
+ 322              	.L29:
+ 323 0218 00C002E0 		.word	-536690688
+ 324              		.cfi_endproc
+ 325              	.LFE0:
+ 326              		.fnend
+ 328              		.align	2
+ 329              		.global	log_int
+ 331              	log_int:
+ 332              		.fnstart
+ 333              	.LFB2:
+  44:logger.c      **** 
+  45:logger.c      **** void log_int(int num){
+ 334              		.loc 1 45 0
+ 335              		.cfi_startproc
+ 336              		@ Function supports interworking.
+ 337              		@ args = 0, pretend = 0, frame = 0
+ 338              		@ frame_needed = 0, uses_anonymous_args = 0
+ 339              	.LVL11:
+ 340 021c 70402DE9 		stmfd	sp!, {r4, r5, r6, lr}
+ 341              		.save {r4, r5, r6, lr}
+ 342              	.LCFI2:
+ 343              		.cfi_def_cfa_offset 16
+  46:logger.c      **** 	if(num & 0x80000000){// se for negativo
+ 344              		.loc 1 46 0
+ 345 0220 004050E2 		subs	r4, r0, #0
+ 346              		.cfi_offset 14, -4
+ 347              		.cfi_offset 6, -8
+ 348              		.cfi_offset 5, -12
+ 349              		.cfi_offset 4, -16
+ 350 0224 030000AA 		bge	.L32
+  47:logger.c      **** 		ua_outchar('-');
+ 351              		.loc 1 47 0
+ 352 0228 2D00A0E3 		mov	r0, #45
+ 353              	.LVL12:
+ 354 022c 73FFFFEB 		bl	ua_outchar
+ 355              	.LVL13:
+  48:logger.c      **** 		num = ~num;
+  49:logger.c      **** 		num += 0x1;
+ 356              		.loc 1 49 0
+ 357 0230 004064E2 		rsb	r4, r4, #0
+ 358              	.LVL14:
+ 359 0234 010000EA 		b	.L33
+ 360              	.LVL15:
+ 361              	.L32:
+  50:logger.c      **** 	}else
+  51:logger.c      **** 		ua_outchar(' ');
+ 362              		.loc 1 51 0
+ 363 0238 2000A0E3 		mov	r0, #32
+ 364              	.LVL16:
+ 365 023c 6FFFFFEB 		bl	ua_outchar
+ 366              	.L33:
+  52:logger.c      **** 	ua_outchar(ascii[num >> 28]);
+ 367              		.loc 1 52 0
+ 368 0240 74509FE5 		ldr	r5, .L34
+ 369 0244 440ED5E7 		ldrb	r0, [r5, r4, asr #28]	@ zero_extendqisi2
+ 370 0248 6CFFFFEB 		bl	ua_outchar
+  53:logger.c      **** 	ua_outchar(ascii[num >> 24 & 0x0000000f]);
+ 371              		.loc 1 53 0
+ 372 024c 443CA0E1 		mov	r3, r4, asr #24
+ 373 0250 0F3003E2 		and	r3, r3, #15
+ 374 0254 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 375 0258 68FFFFEB 		bl	ua_outchar
+  54:logger.c      **** 	ua_outchar(ascii[num >> 20 & 0x0000000f]);
+ 376              		.loc 1 54 0
+ 377 025c 443AA0E1 		mov	r3, r4, asr #20
+ 378 0260 0F3003E2 		and	r3, r3, #15
+ 379 0264 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 380 0268 64FFFFEB 		bl	ua_outchar
+  55:logger.c      **** 	ua_outchar(ascii[num >> 16 & 0x0000000f]);
+ 381              		.loc 1 55 0
+ 382 026c 4438A0E1 		mov	r3, r4, asr #16
+ 383 0270 0F3003E2 		and	r3, r3, #15
+ 384 0274 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 385 0278 60FFFFEB 		bl	ua_outchar
+  56:logger.c      **** 	ua_outchar(ascii[num >> 12 & 0x0000000f]);
+ 386              		.loc 1 56 0
+ 387 027c 4436A0E1 		mov	r3, r4, asr #12
+ 388 0280 0F3003E2 		and	r3, r3, #15
+ 389 0284 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 390 0288 5CFFFFEB 		bl	ua_outchar
+  57:logger.c      **** 	ua_outchar(ascii[num >> 8 & 0x0000000f]);
+ 391              		.loc 1 57 0
+ 392 028c 4434A0E1 		mov	r3, r4, asr #8
+ 393 0290 0F3003E2 		and	r3, r3, #15
+ 394 0294 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 395 0298 58FFFFEB 		bl	ua_outchar
+  58:logger.c      **** 	ua_outchar(ascii[num >> 4 & 0x0000000f]);
+ 396              		.loc 1 58 0
+ 397 029c 4432A0E1 		mov	r3, r4, asr #4
+ 398 02a0 0F3003E2 		and	r3, r3, #15
+ 399 02a4 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 400 02a8 54FFFFEB 		bl	ua_outchar
+  59:logger.c      **** 	ua_outchar(ascii[num & 0x0000000f]);
+ 401              		.loc 1 59 0
+ 402 02ac 0F4004E2 		and	r4, r4, #15
+ 403              	.LVL17:
+ 404 02b0 0400D5E7 		ldrb	r0, [r5, r4]	@ zero_extendqisi2
+  60:logger.c      **** }
+ 405              		.loc 1 60 0
+ 406 02b4 7040BDE8 		ldmfd	sp!, {r4, r5, r6, lr}
+  59:logger.c      **** 	ua_outchar(ascii[num & 0x0000000f]);
+ 407              		.loc 1 59 0
+ 408 02b8 50FFFFEA 		b	ua_outchar
+ 409              	.L35:
+ 410              		.align	2
+ 411              	.L34:
+ 412 02bc 00000000 		.word	.LANCHOR2
+ 413              		.cfi_endproc
+ 414              	.LFE2:
+ 415              		.fnend
+ 417              		.align	2
+ 418              		.global	log_short
+ 420              	log_short:
+ 421              		.fnstart
+ 422              	.LFB3:
+  61:logger.c      **** 
+  62:logger.c      **** void log_short(short num){
+ 423              		.loc 1 62 0
+ 424              		.cfi_startproc
+ 425              		@ Function supports interworking.
+ 426              		@ args = 0, pretend = 0, frame = 0
+ 427              		@ frame_needed = 0, uses_anonymous_args = 0
+ 428              	.LVL18:
+ 429 02c0 70402DE9 		stmfd	sp!, {r4, r5, r6, lr}
+ 430              		.save {r4, r5, r6, lr}
+ 431              	.LCFI3:
+ 432              		.cfi_def_cfa_offset 16
+  63:logger.c      **** 	if(num & 0x8000){// se for negativo
+ 433              		.loc 1 63 0
+ 434 02c4 004050E2 		subs	r4, r0, #0
+ 435              		.cfi_offset 14, -4
+ 436              		.cfi_offset 6, -8
+ 437              		.cfi_offset 5, -12
+ 438              		.cfi_offset 4, -16
+ 439 02c8 050000AA 		bge	.L37
+  64:logger.c      **** 		ua_outchar('-');
+  65:logger.c      **** 		num = ~num;
+  66:logger.c      **** 		num++;
+ 440              		.loc 1 66 0
+ 441 02cc 004064E2 		rsb	r4, r4, #0
+  64:logger.c      **** 		ua_outchar('-');
+ 442              		.loc 1 64 0
+ 443 02d0 2D00A0E3 		mov	r0, #45
+ 444              	.LVL19:
+ 445              		.loc 1 66 0
+ 446 02d4 0448A0E1 		mov	r4, r4, asl #16
+  64:logger.c      **** 		ua_outchar('-');
+ 447              		.loc 1 64 0
+ 448 02d8 48FFFFEB 		bl	ua_outchar
+ 449              		.loc 1 66 0
+ 450 02dc 4448A0E1 		mov	r4, r4, asr #16
+ 451              	.LVL20:
+ 452 02e0 010000EA 		b	.L38
+ 453              	.LVL21:
+ 454              	.L37:
+  67:logger.c      **** 	}else
+  68:logger.c      **** 		ua_outchar(' ');
+ 455              		.loc 1 68 0
+ 456 02e4 2000A0E3 		mov	r0, #32
+ 457              	.LVL22:
+ 458 02e8 44FFFFEB 		bl	ua_outchar
+ 459              	.L38:
+ 460              	.LVL23:
+  69:logger.c      **** 	ua_outchar(ascii[num >> 12]);
+ 461              		.loc 1 69 0
+ 462 02ec 34509FE5 		ldr	r5, .L39
+ 463 02f0 4406D5E7 		ldrb	r0, [r5, r4, asr #12]	@ zero_extendqisi2
+ 464 02f4 41FFFFEB 		bl	ua_outchar
+  70:logger.c      **** 	ua_outchar(ascii[num >> 8 & 0x000f]);
+ 465              		.loc 1 70 0
+ 466 02f8 2434A0E1 		mov	r3, r4, lsr #8
+ 467 02fc 0F3003E2 		and	r3, r3, #15
+ 468 0300 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 469 0304 3DFFFFEB 		bl	ua_outchar
+  71:logger.c      **** 	ua_outchar(ascii[num >> 4 & 0x000f]);
+ 470              		.loc 1 71 0
+ 471 0308 2432A0E1 		mov	r3, r4, lsr #4
+ 472 030c 0F3003E2 		and	r3, r3, #15
+ 473 0310 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 474 0314 39FFFFEB 		bl	ua_outchar
+  72:logger.c      **** 	ua_outchar(ascii[num & 0x000f]);
+ 475              		.loc 1 72 0
+ 476 0318 0F4004E2 		and	r4, r4, #15
+ 477              	.LVL24:
+ 478 031c 0400D5E7 		ldrb	r0, [r5, r4]	@ zero_extendqisi2
+  73:logger.c      **** }
+ 479              		.loc 1 73 0
+ 480 0320 7040BDE8 		ldmfd	sp!, {r4, r5, r6, lr}
+  72:logger.c      **** 	ua_outchar(ascii[num & 0x000f]);
+ 481              		.loc 1 72 0
+ 482 0324 35FFFFEA 		b	ua_outchar
+ 483              	.L40:
+ 484              		.align	2
+ 485              	.L39:
+ 486 0328 00000000 		.word	.LANCHOR2
+ 487              		.cfi_endproc
+ 488              	.LFE3:
+ 489              		.fnend
+ 491              		.align	2
+ 492              		.global	log_string
+ 494              	log_string:
+ 495              		.fnstart
+ 496              	.LFB4:
+  74:logger.c      **** 
+  75:logger.c      **** void log_string(const char *s){
+ 497              		.loc 1 75 0
+ 498              		.cfi_startproc
+ 499              		@ Function supports interworking.
+ 500              		@ args = 0, pretend = 0, frame = 0
+ 501              		@ frame_needed = 0, uses_anonymous_args = 0
+ 502              	.LVL25:
+ 503 032c 10402DE9 		stmfd	sp!, {r4, lr}
+ 504              		.save {r4, lr}
+ 505              	.LCFI4:
+ 506              		.cfi_def_cfa_offset 8
+ 507              		.loc 1 75 0
+ 508 0330 0040A0E1 		mov	r4, r0
+ 509              		.cfi_offset 14, -4
+ 510              		.cfi_offset 4, -8
+  76:logger.c      **** 	while(*s){
+ 511              		.loc 1 76 0
+ 512 0334 040000EA 		b	.L42
+ 513              	.LVL26:
+ 514              	.L44:
+  77:logger.c      **** 		if(*s == '\n')
+ 515              		.loc 1 77 0
+ 516 0338 0A0053E3 		cmp	r3, #10
+  78:logger.c      **** 			ua_outchar('\r'); // \n + \r = new line
+ 517              		.loc 1 78 0
+ 518 033c 0D00A003 		moveq	r0, #13
+ 519 0340 2EFFFF0B 		bleq	ua_outchar
+ 520              	.L43:
+  79:logger.c      **** 		ua_outchar(*s);
+ 521              		.loc 1 79 0
+ 522 0344 010054E5 		ldrb	r0, [r4, #-1]	@ zero_extendqisi2
+ 523 0348 2CFFFFEB 		bl	ua_outchar
+ 524              	.L42:
+  76:logger.c      **** 	while(*s){
+ 525              		.loc 1 76 0 discriminator 1
+ 526 034c 0130D4E4 		ldrb	r3, [r4], #1	@ zero_extendqisi2
+ 527 0350 000053E3 		cmp	r3, #0
+ 528 0354 F7FFFF1A 		bne	.L44
+  80:logger.c      **** 		s++;
+  81:logger.c      **** 	}
+  82:logger.c      **** }
+ 529              		.loc 1 82 0
+ 530 0358 1040BDE8 		ldmfd	sp!, {r4, lr}
+ 531 035c 1EFF2FE1 		bx	lr
+ 532              		.cfi_endproc
+ 533              	.LFE4:
+ 534              		.fnend
+ 536              		.align	2
+ 537              		.global	error
+ 539              	error:
+ 540              		.fnstart
+ 541              	.LFB31:
+ 311:bellator_low_level.c **** 
+ 312:bellator_low_level.c **** //int count1 = 0;
+ 313:bellator_low_level.c **** void update_position(void){
+ 314:bellator_low_level.c **** 	if(calcount_g>0){//calibration
+ 315:bellator_low_level.c **** 		calx += ADC0_Read();
+ 316:bellator_low_level.c **** 		posx += ((velx*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 317:bellator_low_level.c **** 		caly += ADC1_Read();
+ 318:bellator_low_level.c **** 		posy += ((vely*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 319:bellator_low_level.c **** 		if(calcount_g == 1){
+ 320:bellator_low_level.c **** 			//calx >>= 1;
+ 321:bellator_low_level.c **** 			//caly >>= 1;
+ 322:bellator_low_level.c **** 			posx = posy = 0;
+ 323:bellator_low_level.c **** 			log_string("foi");
+ 324:bellator_low_level.c **** 		}
+ 325:bellator_low_level.c **** 		calcount_g--;
+ 326:bellator_low_level.c **** 	}else{
+ 327:bellator_low_level.c **** 		velx = (ADC0_Read() << 10) - calx;
+ 328:bellator_low_level.c **** 		posx += (velx*10);// fixed point with 5 hexa
+ 329:bellator_low_level.c **** 		vely = (ADC1_Read() << 10) - caly;
+ 330:bellator_low_level.c **** 		posy += (vely*10);// fixed point with 5 hexa
+ 331:bellator_low_level.c **** 		/*if(count1 == 35){
+ 332:bellator_low_level.c **** 			log_string("x: ");
+ 333:bellator_low_level.c **** 			log4bytes(posx);
+ 334:bellator_low_level.c **** 			log_string("\ty: ");
+ 335:bellator_low_level.c **** 			log4bytes(posy);
+ 336:bellator_low_level.c **** 			log_string("\n");
+ 337:bellator_low_level.c **** 			count1=0;
+ 338:bellator_low_level.c **** 		}else
+ 339:bellator_low_level.c **** 			count1++;*/
+ 340:bellator_low_level.c **** 	}
+ 341:bellator_low_level.c **** 	T3IR |= 0x01;//reset interruption
+ 342:bellator_low_level.c **** 	VICVectAddr = 0;
+ 343:bellator_low_level.c **** }
+ 344:bellator_low_level.c **** 
+ 345:bellator_low_level.c **** void pwm_in_handler(void){
+ 346:bellator_low_level.c **** 	const unsigned short ir = T1IR;
+ 347:bellator_low_level.c **** 	//capture 1.2 and 1.3
+ 348:bellator_low_level.c **** 	if(ir & 0x40){//CAP1.2 pwm0
+ 349:bellator_low_level.c **** 		if(T1CCR & 0x40){//rising edge
+ 350:bellator_low_level.c **** 			tmp0 = T1CR2;
+ 351:bellator_low_level.c **** 			T1CCR &= ~0x40;//interrupt disabled for the rising edge
+ 352:bellator_low_level.c **** 			T1CCR |= 0x80;//interrupt enabled for the falling edge
+ 353:bellator_low_level.c **** 		}else{//falling
+ 354:bellator_low_level.c **** 			unsigned short tmp = T1CR2 - tmp0;
+ 355:bellator_low_level.c **** 			if(tmp > 900 && tmp < 2200){
+ 356:bellator_low_level.c **** 				if(calcountx>0){
+ 357:bellator_low_level.c **** 					calpx += tmp;
+ 358:bellator_low_level.c **** 					if(calcountx ==1){
+ 359:bellator_low_level.c **** 						calpx <<= 3;
+ 360:bellator_low_level.c **** 					}
+ 361:bellator_low_level.c **** 					calcountx--;
+ 362:bellator_low_level.c **** 				}else{
+ 363:bellator_low_level.c **** 					int tmp2 = tmp;
+ 364:bellator_low_level.c **** 					tmp2 <<= 11;
+ 365:bellator_low_level.c **** 					tmp2 -= calpx;
+ 366:bellator_low_level.c **** 					vposx += tmp2;//fixed point 5 hexa
+ 367:bellator_low_level.c **** 					//pwm1 measured
+ 368:bellator_low_level.c **** 					//pwm0in = tmp - (calpx >> 11);
+ 369:bellator_low_level.c **** 				}
+ 370:bellator_low_level.c **** 			}
+ 371:bellator_low_level.c **** 			T1CCR &= ~0x80;
+ 372:bellator_low_level.c **** 			T1CCR |= 0x40;
+ 373:bellator_low_level.c **** 		}
+ 374:bellator_low_level.c **** 		T1IR |= 0x40; //reset interruption
+ 375:bellator_low_level.c **** 	}else{//CAP1.3 pwm1
+ 376:bellator_low_level.c **** 		if(T1CCR & 0x200){//rising edge
+ 377:bellator_low_level.c **** 			tmp1 = T1CR3;
+ 378:bellator_low_level.c **** 			T1CCR &= ~0x200;
+ 379:bellator_low_level.c **** 			T1CCR |= 0x400;
+ 380:bellator_low_level.c **** 		}else{//falling
+ 381:bellator_low_level.c **** 			unsigned short tmp = T1CR3 - tmp1;
+ 382:bellator_low_level.c **** 			if(tmp > 900 && tmp < 2200){
+ 383:bellator_low_level.c **** 				if(calcounty>0){
+ 384:bellator_low_level.c **** 					calpy += tmp;
+ 385:bellator_low_level.c **** 					if(calcounty==1){
+ 386:bellator_low_level.c **** 						calpy <<= 3;
+ 387:bellator_low_level.c **** 					}
+ 388:bellator_low_level.c **** 					calcounty--;
+ 389:bellator_low_level.c **** 				}else{
+ 390:bellator_low_level.c **** 					int tmp2 = tmp;
+ 391:bellator_low_level.c **** 					tmp2 <<= 11;
+ 392:bellator_low_level.c **** 					tmp2 -= calpy;
+ 393:bellator_low_level.c **** 					vposy += tmp2;
+ 394:bellator_low_level.c **** 					//pwm1 measured
+ 395:bellator_low_level.c **** 					//pwm1in = tmp - (calpy >> 11);
+ 396:bellator_low_level.c **** 				}
+ 397:bellator_low_level.c **** 			}
+ 398:bellator_low_level.c **** 			T1CCR &= ~0x400;
+ 399:bellator_low_level.c **** 			T1CCR |= 0x200;
+ 400:bellator_low_level.c **** 		}
+ 401:bellator_low_level.c **** 		T1IR |= 0x80; //reset interruption
+ 402:bellator_low_level.c **** 	}
+ 403:bellator_low_level.c **** 	VICVectAddr = 0;
+ 404:bellator_low_level.c **** }
+ 405:bellator_low_level.c **** 
+ 406:bellator_low_level.c **** void pid(void){
+ 407:bellator_low_level.c **** 	//pwm0out = 499;
+ 408:bellator_low_level.c **** 	//pwm1out = 499;
+ 409:bellator_low_level.c **** 	//if(calcount_g == 0){
+ 410:bellator_low_level.c **** 	/*	diffx = posx - vposx;//fixed point 5 hexa
+ 411:bellator_low_level.c **** 		diffy = posy - vposy;
+ 412:bellator_low_level.c **** 
+ 413:bellator_low_level.c **** 		int tmpx = diffx >> 20;//4 hexa places
+ 414:bellator_low_level.c **** 		int tmpy = diffy >> 20;
+ 415:bellator_low_level.c **** 
+ 416:bellator_low_level.c **** 		log4bytes(tmpx);
+ 417:bellator_low_level.c **** 		if(tmpx>500){
+ 418:bellator_low_level.c **** 			tmpx = 500;
+ 419:bellator_low_level.c **** 		}else if(tmpx<-500){
+ 420:bellator_low_level.c **** 			tmpx = -500;
+ 421:bellator_low_level.c **** 		}
+ 422:bellator_low_level.c **** 		if(tmpy>500){
+ 423:bellator_low_level.c **** 			tmpy = 500;
+ 424:bellator_low_level.c **** 		}else if(tmpy<-500){
+ 425:bellator_low_level.c **** 			tmpy = -500;
+ 426:bellator_low_level.c **** 		}
+ 427:bellator_low_level.c **** 
+ 428:bellator_low_level.c **** 	/*
+ 429:bellator_low_level.c **** 		//log4bytes(posx);
+ 430:bellator_low_level.c **** 		//log_string("P");
+ 431:bellator_low_level.c **** 
+ 432:bellator_low_level.c **** 		if(pwm0out == 999)
+ 433:bellator_low_level.c **** 			pwm0out = 0;
+ 434:bellator_low_level.c **** 		else
+ 435:bellator_low_level.c **** 			pwm0out++;
+ 436:bellator_low_level.c **** 
+ 437:bellator_low_level.c **** 		if(pwm1out == 999)
+ 438:bellator_low_level.c **** 			pwm1out = 0;
+ 439:bellator_low_level.c **** 		else
+ 440:bellator_low_level.c **** 			pwm1out++;
+ 441:bellator_low_level.c **** 	*/
+ 442:bellator_low_level.c **** //		T2MR0 = 18999 - tmpx;//pwm0out;//set pwm0 output
+ 443:bellator_low_level.c **** //		T2MR1 = 18999 - tmpy;//pwm1out;//set pwm1 output
+ 444:bellator_low_level.c **** 	//}
+ 445:bellator_low_level.c **** 
+ 446:bellator_low_level.c **** 	//T2MR0 = 18000 + pwm0in;//pwm0out;//set pwm0 output
+ 447:bellator_low_level.c **** 	//T2MR1 = 18000 + pwm1in;//pwm1out;//set pwm1 output
+ 448:bellator_low_level.c **** 
+ 449:bellator_low_level.c **** 	log_string("p");
+ 450:bellator_low_level.c **** 	T2IR |= 0x04;
+ 451:bellator_low_level.c **** 	VICVectAddr = 0;
+ 452:bellator_low_level.c **** }
+ 453:bellator_low_level.c **** 
+ 454:bellator_low_level.c **** inline void pwm_out_init(void){
+ 455:bellator_low_level.c **** 	PINSEL0 |= 0x00028000; //Output pins set for MAT2.0 and MAT2.1
+ 456:bellator_low_level.c **** 
+ 457:bellator_low_level.c **** 	VICVectAddr0 = (unsigned int) &pid; //Setting the interrupt handler location
+ 458:bellator_low_level.c **** 	//to the first vectored interruption slot
+ 459:bellator_low_level.c **** 	VICVectCntl0 = 0x3A; //Vectored Interrupt slot 0 enabled with source #26 (TIMER2)
+ 460:bellator_low_level.c **** 	VICIntEnable |= 0x04000000; //source #26 enabled as FIQ or IRQ
+ 461:bellator_low_level.c **** 
+ 462:bellator_low_level.c **** 	T2MR0 = 18500;//20000-1100 -> pwm0
+ 463:bellator_low_level.c **** 	T2MR1 = 18500;//20000-1900 -> pwm1
+ 464:bellator_low_level.c **** 	T2MR2 = 15000;// PID
+ 465:bellator_low_level.c **** 	T2MR3 = 20000;//20ms -> period
+ 466:bellator_low_level.c **** 
+ 467:bellator_low_level.c **** 	T2MCR |= 0x0440;//reset on match3 and interrupt on match2
+ 468:bellator_low_level.c **** 	T2PWMCON |= 0x03; //set match0 and match1 as pwm;
+ 469:bellator_low_level.c **** 
+ 470:bellator_low_level.c **** 	T2PC = 0;//Prescale = 0
+ 471:bellator_low_level.c **** 	T2PR = 0x1C;//Prescale increments in 30 cclk cycles
+ 472:bellator_low_level.c **** 	T2TC = 0;//Reset T2
+ 473:bellator_low_level.c **** 	T2TCR = 1;//enable T2
+ 474:bellator_low_level.c **** }
+ 475:bellator_low_level.c **** 
+ 476:bellator_low_level.c **** inline void pwm_in_init(void){
+ 477:bellator_low_level.c **** 	PINSEL1 |= 0x000000028;//set pin capture function CAP1.2 - p0.17, CAP1.3 p0.18
+ 478:bellator_low_level.c **** 
+ 479:bellator_low_level.c **** 	VICVectAddr1 = (unsigned int) &pwm_in_handler; //Setting the interrupt handler location
+ 480:bellator_low_level.c **** 	//to the second vectored interruption slot
+ 481:bellator_low_level.c **** 	VICVectCntl1 = 0x25; //Vectored Interrupt slot 1 enabled with source #5 (TIMER1)
+ 482:bellator_low_level.c **** 	VICIntEnable |= 0x20; //source #5 enabled as FIQ or IRQ
+ 483:bellator_low_level.c **** 
+ 484:bellator_low_level.c **** 	T1CCR |= 0x0B40;//interrupt for Capture 2,3 rising edges
+ 485:bellator_low_level.c **** 
+ 486:bellator_low_level.c **** 	T1PC = 0; //Prescale = 0;
+ 487:bellator_low_level.c **** 	T1PR = 0x1C; //Prescale increments in 30 cclk cycles
+ 488:bellator_low_level.c **** 	T1TC = 0; // reset T1
+ 489:bellator_low_level.c **** 	T1TCR = 1; //enable T1
+ 490:bellator_low_level.c **** }
+ 491:bellator_low_level.c **** 
+ 492:bellator_low_level.c **** void error(void){
+ 542              		.loc 2 492 0
+ 543              		.cfi_startproc
+ 544              		@ Interrupt Service Routine.
+ 545              		@ args = 0, pretend = 0, frame = 0
+ 546              		@ frame_needed = 0, uses_anonymous_args = 0
+ 547 0360 04E04EE2 		sub	lr, lr, #4
+ 548 0364 0F502DE9 		stmfd	sp!, {r0, r1, r2, r3, ip, lr}
+ 549              		.save {r0, r1, r2, r3, ip, lr}
+ 550              	.LCFI5:
+ 551              		.cfi_def_cfa_offset 24
+ 493:bellator_low_level.c **** 	log_string("irq error");
+ 552              		.loc 2 493 0
+ 553 0368 04009FE5 		ldr	r0, .L46
+ 554              		.cfi_offset 14, -4
+ 555              		.cfi_offset 12, -8
+ 556              		.cfi_offset 3, -12
+ 557              		.cfi_offset 2, -16
+ 558              		.cfi_offset 1, -20
+ 559              		.cfi_offset 0, -24
+ 560 036c FEFFFFEB 		bl	log_string
+ 494:bellator_low_level.c **** }
+ 561              		.loc 2 494 0
+ 562 0370 0F90FDE8 		ldmfd	sp!, {r0, r1, r2, r3, ip, pc}^
+ 563              	.L47:
+ 564              		.align	2
+ 565              	.L46:
+ 566 0374 00000000 		.word	.LC0
+ 567              		.cfi_endproc
+ 568              	.LFE31:
+ 569              		.fnend
+ 571              		.align	2
+ 572              		.global	log2bytes
+ 574              	log2bytes:
+ 575              		.fnstart
+ 576              	.LFB5:
+  83:logger.c      **** 
+  84:logger.c      **** void log2bytes(short c){
+ 577              		.loc 1 84 0
+ 578              		.cfi_startproc
+ 579              		@ Function supports interworking.
+ 580              		@ args = 0, pretend = 0, frame = 0
+ 581              		@ frame_needed = 0, uses_anonymous_args = 0
+ 582              	.LVL27:
+ 583 0378 70402DE9 		stmfd	sp!, {r4, r5, r6, lr}
+ 584              		.save {r4, r5, r6, lr}
+ 585              	.LCFI6:
+ 586              		.cfi_def_cfa_offset 16
+  85:logger.c      **** 	if(c & 0x8000){// se for negativo
+ 587              		.loc 1 85 0
+ 588 037c 004050E2 		subs	r4, r0, #0
+ 589              		.cfi_offset 14, -4
+ 590              		.cfi_offset 6, -8
+ 591              		.cfi_offset 5, -12
+ 592              		.cfi_offset 4, -16
+ 593 0380 050000AA 		bge	.L49
+  86:logger.c      **** 		ua_outchar('-');
+  87:logger.c      **** 		c = ~c;
+  88:logger.c      **** 		c++;
+ 594              		.loc 1 88 0
+ 595 0384 004064E2 		rsb	r4, r4, #0
+  86:logger.c      **** 		ua_outchar('-');
+ 596              		.loc 1 86 0
+ 597 0388 2D00A0E3 		mov	r0, #45
+ 598              	.LVL28:
+ 599              		.loc 1 88 0
+ 600 038c 0448A0E1 		mov	r4, r4, asl #16
+  86:logger.c      **** 		ua_outchar('-');
+ 601              		.loc 1 86 0
+ 602 0390 1AFFFFEB 		bl	ua_outchar
+ 603              		.loc 1 88 0
+ 604 0394 4448A0E1 		mov	r4, r4, asr #16
+ 605              	.LVL29:
+ 606 0398 010000EA 		b	.L50
+ 607              	.LVL30:
+ 608              	.L49:
+  89:logger.c      **** 	}else
+  90:logger.c      **** 		ua_outchar(' ');
+ 609              		.loc 1 90 0
+ 610 039c 2000A0E3 		mov	r0, #32
+ 611              	.LVL31:
+ 612 03a0 16FFFFEB 		bl	ua_outchar
+ 613              	.L50:
+ 614              	.LVL32:
+  91:logger.c      **** 	ua_outchar(ascii[c >> 12]);
+ 615              		.loc 1 91 0
+ 616 03a4 34509FE5 		ldr	r5, .L51
+ 617 03a8 4406D5E7 		ldrb	r0, [r5, r4, asr #12]	@ zero_extendqisi2
+ 618 03ac 13FFFFEB 		bl	ua_outchar
+  92:logger.c      **** 	ua_outchar(ascii[c >> 8 & 0x000f]);
+ 619              		.loc 1 92 0
+ 620 03b0 2434A0E1 		mov	r3, r4, lsr #8
+ 621 03b4 0F3003E2 		and	r3, r3, #15
+ 622 03b8 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 623 03bc 0FFFFFEB 		bl	ua_outchar
+  93:logger.c      **** 	ua_outchar(ascii[c >> 4 & 0x000f]);
+ 624              		.loc 1 93 0
+ 625 03c0 2432A0E1 		mov	r3, r4, lsr #4
+ 626 03c4 0F3003E2 		and	r3, r3, #15
+ 627 03c8 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 628 03cc 0BFFFFEB 		bl	ua_outchar
+  94:logger.c      **** 	ua_outchar(ascii[c & 0x000f]);
+ 629              		.loc 1 94 0
+ 630 03d0 0F4004E2 		and	r4, r4, #15
+ 631              	.LVL33:
+ 632 03d4 0400D5E7 		ldrb	r0, [r5, r4]	@ zero_extendqisi2
+  95:logger.c      **** }
+ 633              		.loc 1 95 0
+ 634 03d8 7040BDE8 		ldmfd	sp!, {r4, r5, r6, lr}
+  94:logger.c      **** 	ua_outchar(ascii[c & 0x000f]);
+ 635              		.loc 1 94 0
+ 636 03dc 07FFFFEA 		b	ua_outchar
+ 637              	.L52:
+ 638              		.align	2
+ 639              	.L51:
+ 640 03e0 00000000 		.word	.LANCHOR2
+ 641              		.cfi_endproc
+ 642              	.LFE5:
+ 643              		.fnend
+ 645              		.align	2
+ 646              		.global	log4bytes
+ 648              	log4bytes:
+ 649              		.fnstart
+ 650              	.LFB6:
+  96:logger.c      **** 
+  97:logger.c      **** void log4bytes(int c){
+ 651              		.loc 1 97 0
+ 652              		.cfi_startproc
+ 653              		@ Function supports interworking.
+ 654              		@ args = 0, pretend = 0, frame = 0
+ 655              		@ frame_needed = 0, uses_anonymous_args = 0
+ 656              	.LVL34:
+ 657 03e4 70402DE9 		stmfd	sp!, {r4, r5, r6, lr}
+ 658              		.save {r4, r5, r6, lr}
+ 659              	.LCFI7:
+ 660              		.cfi_def_cfa_offset 16
+  98:logger.c      **** 	if(c & 0x80000000){// se for negativo
+ 661              		.loc 1 98 0
+ 662 03e8 004050E2 		subs	r4, r0, #0
+ 663              		.cfi_offset 14, -4
+ 664              		.cfi_offset 6, -8
+ 665              		.cfi_offset 5, -12
+ 666              		.cfi_offset 4, -16
+ 667 03ec 030000AA 		bge	.L54
+  99:logger.c      **** 		ua_outchar('-');
+ 668              		.loc 1 99 0
+ 669 03f0 2D00A0E3 		mov	r0, #45
+ 670              	.LVL35:
+ 671 03f4 01FFFFEB 		bl	ua_outchar
+ 672              	.LVL36:
+ 100:logger.c      **** 		c = ~c;
+ 101:logger.c      **** 		c += 0x1;
+ 673              		.loc 1 101 0
+ 674 03f8 004064E2 		rsb	r4, r4, #0
+ 675              	.LVL37:
+ 676 03fc 010000EA 		b	.L55
+ 677              	.LVL38:
+ 678              	.L54:
+ 102:logger.c      **** 	}else
+ 103:logger.c      **** 		ua_outchar(' ');
+ 679              		.loc 1 103 0
+ 680 0400 2000A0E3 		mov	r0, #32
+ 681              	.LVL39:
+ 682 0404 FDFEFFEB 		bl	ua_outchar
+ 683              	.L55:
+ 104:logger.c      **** 	ua_outchar(ascii[c >> 28]);
+ 684              		.loc 1 104 0
+ 685 0408 74509FE5 		ldr	r5, .L56
+ 686 040c 440ED5E7 		ldrb	r0, [r5, r4, asr #28]	@ zero_extendqisi2
+ 687 0410 FAFEFFEB 		bl	ua_outchar
+ 105:logger.c      **** 	ua_outchar(ascii[c >> 24 & 0x0000000f]);
+ 688              		.loc 1 105 0
+ 689 0414 443CA0E1 		mov	r3, r4, asr #24
+ 690 0418 0F3003E2 		and	r3, r3, #15
+ 691 041c 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 692 0420 F6FEFFEB 		bl	ua_outchar
+ 106:logger.c      **** 	ua_outchar(ascii[c >> 20 & 0x0000000f]);
+ 693              		.loc 1 106 0
+ 694 0424 443AA0E1 		mov	r3, r4, asr #20
+ 695 0428 0F3003E2 		and	r3, r3, #15
+ 696 042c 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 697 0430 F2FEFFEB 		bl	ua_outchar
+ 107:logger.c      **** 	ua_outchar(ascii[c >> 16 & 0x0000000f]);
+ 698              		.loc 1 107 0
+ 699 0434 4438A0E1 		mov	r3, r4, asr #16
+ 700 0438 0F3003E2 		and	r3, r3, #15
+ 701 043c 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 702 0440 EEFEFFEB 		bl	ua_outchar
+ 108:logger.c      **** 	ua_outchar(ascii[c >> 12 & 0x0000000f]);
+ 703              		.loc 1 108 0
+ 704 0444 4436A0E1 		mov	r3, r4, asr #12
+ 705 0448 0F3003E2 		and	r3, r3, #15
+ 706 044c 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 707 0450 EAFEFFEB 		bl	ua_outchar
+ 109:logger.c      **** 	ua_outchar(ascii[c >> 8 & 0x0000000f]);
+ 708              		.loc 1 109 0
+ 709 0454 4434A0E1 		mov	r3, r4, asr #8
+ 710 0458 0F3003E2 		and	r3, r3, #15
+ 711 045c 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 712 0460 E6FEFFEB 		bl	ua_outchar
+ 110:logger.c      **** 	ua_outchar(ascii[c >> 4 & 0x0000000f]);
+ 713              		.loc 1 110 0
+ 714 0464 4432A0E1 		mov	r3, r4, asr #4
+ 715 0468 0F3003E2 		and	r3, r3, #15
+ 716 046c 0300D5E7 		ldrb	r0, [r5, r3]	@ zero_extendqisi2
+ 717 0470 E2FEFFEB 		bl	ua_outchar
+ 111:logger.c      **** 	ua_outchar(ascii[c & 0x0000000f]);
+ 718              		.loc 1 111 0
+ 719 0474 0F4004E2 		and	r4, r4, #15
+ 720              	.LVL40:
+ 721 0478 0400D5E7 		ldrb	r0, [r5, r4]	@ zero_extendqisi2
+ 112:logger.c      **** }
+ 722              		.loc 1 112 0
+ 723 047c 7040BDE8 		ldmfd	sp!, {r4, r5, r6, lr}
+ 111:logger.c      **** 	ua_outchar(ascii[c & 0x0000000f]);
+ 724              		.loc 1 111 0
+ 725 0480 DEFEFFEA 		b	ua_outchar
+ 726              	.L57:
+ 727              		.align	2
+ 728              	.L56:
+ 729 0484 00000000 		.word	.LANCHOR2
+ 730              		.cfi_endproc
+ 731              	.LFE6:
+ 732              		.fnend
+ 734              		.align	2
+ 735              		.global	main
+ 737              	main:
+ 738              		.fnstart
+ 739              	.LFB14:
+  55:bellator_low_level.c **** int main(void){
+ 740              		.loc 2 55 0
+ 741              		.cfi_startproc
+ 742              		@ Function supports interworking.
+ 743              		@ args = 0, pretend = 0, frame = 8
+ 744              		@ frame_needed = 0, uses_anonymous_args = 0
+ 745              	.LBB26:
+ 746              	.LBB27:
+ 103:bellator_low_level.c **** 	PLLCFG=0x24;                // 12MHz crystal      -> 60MHz
+ 747              		.loc 2 103 0
+ 748 0488 30319FE5 		ldr	r3, .L60
+ 749              	.LBE27:
+ 750              	.LBE26:
+  55:bellator_low_level.c **** int main(void){
+ 751              		.loc 2 55 0
+ 752 048c 37402DE9 		stmfd	sp!, {r0, r1, r2, r4, r5, lr}
+ 753              		.save {r0, r1, r2, r4, r5, lr}
+ 754              	.LCFI8:
+ 755              		.cfi_def_cfa_offset 24
+ 756              	.LBB29:
+ 757              	.LBB28:
+ 103:bellator_low_level.c **** 	PLLCFG=0x24;                // 12MHz crystal      -> 60MHz
+ 758              		.loc 2 103 0
+ 759 0490 2420A0E3 		mov	r2, #36
+ 760              		.cfi_offset 14, -4
+ 761              		.cfi_offset 5, -8
+ 762              		.cfi_offset 4, -12
+ 763              		.cfi_offset 2, -16
+ 764              		.cfi_offset 1, -20
+ 765              		.cfi_offset 0, -24
+ 766 0494 8420C3E5 		strb	r2, [r3, #132]
+ 109:bellator_low_level.c **** 	PLLCON=0x1;                 //PLLE = 1, PLLEnable
+ 767              		.loc 2 109 0
+ 768 0498 0120A0E3 		mov	r2, #1
+ 769 049c 8020C3E5 		strb	r2, [r3, #128]
+ 110:bellator_low_level.c **** 	PLLFEED=0xAA;               // Validation sequence
+ 770              		.loc 2 110 0
+ 771 04a0 5520E0E3 		mvn	r2, #85
+ 772 04a4 8C20C3E5 		strb	r2, [r3, #140]
+ 111:bellator_low_level.c **** 	PLLFEED=0x55;               // Validation sequence
+ 773              		.loc 2 111 0
+ 774 04a8 AB2082E2 		add	r2, r2, #171
+ 775 04ac 8C20C3E5 		strb	r2, [r3, #140]
+ 776 04b0 0320A0E1 		mov	r2, r3
+ 777              	.L59:
+ 112:bellator_low_level.c **** 	while(!(PLLSTAT & 0x400)); // Wait PLL to lock
+ 778              		.loc 2 112 0
+ 779 04b4 B818D2E1 		ldrh	r1, [r2, #136]
+ 780 04b8 010B11E3 		tst	r1, #1024
+ 781 04bc FC309FE5 		ldr	r3, .L60
+ 782 04c0 FBFFFF0A 		beq	.L59
+ 113:bellator_low_level.c **** 	PLLCON=0x3;                 // PLLC = 1, PLLConnect, Assert the PLL to be the cclk
+ 783              		.loc 2 113 0
+ 784 04c4 0320A0E3 		mov	r2, #3
+ 785 04c8 8020C3E5 		strb	r2, [r3, #128]
+ 114:bellator_low_level.c **** 	PLLFEED=0xAA;               // Validation sequence
+ 786              		.loc 2 114 0
+ 787 04cc 5520E0E3 		mvn	r2, #85
+ 788 04d0 8C20C3E5 		strb	r2, [r3, #140]
+ 115:bellator_low_level.c **** 	PLLFEED=0x55;               // Validation sequence
+ 789              		.loc 2 115 0
+ 790 04d4 AB2082E2 		add	r2, r2, #171
+ 791 04d8 8C20C3E5 		strb	r2, [r3, #140]
+ 792              	.LBE28:
+ 793              	.LBE29:
+ 794              	.LBB30:
+ 795              	.LBB31:
+ 129:bellator_low_level.c **** 	MAMTIM = 4; // 4 clock fetches
+ 796              		.loc 2 129 0
+ 797 04dc 0420A0E3 		mov	r2, #4
+ 798 04e0 0420C3E5 		strb	r2, [r3, #4]
+ 134:bellator_low_level.c **** 	MAMCR = 2;	// MAM functions fully enabled
+ 799              		.loc 2 134 0
+ 800 04e4 0220A0E3 		mov	r2, #2
+ 801 04e8 0020C3E5 		strb	r2, [r3, #0]
+ 802              	.LBE31:
+ 803              	.LBE30:
+ 804              	.LBB32:
+ 805              	.LBB33:
+ 143:bellator_low_level.c **** 	APBDIV &= ~0x03;
+ 806              		.loc 2 143 0
+ 807 04ec 0021D3E5 		ldrb	r2, [r3, #256]	@ zero_extendqisi2
+ 808 04f0 FC2002E2 		and	r2, r2, #252
+ 809 04f4 0021C3E5 		strb	r2, [r3, #256]
+ 810              	.LBE33:
+ 811              	.LBE32:
+  61:bellator_low_level.c **** 	logger_init();
+ 812              		.loc 2 61 0
+ 813 04f8 FEFFFFEB 		bl	logger_init
+  62:bellator_low_level.c **** 	log_string("iniciando\n");
+ 814              		.loc 2 62 0
+ 815 04fc C0009FE5 		ldr	r0, .L60+4
+ 816 0500 FEFFFFEB 		bl	log_string
+ 817              	.LBB34:
+ 818              	.LBB35:
+ 819              	.LBB36:
+ 820              	.LBB37:
+ 821              		.file 3 "irq.c"
+   1:irq.c         **** /*
+   2:irq.c         ****  * irq.c
+   3:irq.c         ****  *
+   4:irq.c         ****  *  Created on: Jul 15, 2009
+   5:irq.c         ****  *      Author: telmo
+   6:irq.c         ****  */
+   7:irq.c         **** 
+   8:irq.c         **** #include "irq.h"
+   9:irq.c         **** 
+  10:irq.c         **** static inline unsigned asm_get_cpsr(void)
+  11:irq.c         **** {
+  12:irq.c         ****   unsigned long retval;
+  13:irq.c         ****   asm volatile (" mrs  %0, cpsr" : "=r" (retval) : /* no inputs */  );
+ 822              		.loc 3 13 0
+ 823              	#APP
+ 824              	@ 13 "irq.c" 1
+ 825 0504 00300FE1 		 mrs  r3, cpsr
+ 826              	@ 0 "" 2
+ 827              	.LVL41:
+ 828              	.LBE37:
+ 829              	.LBE36:
+  14:irq.c         ****   return retval;
+  15:irq.c         **** }
+  16:irq.c         **** 
+  17:irq.c         **** static inline void asm_set_cpsr(unsigned val)
+  18:irq.c         **** {
+  19:irq.c         ****   asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
+  20:irq.c         **** }
+  21:irq.c         **** 
+  22:irq.c         **** inline unsigned enableIRQ(void)
+  23:irq.c         **** {
+  24:irq.c         ****   unsigned _cpsr;
+  25:irq.c         **** 
+  26:irq.c         ****   _cpsr = asm_get_cpsr();
+  27:irq.c         ****   asm_set_cpsr(_cpsr & ~IRQ_MASK);
+ 830              		.loc 3 27 0
+ 831 0508 8030C3E3 		bic	r3, r3, #128
+ 832              	.LVL42:
+ 833              	.LBB38:
+ 834              	.LBB39:
+  19:irq.c         ****   asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
+ 835              		.loc 3 19 0
+ 836              	#APP
+ 837              	@ 19 "irq.c" 1
+ 838 050c 03F029E1 		 msr  cpsr, r3
+ 839              	@ 0 "" 2
+ 840              	.LBE39:
+ 841              	.LBE38:
+ 842              	.LBE35:
+ 843              	.LBE34:
+ 844              	.LBB40:
+ 845              	.LBB41:
+ 162:bellator_low_level.c **** 	PINSEL0 |= 0x05 << 16; // Set the pins function
+ 846              		.loc 2 162 0
+ 847 0510 B0309FE5 		ldr	r3, .L60+8
+ 848 0514 002093E5 		ldr	r2, [r3, #0]
+ 849 0518 052882E3 		orr	r2, r2, #327680
+ 850 051c 002083E5 		str	r2, [r3, #0]
+ 163:bellator_low_level.c **** 	U1FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable, Rx trigger = 1
+ 851              		.loc 2 163 0
+ 852 0520 073943E2 		sub	r3, r3, #114688
+ 853 0524 0720A0E3 		mov	r2, #7
+ 854 0528 0820C3E5 		strb	r2, [r3, #8]
+ 164:bellator_low_level.c **** 	U1LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+ 855              		.loc 2 164 0
+ 856 052c 7C20E0E3 		mvn	r2, #124
+ 857 0530 0C20C3E5 		strb	r2, [r3, #12]
+ 168:bellator_low_level.c **** 	U1DLM	 = 0x00; // DivisorLatchHigh bit
+ 858              		.loc 2 168 0
+ 859 0534 0000A0E3 		mov	r0, #0
+ 167:bellator_low_level.c **** 	U1DLL	 = 0x06; // DivisorLatchLow bit
+ 860              		.loc 2 167 0
+ 861 0538 832082E2 		add	r2, r2, #131
+ 862 053c 0020C3E5 		strb	r2, [r3, #0]
+ 168:bellator_low_level.c **** 	U1DLM	 = 0x00; // DivisorLatchHigh bit
+ 863              		.loc 2 168 0
+ 864 0540 0400C3E5 		strb	r0, [r3, #4]
+ 169:bellator_low_level.c **** 	U1FDR	|= 0x05; // DivAddVal
+ 865              		.loc 2 169 0
+ 866 0544 2820D3E5 		ldrb	r2, [r3, #40]	@ zero_extendqisi2
+ 867 0548 052082E3 		orr	r2, r2, #5
+ 868 054c 2820C3E5 		strb	r2, [r3, #40]
+ 170:bellator_low_level.c **** 	U1FDR	|= 0x0E << 4; // MulVal = 14
+ 869              		.loc 2 170 0
+ 870 0550 2820D3E5 		ldrb	r2, [r3, #40]	@ zero_extendqisi2
+ 179:bellator_low_level.c **** 	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the first 
+ 871              		.loc 2 179 0
+ 872 0554 70109FE5 		ldr	r1, .L60+12
+ 170:bellator_low_level.c **** 	U1FDR	|= 0x0E << 4; // MulVal = 14
+ 873              		.loc 2 170 0
+ 874 0558 E02082E3 		orr	r2, r2, #224
+ 875 055c 2820C3E5 		strb	r2, [r3, #40]
+ 177:bellator_low_level.c **** 	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+ 876              		.loc 2 177 0
+ 877 0560 03C0A0E3 		mov	ip, #3
+ 179:bellator_low_level.c **** 	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the first 
+ 878              		.loc 2 179 0
+ 879 0564 0020E0E3 		mvn	r2, #0
+ 177:bellator_low_level.c **** 	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+ 880              		.loc 2 177 0
+ 881 0568 0CC0C3E5 		strb	ip, [r3, #12]
+ 179:bellator_low_level.c **** 	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the first 
+ 882              		.loc 2 179 0
+ 883 056c F71E02E5 		str	r1, [r2, #-3831]
+ 180:bellator_low_level.c **** 	VICVectCntl2 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
+ 884              		.loc 2 180 0
+ 885 0570 2710A0E3 		mov	r1, #39
+ 886 0574 F71D02E5 		str	r1, [r2, #-3575]
+ 181:bellator_low_level.c **** 	VICIntEnable |= 0x00000080; //source #7 enabled as FIQ or IRQ
+ 887              		.loc 2 181 0
+ 888 0578 EF1F12E5 		ldr	r1, [r2, #-4079]
+ 889 057c 801081E3 		orr	r1, r1, #128
+ 890 0580 EF1F02E5 		str	r1, [r2, #-4079]
+ 185:bellator_low_level.c **** 	tx_restart = 1;
+ 891              		.loc 2 185 0
+ 892 0584 44409FE5 		ldr	r4, .L60+16
+ 183:bellator_low_level.c **** 	cmd_out.in = 0;
+ 893              		.loc 2 183 0
+ 894 0588 44109FE5 		ldr	r1, .L60+20
+ 185:bellator_low_level.c **** 	tx_restart = 1;
+ 895              		.loc 2 185 0
+ 896 058c 0150A0E3 		mov	r5, #1
+ 183:bellator_low_level.c **** 	cmd_out.in = 0;
+ 897              		.loc 2 183 0
+ 898 0590 180081E5 		str	r0, [r1, #24]
+ 184:bellator_low_level.c **** 	cmd_out.out = 0;
+ 899              		.loc 2 184 0
+ 900 0594 1C0081E5 		str	r0, [r1, #28]
+ 185:bellator_low_level.c **** 	tx_restart = 1;
+ 901              		.loc 2 185 0
+ 902 0598 005084E5 		str	r5, [r4, #0]
+ 187:bellator_low_level.c **** 	cmd_in.in = 0;
+ 903              		.loc 2 187 0
+ 904 059c 000081E5 		str	r0, [r1, #0]
+ 188:bellator_low_level.c **** 	cmd_in.out = 0;
+ 905              		.loc 2 188 0
+ 906 05a0 040081E5 		str	r0, [r1, #4]
+ 190:bellator_low_level.c **** 	dummy = U1IIR;   // Read IrqID - Required to Get Interrupts Started
+ 907              		.loc 2 190 0
+ 908 05a4 0810D3E5 		ldrb	r1, [r3, #8]	@ zero_extendqisi2
+ 909 05a8 0710CDE5 		strb	r1, [sp, #7]
+ 910              	.LVL43:
+ 191:bellator_low_level.c **** 	U1IER = 3;       // Enable UART1 RX and THRE Interrupts
+ 911              		.loc 2 191 0
+ 912 05ac 04C0C3E5 		strb	ip, [r3, #4]
+ 913              	.LBE41:
+ 914              	.LBE40:
+  74:bellator_low_level.c **** 	VICDefVectAddr = (unsigned int) &error;
+ 915              		.loc 2 74 0
+ 916 05b0 20309FE5 		ldr	r3, .L60+24
+ 917 05b4 CB3F02E5 		str	r3, [r2, #-4043]
+  84:bellator_low_level.c **** }
+ 918              		.loc 2 84 0
+ 919 05b8 3E40BDE8 		ldmfd	sp!, {r1, r2, r3, r4, r5, lr}
+ 920 05bc 1EFF2FE1 		bx	lr
+ 921              	.L61:
+ 922              		.align	2
+ 923              	.L60:
+ 924 05c0 00C01FE0 		.word	-534790144
+ 925 05c4 0A000000 		.word	.LC1
+ 926 05c8 00C002E0 		.word	-536690688
+ 927 05cc 00000000 		.word	protocol_in
+ 928 05d0 00000000 		.word	.LANCHOR1
+ 929 05d4 00000000 		.word	.LANCHOR0
+ 930 05d8 00000000 		.word	error
+ 931              		.cfi_endproc
+ 932              	.LFE14:
+ 933              		.fnend
+ 935              		.align	2
+ 936              		.global	com_putchar
+ 938              	com_putchar:
+ 939              		.fnstart
+ 940              	.LFB21:
+ 239:bellator_low_level.c **** int com_putchar (int c){
+ 941              		.loc 2 239 0
+ 942              		.cfi_startproc
+ 943              		@ Function supports interworking.
+ 944              		@ args = 0, pretend = 0, frame = 0
+ 945              		@ frame_needed = 0, uses_anonymous_args = 0
+ 946              		@ link register save eliminated.
+ 947              	.LVL44:
+ 245:bellator_low_level.c **** 	if ((cmd->in - cmd->out) >= CMD_BUFF_SIZE)
+ 948              		.loc 2 245 0
+ 949 05dc 5C309FE5 		ldr	r3, .L66
+ 950 05e0 182093E5 		ldr	r2, [r3, #24]
+ 951 05e4 1C1093E5 		ldr	r1, [r3, #28]
+ 952 05e8 021061E0 		rsb	r1, r1, r2
+ 953 05ec 0F0051E3 		cmp	r1, #15
+ 954 05f0 1000008A 		bhi	.L65
+ 252:bellator_low_level.c **** 	if (tx_restart) {
+ 955              		.loc 2 252 0
+ 956 05f4 48C09FE5 		ldr	ip, .L66+4
+ 957 05f8 00109CE5 		ldr	r1, [ip, #0]
+ 958 05fc 000051E3 		cmp	r1, #0
+ 959 0600 0500000A 		beq	.L64
+ 254:bellator_low_level.c **** 		U1THR = c;
+ 960              		.loc 2 254 0
+ 961 0604 3C209FE5 		ldr	r2, .L66+8
+ 253:bellator_low_level.c **** 		tx_restart = 0;
+ 962              		.loc 2 253 0
+ 963 0608 0030A0E3 		mov	r3, #0
+ 964 060c 00308CE5 		str	r3, [ip, #0]
+ 254:bellator_low_level.c **** 		U1THR = c;
+ 965              		.loc 2 254 0
+ 966 0610 0000C2E5 		strb	r0, [r2, #0]
+ 260:bellator_low_level.c **** 	return (0);
+ 967              		.loc 2 260 0
+ 968 0614 0300A0E1 		mov	r0, r3
+ 969              	.LVL45:
+ 970 0618 1EFF2FE1 		bx	lr
+ 971              	.LVL46:
+ 972              	.L64:
+ 256:bellator_low_level.c **** 		cmd->buff[cmd->in & (CMD_BUFF_SIZE - 1)] = c;
+ 973              		.loc 2 256 0
+ 974 061c 0FC002E2 		and	ip, r2, #15
+ 975 0620 0CC083E0 		add	ip, r3, ip
+ 257:bellator_low_level.c **** 		cmd->in++;
+ 976              		.loc 2 257 0
+ 977 0624 012082E2 		add	r2, r2, #1
+ 256:bellator_low_level.c **** 		cmd->buff[cmd->in & (CMD_BUFF_SIZE - 1)] = c;
+ 978              		.loc 2 256 0
+ 979 0628 2000CCE5 		strb	r0, [ip, #32]
+ 257:bellator_low_level.c **** 		cmd->in++;
+ 980              		.loc 2 257 0
+ 981 062c 182083E5 		str	r2, [r3, #24]
+ 260:bellator_low_level.c **** 	return (0);
+ 982              		.loc 2 260 0
+ 983 0630 0100A0E1 		mov	r0, r1
+ 984              	.LVL47:
+ 985 0634 1EFF2FE1 		bx	lr
+ 986              	.LVL48:
+ 987              	.L65:
+ 246:bellator_low_level.c **** 		return (-1);
+ 988              		.loc 2 246 0
+ 989 0638 0000E0E3 		mvn	r0, #0
+ 990              	.LVL49:
+ 261:bellator_low_level.c **** }
+ 991              		.loc 2 261 0
+ 992 063c 1EFF2FE1 		bx	lr
+ 993              	.L67:
+ 994              		.align	2
+ 995              	.L66:
+ 996 0640 00000000 		.word	.LANCHOR0
+ 997 0644 00000000 		.word	.LANCHOR1
+ 998 0648 000001E0 		.word	-536805376
+ 999              		.cfi_endproc
+ 1000              	.LFE21:
+ 1001              		.fnend
+ 1003              		.align	2
+ 1004              		.global	com_getchar
+ 1006              	com_getchar:
+ 1007              		.fnstart
+ 1008              	.LFB22:
+ 265:bellator_low_level.c **** int com_getchar (void){
+ 1009              		.loc 2 265 0
+ 1010              		.cfi_startproc
+ 1011              		@ Function supports interworking.
+ 1012              		@ args = 0, pretend = 0, frame = 0
+ 1013              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1014              		@ link register save eliminated.
+ 1015              	.LVL50:
+ 268:bellator_low_level.c **** 	if ((cmd->in - cmd->out) == 0)
+ 1016              		.loc 2 268 0
+ 1017 064c 20309FE5 		ldr	r3, .L71
+ 1018 0650 060093E8 		ldmia	r3, {r1, r2}	@ phole ldm
+ 1019 0654 020051E1 		cmp	r1, r2
+ 271:bellator_low_level.c **** 	return (cmd->buff[(cmd->out++) & (CMD_BUFF_SIZE - 1)]);
+ 1020              		.loc 2 271 0
+ 1021 0658 0F100212 		andne	r1, r2, #15
+ 1022 065c 01108310 		addne	r1, r3, r1
+ 1023 0660 01208212 		addne	r2, r2, #1
+ 1024 0664 0800D115 		ldrneb	r0, [r1, #8]	@ zero_extendqisi2
+ 1025 0668 04208315 		strne	r2, [r3, #4]
+ 269:bellator_low_level.c **** 		return (-1);
+ 1026              		.loc 2 269 0
+ 1027 066c 0000E003 		mvneq	r0, #0
+ 272:bellator_low_level.c **** }
+ 1028              		.loc 2 272 0
+ 1029 0670 1EFF2FE1 		bx	lr
+ 1030              	.L72:
+ 1031              		.align	2
+ 1032              	.L71:
+ 1033 0674 00000000 		.word	.LANCHOR0
+ 1034              		.cfi_endproc
+ 1035              	.LFE22:
+ 1036              		.fnend
+ 1038              		.align	2
+ 1039              		.global	update_position
+ 1041              	update_position:
+ 1042              		.fnstart
+ 1043              	.LFB26:
+ 313:bellator_low_level.c **** void update_position(void){
+ 1044              		.loc 2 313 0
+ 1045              		.cfi_startproc
+ 1046              		@ Fast Interrupt Service Routine.
+ 1047              		@ args = 0, pretend = 0, frame = 0
+ 1048              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1049 0678 04E04EE2 		sub	lr, lr, #4
+ 1050 067c FF412DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, lr}
+ 1051              		.save {r0, r1, r2, r3, r4, r5, r6, r7, r8, lr}
+ 1052              	.LCFI9:
+ 1053              		.cfi_def_cfa_offset 40
+ 314:bellator_low_level.c **** 	if(calcount_g>0){//calibration
+ 1054              		.loc 2 314 0
+ 1055 0680 00619FE5 		ldr	r6, .L77
+ 1056              		.cfi_offset 14, -4
+ 1057              		.cfi_offset 8, -8
+ 1058              		.cfi_offset 7, -12
+ 1059              		.cfi_offset 6, -16
+ 1060              		.cfi_offset 5, -20
+ 1061              		.cfi_offset 4, -24
+ 1062              		.cfi_offset 3, -28
+ 1063              		.cfi_offset 2, -32
+ 1064              		.cfi_offset 1, -36
+ 1065              		.cfi_offset 0, -40
+ 1066 0684 F430D6E1 		ldrsh	r3, [r6, #4]
+ 1067 0688 000053E3 		cmp	r3, #0
+ 1068 068c F8509FE5 		ldr	r5, .L77+4
+ 1069 0690 F8409FE5 		ldr	r4, .L77+8
+ 1070 0694 210000DA 		ble	.L74
+ 315:bellator_low_level.c **** 		calx += ADC0_Read();
+ 1071              		.loc 2 315 0
+ 1072 0698 007095E5 		ldr	r7, [r5, #0]
+ 1073 069c A9FEFFEB 		bl	ADC0_Read
+ 316:bellator_low_level.c **** 		posx += ((velx*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 1074              		.loc 2 316 0
+ 1075 06a0 343094E5 		ldr	r3, [r4, #52]
+ 315:bellator_low_level.c **** 		calx += ADC0_Read();
+ 1076              		.loc 2 315 0
+ 1077 06a4 070080E0 		add	r0, r0, r7
+ 1078 06a8 000085E5 		str	r0, [r5, #0]
+ 316:bellator_low_level.c **** 		posx += ((velx*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 1079              		.loc 2 316 0
+ 1080 06ac 0A50A0E3 		mov	r5, #10
+ 1081 06b0 950303E0 		mul	r3, r5, r3
+ 1082 06b4 302094E5 		ldr	r2, [r4, #48]
+ 317:bellator_low_level.c **** 		caly += ADC1_Read();
+ 1083              		.loc 2 317 0
+ 1084 06b8 D4709FE5 		ldr	r7, .L77+12
+ 316:bellator_low_level.c **** 		posx += ((velx*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 1085              		.loc 2 316 0
+ 1086 06bc 012042E2 		sub	r2, r2, #1
+ 1087 06c0 033582E0 		add	r3, r2, r3, asl #10
+ 1088 06c4 303084E5 		str	r3, [r4, #48]
+ 317:bellator_low_level.c **** 		caly += ADC1_Read();
+ 1089              		.loc 2 317 0
+ 1090 06c8 008097E5 		ldr	r8, [r7, #0]
+ 1091 06cc B1FEFFEB 		bl	ADC1_Read
+ 318:bellator_low_level.c **** 		posy += ((vely*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 1092              		.loc 2 318 0
+ 1093 06d0 3C2094E5 		ldr	r2, [r4, #60]
+ 1094 06d4 920505E0 		mul	r5, r2, r5
+ 1095 06d8 383094E5 		ldr	r3, [r4, #56]
+ 1096 06dc 013043E2 		sub	r3, r3, #1
+ 1097 06e0 055583E0 		add	r5, r3, r5, asl #10
+ 319:bellator_low_level.c **** 		if(calcount_g == 1){
+ 1098              		.loc 2 319 0
+ 1099 06e4 F430D6E1 		ldrsh	r3, [r6, #4]
+ 317:bellator_low_level.c **** 		caly += ADC1_Read();
+ 1100              		.loc 2 317 0
+ 1101 06e8 080080E0 		add	r0, r0, r8
+ 319:bellator_low_level.c **** 		if(calcount_g == 1){
+ 1102              		.loc 2 319 0
+ 1103 06ec 010053E3 		cmp	r3, #1
+ 317:bellator_low_level.c **** 		caly += ADC1_Read();
+ 1104              		.loc 2 317 0
+ 1105 06f0 000087E5 		str	r0, [r7, #0]
+ 318:bellator_low_level.c **** 		posy += ((vely*10) << 10) - 1;//only to let it in the same situation as in normal circumstances
+ 1106              		.loc 2 318 0
+ 1107 06f4 385084E5 		str	r5, [r4, #56]
+ 319:bellator_low_level.c **** 		if(calcount_g == 1){
+ 1108              		.loc 2 319 0
+ 322:bellator_low_level.c **** 			posx = posy = 0;
+ 1109              		.loc 2 322 0
+ 1110 06f8 0030A003 		moveq	r3, #0
+ 323:bellator_low_level.c **** 			log_string("foi");
+ 1111              		.loc 2 323 0
+ 1112 06fc 94009F05 		ldreq	r0, .L77+16
+ 322:bellator_low_level.c **** 			posx = posy = 0;
+ 1113              		.loc 2 322 0
+ 1114 0700 38308405 		streq	r3, [r4, #56]
+ 1115 0704 30308405 		streq	r3, [r4, #48]
+ 323:bellator_low_level.c **** 			log_string("foi");
+ 1116              		.loc 2 323 0
+ 1117 0708 FEFFFF0B 		bleq	log_string
+ 1118              	.L75:
+ 325:bellator_low_level.c **** 		calcount_g--;
+ 1119              		.loc 2 325 0
+ 1120 070c 74309FE5 		ldr	r3, .L77
+ 1121 0710 B420D3E1 		ldrh	r2, [r3, #4]
+ 1122 0714 012042E2 		sub	r2, r2, #1
+ 1123 0718 B420C3E1 		strh	r2, [r3, #4]	@ movhi
+ 1124 071c 110000EA 		b	.L76
+ 1125              	.L74:
+ 327:bellator_low_level.c **** 		velx = (ADC0_Read() << 10) - calx;
+ 1126              		.loc 2 327 0
+ 1127 0720 88FEFFEB 		bl	ADC0_Read
+ 1128 0724 003095E5 		ldr	r3, [r5, #0]
+ 1129 0728 0005A0E1 		mov	r0, r0, asl #10
+ 1130 072c 000063E0 		rsb	r0, r3, r0
+ 328:bellator_low_level.c **** 		posx += (velx*10);// fixed point with 5 hexa
+ 1131              		.loc 2 328 0
+ 1132 0730 303094E5 		ldr	r3, [r4, #48]
+ 1133 0734 0A50A0E3 		mov	r5, #10
+ 327:bellator_low_level.c **** 		velx = (ADC0_Read() << 10) - calx;
+ 1134              		.loc 2 327 0
+ 1135 0738 340084E5 		str	r0, [r4, #52]
+ 328:bellator_low_level.c **** 		posx += (velx*10);// fixed point with 5 hexa
+ 1136              		.loc 2 328 0
+ 1137 073c 953020E0 		mla	r0, r5, r0, r3
+ 1138 0740 300084E5 		str	r0, [r4, #48]
+ 329:bellator_low_level.c **** 		vely = (ADC1_Read() << 10) - caly;
+ 1139              		.loc 2 329 0
+ 1140 0744 93FEFFEB 		bl	ADC1_Read
+ 1141 0748 1005A0E1 		mov	r0, r0, asl r5
+ 1142 074c 40309FE5 		ldr	r3, .L77+12
+ 1143 0750 003093E5 		ldr	r3, [r3, #0]
+ 1144 0754 000063E0 		rsb	r0, r3, r0
+ 330:bellator_low_level.c **** 		posy += (vely*10);// fixed point with 5 hexa
+ 1145              		.loc 2 330 0
+ 1146 0758 383094E5 		ldr	r3, [r4, #56]
+ 1147 075c 903525E0 		mla	r5, r0, r5, r3
+ 329:bellator_low_level.c **** 		vely = (ADC1_Read() << 10) - caly;
+ 1148              		.loc 2 329 0
+ 1149 0760 3C0084E5 		str	r0, [r4, #60]
+ 330:bellator_low_level.c **** 		posy += (vely*10);// fixed point with 5 hexa
+ 1150              		.loc 2 330 0
+ 1151 0764 385084E5 		str	r5, [r4, #56]
+ 1152              	.L76:
+ 341:bellator_low_level.c **** 	T3IR |= 0x01;//reset interruption
+ 1153              		.loc 2 341 0
+ 1154 0768 2C309FE5 		ldr	r3, .L77+20
+ 1155 076c 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1156 0770 012082E3 		orr	r2, r2, #1
+ 1157 0774 0020C3E5 		strb	r2, [r3, #0]
+ 342:bellator_low_level.c **** 	VICVectAddr = 0;
+ 1158              		.loc 2 342 0
+ 1159 0778 0020A0E3 		mov	r2, #0
+ 1160 077c 0030E0E3 		mvn	r3, #0
+ 1161 0780 CF2F03E5 		str	r2, [r3, #-4047]
+ 343:bellator_low_level.c **** }
+ 1162              		.loc 2 343 0
+ 1163 0784 FF81FDE8 		ldmfd	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, pc}^
+ 1164              	.L78:
+ 1165              		.align	2
+ 1166              	.L77:
+ 1167 0788 00000000 		.word	.LANCHOR1
+ 1168 078c 00000000 		.word	calx
+ 1169 0790 00000000 		.word	.LANCHOR0
+ 1170 0794 00000000 		.word	caly
+ 1171 0798 15000000 		.word	.LC2
+ 1172 079c 004007E0 		.word	-536395776
+ 1173              		.cfi_endproc
+ 1174              	.LFE26:
+ 1175              		.fnend
+ 1177              		.align	2
+ 1178              		.global	pwm_in_handler
+ 1180              	pwm_in_handler:
+ 1181              		.fnstart
+ 1182              	.LFB27:
+ 345:bellator_low_level.c **** void pwm_in_handler(void){
+ 1183              		.loc 2 345 0
+ 1184              		.cfi_startproc
+ 1185              		@ Interrupt Service Routine.
+ 1186              		@ args = 0, pretend = 0, frame = 0
+ 1187              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1188              		@ link register save eliminated.
+ 1189 07a0 1F102DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, ip}
+ 1190              		.save {r0, r1, r2, r3, r4, ip}
+ 1191              	.LCFI10:
+ 1192              		.cfi_def_cfa_offset 24
+ 346:bellator_low_level.c **** 	const unsigned short ir = T1IR;
+ 1193              		.loc 2 346 0
+ 1194 07a4 E4319FE5 		ldr	r3, .L95
+ 1195              		.cfi_offset 12, -4
+ 1196              		.cfi_offset 4, -8
+ 1197              		.cfi_offset 3, -12
+ 1198              		.cfi_offset 2, -16
+ 1199              		.cfi_offset 1, -20
+ 1200              		.cfi_offset 0, -24
+ 1201 07a8 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 348:bellator_low_level.c **** 	if(ir & 0x40){//CAP1.2 pwm0
+ 1202              		.loc 2 348 0
+ 1203 07ac 400012E3 		tst	r2, #64
+ 1204 07b0 3800000A 		beq	.L80
+ 349:bellator_low_level.c **** 		if(T1CCR & 0x40){//rising edge
+ 1205              		.loc 2 349 0
+ 1206 07b4 B822D3E1 		ldrh	r2, [r3, #40]
+ 1207 07b8 400012E3 		tst	r2, #64
+ 1208 07bc D0219FE5 		ldr	r2, .L95+4
+ 1209 07c0 0800000A 		beq	.L81
+ 350:bellator_low_level.c **** 			tmp0 = T1CR2;
+ 1210              		.loc 2 350 0
+ 1211 07c4 341093E5 		ldr	r1, [r3, #52]
+ 1212 07c8 B010C2E1 		strh	r1, [r2, #0]	@ movhi
+ 351:bellator_low_level.c **** 			T1CCR &= ~0x40;//interrupt disabled for the rising edge
+ 1213              		.loc 2 351 0
+ 1214 07cc C4219FE5 		ldr	r2, .L95+8
+ 1215 07d0 B812D3E1 		ldrh	r1, [r3, #40]
+ 1216 07d4 022001E0 		and	r2, r1, r2
+ 1217 07d8 B822C3E1 		strh	r2, [r3, #40]	@ movhi
+ 352:bellator_low_level.c **** 			T1CCR |= 0x80;//interrupt enabled for the falling edge
+ 1218              		.loc 2 352 0
+ 1219 07dc B822D3E1 		ldrh	r2, [r3, #40]
+ 1220 07e0 802082E3 		orr	r2, r2, #128
+ 1221 07e4 260000EA 		b	.L92
+ 1222              	.L81:
+ 1223              	.LBB42:
+ 354:bellator_low_level.c **** 			unsigned short tmp = T1CR2 - tmp0;
+ 1224              		.loc 2 354 0
+ 1225 07e8 341093E5 		ldr	r1, [r3, #52]
+ 1226 07ec B030D2E1 		ldrh	r3, [r2, #0]
+ 1227 07f0 013063E0 		rsb	r3, r3, r1
+ 1228 07f4 0338A0E1 		mov	r3, r3, asl #16
+ 1229              	.LVL51:
+ 355:bellator_low_level.c **** 			if(tmp > 900 && tmp < 2200){
+ 1230              		.loc 2 355 0
+ 1231 07f8 2318A0E1 		mov	r1, r3, lsr #16
+ 1232 07fc 98219FE5 		ldr	r2, .L95+12
+ 1233 0800 3F3383E2 		add	r3, r3, #-67108864
+ 1234              	.LVL52:
+ 1235 0804 7B3883E2 		add	r3, r3, #8060928
+ 1236              	.LVL53:
+ 1237 0808 230852E1 		cmp	r2, r3, lsr #16
+ 1238 080c 1500003A 		bcc	.L83
+ 356:bellator_low_level.c **** 				if(calcountx>0){
+ 1239              		.loc 2 356 0
+ 1240 0810 88319FE5 		ldr	r3, .L95+16
+ 1241              	.LVL54:
+ 1242 0814 F620D3E1 		ldrsh	r2, [r3, #6]
+ 1243 0818 000052E3 		cmp	r2, #0
+ 1244 081c B6C0D3E1 		ldrh	ip, [r3, #6]
+ 1245 0820 0300A0E1 		mov	r0, r3
+ 1246 0824 78319FE5 		ldr	r3, .L95+20
+ 1247 0828 080000DA 		ble	.L84
+ 357:bellator_low_level.c **** 					calpx += tmp;
+ 1248              		.loc 2 357 0
+ 1249 082c 404093E5 		ldr	r4, [r3, #64]
+ 358:bellator_low_level.c **** 					if(calcountx ==1){
+ 1250              		.loc 2 358 0
+ 1251 0830 010052E3 		cmp	r2, #1
+ 357:bellator_low_level.c **** 					calpx += tmp;
+ 1252              		.loc 2 357 0
+ 1253 0834 041081E0 		add	r1, r1, r4
+ 1254 0838 401083E5 		str	r1, [r3, #64]
+ 359:bellator_low_level.c **** 						calpx <<= 3;
+ 1255              		.loc 2 359 0
+ 1256 083c 8111A001 		moveq	r1, r1, asl #3
+ 1257 0840 40108305 		streq	r1, [r3, #64]
+ 361:bellator_low_level.c **** 					calcountx--;
+ 1258              		.loc 2 361 0
+ 1259 0844 01304CE2 		sub	r3, ip, #1
+ 1260 0848 B630C0E1 		strh	r3, [r0, #6]	@ movhi
+ 1261 084c 050000EA 		b	.L83
+ 1262              	.L84:
+ 1263              	.LVL55:
+ 1264              	.LBB43:
+ 366:bellator_low_level.c **** 					vposx += tmp2;//fixed point 5 hexa
+ 1265              		.loc 2 366 0
+ 1266 0850 50219FE5 		ldr	r2, .L95+24
+ 365:bellator_low_level.c **** 					tmp2 -= calpx;
+ 1267              		.loc 2 365 0
+ 1268 0854 403093E5 		ldr	r3, [r3, #64]
+ 1269 0858 000092E5 		ldr	r0, [r2, #0]
+ 1270 085c 003063E0 		rsb	r3, r3, r0
+ 366:bellator_low_level.c **** 					vposx += tmp2;//fixed point 5 hexa
+ 1271              		.loc 2 366 0
+ 1272 0860 811583E0 		add	r1, r3, r1, asl #11
+ 1273              	.LVL56:
+ 1274 0864 001082E5 		str	r1, [r2, #0]
+ 1275              	.L83:
+ 1276              	.LBE43:
+ 371:bellator_low_level.c **** 			T1CCR &= ~0x80;
+ 1277              		.loc 2 371 0
+ 1278 0868 20319FE5 		ldr	r3, .L95
+ 1279 086c 38219FE5 		ldr	r2, .L95+28
+ 1280 0870 B812D3E1 		ldrh	r1, [r3, #40]
+ 1281 0874 022001E0 		and	r2, r1, r2
+ 1282 0878 B822C3E1 		strh	r2, [r3, #40]	@ movhi
+ 372:bellator_low_level.c **** 			T1CCR |= 0x40;
+ 1283              		.loc 2 372 0
+ 1284 087c B822D3E1 		ldrh	r2, [r3, #40]
+ 1285 0880 402082E3 		orr	r2, r2, #64
+ 1286              	.L92:
+ 1287 0884 B822C3E1 		strh	r2, [r3, #40]	@ movhi
+ 1288              	.LBE42:
+ 374:bellator_low_level.c **** 		T1IR |= 0x40; //reset interruption
+ 1289              		.loc 2 374 0
+ 1290 0888 00319FE5 		ldr	r3, .L95
+ 1291 088c 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1292 0890 402082E3 		orr	r2, r2, #64
+ 1293 0894 370000EA 		b	.L94
+ 1294              	.L80:
+ 376:bellator_low_level.c **** 		if(T1CCR & 0x200){//rising edge
+ 1295              		.loc 2 376 0
+ 1296 0898 B822D3E1 		ldrh	r2, [r3, #40]
+ 1297 089c 020C12E3 		tst	r2, #512
+ 1298 08a0 08219FE5 		ldr	r2, .L95+32
+ 1299 08a4 0800000A 		beq	.L87
+ 377:bellator_low_level.c **** 			tmp1 = T1CR3;
+ 1300              		.loc 2 377 0
+ 1301 08a8 381093E5 		ldr	r1, [r3, #56]
+ 1302 08ac B010C2E1 		strh	r1, [r2, #0]	@ movhi
+ 378:bellator_low_level.c **** 			T1CCR &= ~0x200;
+ 1303              		.loc 2 378 0
+ 1304 08b0 FC209FE5 		ldr	r2, .L95+36
+ 1305 08b4 B812D3E1 		ldrh	r1, [r3, #40]
+ 1306 08b8 022001E0 		and	r2, r1, r2
+ 1307 08bc B822C3E1 		strh	r2, [r3, #40]	@ movhi
+ 379:bellator_low_level.c **** 			T1CCR |= 0x400;
+ 1308              		.loc 2 379 0
+ 1309 08c0 B822D3E1 		ldrh	r2, [r3, #40]
+ 1310 08c4 012B82E3 		orr	r2, r2, #1024
+ 1311 08c8 260000EA 		b	.L93
+ 1312              	.L87:
+ 1313              	.LBB44:
+ 381:bellator_low_level.c **** 			unsigned short tmp = T1CR3 - tmp1;
+ 1314              		.loc 2 381 0
+ 1315 08cc 381093E5 		ldr	r1, [r3, #56]
+ 1316 08d0 B030D2E1 		ldrh	r3, [r2, #0]
+ 1317 08d4 013063E0 		rsb	r3, r3, r1
+ 1318 08d8 0338A0E1 		mov	r3, r3, asl #16
+ 1319              	.LVL57:
+ 382:bellator_low_level.c **** 			if(tmp > 900 && tmp < 2200){
+ 1320              		.loc 2 382 0
+ 1321 08dc 2318A0E1 		mov	r1, r3, lsr #16
+ 1322 08e0 B4209FE5 		ldr	r2, .L95+12
+ 1323 08e4 3F3383E2 		add	r3, r3, #-67108864
+ 1324              	.LVL58:
+ 1325 08e8 7B3883E2 		add	r3, r3, #8060928
+ 1326              	.LVL59:
+ 1327 08ec 230852E1 		cmp	r2, r3, lsr #16
+ 1328 08f0 1500003A 		bcc	.L89
+ 383:bellator_low_level.c **** 				if(calcounty>0){
+ 1329              		.loc 2 383 0
+ 1330 08f4 A4309FE5 		ldr	r3, .L95+16
+ 1331              	.LVL60:
+ 1332 08f8 F820D3E1 		ldrsh	r2, [r3, #8]
+ 1333 08fc 000052E3 		cmp	r2, #0
+ 1334 0900 B8C0D3E1 		ldrh	ip, [r3, #8]
+ 1335 0904 0300A0E1 		mov	r0, r3
+ 1336 0908 94309FE5 		ldr	r3, .L95+20
+ 1337 090c 080000DA 		ble	.L90
+ 384:bellator_low_level.c **** 					calpy += tmp;
+ 1338              		.loc 2 384 0
+ 1339 0910 444093E5 		ldr	r4, [r3, #68]
+ 385:bellator_low_level.c **** 					if(calcounty==1){
+ 1340              		.loc 2 385 0
+ 1341 0914 010052E3 		cmp	r2, #1
+ 384:bellator_low_level.c **** 					calpy += tmp;
+ 1342              		.loc 2 384 0
+ 1343 0918 041081E0 		add	r1, r1, r4
+ 1344 091c 441083E5 		str	r1, [r3, #68]
+ 386:bellator_low_level.c **** 						calpy <<= 3;
+ 1345              		.loc 2 386 0
+ 1346 0920 8111A001 		moveq	r1, r1, asl #3
+ 1347 0924 44108305 		streq	r1, [r3, #68]
+ 388:bellator_low_level.c **** 					calcounty--;
+ 1348              		.loc 2 388 0
+ 1349 0928 01304CE2 		sub	r3, ip, #1
+ 1350 092c B830C0E1 		strh	r3, [r0, #8]	@ movhi
+ 1351 0930 050000EA 		b	.L89
+ 1352              	.L90:
+ 1353              	.LVL61:
+ 1354              	.LBB45:
+ 393:bellator_low_level.c **** 					vposy += tmp2;
+ 1355              		.loc 2 393 0
+ 1356 0934 7C209FE5 		ldr	r2, .L95+40
+ 392:bellator_low_level.c **** 					tmp2 -= calpy;
+ 1357              		.loc 2 392 0
+ 1358 0938 443093E5 		ldr	r3, [r3, #68]
+ 1359 093c 000092E5 		ldr	r0, [r2, #0]
+ 1360 0940 003063E0 		rsb	r3, r3, r0
+ 393:bellator_low_level.c **** 					vposy += tmp2;
+ 1361              		.loc 2 393 0
+ 1362 0944 811583E0 		add	r1, r3, r1, asl #11
+ 1363              	.LVL62:
+ 1364 0948 001082E5 		str	r1, [r2, #0]
+ 1365              	.L89:
+ 1366              	.LBE45:
+ 398:bellator_low_level.c **** 			T1CCR &= ~0x400;
+ 1367              		.loc 2 398 0
+ 1368 094c 3C309FE5 		ldr	r3, .L95
+ 1369 0950 64209FE5 		ldr	r2, .L95+44
+ 1370 0954 B812D3E1 		ldrh	r1, [r3, #40]
+ 1371 0958 022001E0 		and	r2, r1, r2
+ 1372 095c B822C3E1 		strh	r2, [r3, #40]	@ movhi
+ 399:bellator_low_level.c **** 			T1CCR |= 0x200;
+ 1373              		.loc 2 399 0
+ 1374 0960 B822D3E1 		ldrh	r2, [r3, #40]
+ 1375 0964 022C82E3 		orr	r2, r2, #512
+ 1376              	.L93:
+ 1377 0968 B822C3E1 		strh	r2, [r3, #40]	@ movhi
+ 1378              	.LBE44:
+ 401:bellator_low_level.c **** 		T1IR |= 0x80; //reset interruption
+ 1379              		.loc 2 401 0
+ 1380 096c 1C309FE5 		ldr	r3, .L95
+ 1381 0970 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1382 0974 802082E3 		orr	r2, r2, #128
+ 1383              	.L94:
+ 1384 0978 0020C3E5 		strb	r2, [r3, #0]
+ 403:bellator_low_level.c **** 	VICVectAddr = 0;
+ 1385              		.loc 2 403 0
+ 1386 097c 0020A0E3 		mov	r2, #0
+ 1387 0980 0030E0E3 		mvn	r3, #0
+ 1388 0984 CF2F03E5 		str	r2, [r3, #-4047]
+ 404:bellator_low_level.c **** }
+ 1389              		.loc 2 404 0
+ 1390 0988 1F10BDE8 		ldmfd	sp!, {r0, r1, r2, r3, r4, ip}
+ 1391 098c 04F05EE2 		subs	pc, lr, #4
+ 1392              	.L96:
+ 1393              		.align	2
+ 1394              	.L95:
+ 1395 0990 008000E0 		.word	-536838144
+ 1396 0994 00000000 		.word	tmp0
+ 1397 0998 BFFF0000 		.word	65471
+ 1398 099c 12050000 		.word	1298
+ 1399 09a0 00000000 		.word	.LANCHOR1
+ 1400 09a4 00000000 		.word	.LANCHOR0
+ 1401 09a8 00000000 		.word	vposx
+ 1402 09ac 7FFF0000 		.word	65407
+ 1403 09b0 00000000 		.word	tmp1
+ 1404 09b4 FFFD0000 		.word	65023
+ 1405 09b8 00000000 		.word	vposy
+ 1406 09bc FFFB0000 		.word	64511
+ 1407              		.cfi_endproc
+ 1408              	.LFE27:
+ 1409              		.fnend
+ 1411              		.align	2
+ 1412              		.global	pid
+ 1414              	pid:
+ 1415              		.fnstart
+ 1416              	.LFB28:
+ 406:bellator_low_level.c **** void pid(void){
+ 1417              		.loc 2 406 0
+ 1418              		.cfi_startproc
+ 1419              		@ Function supports interworking.
+ 1420              		@ args = 0, pretend = 0, frame = 0
+ 1421              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1422 09c0 08402DE9 		stmfd	sp!, {r3, lr}
+ 1423              		.save {r3, lr}
+ 1424              	.LCFI11:
+ 1425              		.cfi_def_cfa_offset 8
+ 449:bellator_low_level.c **** 	log_string("p");
+ 1426              		.loc 2 449 0
+ 1427 09c4 24009FE5 		ldr	r0, .L98
+ 1428              		.cfi_offset 14, -4
+ 1429              		.cfi_offset 3, -8
+ 1430 09c8 FEFFFFEB 		bl	log_string
+ 450:bellator_low_level.c **** 	T2IR |= 0x04;
+ 1431              		.loc 2 450 0
+ 1432 09cc 20309FE5 		ldr	r3, .L98+4
+ 1433 09d0 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1434 09d4 042082E3 		orr	r2, r2, #4
+ 1435 09d8 0020C3E5 		strb	r2, [r3, #0]
+ 451:bellator_low_level.c **** 	VICVectAddr = 0;
+ 1436              		.loc 2 451 0
+ 1437 09dc 0020A0E3 		mov	r2, #0
+ 1438 09e0 0030E0E3 		mvn	r3, #0
+ 1439 09e4 CF2F03E5 		str	r2, [r3, #-4047]
+ 452:bellator_low_level.c **** }
+ 1440              		.loc 2 452 0
+ 1441 09e8 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 1442 09ec 1EFF2FE1 		bx	lr
+ 1443              	.L99:
+ 1444              		.align	2
+ 1445              	.L98:
+ 1446 09f0 19000000 		.word	.LC3
+ 1447 09f4 000007E0 		.word	-536412160
+ 1448              		.cfi_endproc
+ 1449              	.LFE28:
+ 1450              		.fnend
+ 1452              		.global	ascii
+ 1453              		.global	pwm0out
+ 1454              		.global	pwm1out
+ 1455              		.global	calcountx
+ 1456              		.global	calcounty
+ 1457              		.global	calcount_g
+ 1458              		.global	calpx
+ 1459              		.global	calpy
+ 1460              		.global	velx
+ 1461              		.global	vely
+ 1462              		.global	posx
+ 1463              		.global	posy
+ 1464              		.comm	pwm0in,2,2
+ 1465              		.comm	pwm1in,2,2
+ 1466              		.comm	tmp0,2,2
+ 1467              		.comm	tmp1,2,2
+ 1468              		.comm	calx,4,4
+ 1469              		.comm	caly,4,4
+ 1470              		.comm	vposx,4,4
+ 1471              		.comm	vposy,4,4
+ 1472              		.comm	diffx,4,4
+ 1473              		.comm	diffy,4,4
+ 1474              		.section	.rodata
+ 1475              	.LANCHOR2 = . + 0
+ 1478              	ascii:
+ 1479 0000 30313233 		.ascii	"0123456789ABCDEF\000"
+ 1479      34353637 
+ 1479      38394142 
+ 1479      43444546 
+ 1479      00
+ 1480              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 1481              	.LC0:
+ 1482 0000 69727120 		.ascii	"irq error\000"
+ 1482      6572726F 
+ 1482      7200
+ 1483              	.LC1:
+ 1484 000a 696E6963 		.ascii	"iniciando\012\000"
+ 1484      69616E64 
+ 1484      6F0A00
+ 1485              	.LC2:
+ 1486 0015 666F6900 		.ascii	"foi\000"
+ 1487              	.LC3:
+ 1488 0019 7000     		.ascii	"p\000"
+ 1489              		.data
+ 1490              		.align	2
+ 1491              	.LANCHOR1 = . + 0
+ 1494              	tx_restart:
+ 1495 0000 01000000 		.word	1
+ 1498              	calcount_g:
+ 1499 0004 0004     		.short	1024
+ 1502              	calcountx:
+ 1503 0006 0001     		.short	256
+ 1506              	calcounty:
+ 1507 0008 0001     		.short	256
+ 1510              	pwm0out:
+ 1511 000a F401     		.short	500
+ 1514              	pwm1out:
+ 1515 000c F401     		.short	500
+ 1516 000e 0000     		.bss
+ 1517              		.align	2
+ 1518              	.LANCHOR0 = . + 0
+ 1521              	cmd_in:
+ 1522 0000 00000000 		.space	24
+ 1522      00000000 
+ 1522      00000000 
+ 1522      00000000 
+ 1522      00000000 
+ 1525              	cmd_out:
+ 1526 0018 00000000 		.space	24
+ 1526      00000000 
+ 1526      00000000 
+ 1526      00000000 
+ 1526      00000000 
+ 1529              	posx:
+ 1530 0030 00000000 		.space	4
+ 1533              	velx:
+ 1534 0034 00000000 		.space	4
+ 1537              	posy:
+ 1538 0038 00000000 		.space	4
+ 1541              	vely:
+ 1542 003c 00000000 		.space	4
+ 1545              	calpx:
+ 1546 0040 00000000 		.space	4
+ 1549              	calpy:
+ 1550 0044 00000000 		.space	4
+ 1551              		.text
+ 1552              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 bellator_low_level.c
+     /tmp/cctsP8oM.s:21     .text:00000000 $a
+     /tmp/cctsP8oM.s:23     .text:00000000 ua_outchar
+     /tmp/cctsP8oM.s:47     .text:00000018 $d
+                       .ARM.exidx:00000000 $d
+     /tmp/cctsP8oM.s:52     .text:0000001c $a
+     /tmp/cctsP8oM.s:55     .text:0000001c protocol_in
+     /tmp/cctsP8oM.s:106    .text:00000058 $d
+     /tmp/cctsP8oM.s:121    .text:0000008c $a
+     /tmp/cctsP8oM.s:192    .text:0000013c $d
+                       .ARM.extab:00000000 $d
+     /tmp/cctsP8oM.s:199    .text:00000148 $a
+     /tmp/cctsP8oM.s:201    .text:00000148 ADC0_Read
+     /tmp/cctsP8oM.s:238    .text:0000018c $d
+     /tmp/cctsP8oM.s:245    .text:00000198 $a
+     /tmp/cctsP8oM.s:247    .text:00000198 ADC1_Read
+     /tmp/cctsP8oM.s:284    .text:000001dc $d
+     /tmp/cctsP8oM.s:291    .text:000001e8 $a
+     /tmp/cctsP8oM.s:294    .text:000001e8 logger_init
+     /tmp/cctsP8oM.s:323    .text:00000218 $d
+     /tmp/cctsP8oM.s:328    .text:0000021c $a
+     /tmp/cctsP8oM.s:331    .text:0000021c log_int
+     /tmp/cctsP8oM.s:412    .text:000002bc $d
+     /tmp/cctsP8oM.s:417    .text:000002c0 $a
+     /tmp/cctsP8oM.s:420    .text:000002c0 log_short
+     /tmp/cctsP8oM.s:486    .text:00000328 $d
+     /tmp/cctsP8oM.s:491    .text:0000032c $a
+     /tmp/cctsP8oM.s:494    .text:0000032c log_string
+     /tmp/cctsP8oM.s:539    .text:00000360 error
+     /tmp/cctsP8oM.s:566    .text:00000374 $d
+     /tmp/cctsP8oM.s:571    .text:00000378 $a
+     /tmp/cctsP8oM.s:574    .text:00000378 log2bytes
+     /tmp/cctsP8oM.s:640    .text:000003e0 $d
+     /tmp/cctsP8oM.s:645    .text:000003e4 $a
+     /tmp/cctsP8oM.s:648    .text:000003e4 log4bytes
+     /tmp/cctsP8oM.s:729    .text:00000484 $d
+     /tmp/cctsP8oM.s:734    .text:00000488 $a
+     /tmp/cctsP8oM.s:737    .text:00000488 main
+     /tmp/cctsP8oM.s:924    .text:000005c0 $d
+     /tmp/cctsP8oM.s:935    .text:000005dc $a
+     /tmp/cctsP8oM.s:938    .text:000005dc com_putchar
+     /tmp/cctsP8oM.s:996    .text:00000640 $d
+     /tmp/cctsP8oM.s:1003   .text:0000064c $a
+     /tmp/cctsP8oM.s:1006   .text:0000064c com_getchar
+     /tmp/cctsP8oM.s:1033   .text:00000674 $d
+     /tmp/cctsP8oM.s:1038   .text:00000678 $a
+     /tmp/cctsP8oM.s:1041   .text:00000678 update_position
+     /tmp/cctsP8oM.s:1167   .text:00000788 $d
+                            *COM*:00000004 calx
+                            *COM*:00000004 caly
+     /tmp/cctsP8oM.s:1177   .text:000007a0 $a
+     /tmp/cctsP8oM.s:1180   .text:000007a0 pwm_in_handler
+     /tmp/cctsP8oM.s:1395   .text:00000990 $d
+                            *COM*:00000002 tmp0
+                            *COM*:00000004 vposx
+                            *COM*:00000002 tmp1
+                            *COM*:00000004 vposy
+     /tmp/cctsP8oM.s:1411   .text:000009c0 $a
+     /tmp/cctsP8oM.s:1414   .text:000009c0 pid
+     /tmp/cctsP8oM.s:1446   .text:000009f0 $d
+     /tmp/cctsP8oM.s:1478   .rodata:00000000 ascii
+     /tmp/cctsP8oM.s:1510   .data:0000000a pwm0out
+     /tmp/cctsP8oM.s:1514   .data:0000000c pwm1out
+     /tmp/cctsP8oM.s:1502   .data:00000006 calcountx
+     /tmp/cctsP8oM.s:1506   .data:00000008 calcounty
+     /tmp/cctsP8oM.s:1498   .data:00000004 calcount_g
+     /tmp/cctsP8oM.s:1545   .bss:00000040 calpx
+     /tmp/cctsP8oM.s:1549   .bss:00000044 calpy
+     /tmp/cctsP8oM.s:1533   .bss:00000034 velx
+     /tmp/cctsP8oM.s:1541   .bss:0000003c vely
+     /tmp/cctsP8oM.s:1529   .bss:00000030 posx
+     /tmp/cctsP8oM.s:1537   .bss:00000038 posy
+                            *COM*:00000002 pwm0in
+                            *COM*:00000002 pwm1in
+                            *COM*:00000004 diffx
+                            *COM*:00000004 diffy
+     /tmp/cctsP8oM.s:1490   .data:00000000 $d
+     /tmp/cctsP8oM.s:1494   .data:00000000 tx_restart
+     /tmp/cctsP8oM.s:1517   .bss:00000000 $d
+     /tmp/cctsP8oM.s:1521   .bss:00000000 cmd_in
+     /tmp/cctsP8oM.s:1525   .bss:00000018 cmd_out
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_unwind_cpp_pr0
+__aeabi_unwind_cpp_pr1
