@@ -19,9 +19,8 @@
 
 /* interruptions */
 void __attribute__ ((interrupt("IRQ"))) protocol_in(void);
-//void __attribute__ ((interrupt("FIQ"))) update_position(void);
+void __attribute__ ((interrupt("IRQ"))) encoder_pulse_in(void);
 void __attribute__ ((interrupt("IRQ"))) error(void);
-
 
 /* init functions */
 inline void PLL_Init(void);
@@ -34,10 +33,10 @@ inline void adc_init(void);
 inline void pwm_out_init(void);
 static inline void protocol_init(void);
 
-
-/* getters */
+/* getters and setters */
 int get_ir_sensor_data(unsigned short i);
 int get_encoder_count(unsigned short i);
+void set_wheel_pwm(unsigned short wheel, unsigned short val);
 
 /* auxiliary functions */
 static void protocol_out_cmd(void);
@@ -52,6 +51,7 @@ struct cmd_buff {
 /* global variables */
 static struct cmd_buff cmd_out = { 0, };
 static struct cmd_buff cmd_in = { 0, };
+static int encoder_count[2] = { 0, 0};
 
 /**
  * Entry point
@@ -69,14 +69,11 @@ int main(void){
 
 	enableIRQ(); // Enable interruptions
 
-	pulses_in_init(); // start counting pulses from the encoder	| Timer 0 counter mode, no interruption
+	pulses_in_init(); // start counting pulses from the encoder	| Timer 2, Int prirority 0
 	i2c_init(); // start the communication with the IMU			| Int prirority 1
 	adc_init(); // start reading the IR sensor signals			| Burst mode, no interruption
-	pwm_out_init(); // start pwm for the H bridges				| Int prirority 2
+	pwm_out_init(); // start pwm for the H bridges				| Timer 0 and Timer 1 operating in PWM mode
 	protocol_init(); // start the communication protocol		| Int prirority 3
-
-	//enableFIQ();
-	//positioning_init();
 
 	VICDefVectAddr = (unsigned int) &error;
 
@@ -141,11 +138,23 @@ inline void APB_Init(void){
 }
 
 /**
- * Timer 2, capture pins as event counter
+ * Timer 2, capture pins generating interruptions for event counter
+ * The timer has no function, except for the interrupt generation.
  */
 inline void pulses_in_init(void){
 
+	// Set the pin function
+	PINSEL1 |= 0x2 << 22; // CAP2.0
+	PINSEL1 |= 0x2 << 24; // CAP2.1
 
+	// Timer Setup
+	T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
+	T2CCR |= 0x5 << 3; // capture and interrupt on CAP2.1 rising edge
+	T2TCR = 1; //enable T2
+
+	VICVectAddr0 = (unsigned int) &encoder_pulse_in; //Setting the interrupt handler location
+	VICVectCntl0 = 0x3A; //Vectored Interrupt slot enabled with source #26 (TIMER2)
+	VICIntEnable |= 0x1 << 26; //source #26 enabled as FIQ or IRQ
 }
 
 /**
@@ -175,10 +184,49 @@ inline void adc_init(void){
 }
 
 /**
- * Timer 1
+ * Timer 0,1, 200Hz, at least 76 levels to comply with the old version
+ * Timer 0 -> left wheel
+ * Timer 1 -> right wheel
  */
 inline void pwm_out_init(void){
 
+	// Set the pin function
+	PINSEL1 |= 0x2 << 0;  // MAT0.2
+	PINSEL0 |= 0x2 << 10; // MAT0.1
+	PINSEL0 |= 0x2 << 24; // MAT1.0
+	PINSEL0 |= 0x2 << 26; // MAT1.1
+
+#ifdef CRYSTAL12MHz
+	T0PR = 294; // 255 levels for T2TC in 5ms
+	T1PR = 294;
+#endif
+#ifdef CRYSTAL14745600Hz
+	T0PR = 289; // 255 levels for T2TC in 5ms
+	T1PR = 289;
+#endif
+
+	T0PC = 0; // Prescale = 0
+	T1PC = 0;
+	T0TC = 0; // Counter = 0
+	T1TC = 0;
+
+	T0MCR |= (0x1 << 10); // Reset the counter on MAT0.3
+	T1MCR |= (0x1 << 10); // Reset the counter on MAT1.3
+	T0MR3 = 255; // MAT0.3 every 255 counts (5ms)
+	T1MR3 = 255; // MAT1.3 every 255 counts (5ms)
+
+	T0PWMCON |= (0x1 << 2); // MAT0.2 configured as PWM output
+	T0PWMCON |= (0x1 << 1); // MAT0.1 configured as PWM output
+	T1PWMCON |= (0x1 << 0); // MAT1.0 configured as PWM output
+	T1PWMCON |= (0x1 << 1); // MAT1.1 configured as PWM output
+
+	T0MR2 = 0; // initially LOW
+	T0MR1 = 84; // initially LOW
+	T1MR0 = 168; // initially LOW
+	T1MR1 = 255; // initially LOW
+
+	T0TCR = 1; // enable T0
+	T1TCR = 1; // enable T1
 }
 
 /**
@@ -245,8 +293,8 @@ void protocol_in(void){
 		case 0x0C: // Character Time-Out
 			cmd_in.buff[cmd_in.i] = U1RBR;
 
-			if (cmd_in.buff[cmd_in.i] == 'e'/*END_CMD*/) {
-				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'y'/*SYNC*/) {
+			if (cmd_in.buff[cmd_in.i] == /*'e'*/ END_CMD) {
+				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'y'*/ SYNC) {
 					// Send IR info
 					for (int i = OPTICAL_SENSOR_0; i <= OPTICAL_SENSOR_4; i++) {
 						cmd_out.buff[0] = i;
@@ -267,12 +315,36 @@ void protocol_in(void){
 						cmd_out.i = 5;
 						protocol_out_cmd();
 					}
-				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 's'/*STOP*/) {
-					//protocol_out_cmd("STOP\n");
-				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l'/*LEFT_WHEEL*/) {
-					//out_cmd("LEFT_WHEEL\n");
-				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'r'/*RIGHT_WHEEL*/) {
-					//protocol_out_cmd("RIGHT_WHEEL\n");
+				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'s'*/ STOP ) {
+					// Stop PWMs
+					set_wheel_pwm(LEFT_WHEEL,0);
+					set_wheel_pwm(RIGHT_WHEEL,0);
+
+				} else if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'l'*/ LEFT_WHEEL
+						|| cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'r'*/ RIGHT_WHEEL) {
+
+					/*if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l') {
+						if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l') {
+							set_wheel_pwm(LEFT_WHEEL, 0x00 );
+						} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'm') {
+							set_wheel_pwm(LEFT_WHEEL, 0x0E);
+						} else {
+							set_wheel_pwm(LEFT_WHEEL, 0x7F);
+						}
+					}
+
+					if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'r') {
+						if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l') {
+							set_wheel_pwm(RIGHT_WHEEL, 0x00 );
+						} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'm') {
+							set_wheel_pwm(RIGHT_WHEEL, 0x0E);
+						} else {
+							set_wheel_pwm(RIGHT_WHEEL, 0x7F);
+						}
+					}*/
+
+					set_wheel_pwm(cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)],
+							(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));
 				}
 			}
 			cmd_in.i = (cmd_in.i + 1) & (CMD_BUFF_SIZE-1);
@@ -292,6 +364,25 @@ void protocol_in(void){
 	}
 
 	// TODO: enable interruptions
+
+	VICVectAddr = 0;
+}
+
+/**
+ * Count the encoder pulses using CAP2.0-1 as interrupt sources
+ */
+void encoder_pulse_in(void) {
+
+	const unsigned short ir = T2IR;
+
+	if (ir & (0x1 << 4)) { //CAP2.0 left encoder
+		encoder_count[0]++;
+		T2IR |= 0x1 << 4; // reset CAP2.0
+	}
+	if (ir & (0x1 << 5)) { //CAP2.1 right encoder
+		encoder_count[1]++;
+		T2IR |= 0x1 << 5; // reset CAP2.1
+	}
 
 	VICVectAddr = 0;
 }
@@ -351,8 +442,34 @@ int get_ir_sensor_data(unsigned short i) {
  * Return the value read from the i'th sensor
  */
 int get_encoder_count(unsigned short i) {
-	int val = 0;
+	int val;
+	val = encoder_count[i - ENCODER_L];
+	encoder_count[i - ENCODER_L] = 0;
 	return val;
+}
+
+/**
+ * Set the output pwm value
+ */
+void set_wheel_pwm(unsigned short wheel, unsigned short val) {
+
+	if (wheel == LEFT_WHEEL) {
+		if (val & PWM_DIR) { // Forward
+			T0MR1 = 256;
+			T0MR2 = 256 - val;
+		} else { // Backwards
+			T0MR2 = 256;
+			T0MR1 = 256 - val;
+		}
+	} else if (wheel == RIGHT_WHEEL) {
+		if (val & PWM_DIR) { // Forward
+			T1MR1 = 256;
+			T1MR0 = 256 - val;
+		} else { // Backwards
+			T1MR0 = 256;
+			T1MR1 = 256 - val;
+		}
+	}
 }
 
 /**
@@ -370,232 +487,3 @@ static void protocol_out_char(char c){
 	U1THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
 	while(!(U1LSR & 0x40));
 }
-
-//void out_str(const char *s){
-//	while(*s){
-//		if(*s == '\n')
-//			out_char('\r'); // \n + \r = new line
-//		protocol_out_char(*s);
-//		s++;
-//	}
-//}
-
-
-
-//inline void positioning_init(void){
-//    //ADC
-//	PINSEL1 |= 0x0000F000; // Set the pin function
-//
-//	//FIQ
-//	VICIntSelect |= 0x08000000;//Timer 3 as FIQ
-//	VICIntEnable |= 0x08000000;//source #27 enabled as FIQ or IRQ
-//
-//	//TIMER
-//	T3MR0 = 10000;//10000;//5ms -> 200Hz
-//	T3MCR = 0x03;//reset and interrupt on match0
-//	T3PC = 0;//Prescale = 0
-//	T3PR = 0x1C;//Prescale increments i 30 cclk cycles
-//	T3TC = 0;//Reset T3
-//	T3TCR = 1;//enable T3
-//	//T3TC = T2TC;
-//}
-
-//static inline int ADC0_Read(void){
-//	int i;
-//	ADCR |= 0x01200601; // Start A/D Conversion Enabled, No Burst, 4,28MHz se pclk=30MHz
-//	while(!(ADSTAT & 0x00000001)); // Wait for end of A/D Conversion
-//	i = ADDR0; // Read A/D Data Register
-//	ADCR &= 0xFEDFF9FE; // Stop A/D Conversion
-//	return (i >> 6); // bit 6:15 is 10 bit AD value
-//}
-//
-//static inline int ADC1_Read(void){
-//	int i;
-//	ADCR |= 0x01200602; // Start A/D Conversion Enabled, No Burst, 4,28MHz se pclk=30MHz
-//	while(!(ADSTAT & 0x00000002)); // Wait for end of A/D Conversion
-//	i = ADDR1; // Read A/D Data Register
-//	ADCR &= 0xFEDFF9FD; // Stop A/D Conversion
-//	return (i >> 6); // bit 6:15 is 10 bit AD value
-//}
-
-//int count1 = 0;
-//void update_position(void){
-//	if(calcount_g>0){//calibration
-//		calx += ADC0_Read();
-//		posx += ((velx*10) << 10) - 1;//only to let it in the same situation as i normal circumstances
-//		caly += ADC1_Read();
-//		posy += ((vely*10) << 10) - 1;//only to let it i the same situation as in normal circumstances
-//		if(calcount_g == 1){
-//			//calx >>= 1;
-//			//caly >>= 1;
-//			posx = posy = 0;
-//			log_string("foi");
-//		}
-//		calcount_g--;
-//	}else{
-//		velx = (ADC0_Read() << 10) - calx;
-//		posx += (velx*10);// fixed point with 5 hexa
-//		vely = (ADC1_Read() << 10) - caly;
-//		posy += (vely*10);// fixed point with 5 hexa
-//		/*if(count1 == 35){
-//			log_string("x: ");
-//			log4bytes(posx);
-//			log_string("\ty: ");
-//			log4bytes(posy);
-//			log_string("\n");
-//			count1=0;
-//		}else
-//			count1++;*/
-//	}
-//	T3IR |= 0x01;//reset interruption
-//	VICVectAddr = 0;
-//}
-//
-//void pwm_in_handler(void){
-//	const unsigned short ir = T1IR;
-//	//capture 1.2 and 1.3
-//	if(ir & 0x40){//CAP1.2 pwm0
-//		if(T1CCR & 0x40){//rising edge
-//			tmp0 = T1CR2;
-//			T1CCR &= ~0x40;//interrupt disabled for the rising edge
-//			T1CCR |= 0x80;//interrupt enabled for the falling edge
-//		}else{//falling
-//			unsigned short tmp = T1CR2 - tmp0;
-//			if(tmp > 900 && tmp < 2200){
-//				if(calcountx>0){
-//					calpx += tmp;
-//					if(calcountx ==1){
-//						calpx <<= 3;
-//					}
-//					calcountx--;
-//				}else{
-//					int tmp2 = tmp;
-//					tmp2 <<= 11;
-//					tmp2 -= calpx;
-//					vposx += tmp2;//fixed point 5 hexa
-//					//pwm1 measured
-//					//pwm0in = tmp - (calpx >> 11);
-//				}
-//			}
-//			T1CCR &= ~0x80;
-//			T1CCR |= 0x40;
-//		}
-//		T1IR |= 0x40; //reset interruption
-//	}else{//CAP1.3 pwm1
-//		if(T1CCR & 0x200){//rising edge
-//			tmp1 = T1CR3;
-//			T1CCR &= ~0x200;
-//			T1CCR |= 0x400;
-//		}else{//falling
-//			unsigned short tmp = T1CR3 - tmp1;
-//			if(tmp > 900 && tmp < 2200){
-//				if(calcounty>0){
-//					calpy += tmp;
-//					if(calcounty==1){
-//						calpy <<= 3;
-//					}
-//					calcounty--;
-//				}else{
-//					int tmp2 = tmp;
-//					tmp2 <<= 11;
-//					tmp2 -= calpy;
-//					vposy += tmp2;
-//					//pwm1 measured
-//					//pwm1in = tmp - (calpy >> 11);
-//				}
-//			}
-//			T1CCR &= ~0x400;
-//			T1CCR |= 0x200;
-//		}
-//		T1IR |= 0x80; //reset interruption
-//	}
-//	VICVectAddr = 0;
-//}
-//
-//void pid(void){
-	//pwm0out = 499;
-	//pwm1out = 499;
-	//if(calcount_g == 0){
-	/*	diffx = posx - vposx;//fixed point 5 hexa
-		diffy = posy - vposy;
-
-		int tmpx = diffx >> 20;//4 hexa places
-		int tmpy = diffy >> 20;
-
-		log4bytes(tmpx);
-		if(tmpx>500){
-			tmpx = 500;
-		}else if(tmpx<-500){
-			tmpx = -500;
-		}
-		if(tmpy>500){
-			tmpy = 500;
-		}else if(tmpy<-500){
-			tmpy = -500;
-		}
-
-
-		//log4bytes(posx);
-		//log_string("P");
-
-		if(pwm0out == 999)
-			pwm0out = 0;
-		else
-			pwm0out++;
-
-		if(pwm1out == 999)
-			pwm1out = 0;
-		else
-			pwm1out++;
-	*/
-//		T2MR0 = 18999 - tmpx;//pwm0out;//set pwm0 output
-//		T2MR1 = 18999 - tmpy;//pwm1out;//set pwm1 output
-	//}
-
-	//T2MR0 = 18000 + pwm0in;//pwm0out;//set pwm0 output
-	//T2MR1 = 18000 + pwm1in;//pwm1out;//set pwm1 output
-//
-//	log_string("p");
-//	T2IR |= 0x04;
-//	VICVectAddr = 0;
-//}
-
-/*inline void pwm_out_init(void){
-	PINSEL0 |= 0x00028000; //Output pins set for MAT2.0 and MAT2.1
-
-	VICVectAddr0 = (unsigned int) &pid; //Setting the interrupt handler location
-	//to the first vectored interruption slot
-	VICVectCntl0 = 0x3A; //Vectored Interrupt slot 0 enabled with source #26 (TIMER2)
-	VICIntEnable |= 0x04000000; //source #26 enabled as FIQ or IRQ
-
-	T2MR0 = 18500;//20000-1100 -> pwm0
-	T2MR1 = 18500;//20000-1900 -> pwm1
-	T2MR2 = 15000;// PID
-	T2MR3 = 20000;//20ms -> period
-
-	T2MCR |= 0x0440;//reset on match3 and interrupt on match2
-	T2PWMCON |= 0x03; //set match0 and match1 as pwm;
-
-	T2PC = 0;//Prescale = 0
-	T2PR = 0x1C;//Prescale increments i 30 cclk cycles
-	T2TC = 0;//Reset T2
-	T2TCR = 1;//enable T2
-}
-
-inline void pwm_in_init(void){
-	PINSEL1 |= 0x000000028;//set pin capture function CAP1.2 - p0.17, CAP1.3 p0.18
-
-	VICVectAddr1 = (unsigned int) &pwm_in_handler; //Setting the interrupt handler location
-	//to the second vectored interruption slot
-	VICVectCntl1 = 0x25; //Vectored Interrupt slot 1 enabled with source #5 (TIMER1)
-	VICIntEnable |= 0x20; //source #5 enabled as FIQ or IRQ
-
-	T1CCR |= 0x0B40;//interrupt for Capture 2,3 rising edges
-
-	T1PC = 0; //Prescale = 0;
-	T1PR = 0x1C; //Prescale increments i 30 cclk cycles
-	T1TC = 0; // reset T1
-	T1TCR = 1; //enable T1
-}*/
-
-
