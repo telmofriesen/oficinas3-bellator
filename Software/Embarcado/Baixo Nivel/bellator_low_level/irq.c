@@ -19,7 +19,7 @@ static inline void asm_set_cpsr(unsigned val)
   asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
 }
 
-inline unsigned enableIRQ(void)
+static inline unsigned enableIRQ(void)
 {
   unsigned _cpsr;
 
@@ -28,7 +28,7 @@ inline unsigned enableIRQ(void)
   return _cpsr;
 }
 
-inline unsigned disableIRQ(void)
+static inline unsigned disableIRQ(void)
 {
   unsigned _cpsr;
 
@@ -37,7 +37,7 @@ inline unsigned disableIRQ(void)
   return _cpsr;
 }
 
-inline unsigned restoreIRQ(unsigned oldCPSR)
+static inline unsigned restoreIRQ(unsigned oldCPSR)
 {
   unsigned _cpsr;
 
@@ -46,7 +46,7 @@ inline unsigned restoreIRQ(unsigned oldCPSR)
   return _cpsr;
 }
 
-inline unsigned enableFIQ(void)
+static inline unsigned enableFIQ(void)
 {
   unsigned _cpsr;
 
@@ -55,7 +55,7 @@ inline unsigned enableFIQ(void)
   return _cpsr;
 }
 
-inline unsigned disableFIQ(void)
+static inline unsigned disableFIQ(void)
 {
   unsigned _cpsr;
 

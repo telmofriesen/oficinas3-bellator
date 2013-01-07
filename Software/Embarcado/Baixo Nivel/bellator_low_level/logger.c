@@ -29,7 +29,7 @@ void logger_init(void){ // using UART0
 	U0FDR	|= 0x05; // DivAddVal
 	U0FDR	|= 0x0E << 4; // MulVal = 14
 #endif
-#ifdef CRYSTAL14.7456MHz
+#ifdef CRYSTAL14745600Hz
 	U0DLL	 = 0x08; // DivisorLatchLow bit
 	U0DLM	 = 0x00; // DivisorLatchHigh bit
 #endif

@@ -13,10 +13,10 @@
 
 static inline unsigned asm_get_cpsr(void);
 static inline void asm_set_cpsr(unsigned val);
-inline unsigned enableIRQ(void);
-inline unsigned disableIRQ(void);
-inline unsigned restoreIRQ(unsigned oldCPSR);
-inline unsigned enableFIQ(void);
-inline unsigned disableFIQ(void);
+static inline unsigned enableIRQ(void);
+static inline unsigned disableIRQ(void);
+static inline unsigned restoreIRQ(unsigned oldCPSR);
+static inline unsigned enableFIQ(void);
+static inline unsigned disableFIQ(void);
 
 #endif /* IRQ_H_ */
