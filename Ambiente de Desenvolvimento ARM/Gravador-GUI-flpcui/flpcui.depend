@@ -1,0 +1,353 @@
+# depslib dependency file v1.0
+1316110007 source:/home/moses/Projects/flpcui/flpcui.cpp
+	"flpcui.h"
+	<FL/Fl_Preferences.H>
+	<FL/filename.H>
+
+1316110007 /home/moses/Projects/flpcui/flpcui.h
+	<FL/Fl.H>
+	<string>
+	<FL/Fl_Double_Window.H>
+	<FL/Fl_Group.H>
+	<FL/Fl_Button.H>
+	<FL/Fl_Output.H>
+	<FL/Fl_Choice.H>
+	<FL/Fl_Check_Button.H>
+	<FL/Fl_Int_Input.H>
+	<FL/Fl_Scroll.H>
+	<FL/Fl_Text_Display.H>
+	<FL/Fl_Menu_Bar.H>
+
+1316110220 /usr/local/include/FL/Fl.H
+	<FL/Fl_Cairo.H>
+	"fl_utf8.h"
+	"Enumerations.H"
+
+1316110220 /usr/local/include/FL/Fl_Cairo.H
+	<FL/Fl_Export.H>
+	<cairo-xlib.h>
+	<cairo-win32.h>
+	<cairo-quartz.h>
+
+1316110220 /usr/local/include/FL/Fl_Export.H
+
+1316110221 /usr/local/include/FL/fl_utf8.h
+	"Fl_Export.H"
+	"fl_types.h"
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<locale.h>
+	<ctype.h>
+	<wchar.h>
+	<sys/stat.h>
+	<sys/types.h>
+	<sys/stat.h>
+	"Xutf8.h"
+	<X11/Xlocale.h>
+	<X11/Xlib.h>
+	<locale.h>
+
+1316110221 /usr/local/include/FL/fl_types.h
+
+1316110221 /usr/local/include/FL/Xutf8.h
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xlocale.h>
+	<X11/Xutil.h>
+
+1316110220 /usr/local/include/FL/Enumerations.H
+	"Fl_Export.H"
+	"fl_types.h"
+
+1316110220 /usr/local/include/FL/Fl_Double_Window.H
+	"Fl_Window.H"
+
+1316110221 /usr/local/include/FL/Fl_Window.H
+	"Fl_Group.H"
+
+1316110221 /usr/local/include/FL/Fl_Group.H
+	"Fl_Widget.H"
+
+1316110221 /usr/local/include/FL/Fl_Widget.H
+	"Enumerations.H"
+	<stdint.h>
+	<stddef.h>
+
+1316110221 /usr/local/include/FL/Fl_Input.H
+	"Fl_Input_.H"
+
+1316110221 /usr/local/include/FL/Fl_Input_.H
+	"Fl_Widget.H"
+
+1316110220 /usr/local/include/FL/Fl_Button.H
+	"Fl_Widget.H"
+
+1316110220 /usr/local/include/FL/Fl_Choice.H
+	"Fl_Menu_.H"
+
+1316110221 /usr/local/include/FL/Fl_Menu_.H
+	"Fl_Widget.H"
+	"Fl_Menu_Item.H"
+
+1316110221 /usr/local/include/FL/Fl_Menu_Item.H
+	"Fl_Widget.H"
+	"Fl_Image.H"
+
+1316110221 /usr/local/include/FL/Fl_Image.H
+	"Enumerations.H"
+
+1316110220 /usr/local/include/FL/Fl_Check_Button.H
+	"Fl_Light_Button.H"
+
+1316110221 /usr/local/include/FL/Fl_Light_Button.H
+	"Fl_Button.H"
+
+1316110221 /usr/local/include/FL/Fl_Int_Input.H
+	"Fl_Input.H"
+
+1316110221 /usr/local/include/FL/Fl_Scroll.H
+	"Fl_Group.H"
+	"Fl_Scrollbar.H"
+
+1316110221 /usr/local/include/FL/Fl_Scrollbar.H
+	"Fl_Slider.H"
+
+1316110221 /usr/local/include/FL/Fl_Slider.H
+	"Fl_Valuator.H"
+
+1316110221 /usr/local/include/FL/Fl_Valuator.H
+	"Fl_Widget.H"
+
+1316110221 /usr/local/include/FL/Fl_Text_Display.H
+	"fl_draw.H"
+	"Fl_Group.H"
+	"Fl_Widget.H"
+	"Fl_Scrollbar.H"
+	"Fl_Text_Buffer.H"
+
+1316110221 /usr/local/include/FL/fl_draw.H
+	<FL/x.H>
+	<FL/Enumerations.H>
+	<FL/Fl_Window.H>
+	<FL/Fl_Device.H>
+
+1316110221 /usr/local/include/FL/x.H
+	"Enumerations.H"
+	"win32.H"
+	"mac.H"
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<X11/Xatom.h>
+	"Fl_Window.H"
+	"Xutf8.h"
+
+1316110221 /usr/local/include/FL/win32.H
+	<windows.h>
+	<FL/Fl_Window.H>
+
+1316110221 /usr/local/include/FL/mac.H
+	<FL/Fl_Widget.H>
+	<ApplicationServices/ApplicationServices.h>
+	"Fl_Window.H"
+
+1316110220 /usr/local/include/FL/Fl_Device.H
+	<FL/x.H>
+	<FL/Fl_Plugin.H>
+	<FL/Fl_Image.H>
+	<FL/Fl_Bitmap.H>
+	<FL/Fl_Pixmap.H>
+	<FL/Fl_RGB_Image.H>
+
+1316110221 /usr/local/include/FL/Fl_Plugin.H
+	"Fl_Preferences.H"
+
+1316110221 /usr/local/include/FL/Fl_Preferences.H
+	<stdio.h>
+	"Fl_Export.H"
+
+1316110220 /usr/local/include/FL/Fl_Bitmap.H
+	"Fl_Image.H"
+
+1316110221 /usr/local/include/FL/Fl_Pixmap.H
+	"Fl_Image.H"
+
+1316110221 /usr/local/include/FL/Fl_RGB_Image.H
+	"Fl_Image.H"
+
+1316110221 /usr/local/include/FL/Fl_Text_Buffer.H
+	<assert.h>
+	"Fl_Export.H"
+
+1316110221 /usr/local/include/FL/Fl_Menu_Bar.H
+	"Fl_Menu_.H"
+
+1316110007 source:/home/moses/Projects/flpcui/lpc21isp/adprog.c
+	"StdAfx.h"
+	"lpc21isp.h"
+	"adprog.h"
+
+1316110007 /home/moses/Projects/flpcui/lpc21isp/lpc21isp.h
+	<windows.h>
+	<io.h>
+	<conio.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<stdlib.h>
+	<string.h>
+	<strings.h>
+	<sys/ioctl.h>
+	<termios.h>
+	<unistd.h>
+	<sys/time.h>
+	<ctype.h>
+	<stdio.h>
+	<stdarg.h>
+	<time.h>
+	<errno.h>
+	<sys/errno.h>
+	<stdlib.h>
+	<string.h>
+	<fcntl.h>
+
+1316110007 /home/moses/Projects/flpcui/lpc21isp/adprog.h
+
+1316110007 source:/home/moses/Projects/flpcui/lpc21isp/lpc21isp.c
+	"StdAfx.h"
+	"lpc21isp.h"
+	"adprog.h"
+	"lpcprog.h"
+	"lpcterm.h"
+
+1316110007 /home/moses/Projects/flpcui/lpc21isp/lpcprog.h
+
+1316110007 /home/moses/Projects/flpcui/lpc21isp/lpcterm.h
+
+1316110007 source:/home/moses/Projects/flpcui/lpc21isp/lpcprog.c
+	"StdAfx.h"
+	"lpc21isp.h"
+	"lpcprog.h"
+
+1309467682 source:/home/moses/Projects/flpcui/lpc21isp/lpcterm.c
+	"StdAfx.h"
+	"lpc21isp.h"
+	"lpcterm.h"
+
+1316133640 source:/home/moses/Projects/flpcui/main.cpp
+	<sys/types.h>
+	<string.h>
+	<tchar.h>
+	<dirent.h>
+	<errno.h>
+	<stdlib.h>
+	<iostream>
+	<string>
+	<sstream>
+	<vector>
+	<cctype>
+	"lpc21isp/lpc21isp.h"
+	"lpc21isp/lpcprog.h"
+	"lpc21isp/adprog.h"
+	<FL/Fl_File_Icon.H>
+	<FL/Fl_Native_File_Chooser.H>
+	"flpcui.h"
+	"threads.h"
+
+1316110221 /usr/local/include/FL/Fl_File_Icon.H
+	"Fl.H"
+
+1316110221 /usr/local/include/FL/Fl_Native_File_Chooser.H
+	<FL/Fl_Native_File_Chooser.H>
+	<FL/Fl_Native_File_Chooser.H>
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<commdlg.h>
+	<shlobj.h>
+	<FL/filename.H>
+	<FL/Fl_File_Chooser.H>
+	<unistd.h>
+	<FL/Fl_Native_File_Chooser.H>
+	<FL/Fl_Native_File_Chooser.H>
+
+1316110221 /usr/local/include/FL/filename.H
+	"/usr/include/dirent.h"
+	"Fl_Export.H"
+	<FL/filename.H>
+	<sys/types.h>
+	<direct.h>
+	<sys/types.h>
+	<dirent.h>
+
+1295653905 /usr/include/dirent.h
+	<features.h>
+	<bits/types.h>
+	<bits/dirent.h>
+	<bits/types.h>
+	<bits/posix1_lim.h>
+	<stddef.h>
+
+1316110221 /usr/local/include/FL/Fl_File_Chooser.H
+	<FL/Fl.H>
+	<FL/Fl_Double_Window.H>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<FL/Fl_Group.H>
+	<FL/Fl_Choice.H>
+	<FL/Fl_Menu_Button.H>
+	<FL/Fl_Button.H>
+	<FL/Fl_Preferences.H>
+	<FL/Fl_Tile.H>
+	<FL/Fl_File_Browser.H>
+	<FL/Fl_Box.H>
+	<FL/Fl_Check_Button.H>
+	<FL/Fl_File_Input.H>
+	<FL/Fl_Return_Button.H>
+	<FL/fl_ask.H>
+
+1316110221 /usr/local/include/FL/Fl_Menu_Button.H
+	"Fl_Menu_.H"
+
+1316110221 /usr/local/include/FL/Fl_Tile.H
+	"Fl_Group.H"
+
+1316110220 /usr/local/include/FL/Fl_File_Browser.H
+	"Fl_Browser.H"
+	"Fl_File_Icon.H"
+	"filename.H"
+
+1316110220 /usr/local/include/FL/Fl_Browser.H
+	"Fl_Browser_.H"
+	"Fl_Image.H"
+
+1316110220 /usr/local/include/FL/Fl_Browser_.H
+	"Fl_Group.H"
+	"Fl_Scrollbar.H"
+	<FL/Fl.H>
+
+1316110220 /usr/local/include/FL/Fl_Box.H
+	"Fl_Widget.H"
+
+1316110221 /usr/local/include/FL/Fl_File_Input.H
+	<FL/Fl_Input.H>
+
+1316110221 /usr/local/include/FL/Fl_Return_Button.H
+	"Fl_Button.H"
+
+1316110221 /usr/local/include/FL/fl_ask.H
+	"Enumerations.H"
+
+1316110221 /usr/local/include/FL/Fl_Output.H
+	"Fl_Input.H"
+
+1242011072 /home/moses/Projects/flpcui/lpc21isp/StdAfx.h
+
+1316133015 /home/moses/Projects/flpcui/threads.h
+	<windows.h>
+	<process.h>
+	<process.h>
+	<pthread.h>
+

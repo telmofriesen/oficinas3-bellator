@@ -1,0 +1,932 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 2
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 18, 4
+  11              		.file	"printer.c"
+  19              	.Ltext0:
+  20              		.align	2
+  21              		.global	printer_init
+  23              	printer_init:
+  24              	.LFB2:
+  25              		.file 1 "printer.c"
+   1:printer.c     **** /*
+   2:printer.c     ****  * printer.c
+   3:printer.c     ****  *
+   4:printer.c     ****  *  Created on: Jul 14, 2009
+   5:printer.c     ****  *      Author: telmo
+   6:printer.c     ****  */
+   7:printer.c     **** #include "lpc2103.h"
+   8:printer.c     **** #include "printer.h"
+   9:printer.c     **** 
+  10:printer.c     **** //TODO: arrumar o clock para 60MHz, alguma coisa está dividindo-o por 4
+  11:printer.c     **** // procurar por peripheral clock VPBDIV=0x01
+  12:printer.c     **** // talvez esteja relacionado com o MAM
+  13:printer.c     **** void printer_init(void){ // using UART0
+  26              		.loc 1 13 0
+  27              		@ Function supports interworking.
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+  14:printer.c     **** 	PINSEL0 |= 0x05; // Set the pins function
+  31              		.loc 1 14 0
+  32 0000 38109FE5 		ldr	r1, .L3
+  33 0004 003091E5 		ldr	r3, [r1, #0]
+  15:printer.c     **** 	U0FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable
+  34              		.loc 1 15 0
+  35 0008 34209FE5 		ldr	r2, .L3+4
+  36              		.loc 1 14 0
+  37 000c 053083E3 		orr	r3, r3, #5
+  38 0010 003081E5 		str	r3, [r1, #0]
+  39              		.loc 1 15 0
+  40 0014 0730A0E3 		mov	r3, #7
+  41 0018 0830C2E5 		strb	r3, [r2, #8]
+  16:printer.c     **** 	U0LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+  42              		.loc 1 16 0
+  43 001c 7C30E0E3 		mvn	r3, #124
+  44 0020 0C30C2E5 		strb	r3, [r2, #12]
+  17:printer.c     **** 	U0DLL	 = 0x62; // DivisorLatchLow bit   UARTbaudrate = ______PCLK_______
+  45              		.loc 1 17 0
+  46 0024 DF3083E2 		add	r3, r3, #223
+  47 0028 0030C2E5 		strb	r3, [r2, #0]
+  18:printer.c     **** 	U0DLM	 = 0x00; // DivisorLatchHigh bit                 16x(DividerLatch) x4 ?
+  48              		.loc 1 18 0
+  49 002c 0030A0E3 		mov	r3, #0
+  50 0030 0430C2E5 		strb	r3, [r2, #4]
+  19:printer.c     **** 	U0LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+  51              		.loc 1 19 0
+  52 0034 033083E2 		add	r3, r3, #3
+  53              		.loc 1 13 0
+  54              		@ lr needed for prologue
+  55              		.loc 1 19 0
+  56 0038 0C30C2E5 		strb	r3, [r2, #12]
+  20:printer.c     **** }
+  57              		.loc 1 20 0
+  58 003c 1EFF2FE1 		bx	lr
+  59              	.L4:
+  60              		.align	2
+  61              	.L3:
+  62 0040 00C002E0 		.word	-536690688
+  63 0044 00C000E0 		.word	-536821760
+  64              	.LFE2:
+  66              		.align	2
+  67              		.global	print4bytes
+  69              	print4bytes:
+  70              	.LFB8:
+  21:printer.c     **** 
+  22:printer.c     **** static void ua_outchar(char c){
+  23:printer.c     **** 	U0THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
+  24:printer.c     **** 	while(!(U0LSR & 0x40));
+  25:printer.c     **** }
+  26:printer.c     **** 
+  27:printer.c     **** void print_int(int num){
+  28:printer.c     **** 	if(num & 0x80000000){// se for negativo
+  29:printer.c     **** 		ua_outchar('-');
+  30:printer.c     **** 		num = ~num;
+  31:printer.c     **** 		num += 0x1;
+  32:printer.c     **** 	}else
+  33:printer.c     **** 		ua_outchar(' ');
+  34:printer.c     **** 	ua_outchar(ascii[num >> 28]);
+  35:printer.c     **** 	ua_outchar(ascii[num >> 24 & 0x0000000f]);
+  36:printer.c     **** 	ua_outchar(ascii[num >> 20 & 0x0000000f]);
+  37:printer.c     **** 	ua_outchar(ascii[num >> 16 & 0x0000000f]);
+  38:printer.c     **** 	ua_outchar(ascii[num >> 12 & 0x0000000f]);
+  39:printer.c     **** 	ua_outchar(ascii[num >> 8 & 0x0000000f]);
+  40:printer.c     **** 	ua_outchar(ascii[num >> 4 & 0x0000000f]);
+  41:printer.c     **** 	ua_outchar(ascii[num & 0x0000000f]);
+  42:printer.c     **** }
+  43:printer.c     **** 
+  44:printer.c     **** void print_short(short num){
+  45:printer.c     **** 	if(num & 0x8000){// se for negativo
+  46:printer.c     **** 		ua_outchar('-');
+  47:printer.c     **** 		num = ~num;
+  48:printer.c     **** 		num++;
+  49:printer.c     **** 	}else
+  50:printer.c     **** 		ua_outchar(' ');
+  51:printer.c     **** 	ua_outchar(ascii[num >> 12]);
+  52:printer.c     **** 	ua_outchar(ascii[num >> 8 & 0x000f]);
+  53:printer.c     **** 	ua_outchar(ascii[num >> 4 & 0x000f]);
+  54:printer.c     **** 	ua_outchar(ascii[num & 0x000f]);
+  55:printer.c     **** }
+  56:printer.c     **** 
+  57:printer.c     **** void print_string(const char *s){
+  58:printer.c     **** 	while(*s){
+  59:printer.c     **** 		if(*s == '\n')
+  60:printer.c     **** 			ua_outchar('\r'); // \n + \r = new line
+  61:printer.c     **** 		ua_outchar(*s);
+  62:printer.c     **** 		s++;
+  63:printer.c     **** 	}
+  64:printer.c     **** }
+  65:printer.c     **** 
+  66:printer.c     **** void print2bytes(short c){
+  67:printer.c     **** 	if(c & 0x8000){// se for negativo
+  68:printer.c     **** 		ua_outchar('-');
+  69:printer.c     **** 		c = ~c;
+  70:printer.c     **** 		c++;
+  71:printer.c     **** 	}else
+  72:printer.c     **** 		ua_outchar(' ');
+  73:printer.c     **** 	ua_outchar(ascii[c >> 12]);
+  74:printer.c     **** 	ua_outchar(ascii[c >> 8 & 0x000f]);
+  75:printer.c     **** 	ua_outchar(ascii[c >> 4 & 0x000f]);
+  76:printer.c     **** 	ua_outchar(ascii[c & 0x000f]);
+  77:printer.c     **** }
+  78:printer.c     **** 
+  79:printer.c     **** void print4bytes(int c){
+  71              		.loc 1 79 0
+  72              		@ Function supports interworking.
+  73              		@ args = 0, pretend = 0, frame = 0
+  74              		@ frame_needed = 0, uses_anonymous_args = 0
+  75              		@ link register save eliminated.
+  76              	.LVL0:
+  80:printer.c     **** 	if(c & 0x80000000){// se for negativo
+  77              		.loc 1 80 0
+  78 0048 000050E3 		cmp	r0, #0
+  79              		.loc 1 79 0
+  80              		@ lr needed for prologue
+  81              		.loc 1 80 0
+  82 004c 070000AA 		bge	.L6
+  83              	.LBB22:
+  84              	.LBB23:
+  85              		.loc 1 23 0
+  86 0050 4C219FE5 		ldr	r2, .L48
+  87 0054 2D30A0E3 		mov	r3, #45
+  88 0058 0030C2E5 		strb	r3, [r2, #0]
+  89              	.L8:
+  90              		.loc 1 24 0
+  91 005c 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+  92 0060 400013E3 		tst	r3, #64
+  93 0064 FCFFFF0A 		beq	.L8
+  94              	.LBE23:
+  95              	.LBE22:
+  81:printer.c     **** 		ua_outchar('-');
+  82:printer.c     **** 		c = ~c;
+  83:printer.c     **** 		c += 0x1;
+  96              		.loc 1 83 0
+  97 0068 000060E2 		rsb	r0, r0, #0
+  98              	.LVL1:
+  99 006c 050000EA 		b	.L10
+ 100              	.L6:
+ 101              	.LBB24:
+ 102              	.LBB25:
+ 103              		.loc 1 23 0
+ 104 0070 2C219FE5 		ldr	r2, .L48
+ 105 0074 2030A0E3 		mov	r3, #32
+ 106 0078 0030C2E5 		strb	r3, [r2, #0]
+ 107              	.L11:
+ 108              		.loc 1 24 0
+ 109 007c 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 110 0080 400013E3 		tst	r3, #64
+ 111 0084 FCFFFF0A 		beq	.L11
+ 112              	.L10:
+ 113              	.LBE25:
+ 114              	.LBE24:
+  84:printer.c     **** 	}else
+  85:printer.c     **** 		ua_outchar(' ');
+  86:printer.c     **** 	ua_outchar(ascii[c >> 28]);
+ 115              		.loc 1 86 0
+ 116 0088 18319FE5 		ldr	r3, .L48+4
+ 117 008c 402ED3E7 		ldrb	r2, [r3, r0, asr #28]	@ zero_extendqisi2
+ 118              	.LVL2:
+ 119              	.LBB26:
+ 120              	.LBB27:
+ 121              		.loc 1 23 0
+ 122 0090 0C319FE5 		ldr	r3, .L48
+ 123 0094 0020C3E5 		strb	r2, [r3, #0]
+ 124              		.loc 1 24 0
+ 125 0098 0310A0E1 		mov	r1, r3
+ 126              	.L12:
+ 127 009c 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 128 00a0 400013E3 		tst	r3, #64
+ 129 00a4 FCFFFF0A 		beq	.L12
+ 130              	.LBE27:
+ 131              	.LBE26:
+  87:printer.c     **** 	ua_outchar(ascii[c >> 24 & 0x0000000f]);
+ 132              		.loc 1 87 0
+ 133 00a8 403CA0E1 		mov	r3, r0, asr #24
+ 134 00ac F4209FE5 		ldr	r2, .L48+4
+ 135              	.LVL3:
+ 136 00b0 0F3003E2 		and	r3, r3, #15
+ 137 00b4 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 138              	.LVL4:
+ 139              	.LBB28:
+ 140              	.LBB29:
+ 141              		.loc 1 23 0
+ 142 00b8 0030C1E5 		strb	r3, [r1, #0]
+ 143              		.loc 1 24 0
+ 144 00bc E0109FE5 		ldr	r1, .L48
+ 145              	.L14:
+ 146 00c0 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 147              	.LVL5:
+ 148 00c4 400013E3 		tst	r3, #64
+ 149 00c8 FCFFFF0A 		beq	.L14
+ 150              	.LBE29:
+ 151              	.LBE28:
+  88:printer.c     **** 	ua_outchar(ascii[c >> 20 & 0x0000000f]);
+ 152              		.loc 1 88 0
+ 153 00cc 403AA0E1 		mov	r3, r0, asr #20
+ 154 00d0 D0209FE5 		ldr	r2, .L48+4
+ 155 00d4 0F3003E2 		and	r3, r3, #15
+ 156 00d8 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 157              	.LVL6:
+ 158              	.LBB30:
+ 159              	.LBB31:
+ 160              		.loc 1 23 0
+ 161 00dc 0030C1E5 		strb	r3, [r1, #0]
+ 162              		.loc 1 24 0
+ 163 00e0 BC109FE5 		ldr	r1, .L48
+ 164              	.L16:
+ 165 00e4 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 166              	.LVL7:
+ 167 00e8 400013E3 		tst	r3, #64
+ 168 00ec FCFFFF0A 		beq	.L16
+ 169              	.LBE31:
+ 170              	.LBE30:
+  89:printer.c     **** 	ua_outchar(ascii[c >> 16 & 0x0000000f]);
+ 171              		.loc 1 89 0
+ 172 00f0 4038A0E1 		mov	r3, r0, asr #16
+ 173 00f4 AC209FE5 		ldr	r2, .L48+4
+ 174 00f8 0F3003E2 		and	r3, r3, #15
+ 175 00fc 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 176              	.LVL8:
+ 177              	.LBB32:
+ 178              	.LBB33:
+ 179              		.loc 1 23 0
+ 180 0100 0030C1E5 		strb	r3, [r1, #0]
+ 181              		.loc 1 24 0
+ 182 0104 98109FE5 		ldr	r1, .L48
+ 183              	.L18:
+ 184 0108 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 185              	.LVL9:
+ 186 010c 400013E3 		tst	r3, #64
+ 187 0110 FCFFFF0A 		beq	.L18
+ 188              	.LBE33:
+ 189              	.LBE32:
+  90:printer.c     **** 	ua_outchar(ascii[c >> 12 & 0x0000000f]);
+ 190              		.loc 1 90 0
+ 191 0114 4036A0E1 		mov	r3, r0, asr #12
+ 192 0118 88209FE5 		ldr	r2, .L48+4
+ 193 011c 0F3003E2 		and	r3, r3, #15
+ 194 0120 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 195              	.LVL10:
+ 196              	.LBB34:
+ 197              	.LBB35:
+ 198              		.loc 1 23 0
+ 199 0124 0030C1E5 		strb	r3, [r1, #0]
+ 200              		.loc 1 24 0
+ 201 0128 74109FE5 		ldr	r1, .L48
+ 202              	.L20:
+ 203 012c 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 204              	.LVL11:
+ 205 0130 400013E3 		tst	r3, #64
+ 206 0134 FCFFFF0A 		beq	.L20
+ 207              	.LBE35:
+ 208              	.LBE34:
+  91:printer.c     **** 	ua_outchar(ascii[c >> 8 & 0x0000000f]);
+ 209              		.loc 1 91 0
+ 210 0138 4034A0E1 		mov	r3, r0, asr #8
+ 211 013c 64209FE5 		ldr	r2, .L48+4
+ 212 0140 0F3003E2 		and	r3, r3, #15
+ 213 0144 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 214              	.LVL12:
+ 215              	.LBB36:
+ 216              	.LBB37:
+ 217              		.loc 1 23 0
+ 218 0148 0030C1E5 		strb	r3, [r1, #0]
+ 219              		.loc 1 24 0
+ 220 014c 50109FE5 		ldr	r1, .L48
+ 221              	.L22:
+ 222 0150 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 223              	.LVL13:
+ 224 0154 400013E3 		tst	r3, #64
+ 225 0158 FCFFFF0A 		beq	.L22
+ 226              	.LBE37:
+ 227              	.LBE36:
+  92:printer.c     **** 	ua_outchar(ascii[c >> 4 & 0x0000000f]);
+ 228              		.loc 1 92 0
+ 229 015c 4032A0E1 		mov	r3, r0, asr #4
+ 230 0160 40209FE5 		ldr	r2, .L48+4
+ 231 0164 0F3003E2 		and	r3, r3, #15
+ 232 0168 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 233              	.LVL14:
+ 234              	.LBB38:
+ 235              	.LBB39:
+ 236              		.loc 1 23 0
+ 237 016c 0030C1E5 		strb	r3, [r1, #0]
+ 238              		.loc 1 24 0
+ 239 0170 2C109FE5 		ldr	r1, .L48
+ 240              	.L24:
+ 241 0174 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 242              	.LVL15:
+ 243 0178 400013E3 		tst	r3, #64
+ 244 017c FCFFFF0A 		beq	.L24
+ 245              	.LBE39:
+ 246              	.LBE38:
+  93:printer.c     **** 	ua_outchar(ascii[c & 0x0000000f]);
+ 247              		.loc 1 93 0
+ 248 0180 20209FE5 		ldr	r2, .L48+4
+ 249 0184 0F3000E2 		and	r3, r0, #15
+ 250 0188 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 251              	.LVL16:
+ 252              	.LBB40:
+ 253              	.LBB41:
+ 254              		.loc 1 24 0
+ 255 018c 10209FE5 		ldr	r2, .L48
+ 256              		.loc 1 23 0
+ 257 0190 0030C1E5 		strb	r3, [r1, #0]
+ 258              	.L26:
+ 259              		.loc 1 24 0
+ 260 0194 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 261              	.LVL17:
+ 262 0198 400013E3 		tst	r3, #64
+ 263 019c FCFFFF0A 		beq	.L26
+ 264              	.LBE41:
+ 265              	.LBE40:
+  94:printer.c     **** }
+ 266              		.loc 1 94 0
+ 267 01a0 1EFF2FE1 		bx	lr
+ 268              	.L49:
+ 269              		.align	2
+ 270              	.L48:
+ 271 01a4 00C000E0 		.word	-536821760
+ 272 01a8 00000000 		.word	.LANCHOR0
+ 273              	.LFE8:
+ 275              		.align	2
+ 276              		.global	print2bytes
+ 278              	print2bytes:
+ 279              	.LFB7:
+ 280              		.loc 1 66 0
+ 281              		@ Function supports interworking.
+ 282              		@ args = 0, pretend = 0, frame = 0
+ 283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 284              		@ link register save eliminated.
+ 285              	.LVL18:
+ 286              		.loc 1 67 0
+ 287 01ac 000050E3 		cmp	r0, #0
+ 288              		.loc 1 66 0
+ 289              		@ lr needed for prologue
+ 290              		.loc 1 67 0
+ 291 01b0 0A0000AA 		bge	.L51
+ 292              	.LBB54:
+ 293              	.LBB55:
+ 294              		.loc 1 23 0
+ 295 01b4 C8209FE5 		ldr	r2, .L77
+ 296 01b8 2D30A0E3 		mov	r3, #45
+ 297 01bc 0030C2E5 		strb	r3, [r2, #0]
+ 298              	.L53:
+ 299              		.loc 1 24 0
+ 300 01c0 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 301 01c4 400013E3 		tst	r3, #64
+ 302 01c8 FCFFFF0A 		beq	.L53
+ 303              	.LBE55:
+ 304              	.LBE54:
+ 305              		.loc 1 69 0
+ 306 01cc 0030E0E1 		mvn	r3, r0
+ 307 01d0 0338A0E1 		mov	r3, r3, asl #16
+ 308              		.loc 1 70 0
+ 309 01d4 013883E2 		add	r3, r3, #65536
+ 310 01d8 4308A0E1 		mov	r0, r3, asr #16
+ 311              	.LVL19:
+ 312 01dc 050000EA 		b	.L55
+ 313              	.L51:
+ 314              	.LBB56:
+ 315              	.LBB57:
+ 316              		.loc 1 23 0
+ 317 01e0 9C209FE5 		ldr	r2, .L77
+ 318 01e4 2030A0E3 		mov	r3, #32
+ 319 01e8 0030C2E5 		strb	r3, [r2, #0]
+ 320              	.L56:
+ 321              		.loc 1 24 0
+ 322 01ec 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 323 01f0 400013E3 		tst	r3, #64
+ 324 01f4 FCFFFF0A 		beq	.L56
+ 325              	.L55:
+ 326              	.LBE57:
+ 327              	.LBE56:
+ 328              		.loc 1 73 0
+ 329 01f8 88309FE5 		ldr	r3, .L77+4
+ 330 01fc 4026D3E7 		ldrb	r2, [r3, r0, asr #12]	@ zero_extendqisi2
+ 331              	.LVL20:
+ 332              	.LBB58:
+ 333              	.LBB59:
+ 334              		.loc 1 23 0
+ 335 0200 7C309FE5 		ldr	r3, .L77
+ 336 0204 0020C3E5 		strb	r2, [r3, #0]
+ 337              		.loc 1 24 0
+ 338 0208 0310A0E1 		mov	r1, r3
+ 339              	.L57:
+ 340 020c 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 341 0210 400013E3 		tst	r3, #64
+ 342 0214 FCFFFF0A 		beq	.L57
+ 343              	.LBE59:
+ 344              	.LBE58:
+ 345              		.loc 1 74 0
+ 346 0218 2034A0E1 		mov	r3, r0, lsr #8
+ 347 021c 64209FE5 		ldr	r2, .L77+4
+ 348              	.LVL21:
+ 349 0220 0F3003E2 		and	r3, r3, #15
+ 350 0224 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 351              	.LVL22:
+ 352              	.LBB60:
+ 353              	.LBB61:
+ 354              		.loc 1 23 0
+ 355 0228 0030C1E5 		strb	r3, [r1, #0]
+ 356              		.loc 1 24 0
+ 357 022c 50109FE5 		ldr	r1, .L77
+ 358              	.L59:
+ 359 0230 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 360              	.LVL23:
+ 361 0234 400013E3 		tst	r3, #64
+ 362 0238 FCFFFF0A 		beq	.L59
+ 363              	.LBE61:
+ 364              	.LBE60:
+ 365              		.loc 1 75 0
+ 366 023c 2032A0E1 		mov	r3, r0, lsr #4
+ 367 0240 40209FE5 		ldr	r2, .L77+4
+ 368 0244 0F3003E2 		and	r3, r3, #15
+ 369 0248 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 370              	.LVL24:
+ 371              	.LBB62:
+ 372              	.LBB63:
+ 373              		.loc 1 23 0
+ 374 024c 0030C1E5 		strb	r3, [r1, #0]
+ 375              		.loc 1 24 0
+ 376 0250 2C109FE5 		ldr	r1, .L77
+ 377              	.L61:
+ 378 0254 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 379              	.LVL25:
+ 380 0258 400013E3 		tst	r3, #64
+ 381 025c FCFFFF0A 		beq	.L61
+ 382              	.LBE63:
+ 383              	.LBE62:
+ 384              		.loc 1 76 0
+ 385 0260 20209FE5 		ldr	r2, .L77+4
+ 386 0264 0F3000E2 		and	r3, r0, #15
+ 387 0268 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 388              	.LVL26:
+ 389              	.LBB64:
+ 390              	.LBB65:
+ 391              		.loc 1 24 0
+ 392 026c 10209FE5 		ldr	r2, .L77
+ 393              		.loc 1 23 0
+ 394 0270 0030C1E5 		strb	r3, [r1, #0]
+ 395              	.L63:
+ 396              		.loc 1 24 0
+ 397 0274 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 398              	.LVL27:
+ 399 0278 400013E3 		tst	r3, #64
+ 400 027c FCFFFF0A 		beq	.L63
+ 401              	.LBE65:
+ 402              	.LBE64:
+ 403              		.loc 1 77 0
+ 404 0280 1EFF2FE1 		bx	lr
+ 405              	.L78:
+ 406              		.align	2
+ 407              	.L77:
+ 408 0284 00C000E0 		.word	-536821760
+ 409 0288 00000000 		.word	.LANCHOR0
+ 410              	.LFE7:
+ 412              		.align	2
+ 413              		.global	print_string
+ 415              	print_string:
+ 416              	.LFB6:
+ 417              		.loc 1 57 0
+ 418              		@ Function supports interworking.
+ 419              		@ args = 0, pretend = 0, frame = 0
+ 420              		@ frame_needed = 0, uses_anonymous_args = 0
+ 421              		@ link register save eliminated.
+ 422              	.LVL28:
+ 423              	.LBB70:
+ 424              	.LBB71:
+ 425              		.loc 1 23 0
+ 426 028c 40109FE5 		ldr	r1, .L92
+ 427 0290 0DC0A0E3 		mov	ip, #13
+ 428              	.LBE71:
+ 429              	.LBE70:
+ 430              		.loc 1 57 0
+ 431              		@ lr needed for prologue
+ 432 0294 0A0000EA 		b	.L80
+ 433              	.LVL29:
+ 434              	.L81:
+ 435              		.loc 1 59 0
+ 436 0298 0A0052E3 		cmp	r2, #10
+ 437 029c 0300001A 		bne	.L82
+ 438              	.LBB73:
+ 439              	.LBB72:
+ 440              		.loc 1 23 0
+ 441 02a0 00C0C1E5 		strb	ip, [r1, #0]
+ 442              	.L84:
+ 443              		.loc 1 24 0
+ 444 02a4 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 445 02a8 400013E3 		tst	r3, #64
+ 446 02ac FCFFFF0A 		beq	.L84
+ 447              	.L82:
+ 448              	.LBE72:
+ 449              	.LBE73:
+ 450              	.LBB74:
+ 451              	.LBB75:
+ 452              		.loc 1 23 0
+ 453 02b0 0020C1E5 		strb	r2, [r1, #0]
+ 454              	.L85:
+ 455              		.loc 1 24 0
+ 456 02b4 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 457 02b8 400013E3 		tst	r3, #64
+ 458 02bc FCFFFF0A 		beq	.L85
+ 459              	.LBE75:
+ 460              	.LBE74:
+ 461              		.loc 1 62 0
+ 462 02c0 010080E2 		add	r0, r0, #1
+ 463              	.LVL30:
+ 464              	.L80:
+ 465              		.loc 1 58 0
+ 466 02c4 0020D0E5 		ldrb	r2, [r0, #0]	@ zero_extendqisi2
+ 467 02c8 000052E3 		cmp	r2, #0
+ 468 02cc F1FFFF1A 		bne	.L81
+ 469              		.loc 1 64 0
+ 470 02d0 1EFF2FE1 		bx	lr
+ 471              	.L93:
+ 472              		.align	2
+ 473              	.L92:
+ 474 02d4 00C000E0 		.word	-536821760
+ 475              	.LFE6:
+ 477              		.align	2
+ 478              		.global	print_short
+ 480              	print_short:
+ 481              	.LFB5:
+ 482              		.loc 1 44 0
+ 483              		@ Function supports interworking.
+ 484              		@ args = 0, pretend = 0, frame = 0
+ 485              		@ frame_needed = 0, uses_anonymous_args = 0
+ 486              		@ link register save eliminated.
+ 487              	.LVL31:
+ 488              		.loc 1 45 0
+ 489 02d8 000050E3 		cmp	r0, #0
+ 490              		.loc 1 44 0
+ 491              		@ lr needed for prologue
+ 492              		.loc 1 45 0
+ 493 02dc 0A0000AA 		bge	.L95
+ 494              	.LBB88:
+ 495              	.LBB89:
+ 496              		.loc 1 23 0
+ 497 02e0 C8209FE5 		ldr	r2, .L121
+ 498 02e4 2D30A0E3 		mov	r3, #45
+ 499 02e8 0030C2E5 		strb	r3, [r2, #0]
+ 500              	.L97:
+ 501              		.loc 1 24 0
+ 502 02ec 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 503 02f0 400013E3 		tst	r3, #64
+ 504 02f4 FCFFFF0A 		beq	.L97
+ 505              	.LBE89:
+ 506              	.LBE88:
+ 507              		.loc 1 47 0
+ 508 02f8 0030E0E1 		mvn	r3, r0
+ 509 02fc 0338A0E1 		mov	r3, r3, asl #16
+ 510              		.loc 1 48 0
+ 511 0300 013883E2 		add	r3, r3, #65536
+ 512 0304 4308A0E1 		mov	r0, r3, asr #16
+ 513              	.LVL32:
+ 514 0308 050000EA 		b	.L99
+ 515              	.L95:
+ 516              	.LBB90:
+ 517              	.LBB91:
+ 518              		.loc 1 23 0
+ 519 030c 9C209FE5 		ldr	r2, .L121
+ 520 0310 2030A0E3 		mov	r3, #32
+ 521 0314 0030C2E5 		strb	r3, [r2, #0]
+ 522              	.L100:
+ 523              		.loc 1 24 0
+ 524 0318 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 525 031c 400013E3 		tst	r3, #64
+ 526 0320 FCFFFF0A 		beq	.L100
+ 527              	.L99:
+ 528              	.LBE91:
+ 529              	.LBE90:
+ 530              		.loc 1 51 0
+ 531 0324 88309FE5 		ldr	r3, .L121+4
+ 532 0328 4026D3E7 		ldrb	r2, [r3, r0, asr #12]	@ zero_extendqisi2
+ 533              	.LVL33:
+ 534              	.LBB92:
+ 535              	.LBB93:
+ 536              		.loc 1 23 0
+ 537 032c 7C309FE5 		ldr	r3, .L121
+ 538 0330 0020C3E5 		strb	r2, [r3, #0]
+ 539              		.loc 1 24 0
+ 540 0334 0310A0E1 		mov	r1, r3
+ 541              	.L101:
+ 542 0338 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 543 033c 400013E3 		tst	r3, #64
+ 544 0340 FCFFFF0A 		beq	.L101
+ 545              	.LBE93:
+ 546              	.LBE92:
+ 547              		.loc 1 52 0
+ 548 0344 2034A0E1 		mov	r3, r0, lsr #8
+ 549 0348 64209FE5 		ldr	r2, .L121+4
+ 550              	.LVL34:
+ 551 034c 0F3003E2 		and	r3, r3, #15
+ 552 0350 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 553              	.LVL35:
+ 554              	.LBB94:
+ 555              	.LBB95:
+ 556              		.loc 1 23 0
+ 557 0354 0030C1E5 		strb	r3, [r1, #0]
+ 558              		.loc 1 24 0
+ 559 0358 50109FE5 		ldr	r1, .L121
+ 560              	.L103:
+ 561 035c 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 562              	.LVL36:
+ 563 0360 400013E3 		tst	r3, #64
+ 564 0364 FCFFFF0A 		beq	.L103
+ 565              	.LBE95:
+ 566              	.LBE94:
+ 567              		.loc 1 53 0
+ 568 0368 2032A0E1 		mov	r3, r0, lsr #4
+ 569 036c 40209FE5 		ldr	r2, .L121+4
+ 570 0370 0F3003E2 		and	r3, r3, #15
+ 571 0374 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 572              	.LVL37:
+ 573              	.LBB96:
+ 574              	.LBB97:
+ 575              		.loc 1 23 0
+ 576 0378 0030C1E5 		strb	r3, [r1, #0]
+ 577              		.loc 1 24 0
+ 578 037c 2C109FE5 		ldr	r1, .L121
+ 579              	.L105:
+ 580 0380 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 581              	.LVL38:
+ 582 0384 400013E3 		tst	r3, #64
+ 583 0388 FCFFFF0A 		beq	.L105
+ 584              	.LBE97:
+ 585              	.LBE96:
+ 586              		.loc 1 54 0
+ 587 038c 20209FE5 		ldr	r2, .L121+4
+ 588 0390 0F3000E2 		and	r3, r0, #15
+ 589 0394 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 590              	.LVL39:
+ 591              	.LBB98:
+ 592              	.LBB99:
+ 593              		.loc 1 24 0
+ 594 0398 10209FE5 		ldr	r2, .L121
+ 595              		.loc 1 23 0
+ 596 039c 0030C1E5 		strb	r3, [r1, #0]
+ 597              	.L107:
+ 598              		.loc 1 24 0
+ 599 03a0 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 600              	.LVL40:
+ 601 03a4 400013E3 		tst	r3, #64
+ 602 03a8 FCFFFF0A 		beq	.L107
+ 603              	.LBE99:
+ 604              	.LBE98:
+ 605              		.loc 1 55 0
+ 606 03ac 1EFF2FE1 		bx	lr
+ 607              	.L122:
+ 608              		.align	2
+ 609              	.L121:
+ 610 03b0 00C000E0 		.word	-536821760
+ 611 03b4 00000000 		.word	.LANCHOR0
+ 612              	.LFE5:
+ 614              		.align	2
+ 615              		.global	print_int
+ 617              	print_int:
+ 618              	.LFB4:
+ 619              		.loc 1 27 0
+ 620              		@ Function supports interworking.
+ 621              		@ args = 0, pretend = 0, frame = 0
+ 622              		@ frame_needed = 0, uses_anonymous_args = 0
+ 623              		@ link register save eliminated.
+ 624              	.LVL41:
+ 625              		.loc 1 28 0
+ 626 03b8 000050E3 		cmp	r0, #0
+ 627              		.loc 1 27 0
+ 628              		@ lr needed for prologue
+ 629              		.loc 1 28 0
+ 630 03bc 070000AA 		bge	.L124
+ 631              	.LBB120:
+ 632              	.LBB121:
+ 633              		.loc 1 23 0
+ 634 03c0 4C219FE5 		ldr	r2, .L166
+ 635 03c4 2D30A0E3 		mov	r3, #45
+ 636 03c8 0030C2E5 		strb	r3, [r2, #0]
+ 637              	.L126:
+ 638              		.loc 1 24 0
+ 639 03cc 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 640 03d0 400013E3 		tst	r3, #64
+ 641 03d4 FCFFFF0A 		beq	.L126
+ 642              	.LBE121:
+ 643              	.LBE120:
+ 644              		.loc 1 31 0
+ 645 03d8 000060E2 		rsb	r0, r0, #0
+ 646              	.LVL42:
+ 647 03dc 050000EA 		b	.L128
+ 648              	.L124:
+ 649              	.LBB122:
+ 650              	.LBB123:
+ 651              		.loc 1 23 0
+ 652 03e0 2C219FE5 		ldr	r2, .L166
+ 653 03e4 2030A0E3 		mov	r3, #32
+ 654 03e8 0030C2E5 		strb	r3, [r2, #0]
+ 655              	.L129:
+ 656              		.loc 1 24 0
+ 657 03ec 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 658 03f0 400013E3 		tst	r3, #64
+ 659 03f4 FCFFFF0A 		beq	.L129
+ 660              	.L128:
+ 661              	.LBE123:
+ 662              	.LBE122:
+ 663              		.loc 1 34 0
+ 664 03f8 18319FE5 		ldr	r3, .L166+4
+ 665 03fc 402ED3E7 		ldrb	r2, [r3, r0, asr #28]	@ zero_extendqisi2
+ 666              	.LVL43:
+ 667              	.LBB124:
+ 668              	.LBB125:
+ 669              		.loc 1 23 0
+ 670 0400 0C319FE5 		ldr	r3, .L166
+ 671 0404 0020C3E5 		strb	r2, [r3, #0]
+ 672              		.loc 1 24 0
+ 673 0408 0310A0E1 		mov	r1, r3
+ 674              	.L130:
+ 675 040c 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 676 0410 400013E3 		tst	r3, #64
+ 677 0414 FCFFFF0A 		beq	.L130
+ 678              	.LBE125:
+ 679              	.LBE124:
+ 680              		.loc 1 35 0
+ 681 0418 403CA0E1 		mov	r3, r0, asr #24
+ 682 041c F4209FE5 		ldr	r2, .L166+4
+ 683              	.LVL44:
+ 684 0420 0F3003E2 		and	r3, r3, #15
+ 685 0424 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 686              	.LVL45:
+ 687              	.LBB126:
+ 688              	.LBB127:
+ 689              		.loc 1 23 0
+ 690 0428 0030C1E5 		strb	r3, [r1, #0]
+ 691              		.loc 1 24 0
+ 692 042c E0109FE5 		ldr	r1, .L166
+ 693              	.L132:
+ 694 0430 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 695              	.LVL46:
+ 696 0434 400013E3 		tst	r3, #64
+ 697 0438 FCFFFF0A 		beq	.L132
+ 698              	.LBE127:
+ 699              	.LBE126:
+ 700              		.loc 1 36 0
+ 701 043c 403AA0E1 		mov	r3, r0, asr #20
+ 702 0440 D0209FE5 		ldr	r2, .L166+4
+ 703 0444 0F3003E2 		and	r3, r3, #15
+ 704 0448 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 705              	.LVL47:
+ 706              	.LBB128:
+ 707              	.LBB129:
+ 708              		.loc 1 23 0
+ 709 044c 0030C1E5 		strb	r3, [r1, #0]
+ 710              		.loc 1 24 0
+ 711 0450 BC109FE5 		ldr	r1, .L166
+ 712              	.L134:
+ 713 0454 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 714              	.LVL48:
+ 715 0458 400013E3 		tst	r3, #64
+ 716 045c FCFFFF0A 		beq	.L134
+ 717              	.LBE129:
+ 718              	.LBE128:
+ 719              		.loc 1 37 0
+ 720 0460 4038A0E1 		mov	r3, r0, asr #16
+ 721 0464 AC209FE5 		ldr	r2, .L166+4
+ 722 0468 0F3003E2 		and	r3, r3, #15
+ 723 046c 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 724              	.LVL49:
+ 725              	.LBB130:
+ 726              	.LBB131:
+ 727              		.loc 1 23 0
+ 728 0470 0030C1E5 		strb	r3, [r1, #0]
+ 729              		.loc 1 24 0
+ 730 0474 98109FE5 		ldr	r1, .L166
+ 731              	.L136:
+ 732 0478 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 733              	.LVL50:
+ 734 047c 400013E3 		tst	r3, #64
+ 735 0480 FCFFFF0A 		beq	.L136
+ 736              	.LBE131:
+ 737              	.LBE130:
+ 738              		.loc 1 38 0
+ 739 0484 4036A0E1 		mov	r3, r0, asr #12
+ 740 0488 88209FE5 		ldr	r2, .L166+4
+ 741 048c 0F3003E2 		and	r3, r3, #15
+ 742 0490 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 743              	.LVL51:
+ 744              	.LBB132:
+ 745              	.LBB133:
+ 746              		.loc 1 23 0
+ 747 0494 0030C1E5 		strb	r3, [r1, #0]
+ 748              		.loc 1 24 0
+ 749 0498 74109FE5 		ldr	r1, .L166
+ 750              	.L138:
+ 751 049c 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 752              	.LVL52:
+ 753 04a0 400013E3 		tst	r3, #64
+ 754 04a4 FCFFFF0A 		beq	.L138
+ 755              	.LBE133:
+ 756              	.LBE132:
+ 757              		.loc 1 39 0
+ 758 04a8 4034A0E1 		mov	r3, r0, asr #8
+ 759 04ac 64209FE5 		ldr	r2, .L166+4
+ 760 04b0 0F3003E2 		and	r3, r3, #15
+ 761 04b4 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 762              	.LVL53:
+ 763              	.LBB134:
+ 764              	.LBB135:
+ 765              		.loc 1 23 0
+ 766 04b8 0030C1E5 		strb	r3, [r1, #0]
+ 767              		.loc 1 24 0
+ 768 04bc 50109FE5 		ldr	r1, .L166
+ 769              	.L140:
+ 770 04c0 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 771              	.LVL54:
+ 772 04c4 400013E3 		tst	r3, #64
+ 773 04c8 FCFFFF0A 		beq	.L140
+ 774              	.LBE135:
+ 775              	.LBE134:
+ 776              		.loc 1 40 0
+ 777 04cc 4032A0E1 		mov	r3, r0, asr #4
+ 778 04d0 40209FE5 		ldr	r2, .L166+4
+ 779 04d4 0F3003E2 		and	r3, r3, #15
+ 780 04d8 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 781              	.LVL55:
+ 782              	.LBB136:
+ 783              	.LBB137:
+ 784              		.loc 1 23 0
+ 785 04dc 0030C1E5 		strb	r3, [r1, #0]
+ 786              		.loc 1 24 0
+ 787 04e0 2C109FE5 		ldr	r1, .L166
+ 788              	.L142:
+ 789 04e4 1430D1E5 		ldrb	r3, [r1, #20]	@ zero_extendqisi2
+ 790              	.LVL56:
+ 791 04e8 400013E3 		tst	r3, #64
+ 792 04ec FCFFFF0A 		beq	.L142
+ 793              	.LBE137:
+ 794              	.LBE136:
+ 795              		.loc 1 41 0
+ 796 04f0 20209FE5 		ldr	r2, .L166+4
+ 797 04f4 0F3000E2 		and	r3, r0, #15
+ 798 04f8 0330D2E7 		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 799              	.LVL57:
+ 800              	.LBB138:
+ 801              	.LBB139:
+ 802              		.loc 1 24 0
+ 803 04fc 10209FE5 		ldr	r2, .L166
+ 804              		.loc 1 23 0
+ 805 0500 0030C1E5 		strb	r3, [r1, #0]
+ 806              	.L144:
+ 807              		.loc 1 24 0
+ 808 0504 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 809              	.LVL58:
+ 810 0508 400013E3 		tst	r3, #64
+ 811 050c FCFFFF0A 		beq	.L144
+ 812              	.LBE139:
+ 813              	.LBE138:
+ 814              		.loc 1 42 0
+ 815 0510 1EFF2FE1 		bx	lr
+ 816              	.L167:
+ 817              		.align	2
+ 818              	.L166:
+ 819 0514 00C000E0 		.word	-536821760
+ 820 0518 00000000 		.word	.LANCHOR0
+ 821              	.LFE4:
+ 823              		.global	ascii
+ 824              		.section	.rodata
+ 825              		.align	2
+ 826              	.LANCHOR0 = . + 0
+ 829              	ascii:
+ 830 0000 30313233 		.ascii	"0123456789ABCDEF\000"
+ 830      34353637 
+ 830      38394142 
+ 830      43444546 
+ 830      00
+ 895              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 printer.c
+     /tmp/cchNF2wi.s:23     .text:00000000 printer_init
+     /tmp/cchNF2wi.s:32     .text:00000000 $a
+     /tmp/cchNF2wi.s:62     .text:00000040 $d
+     /tmp/cchNF2wi.s:69     .text:00000048 print4bytes
+     /tmp/cchNF2wi.s:78     .text:00000048 $a
+     /tmp/cchNF2wi.s:271    .text:000001a4 $d
+     /tmp/cchNF2wi.s:278    .text:000001ac print2bytes
+     /tmp/cchNF2wi.s:287    .text:000001ac $a
+     /tmp/cchNF2wi.s:408    .text:00000284 $d
+     /tmp/cchNF2wi.s:415    .text:0000028c print_string
+     /tmp/cchNF2wi.s:426    .text:0000028c $a
+     /tmp/cchNF2wi.s:474    .text:000002d4 $d
+     /tmp/cchNF2wi.s:480    .text:000002d8 print_short
+     /tmp/cchNF2wi.s:489    .text:000002d8 $a
+     /tmp/cchNF2wi.s:610    .text:000003b0 $d
+     /tmp/cchNF2wi.s:617    .text:000003b8 print_int
+     /tmp/cchNF2wi.s:626    .text:000003b8 $a
+     /tmp/cchNF2wi.s:819    .text:00000514 $d
+     /tmp/cchNF2wi.s:829    .rodata:00000000 ascii
+     /tmp/cchNF2wi.s:833    .debug_frame:00000000 $d
+
+NO UNDEFINED SYMBOLS

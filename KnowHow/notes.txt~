@@ -1,0 +1,46 @@
+Ambiente de desenvolvimento:
+
+- instalar eclipse-cdt (pelo synaptic)
+- instalar compilador:
+	baixar aqui:
+		https://sourcery.mentor.com/GNUToolchain/release1803?lite=arm
+		arm-2011.03-41-arm-none-linux-gnueabi.bin
+	chmod +x ./arm-2011.03-41-arm-none-linux-gnueabi.bin
+	sudo dpkg-reconfigure -plow dash -> Install as /bin/sh? No
+	sudo ./arm-2011.03-41-arm-none-linux-gnueabi.bin
+	- mudar a instalação padrão e instalar somente o toolchain, sem documentação
+	- fazer links simbolicos para /usr/bin do compilador:
+	for i in `ls /opt/arm-none-linux/bin/arm-none-linux-gnueabi-*`; do name=`echo $i|awk -F"-" {'print $NF'}`; sudo ln -s $i /usr/bin/arm-none-linux-gnueabi-$name; done
+- abrir o projeto no eclipse e compilar.	
+
+istalar flpcui (baixar do yahoo groups do lpc)
+colocar o diretorio do hex, setar a porta serial
+colocar o clock e o baud rate pra serial
+(funcionou com 19200 e clock de 12000)
+
+Ambiente para desenvolvimento do hardware
+
+instalar geda (gschem) e pcb pelo synaptic
+copiar a biblioteca de comoponentes para /usr/share/gEDA/sym e dar permicoes adequadas
+
+
+------------------------------------------------------------------------------------
+
+requisitos do hardware:
+
+gyro
+acelerometro
+pwm-out 2 canais
+leitura de pulsos com 2 canais
+adc com 5 canais
+interface serial
+
+gyro e acelerometro: a melhor solucao eh a placa MPU-6050 por custar apenas $20 e por ser 6 eixos
+como o valor do microcontrolador eh bem menor que do gyro, vale mudar para um outro de baixo custo que possui i2c
+foi escolhido o lpc por ser de baixo custo, ter todos os perifericos necessarios e ser 32 bits, acelerando o processo de desenvolvimento de software embarcado
+tambem pela disponibilidade de uma placa de desenvolvimento para testes
+Alem disso nao eh necessario software proprietario para o desenvolvimento, que eh feito em linux com eclipse e gcc
+
+foi optado pelos componentes smd pois a placa podera ser menor reduzindo o custo do projeto e por serem mais precisos
+
+a placa sera feita em bh pela confiabilidade

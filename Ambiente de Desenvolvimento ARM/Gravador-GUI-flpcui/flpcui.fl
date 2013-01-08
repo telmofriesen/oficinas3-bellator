@@ -1,0 +1,305 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cpp}
+comment {/******************************************************************************
+
+Project:           Cross-Platform GUI for lpc21isp, a command line ISP for
+                   NXP LPC1000 / LPC2000 family and Analog Devices ADUC70xx
+                   * This program has lpc21isp compiled into it.
+
+Compiler:          Microsoft VC 6/7, Microsoft VS2008, Microsoft VS2010,
+                   GCC Cygwin, GCC Linux, GCC ARM ELF
+
+Author:            Moses McKnight (moses@texband.net)
+
+Copyright:         (c) Moses McKnight 2011, All rights reserved
+
+    This file is part of flpcui.
+
+    flpcui is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    flpcui is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    and GNU General Public License along with flpcui.
+    If not, see <http://www.gnu.org/licenses/>.
+*/} {in_source in_header
+} 
+
+decl {\#include <string>} {selected public global
+} 
+
+decl {\#include <FL/Fl_Preferences.H>} {private global
+} 
+
+decl {\#include <FL/filename.H>} {private global
+} 
+
+class lpcprog_ui {open
+} {
+  decl {std::string default_dir;} {public local
+  }
+  Function {lpcprog_ui()} {open
+  } {
+    Fl_Window win {
+      label {Flpcui - LPC1000 / LPC2000 ISP}
+      callback on_exit open
+      xywh {552 369 655 645} type Double labelsize 12 visible
+    } {
+      Fl_Group {} {open
+        xywh {5 25 430 120} box BORDER_BOX
+      } {
+        Fl_Button {} {
+          label {Open File...}
+          callback on_open_file
+          xywh {15 35 125 25} labelsize 12
+        }
+        Fl_Button {} {
+          label {Find Device}
+          xywh {90 105 125 25} labelsize 12
+        }
+        Fl_Button {} {
+          label Program
+          callback on_program
+          xywh {225 105 125 25} labelsize 12
+        }
+        Fl_Output file_input {
+          label {File:}
+          xywh {45 70 380 25} labelsize 12 textsize 12
+        }
+      }
+      Fl_Group {} {open
+        xywh {440 25 210 120} box BORDER_BOX
+      } {
+        Fl_Choice port_choice {
+          label {Serial Port:} open
+          xywh {475 50 150 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
+        } {}
+        Fl_Choice baud_choice {
+          label {Baud Rate:}
+          xywh {475 100 150 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
+        } {
+          MenuItem {} {
+            label 4800
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 9600
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 19200
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 38400
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 57600
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 115200
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 230400
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 576000
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label 1152000
+            xywh {0 0 100 20} labelsize 12
+          }
+        }
+      }
+      Fl_Group {} {open
+        xywh {5 150 645 100} box BORDER_BOX labelsize 12
+      } {
+        Fl_Check_Button erase_check {
+          label Erase
+          xywh {20 165 25 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Check_Button verify_check {
+          label Verify
+          xywh {20 190 25 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Choice chip_choice {
+          label {Chip Type}
+          xywh {185 165 100 25} down_box BORDER_BOX labelsize 12 textsize 12
+        } {
+          MenuItem {} {
+            label NXP
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {Analog Devices}
+            xywh {0 0 100 20} labelsize 12
+          }
+        }
+        Fl_Input osc_speed_input {
+          label {Osc. Speed (kHz)}
+          xywh {210 205 75 25} type Int labelsize 12 textsize 12
+        }
+        Fl_Check_Button control_check {
+          label {Use RTS/DTS}
+          xywh {320 157 25 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Check_Button swap_check {
+          label {Swap RTS/DTS}
+          xywh {320 177 25 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Check_Button invert_check {
+          label {Invert RTS/DTS}
+          xywh {320 197 25 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Check_Button hdup_check {
+          label {Half Duplex}
+          xywh {320 217 25 25} down_box DOWN_BOX labelsize 12
+        }
+        Fl_Choice debug_choice {
+          label {Debug Level}
+          xywh {475 180 130 25} down_box BORDER_BOX labelsize 12 align 5 textsize 12
+        } {
+          MenuItem {} {
+            label {0 - very quiet}
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {1 - quiet}
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {2 - indicate progress}
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {3 - first level debug}
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {4 - second level debug}
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {5 - log comm's}
+            xywh {0 0 100 20} labelsize 12
+          }
+        }
+      }
+      Fl_Scroll {} {open
+        xywh {5 255 645 385} labelsize 12
+      } {
+        Fl_Text_Display dbg_text {
+          xywh {5 255 645 385} labelsize 12 textsize 12
+        }
+      }
+      Fl_Menu_Bar {} {open
+        xywh {0 0 655 25} box FLAT_BOX labelsize 12 textsize 12
+      } {
+        Submenu {} {
+          label {&File} open
+          xywh {0 0 70 21} labelsize 12
+        } {
+          MenuItem {} {
+            label {E&xit}
+            callback on_exit
+            xywh {0 0 100 20} labelsize 12
+          }
+        }
+        Submenu {} {
+          label {&Help} open
+          xywh {0 0 100 20} labelsize 12
+        } {
+          MenuItem {} {
+            label Help
+            xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label About
+            xywh {0 0 100 20} labelsize 12
+          }
+        }
+      }
+    }
+  }
+  Function {show(int argc, char **argv)} {open
+  } {
+    code {read_prefs();
+win->show(argc, argv);} {}
+  }
+  Function {write_prefs()} {open
+  } {
+    code {Fl_Preferences app( Fl_Preferences::USER, "flpcui", "flpcui" );
+
+app.set("file", file_input->value());
+app.set("defdir", default_dir.c_str());
+app.set("port", port_choice->text());
+app.set("baud", baud_choice->value());
+app.set("chip", chip_choice->value());
+app.set("xtal", osc_speed_input->value());
+app.set("erase", erase_check->value());
+app.set("verify", verify_check->value());
+app.set("use_control", control_check->value());
+app.set("swap_control", swap_check->value());
+app.set("invert_control", invert_check->value());
+app.set("half_duplex", hdup_check->value());
+app.set("debug_level", debug_choice->value());} {}
+  }
+  Function {read_prefs()} {open
+  } {
+    code {int boolVal;
+int intVal;
+char buffer[FL_PATH_MAX];
+
+Fl_Preferences app( Fl_Preferences::USER, "flpcui", "flpcui" );
+
+app.get("file", buffer, "", FL_PATH_MAX-1);
+file_input->value(buffer);
+app.get("defdir", buffer, "", FL_PATH_MAX-1);
+default_dir = std::string(buffer);
+app.get("port", buffer, "", FL_PATH_MAX-1);
+port_choice->value(port_choice->find_index(buffer));
+app.get("baud", intVal, 0);
+baud_choice->value(intVal);
+app.get("chip", intVal, 0);
+chip_choice->value(intVal);
+app.get("xtal", buffer, "", FL_PATH_MAX-1);
+osc_speed_input->value(buffer);
+app.get("erase", boolVal, 0);
+erase_check->value(boolVal);
+app.get("verify", boolVal, 0);
+verify_check->value(boolVal);
+app.get("use_control", boolVal, 0);
+control_check->value(boolVal);
+app.get("swap_control", boolVal, 0);
+swap_check->value(boolVal);
+app.get("invert_control", boolVal, 0);
+invert_check->value(boolVal);
+app.get("half_duplex", boolVal, 0);
+hdup_check->value(boolVal);
+app.get("debug_level", intVal, 2);
+debug_choice->value(intVal);} {}
+  }
+} 
+
+Function {on_exit(Fl_Widget*, void*)} {open return_type void
+} {
+  code {ui->write_prefs();
+
+exit(0);} {}
+} 
+
+decl {extern lpcprog_ui *ui;} {public global
+} 
