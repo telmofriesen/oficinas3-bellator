@@ -15,9 +15,9 @@ public class Ponto {
 
     public int x, y;
 
-    public Ponto(int X, int Y) {
-        this.x = X;
-        this.y = Y;
+    public Ponto(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
 //    public float getXScaled(float escala){

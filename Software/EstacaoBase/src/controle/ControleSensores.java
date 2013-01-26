@@ -17,9 +17,10 @@ public class ControleSensores {
     private Obstaculos obstaculos;
 
     /**
-     * 
+     *
      * @param robo O robô a ser atualizado com as leituras dos sensores.
-     * @param obstaculos O objeto da classe Obstaculos a ser atualizado com as leituras dos sensores.
+     * @param obstaculos O objeto da classe Obstaculos a ser atualizado com as
+     * leituras dos sensores.
      */
     public ControleSensores(Robo robo, Obstaculos obstaculos) {
         this.robo = robo;
@@ -27,19 +28,27 @@ public class ControleSensores {
     }
 
     /**
-     * Recebe nova leitura dos sensores. À partir dos dados, atualiza a posição do robô e insere os obstáculos que forem detectados.
+     * Recebe nova leitura dos sensores. À partir dos dados, atualiza a posição
+     * do robô e insere os obstáculos que forem detectados.
      *
-     * @param velocidade Velocidade em m/s, medida a partir do acelerômetro (posicionado no centro de movimento do robô).
-     * @param angulo Angulo em radianos relativo à primeira posição do robô. Os ângulos começam em 0 e crescem no sentido HORÁRIO.
-     * @param distIR Vetor com cada distância detectada pelos sensores IR. O vetor deve obrigatoriamente conter um número de elementos igual ao número de sensores IR  presentes no robô. Caso contrário uma exceção é lançada.
+     * @param aceleracao Aceleracao em m/s^2, medida a partir do acelerômetro
+     * (posicionado no centro de movimento do robô).
+     * @param aceleracao_angular Aceleração angular em rad/s^2. Os ângulos
+     * começam em 0 e crescem no sentido HORÁRIO.
+     * @param distIR Vetor com cada distância detectada pelos sensores IR. O
+     * vetor deve obrigatoriamente conter um número de elementos igual ao número
+     * de sensores IR presentes no robô. Caso contrário uma exceção é lançada.
      * @param timestamp Timestamp UNIX em milissegundos do horário da leitura.
-     * @throws Exception Caso timestamp seja menor que o último timestamp recebido OU o número de sensores no vetor distIR diferir do número de sensores presentes no robô.
+     * @throws Exception Caso timestamp seja menor que o último timestamp
+     * recebido OU o número de sensores no vetor distIR diferir do número de
+     * sensores presentes no robô. 
      */
-    public void novaLeituraSensores(float velocidade, float angulo, float[] distIR, int timestamp) throws Exception {
+    public void novaLeituraSensores(float aceleracao, float aceleracao_angular, float[] distIR, int timestamp) throws Exception {
         //
         // Efetua interpretação das leituras do acelerômetro e giroscópio (levando em conta a timestamp).
         //
         PosInfo new_pos;
+        float angulo = 0;
         //Se o robo tiver apenas uma posicao armazenada, com timestamp 0 significa que ele acabou de ser inicializado.
         if (robo.getNumPosicoes() == 1 && robo.getUltimaPosicao().getTimestamp() == 0) {
             //Apenas muda a timestamp para a hora atual.
@@ -54,8 +63,13 @@ public class ControleSensores {
 
             Ponto lastXY = penultPos.getPonto();
             float penultAngulo = penultPos.getAngulo();
-            int difftime = timestamp - penultPos.getTimestamp(); //Diferença de tempo entre a última e penútlima timestamps. (ms)
-            float deslocamento = (velocidade) * ((float) difftime) / (float) 10; //Deslocamento (cm)
+            float difftime = ((float) timestamp - (float) penultPos.getTimestamp()) / 1000; //Diferença de tempo entre a última e penútlima timestamps. (segundos)
+
+            //Efetua as integrações numéricas para calcular as novas posições a partir das acelerações
+            float velocidade = robo.getVelocidade() + aceleracao * difftime; // (m/s)
+            float deslocamento = (velocidade) * ((float) difftime) * (float) 1000; //Deslocamento (mm)
+            float velocidade_angular = robo.getVelocidadeAngular() + aceleracao_angular * difftime; // (rad/s)
+            angulo = penultPos.getAngulo() + velocidade_angular * difftime; //angulo (rad)
 
             //Calcula as novas posições x e y. O cálculo é feito levando-se em conta o ângulo da PENÚLTIMA posição e a velocidade da ÙLTIMA posição.
             int new_X = lastXY.x() + PApplet.round(deslocamento * PApplet.cos(penultAngulo));

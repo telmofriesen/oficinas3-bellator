@@ -12,7 +12,7 @@ import java.awt.Color;
  */
 public class RoboDrawableProp {
 
-    int tamanhoRobo = 8;
+    int tamanhoRobo = 80;
     private Color corRobo = new Color(0, 0, 0, 100);
     private Color corSensoresIR = new Color(0, 0, 200, 240);
 

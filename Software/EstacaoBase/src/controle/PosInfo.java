@@ -17,7 +17,7 @@ public class PosInfo {
 
     /**
      * 
-     * @param ponto Ponto cartesiano da posição
+     * @param ponto Ponto cartesiano da posição (milímetros)
      * @param angulo Ângulo do robô nessa posição (àngulo relativo à primeira posição dele)
      * @param timestamp Timestamp UNIX em milissegundos do horário em que o robô esteve nessa posição
      */

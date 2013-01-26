@@ -77,7 +77,7 @@ public class ObstaculosDrawable implements Drawable2D, MouseListener2D {
                 a.ellipse(0, 0, propriedades.getTamanhoPontos(), propriedades.getTamanhoPontos());
                 a.rotate(-angulo);
                 a.textAlign(PApplet.LEFT);
-                a.text(String.format("(%d, %d)", ponto.x, ponto.y), 5, -10);
+                a.text(String.format("(%d, %d) cm", ponto.x / 10, ponto.y / 10), 5, -10);
                 break;
             }
         }

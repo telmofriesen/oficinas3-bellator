@@ -28,7 +28,7 @@ public class EscalaDrawable implements Drawable2D {
         applet.line(canto_esq.x(), canto_esq.y(), canto_esq.x(), canto_esq.y() - 5); //Pequena linha vertical da esqueda
         applet.line(canto_dir.x(), canto_dir.y(), canto_dir.x(), canto_dir.y() - 5); //Pequena linha vertical da direita
         
-        String txt = String.format("%.1f cm", (float) comprimentoLinha / escala); //Texto da escala
+        String txt = String.format("%.1f cm", (float) comprimentoLinha / escala / 10); //Texto da escala
         applet.textAlign(PApplet.RIGHT); 
         applet.text(txt, canto_esq.x(), canto_esq.y() - 15);
         

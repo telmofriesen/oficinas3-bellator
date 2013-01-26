@@ -46,7 +46,7 @@ public class RoboDrawable implements Drawable2D {
         a.pushStyle();
         a.fill(0);
         a.textAlign(PApplet.RIGHT);
-        a.text(String.format("robo.pos: (%d, %d) cm @ %.2f deg", pontoLastPos.x, pontoLastPos.y, PApplet.degrees(lastPos.getAngulo())), a.width - 5, 15);
+        a.text(String.format("robo.pos: (%d, %d) cm @ %.2f deg", pontoLastPos.x / 10, pontoLastPos.y / 10, PApplet.degrees(lastPos.getAngulo())), a.width - 5, 15);
         a.text(String.format("robo.velocidade=%.2f m/s", robo.getVelocidade()), a.width - 5, 30);
 //        a.text(String.format("robo.y=%d cm", pontoLastPos.y), a.width - 5, 30);
 //        a.text(String.format("robo.angulo=%.2f deg", PApplet.degrees(lastPos.getAngulo())), a.width - 5, 45);
@@ -101,7 +101,7 @@ public class RoboDrawable implements Drawable2D {
             a.translate(pontoLastPos.x() * escala, pontoLastPos.y() * escala);
             a.rotate(-angulo_interface);
             a.textAlign(PApplet.LEFT);
-            a.text(String.format("(%d,%d) @ %.2f deg", pontoLastPos.x, pontoLastPos.y, PApplet.degrees(lastPos.getAngulo())),
+            a.text(String.format("(%d,%d) @ %.2f deg", pontoLastPos.x / 10, pontoLastPos.y / 10, PApplet.degrees(lastPos.getAngulo())),
                    +5, -5);
             a.popMatrix();
         }

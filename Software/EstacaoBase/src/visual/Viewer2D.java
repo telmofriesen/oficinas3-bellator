@@ -20,14 +20,15 @@ public class Viewer2D extends PApplet {
 
     private ArrayList<Drawable2D> listaDrawable2D = new ArrayList<Drawable2D>();
     private ArrayList<MouseListener2D> listaMouseListener2D = new ArrayList<MouseListener2D>();
+    //Escala em px/mm
     //escala=d/D
-    private float escala = 1f;
+    private float escala = 0.1f;
+    private float escala_step = 0.02f;
     //Angulo do viewport (radianos). Zero grau significa eixo X para a DIREITA e Y para BAIXO. Angulos aumentam no sentido horário.
     private float angulo_visao = 0;
     private float angulo_step;
     private PVector origemRealNaInterface = new PVector(0, 0);
     private boolean indicadorCentro = true;
-    private float escala_step = 0.05f;
     private boolean mouseLeftPressed = false;
     private boolean controlPressed = false;
     private PVector pressPos = new PVector(0, 0);
@@ -92,7 +93,7 @@ public class Viewer2D extends PApplet {
         textAlign(LEFT);
 //        text("oi",height-20, 20);
         text(String.format("mouse_interface: (%.2f, %.2f) px", posMouseInterface.x, posMouseInterface.y), 5, height - 25);
-        text(String.format("mouse_real: (%.2f, %.2f) cm", posMouseReal.x, posMouseReal.y), 5, height - 10);
+        text(String.format("mouse_real: (%.2f, %.2f) cm", posMouseReal.x / 10, posMouseReal.y / 10), 5, height - 10);
         popMatrix();
         popStyle();
 
@@ -117,7 +118,7 @@ public class Viewer2D extends PApplet {
 //        text(String.format("origemRealNaInterface.y=%.2f px", origemRealNaInterface.y), 5, 30);
         text(String.format("origemRealNaInterface:(%.2f, %.2f) px", origemRealNaInterface.x, origemRealNaInterface.y), 5, 15);
         text(String.format("angulo_visao=%.2f deg", degrees(angulo_visao)), 5, 30);
-        text(String.format("escala=%.2f px/cm", escala), 5, 45);
+        text(String.format("escala=%.2f px/mm", escala), 5, 45);
         text(String.format("frameRate=%.2f fps", frameRate), 5, 60);
         //text(String.format("robo.", ), 5, 80);
 
@@ -293,8 +294,10 @@ public class Viewer2D extends PApplet {
     }
 
     /**
-     * Efetua zoom na interface, fazendo escala = escala + step.
-     * Move a origem real de modo que o zoom seja feito no centro de visualização da interface.
+     * Efetua zoom na interface, fazendo escala = escala + step. Move a origem
+     * real de modo que o zoom seja feito no centro de visualização da
+     * interface.
+     *
      * @param step Quantidade a ser adicionada à escala
      */
     public void zoom_view(float step) {
@@ -305,9 +308,11 @@ public class Viewer2D extends PApplet {
     }
 
     /**
-     * Rotaciona a visão, fanzendo angulo_visao = angulo_visao + step.
-     * Move a origem real de modo que a rotação seja feito no centro de visualização da interface.
-     * @param step 
+     * Rotaciona a visão, fanzendo angulo_visao = angulo_visao + step. Move a
+     * origem real de modo que a rotação seja feito no centro de visualização da
+     * interface.
+     *
+     * @param step
      */
     public void rotate_view(float step) {
         setAngulo(angulo_visao + step);
@@ -337,7 +342,7 @@ public class Viewer2D extends PApplet {
                 //3ª vez: restaura a escala para 1.
                 if (origemRealNaInterface.x == 0 && origemRealNaInterface.y == 0) {
                     if (angulo_visao == 0) {
-                        setEscala(1);
+                        setEscala(0.1f);
                     }
                     setAngulo(0);
                 }
@@ -386,8 +391,10 @@ public class Viewer2D extends PApplet {
     }
 
     /**
-     * Efetua zoom e rotação na interface de acordo com o movimento da roda do mouse.
-     * @param delta Maior que 0: roda para cima. Menor que 0: roda para baixo. 
+     * Efetua zoom e rotação na interface de acordo com o movimento da roda do
+     * mouse.
+     *
+     * @param delta Maior que 0: roda para cima. Menor que 0: roda para baixo.
      */
     public void mouseWheel(int delta) {
         if (delta < 0) {

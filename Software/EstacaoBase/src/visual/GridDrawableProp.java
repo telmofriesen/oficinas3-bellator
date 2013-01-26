@@ -17,9 +17,9 @@ public class GridDrawableProp {
     private int limite_sup_x = 5000;
     private int limite_inf_y = -5000;
     private int limite_sup_y = 5000;
-    //Intervalo entre cada linha
-    private int step_x = 100;
-    private int step_y = 100;
+    //Intervalo entre cada linha (mm)
+    private int step_x = 1000;
+    private int step_y = 1000;
 
     public Color getCorGrid() {
         return corGrid;
