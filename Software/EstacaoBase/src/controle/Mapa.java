@@ -17,7 +17,8 @@ import visual.Drawable2D;
 import visual.Ponto;
 
 /**
- * Classe que contém o mapa. Ela armazena somente as informações essenciais, que consistem no robô e os obstáculos detectados por ele.
+ * Classe que contém o mapa. Ela armazena somente as informações essenciais, que
+ * consistem no robô e os obstáculos detectados por ele.
  *
  * @author stefan
  */
@@ -44,6 +45,8 @@ public class Mapa {
     public void load(String filename) throws FileNotFoundException, IOException, Exception {
 
         BufferedReader br = new BufferedReader(new FileReader(filename));
+        robo.reset();
+        obstaculos.reset();
         String line;
         int sequencia = 0;
         while ((line = br.readLine()) != null) {
@@ -57,7 +60,6 @@ public class Mapa {
                 int largura = Integer.parseInt(str_split[0]);
                 int comprimento = Integer.parseInt(str_split[1]);
                 Ponto centro = new Ponto(Integer.parseInt(str_split[2]), Integer.parseInt(str_split[3]));
-                robo.reset();
                 robo.setLargura(largura);
                 robo.setComprimento(comprimento);
                 robo.setCentroMovimento(centro);
@@ -74,7 +76,7 @@ public class Mapa {
                 int x = Integer.parseInt(str_split[0]);
                 int y = Integer.parseInt(str_split[1]);
                 float angulo = Float.parseFloat(str_split[2]);
-                int timestamp = Integer.parseInt(str_split[3]);
+                long timestamp = Long.parseLong(str_split[3]);
                 robo.addPosicao(new PosInfo(new Ponto(x, y), angulo, timestamp));
             } else if (sequencia == 3) { //Obstaculos detectados
                 String[] str_split = line.split(" ");
@@ -100,5 +102,10 @@ public class Mapa {
 
     public void setObstaculos(Obstaculos obstaculos) {
         this.obstaculos = obstaculos;
+    }
+
+    public void reset() {
+        robo.reset();
+        obstaculos.reset();
     }
 }

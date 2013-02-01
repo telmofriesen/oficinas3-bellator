@@ -31,6 +31,10 @@ public class Obstaculos {
     public synchronized int getNumPontos(){
         return obstaculosPos.size();
     }
+    
+    public void reset(){
+        obstaculosPos.clear();
+    }
 
     public String pontosToString() {
         String str = "";

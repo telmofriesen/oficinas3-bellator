@@ -31,6 +31,10 @@ public class Ponto {
 //    public float getXTranslated(float translation){
 //        return (float)X + translation;        
 //    }    
+    
+    public Ponto copy(){
+        return new Ponto(x, y);
+    }
     public int x() {
         return x;
     }

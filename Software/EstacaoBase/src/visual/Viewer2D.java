@@ -23,7 +23,8 @@ public class Viewer2D extends PApplet {
     //Escala em px/mm
     //escala=d/D
     private float escala = 0.1f;
-    private float escala_step = 0.02f;
+    private float escala_step = 0.01f;
+    private final float escala_default = 0.1f;
     //Angulo do viewport (radianos). Zero grau significa eixo X para a DIREITA e Y para BAIXO. Angulos aumentam no sentido horário.
     private float angulo_visao = 0;
     private float angulo_step;
@@ -118,7 +119,7 @@ public class Viewer2D extends PApplet {
 //        text(String.format("origemRealNaInterface.y=%.2f px", origemRealNaInterface.y), 5, 30);
         text(String.format("origemRealNaInterface:(%.2f, %.2f) px", origemRealNaInterface.x, origemRealNaInterface.y), 5, 15);
         text(String.format("angulo_visao=%.2f deg", degrees(angulo_visao)), 5, 30);
-        text(String.format("escala=%.2f px/mm", escala), 5, 45);
+        text(String.format("escala=%.2f px/cm", escala*10), 5, 45);
         text(String.format("frameRate=%.2f fps", frameRate), 5, 60);
         //text(String.format("robo.", ), 5, 80);
 
@@ -250,7 +251,7 @@ public class Viewer2D extends PApplet {
      *
      * @param obj
      */
-    public void removeDrawable2D(Drawable2D obj) {
+    public synchronized void removeDrawable2D(Drawable2D obj) {
         listaDrawable2D.remove(obj);
         redraw();
     }
@@ -260,7 +261,7 @@ public class Viewer2D extends PApplet {
      *
      * @param obj
      */
-    public void addMouseListener2D(MouseListener2D obj) {
+    public synchronized void addMouseListener2D(MouseListener2D obj) {
         listaMouseListener2D.add(obj);
         redraw();
     }
@@ -301,7 +302,7 @@ public class Viewer2D extends PApplet {
      * @param step Quantidade a ser adicionada à escala
      */
     public void zoom_view(float step) {
-        if (step > 0 || escala > 0.1f) {
+        if (step > 0 || escala > 0.02f) {
             origemRealNaInterface.setMag(origemRealNaInterface.mag() * ((float) 1 + step / escala));
             setEscala(escala + step);
         }
@@ -342,7 +343,7 @@ public class Viewer2D extends PApplet {
                 //3ª vez: restaura a escala para 1.
                 if (origemRealNaInterface.x == 0 && origemRealNaInterface.y == 0) {
                     if (angulo_visao == 0) {
-                        setEscala(0.1f);
+                        setEscala(escala_default);
                     }
                     setAngulo(0);
                 }
@@ -405,5 +406,19 @@ public class Viewer2D extends PApplet {
             else zoom_view(-escala_step);
 
         }
+    }
+
+    public void resetView() {
+        setEscala(escala_default);
+        setAngulo(0);
+        origemRealNaInterface.x = (0);
+        origemRealNaInterface.y = (0);
+        redraw();
+    }
+    
+    public synchronized void reset(){
+        listaDrawable2D.clear();
+        listaMouseListener2D.clear();
+        resetView();
     }
 }

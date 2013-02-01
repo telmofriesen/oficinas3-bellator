@@ -21,6 +21,9 @@ public class Robo {
     private Ponto centroMovimento;
     private ArrayList<PosInfo> posInfos = new ArrayList<PosInfo>();
     private ArrayList<SensorIR> sensoresIR = new ArrayList<SensorIR>();
+    //TODO armazenar valores da velocidade na memoria ao inves de calcular toda vez.
+    private float velocidadeAtual = 0;
+    private float velocidadeAngularAtual = 0;
 
     /**
      *
@@ -38,14 +41,31 @@ public class Robo {
         posInfos.add(new PosInfo(new Ponto(0, 0), 0, 0)); //Adiciona a posição inicial
     }
 
+    public synchronized float getVelocidadeAtual() {
+        return velocidadeAtual;
+    }
+
+    public synchronized void setVelocidadeAtual(float velocidadeAtual) {
+        this.velocidadeAtual = velocidadeAtual;
+    }
+
+    public synchronized float getVelocidadeAngularAtual() {
+        return velocidadeAngularAtual;
+    }
+
+    public synchronized void setVelocidadeAngularAtual(float velocidadeAngularAtual) {
+        this.velocidadeAngularAtual = velocidadeAngularAtual;
+    }
+
     /**
      * Retorna a velocidade atual do robô, a partir dos dois últimos pontos de
      * posição;
      *
      * @return Velocidade atual do robô em m/s. Se houver apenas um ponto de
      * posição armazenado, retorna 0.
+     * @deprecated
      */
-    public float getVelocidade() {
+    public synchronized float getVelocidade() {
         if (posInfos.size() < 2)
             return 0;
         Ponto p2 = posInfos.get(posInfos.size() - 1).getPonto(); //Ultima posicao
@@ -64,9 +84,9 @@ public class Robo {
      *
      * @return Velocidade angular atual do robô em rad/s. Se houver apenas um
      * ponto de posição armazenado, retorna 0.
-     *
+     * @deprecated
      */
-    public float getVelocidadeAngular() {
+    public synchronized float getVelocidadeAngular() {
         if (posInfos.size() < 2)
             return 0;
         float delta_theta = posInfos.get(posInfos.size() - 1).getAngulo() - posInfos.get(posInfos.size() - 2).getAngulo(); //rad
@@ -114,27 +134,27 @@ public class Robo {
         return sensoresIR.size();
     }
 
-    public Ponto getCentroMovimento() {
+    public synchronized Ponto getCentroMovimento() {
         return centroMovimento;
     }
 
-    public int getComprimento() {
+    public synchronized int getComprimento() {
         return comprimento;
     }
 
-    public int getLargura() {
+    public synchronized int getLargura() {
         return largura;
     }
 
-    public void setLargura(int largura) {
+    public synchronized void setLargura(int largura) {
         this.largura = largura;
     }
 
-    public void setComprimento(int comprimento) {
+    public synchronized void setComprimento(int comprimento) {
         this.comprimento = comprimento;
     }
 
-    public void setCentroMovimento(Ponto centroMovimento) {
+    public synchronized void setCentroMovimento(Ponto centroMovimento) {
         this.centroMovimento = centroMovimento;
     }
 
@@ -171,11 +191,17 @@ public class Robo {
         return str;
     }
 
-    public void reset() {
+    public synchronized void clearPosInfos() {
+        posInfos.clear();
+        posInfos.add(new PosInfo(new Ponto(0, 0), 0, 0)); //Adiciona a posição inicial
+    }
+
+    public synchronized void reset() {
         posInfos.clear();
         sensoresIR.clear();
         largura = 0;
         comprimento = 0;
         centroMovimento = null;
+        posInfos.add(new PosInfo(new Ponto(0, 0), 0, 0)); //Adiciona a posição inicial
     }
 }

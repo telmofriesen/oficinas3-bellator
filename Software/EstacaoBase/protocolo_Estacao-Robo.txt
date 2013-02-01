@@ -1,0 +1,64 @@
+Bellator
+Protocolo de comunicação estação base <-> robô
+
+Todos as mensagens são enviadas em forma de String. Os valores recebidos de uma mensagem são interpretados e armazenados nos respectivos formatos.
+
+--- COMANDOS ---
+
+-- Bidirecionais --
+
+- BELLATOR HANDSHAKE 
+	[REQUEST | REPLY | REPLY2]
+		Handshake de 3 vias.
+		Envia requisição e resposta a um handshake. O cliente envia "BELLATOR HANDSHAKE REQUEST" no início de uma conexão, e saberá que o servidor ao qual ele conectou é um robô Bellator se este responder com "BELLATOR HANDSHAKE REPLY". Após o cliente receber um REPLY, deve enviar um REPLY2 para o efetivar a conexão com sucesso.
+
+- ECHO 
+	[REQUEST | REPLY]
+		O cliente por padrão, se não for recebido nenhum pacote em um intervalo máximo de 2 segundos, envia uma mensagem "ECHO REQUEST".
+		Espera-se que o servidor responda imdiatamente com um "ECHO REPLY".
+		O cliente, caso fique mais que 4 segundos sem receber nenhuma mensagem, informa ao usuário que há um problema de tempo excessivo sem comunicação (o objetivo é diagnosticar facilmente caso hajam problemas).
+
+- KEEPALIVE
+O cliente por padrão, se não for enviado nenhum pacote em um intervalo máximo de 2 segundos, envia uma mensagem KEEPALIVE, para que o servidor entenda que a conexão ainda está ativa.
+
+- DISCONNECT
+Solicita formalmente a desconexão.
+
+
+-- Cliente (Estação base) -> Servidor (Robô) --
+
+- SENSORS 
+	[START | STOP]
+		Requisita ao robô o início (START) ou parada (STOP) do envio de amostras dos sensores.
+		Por padrão, o robô no início da conexão não envia leituras dos sensores. O cliente deve requisitar o início do envio obrigatoriamente.
+		O Robô, ao receber esse comando do cliente, deve obrigatoriamente enviar uma resposta (SENSORS STATUS REPLY [STARTED | STOPPED]) para confirmar se o status foi mudado corretamente.
+	STATUS REQUEST
+		Requisita o estado atual de amostragem (STARTED ou STOPPED). Espera-se que o robõ responda com "STATUS REPLY [STARTED | STOPPED]".
+	STATUS SAMPLE_RATE [sample_rate]
+		Configura o robô para mudar a taxa de amostragem.
+		Parâmetros:
+		[sample_rate] (float) a nova taxa de amostragem.
+
+- ENGINES 
+	[velocidade_roda_direita] [velocidade_roda_esquerda]
+		Comanda o robô para mudar a velocidade das rodas direita e esquerda. 
+		Parâmetros:
+		[velocidade_roda_x] (float) Valor de -1 a 1, sendo 1 a máxima velocidade para frente, -1 a máxima velocidade para trás e 0 parada total.
+
+//TODO: adicionar comandos de movimento do robô em alto nível.
+
+
+-- Servidor (Robô) -> Cliente (Estação base) --
+
+-- SENSORS 
+	SAMPLE [aceleração] [aceleração angular] [IR1 IR2 ... IRn] [timestamp]
+	Envia as leituras dos sensores ao cliente para que haja posterior processamento. Parâmetros:
+		[aceleracao] (float) Aceleracao em m/s^2, medida a partir do acelerômetro (posicionado no centro de movimento do robô).
+		[aceleracao_angular] (float) Aceleração angular em rad/s^2. Os ângulos começam em 0 e crescem no sentido HORÁRIO.
+		[IR1 IR2 ... IRn] (int) Cada distância detectada pelos sensores IR, em milímetros (com valores separados por espaço). O vetor deve obrigatoriamente conter um número de elementos igual ao número de sensores IR presentes no robô. Caso contrário uma exceção será lançada no cliente.
+		[timestamp] (long) Timestamp UNIX em milissegundos do horário da leitura.
+	STATUS REPLY [STARTED | STOPPED]
+		Resposta a um comando SENSORS STATUS REQUEST previamente recebido. Informa ao cliente o status do envio de amostras dos sensores.
+     
+- SERVER FULL
+Informa que o robô já está conectado a um cliente.

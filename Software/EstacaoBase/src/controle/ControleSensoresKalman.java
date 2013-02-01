@@ -36,7 +36,7 @@ public class ControleSensoresKalman extends ControleSensores {
     }
 
     @Override
-    public void novaLeituraSensores(float velocidade, float angulo, float[] distIR, int timestamp) throws Exception {
+    public void novaLeituraSensores(float velocidade, float angulo, float[] distIR, long timestamp) throws NumIRException, TimestampException {
         //
         //Aplica os filtros de Kalman a cada leitura
         //
