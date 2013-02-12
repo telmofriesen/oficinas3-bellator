@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package visual.gui;
+package zz_old;
 
 import controle.ControleSensores;
 import events.MyChangeEvent;

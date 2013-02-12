@@ -6,7 +6,8 @@ import events.MyChangeListener;
 import javax.swing.JButton;
 
 /**
- *
+ * Botão de conexão que escuta o Connector em busca de mudanças.
+ * Troca a cor do ícone de conexão caso mudanças na conexão sejam detectadas.
  * @author stefan
  */
 public class ConnectionButtonListener extends JButton implements MyChangeListener {

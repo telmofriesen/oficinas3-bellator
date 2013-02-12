@@ -34,7 +34,7 @@ Solicita formalmente a desconexão.
 		O Robô, ao receber esse comando do cliente, deve obrigatoriamente enviar uma resposta (SENSORS STATUS REPLY [STARTED | STOPPED]) para confirmar se o status foi mudado corretamente.
 	STATUS REQUEST
 		Requisita o estado atual de amostragem (STARTED ou STOPPED). Espera-se que o robõ responda com "STATUS REPLY [STARTED | STOPPED]".
-	STATUS SAMPLE_RATE [sample_rate]
+	SAMPLE_RATE [sample_rate]
 		Configura o robô para mudar a taxa de amostragem.
 		Parâmetros:
 		[sample_rate] (float) a nova taxa de amostragem.

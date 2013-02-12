@@ -12,6 +12,8 @@ import java.util.Date;
 import javax.swing.JTextArea;
 
 /**
+ * Área de log para status de conexão.
+ * Escuta o Connector em busca de mudanças nos status.
  *
  * @author stefan
  */

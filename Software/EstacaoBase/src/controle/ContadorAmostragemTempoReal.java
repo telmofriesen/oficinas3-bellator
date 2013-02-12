@@ -6,6 +6,7 @@ package controle;
 
 import events.MyChangeEvent;
 import events.MyChangeListener;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -13,19 +14,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Implementa um contador que calcula a taxa de amostragem de acordo com as amostras recebidas.
+ * A atualização da taxa de amostragem é feita periodicamente por uma thread, através do método updateSampleRate().
  *
  * @author stefan
  */
 public class ContadorAmostragemTempoReal extends Thread {
 
-    private long last_update = -1; //Inicio da janela de tempo atual (ms)
-    private int time_window_read_count = 0; //Numero de leituras na janela de tempo atual
+    private int update_delay = 1000; //Intervalo entre cada atualização;
     private float sample_rate = 0; //leituras por segundo atual
-    private int time_window = 2000; //Tamanho da janela. Número de milissegundos entre cada conjunto de contagem.
+    private int time_window = 2000; //Tamanho da janela (ms). Número de milissegundos entre cada janela de contagem de amostras.
     private int time_window_min = 2000;
     private int time_window_max = 10000;
     private int time_window_step_up = 1000;
     private int time_window_step_down = 1000;
+    private ArrayList<Long> samples;
     private final CopyOnWriteArrayList<MyChangeListener> listeners = new CopyOnWriteArrayList();
 //    private int update_interval = 1000;
     private boolean run_timer = true;
@@ -33,13 +36,15 @@ public class ContadorAmostragemTempoReal extends Thread {
 //    private Timer timer;
 
     public ContadorAmostragemTempoReal() {
-        super();
+        samples = new ArrayList<Long>();
     }
 
-    public ContadorAmostragemTempoReal(int time_window, int time_window_min, int time_window_max) {
+    public ContadorAmostragemTempoReal(int time_window, int time_window_min, int time_window_max, int update_delay) {
+        samples = new ArrayList<Long>();
         this.time_window = time_window;
         this.time_window_min = time_window_min;
         this.time_window_max = time_window_max;
+        this.update_delay = update_delay;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class ContadorAmostragemTempoReal extends Thread {
             while (run_timer) {
                 updateSampleRate();
                 try {
-                    sleep(time_window);
+                    sleep(update_delay);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(ContadorAmostragemTempoReal.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -88,35 +93,45 @@ public class ContadorAmostragemTempoReal extends Thread {
         }
     }
 
+    /**
+     * Informa o recebimento de uma nova amostra.
+     */
     public synchronized void novaAmostra() {
-        time_window_read_count++;
+        samples.add(System.currentTimeMillis());
     }
 
     public synchronized void updateSampleRate() {
         long timestamp = System.currentTimeMillis();
-        if (last_update == -1) { //Executado na primeira amostra
-            last_update = timestamp;
+        long time_window_start = timestamp - time_window;
+        //Remove os elementos que estejam fora da janela de tempo.
+        while (!samples.isEmpty() && samples.get(0) < time_window_start) {
+            //Como o array está ordenado em ordem crescente, verifica apenas o começo do array a cada iteração.
+            samples.remove(0);
         }
-        if (time_window_read_count == 0) { //Aumenta a janela de tempo se não houver nenhuma leitura
+//        for (int i = 0; i < samples.size(); i++) {
+//            if (samples.get(i) < time_window_start) {
+//                //Remove os elementos que estejam fora da janela de tempo.
+//                samples.remove(i);
+//            } else {
+//                //Como o array está ordenado em ordem crescente, não precisa verificar os outros elementos.
+//                break;
+//            }
+//        }
+        int read_count = samples.size();
+
+        if (read_count == 0) { //Aumenta a janela de tempo se não houver nenhuma leitura
             time_window = Math.min(time_window + time_window_step_up, time_window_max); //Máximo de 5 segundos
-            stopUpdateTimer();
-            startUpdateTimer();
-        } else if (time_window_read_count > 40) { //Reduz a janela de tempo se houverem muitas leituras
+        } else if (read_count > 30) { //Reduz a janela de tempo se houverem muitas leituras
             time_window = Math.max(time_window - time_window_step_down, time_window_min); //Mínimo de 0,5 segundos
-            stopUpdateTimer();
-            startUpdateTimer();
         }
         //Atualiza a taxa de transferencia
-        sample_rate = (float) time_window_read_count / (float) (timestamp - last_update) * 1000; //leituras por segundo
-        //Inicia nova janela de tempo
-        last_update = timestamp;
+        sample_rate = (float) read_count / ((float) time_window / 1000); // Amostras/s
 
         fireChangeEvent();
-        time_window_read_count = 0;
     }
 
     public synchronized void startUpdateTimer() {
-        if(!this.isAlive()){
+        if (!this.isAlive()) {
             this.start();
         }
         run_timer = true;

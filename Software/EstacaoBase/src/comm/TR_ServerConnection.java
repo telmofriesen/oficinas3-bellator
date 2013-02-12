@@ -10,47 +10,87 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Classe que contém os objetos necessários às conexões.
+ * Classe que representa uma conexão do servidor. Contém os objetos necessários às conexões (Sender, Receiver, Interpreter).
+ * IMPORTANTE: não esquecer de chamar startThreads() para iniciar as threads necessárias.
  *
  * @author stefan
  */
 public class TR_ServerConnection extends Thread {
+    //==========================================
+    //========= Constantes =====================
+    //==========================================
+    //<editor-fold defaultstate="collapsed" desc="Constantes">
 
+    /**
+     * HANDSHAKE: Sem atividade de handshake
+     */
+    public static final int HANDSHAKE_NO = 0;
+    /**
+     * HANDSHAKE REQUEST recebido
+     */
+    public static final int HANDSHAKE_REQUEST_RECEIVED = 1;
+    /**
+     * HANDSHAKE REPLY enviado
+     */
+    public static final int HANDSHAKE_REPLY_SENT = 2;
+    /**
+     * HANDSHAKE REPLY2 recebido (HANDSHAKE COMPLETO)
+     */
+    public static final int HANDSHAKE_FULL = 3;
+    //</editor-fold>
+    //==========================================
+    //========= Variáveis ======================
+    //==========================================
+    //<editor-fold defaultstate="collapsed" desc="Variaveis">
     private boolean connected = true; //true até que disconnect() seja chamado
     private TR_ServerReceiver receiver;
     private TR_ServerSender sender;
-    //Objeto linstener
-    private Server server;
+    //Listener do servidor
+    private TR_ServerListener listener;
+    //Interpretador de comandos
     private TR_ServerCommandInterpreter interpreter;
     //O socket da conexão aceita
     private Socket sock;
-    private TR_ServerListener listener;
-    private boolean run = true;
-//    private boolean handshaked = false;
-    public static final int NO_HANDSHAKE = 0, //Sem atividade de handshake
-            REQUEST_RECEIVED_HANDSHAKE = 1, //REQUEST recebido 
-            REPLY_SENT_HANDSHAKE = 2,//REPLY enviado
-            FULL_HANDSHAKE = 3; //REPLY2 recebido
+    //Estado atual de handshake
     private int handshakeStatus;
+    //Horario (milissegundos) da ultima atividade de handshake.
     private long lastHandshakeActivity;
-    private int handshakeTimeout = 5000; //5 segundos (5000 ms) de limite para que o cliente envia um "BELLATOR HANDSHAKE REQUEST"
-    private long last_package_sent_time; //Horario em milissegundos da ultima requisicao de envio de pacote
-    private long last_package_received_time; //Horario em milissegundos do último recebimento de pacote
+    //Tempo máximo (ms) para haver timeout de handshake.
+    private int handshakeTimeout = 5000;
+    //Horario em milissegundos da ultima requisicao de envio de pacote
+    private long last_package_sent_time;
+    //Horario em milissegundos do último recebimento de pacote
+    private long last_package_received_time;
+    //Intervalo máximo para envio de pacotes. Usado para enviar KEEPALIVE quando necessário
     private int package_send_interval_max = 2000;
-    private int package_recv_interval_echo = 4000;
-    private int package_recv_interval_warning = 8000;
-    private int package_recv_interval_timeout = 15000;
+    //Intervalos máximos para recebimento de pacotes:
+    private int package_recv_interval_echo = 4000; //Envia um ECHO REQUEST
+    private int package_recv_interval_warning = 8000; //Entra em estado de Warning
+    private int package_recv_interval_timeout = 15000; //Timeout (desconecta do host)
+    //Indica se o loop principal deve executar ou não.
+    private boolean run;
+    //</editor-fold>
 
-    public TR_ServerConnection(Server server, TR_ServerListener listener, Socket sock) {
-        this.server = server;
+    public TR_ServerConnection(TR_ServerListener listener, Socket sock) {
         this.listener = listener;
         this.sock = sock;
         this.receiver = new TR_ServerReceiver(this);
         this.sender = new TR_ServerSender(this);
         this.interpreter = new TR_ServerCommandInterpreter(this);
         lastHandshakeActivity = System.currentTimeMillis();
-        handshakeStatus = NO_HANDSHAKE;
+        handshakeStatus = HANDSHAKE_NO;
         this.setName(this.getClass().getName());
+        run = true;
+    }
+
+    /**
+     * Inicia as threads necessárias à conexão.
+     */
+    public void startThreads() {
+        receiver.start();
+        sender.start();
+        interpreter.start();
+        this.start();
     }
 
     @Override
@@ -58,10 +98,12 @@ public class TR_ServerConnection extends Thread {
         long current_time = System.currentTimeMillis();
         last_package_sent_time = System.currentTimeMillis();
         last_package_received_time = current_time;
-        while (run) {
+        while (true) {
             synchronized (this) {
+                //Finaliza a execução do loop se for ordenado o término da thread (instrução dentro do bloco synchronized).
+                if (!run) break;
                 current_time = System.currentTimeMillis();
-                if (handshakeStatus != FULL_HANDSHAKE) {
+                if (handshakeStatus != HANDSHAKE_FULL) {
                     if (current_time - lastHandshakeActivity > handshakeTimeout) {//Atingido o tempo máximo sem haver handshake
                         System.out.println("[TR_ServerConnection] Atingido o tempo máximo sem haver handshake. Desconectando...");
                         this.disconnect(); //Desconecta do cliente e remove a conexão.  
@@ -92,6 +134,7 @@ public class TR_ServerConnection extends Thread {
                 }
             }
             try {
+                //"Dorme" por certo tempo para deixar outras threads executarem.
                 sleep(200);
             } catch (InterruptedException ex) {
                 Logger.getLogger(TR_ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
@@ -99,36 +142,73 @@ public class TR_ServerConnection extends Thread {
         }
     }
 
-    public void processCommand(String command) {
-        interpreter.processCommand(command);
+    //==========================================
+    //========= Gerenciamento de conexão =======
+    //==========================================
+    //<editor-fold defaultstate="collapsed" desc="Gerenciamento de conexão">
+    public synchronized boolean isConnected() {
+        return connected;
     }
 
-    public void startThreads() {
-        receiver.start();
-        sender.start();
-        interpreter.start();
-        this.start();
+    /**
+     * Desconecta corretamente do host (enviando mensagem de DISCONNECT e fechando a conexão).
+     */
+    public synchronized void disconnect() {
+        if (!connected) {
+            return;
+        }
+        sendMessageWithPriority("DISCONNECT", true);
+        closeConnection();
     }
 
-    public void sendEchoRequest() {
-        sendMessageWithPriority("ECHO REQUEST"); //envia pacote echo para verificar conectividade.
-    }
+    /**
+     * Fecha a conexão.
+     */
+    public void closeConnection() {
+        synchronized (this) {
+            if (connected == false) {
+                return;
+            }
+            connected = false;
+            run = false;
+        }
 
-    public synchronized void echoReplyReceived() {
-        last_package_received_time = System.currentTimeMillis();
-    }
-
-    private void sendKeepAlive() {
-        sendMessageWithPriority("KEEPALIVE", true);
-    }
-
-    public synchronized void keepAliveReceived() {
-        last_package_received_time = System.currentTimeMillis();
+        //Requisita finalização das threads
+        sender.terminate();
+        receiver.terminate();
+        interpreter.terminate();
+        int count = 0;
+        //Espera o término das threads
+        while (sender.isAlive() && receiver.isAlive() && interpreter.isAlive() && count < 5) {
+            try {
+                System.out.printf("[TR_ServerConnection] Aguardando sender, receiver e interpreter finalizarem.... (%d)\n", count);
+                sleep(500);
+                count++;
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TR_ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        //Força o término das threads 
+        sender.kill();
+        receiver.kill();
+        interpreter.kill();
+        try {
+            synchronized (this) {
+                //Fecha o socket
+                sock.close();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(TR_ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //Remove esta conexão do listener.
+        listener.getServer().stopSend_sensor_info();
+        listener.removeConnection(this);
+        System.out.println("[TR_ServerConnection] Desconectado do host: " + sock);
     }
 
     public synchronized void handShakeRequestReceived() {
-        if (handshakeStatus == NO_HANDSHAKE) {
-            handshakeStatus = REQUEST_RECEIVED_HANDSHAKE;
+        if (handshakeStatus == HANDSHAKE_NO) {
+            handshakeStatus = HANDSHAKE_REQUEST_RECEIVED;
             lastHandshakeActivity = System.currentTimeMillis();
         } else {
             System.out.println("[TR_ServerConnection] ERRO: HANDSHAKE REQUEST recebido erroneamente.");
@@ -137,8 +217,8 @@ public class TR_ServerConnection extends Thread {
     }
 
     public synchronized void handShakeReplySent() {
-        if (handshakeStatus == REQUEST_RECEIVED_HANDSHAKE) {
-            handshakeStatus = REPLY_SENT_HANDSHAKE;
+        if (handshakeStatus == HANDSHAKE_REQUEST_RECEIVED) {
+            handshakeStatus = HANDSHAKE_REPLY_SENT;
             lastHandshakeActivity = System.currentTimeMillis();
         } else {
             System.out.println("[TR_ServerConnection] ERRO: HANDSHAKE REPLY enviado erroneamente.");
@@ -147,8 +227,8 @@ public class TR_ServerConnection extends Thread {
     }
 
     public synchronized void handShakeReply2Received() {
-        if (handshakeStatus == REPLY_SENT_HANDSHAKE) {
-            handshakeStatus = FULL_HANDSHAKE;
+        if (handshakeStatus == HANDSHAKE_REPLY_SENT) {
+            handshakeStatus = HANDSHAKE_FULL;
             lastHandshakeActivity = System.currentTimeMillis();
         } else {
             System.out.println("[TR_ServerConnection] ERRO: HANDSHAKE REPLY2 recebido erroneamente.");
@@ -159,40 +239,102 @@ public class TR_ServerConnection extends Thread {
     public int getHandshakeStatus() {
         return handshakeStatus;
     }
+    //</editor-fold>    
+    //==========================================
+    //===== Gerenciamento de mensagens =========
+    //==========================================
+    //<editor-fold defaultstate="collapsed" desc="Gerenciamento de mensagens">
 
-    public synchronized void sendMessageWithPriority(String message) {
-        sender.sendMessageWithPriority(message);
-        last_package_sent_time = System.currentTimeMillis();
+    /**
+     * Informa que um pacote foi recebido pelo Receiver.
+     */
+    public synchronized void messageReceived() {
+        last_package_received_time = System.currentTimeMillis();
     }
 
+    /**
+     * Envia requisição de ECHO.
+     */
+    public void sendEchoRequest() {
+        sendMessageWithPriority("ECHO REQUEST", true); //envia pacote echo para verificar conectividade.
+    }
+
+    /**
+     * Informa que uma resposta de ECHO foi recebida.
+     */
+    public synchronized void echoReplyReceived() {
+        last_package_received_time = System.currentTimeMillis();
+    }
+
+    /**
+     * Envia um KEEPALIVE.
+     */
+    private void sendKeepAlive() {
+        sendMessageWithPriority("KEEPALIVE", true);
+    }
+
+    /**
+     * Informa que um KEEPALIVE foi recebido.
+     */
+    public synchronized void keepAliveReceived() {
+        last_package_received_time = System.currentTimeMillis();
+    }
+
+    /**
+     * Adiciona uma mensagem à fila prioritária de envio.
+     *
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
+     */
     public synchronized void sendMessageWithPriority(String message, boolean flush_buffer) {
         sender.sendMessageWithPriority(message, flush_buffer);
         last_package_sent_time = System.currentTimeMillis();
     }
 
+    /**
+     * Adiciona uma mensagem à fila prioritária de envio.
+     *
+     * @param senderMessage Mensagem a ser enviada.
+     */
     public synchronized void sendMessageWithPriority(SenderMessage senderMessage) {
         sender.sendMessageWithPriority(senderMessage);
         last_package_sent_time = System.currentTimeMillis();
     }
 
-    public void sendMessage(String message) {
-        sender.sendMessage(message);
-        last_package_sent_time = System.currentTimeMillis();
-    }
-
+    /**
+     * Adiciona uma mensagem à fila de envio.
+     *
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
+     */
     public synchronized void sendMessage(String message, boolean flush_buffer) {
         sender.sendMessage(message, flush_buffer);
         last_package_sent_time = System.currentTimeMillis();
     }
 
+    /**
+     * Adiciona uma mensagem à fila de envio.
+     *
+     * @param senderMessage Mensagem a ser enviada.
+     */
     public synchronized void sendMessage(SenderMessage senderMessage) {
         sender.sendMessage(senderMessage);
         last_package_sent_time = System.currentTimeMillis();
     }
 
-    public synchronized void packetReceived() {
-        last_package_received_time = System.currentTimeMillis();
+    /**
+     * Adiciona um comando à fila de execução.
+     *
+     * @param command O comando a ser executado.
+     */
+    public void processCommand(String command) {
+        interpreter.processCommand(command);
     }
+    //</editor-fold>
+    //==========================================
+    //========= Outros Getters e Setters =======
+    //==========================================
+    //<editor-fold defaultstate="collapsed" desc="Outros Getters e Setters">
 
     public TR_ServerReceiver getReceiver() {
         return receiver;
@@ -206,55 +348,12 @@ public class TR_ServerConnection extends Thread {
         return sock;
     }
 
-    public Server getServer() {
-        return server;
-    }
-
     public synchronized TR_ServerCommandInterpreter getInterpreter() {
         return interpreter;
     }
 
-    public synchronized boolean isConnected() {
-        return connected;
+    public TR_ServerListener getListener() {
+        return listener;
     }
-
-    public synchronized void disconnect() {
-        if (!connected) {
-            return;
-        }
-        sendMessage("DISCONNECT");
-        closeConnection();
-    }
-
-    public void closeConnection() {
-        synchronized (this) {
-            if (connected == false) {
-                return;
-            }
-            connected = false;
-            run = false;
-        }
-
-        sender.terminate();
-        receiver.terminate();
-        interpreter.terminate();
-        while (sender.isAlive() && interpreter.isAlive()) {
-            try {
-//                System.out.println("Sender2 " + sender.isAlive() + " " + interpreter.isAlive());
-                sleep(200); //Espera todas as threads finalizarem (menos o receiver, pois quando o socket for finalizado ele o será também, pois uma exceção será lançada internamente nele)
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TR_ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        try {
-            synchronized (this) {
-                sock.close();
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(TR_ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        listener.removeConnection(this);
-        server.stopSend_sensor_info();
-        System.out.println("[TR_ServerConnection] Desconectado do host: " + sock);
-    }
+    //</editor-fold>
 }

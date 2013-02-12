@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package visual.gui;
 
 import comm.TR_ClientConnector;
@@ -14,25 +10,32 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 /**
- *
+ * Janela responsável pela configuração dos sensores.
  * @author stefan
  */
 public class JanelaSensores extends javax.swing.JFrame implements MyChangeListener {
 
+    /**
+     * Método chamado quando é recebido um evento de mudança.
+     * @param evt 
+     */
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
+        //Se o status da conexão mudar...
         if (evt.getSource() instanceof TR_ClientConnector) {
             TR_ClientConnector c = (TR_ClientConnector) evt.getSource();
             if (!c.isConnected()) {
-                this.setVisible(false); //Fecha a janela se a conexão for perdida.
+                 //Fecha a janela se a conexão for perdida.
+                this.setVisible(false);
             } else {
-                if (lastConnectionStatus != c.getConnectionStatus()) {
+                if (lastConnectionStatus != c.getConnectionStatus() && c.isConnected()) {
                     //Envia o valor de sample rate ao robô quando a conexão for iniciada
                     sendSampleRateValue();
                 }
             }
             lastConnectionStatus = c.getConnectionStatus();
         }
+        //Se o status em ControleSensores mudar...
         if (evt.getSource() instanceof ControleSensores) {
             ControleSensores contr = (ControleSensores) evt.getSource();
             int status = contr.getSensorSampleStatus();
@@ -75,6 +78,7 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
         this.connector = connector;
         initComponents();
 //        controle.addMyChangeListener(this);
+        //Valores minimo e maximo do FloatJSlider.
         sampleRateSlider.setF_min(0.2f);
         sampleRateSlider.setF_max(10f);
 //        sampleRateSlider.setValue(100);
@@ -169,7 +173,7 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
                                 .addComponent(sensorsStatusLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(activateSensorsButton)))
-                        .addGap(0, 84, Short.MAX_VALUE)))
+                        .addGap(0, 14, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -188,7 +192,7 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(sampleRateSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sampleRateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
@@ -227,11 +231,12 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
     }//GEN-LAST:event_sampleRateSliderMouseReleased
 
     /**
-     * Envia o valor de sample rate especificado na interface gráfica ao robô.
+     * Envia o valor de sample rate (especificado na configuração) para o robô.
      */
     public void sendSampleRateValue() {
-        if (connector.isConnected())
+        if (connector.isConnected()){
             connector.sendMessage(String.format("SENSORS SAMPLE_RATE %.1f", sampleRateSlider.getFloatValue()), true);
+        }
     }
 
     /**

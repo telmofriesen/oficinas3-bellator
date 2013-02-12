@@ -1,28 +1,28 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package comm;
 
 /**
- *
+ * Mensagem a ser enviada por um Sender. 
  * @author stefan
  */
 public class SenderMessage {
     private String message;
-    private boolean flush_buffer;
+    private boolean flushBuffer;
 
-    public SenderMessage(String message, boolean flush_buffer) {
+    /**
+     * @param message Mensagem a ser enviada
+     * @param flushBuffer Indica se o buffer de envio deve sofrer um flush ou não.
+     */
+    public SenderMessage(String message, boolean flushBuffer) {
         this.message = message;
-        this.flush_buffer = flush_buffer;
+        this.flushBuffer = flushBuffer;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public boolean isFlush_buffer() {
-        return flush_buffer;
+    public boolean isFlushBuffer() {
+        return flushBuffer;
     }
         
 }

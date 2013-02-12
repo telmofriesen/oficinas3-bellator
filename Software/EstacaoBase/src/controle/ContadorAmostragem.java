@@ -5,29 +5,38 @@
 package controle;
 
 /**
- * Implementa um contador que calcula a taxa de amostragem ao longo do tempo.
+ * Implementa um contador que calcula a taxa de amostragem de acordo com as amostras recebidas.
+ * A atualização da taxa de amostragem é feita na chamada da função novaAmostra(), quando uma amostra é recebida.
+ *
  * @author stefan
  */
 public class ContadorAmostragem {
+
     private long time_window_start = -1; //Inicio da janela de tempo atual (ms)
     private int time_window_read_count = 0; //Numero de leituras na janela de tempo atual
     private float sample_rate = 0; //leituras por segundo atual
     private int time_window = 2000; //Tamanho da janela. Número de milissegundos entre cada conjunto de contagem.
-    private int time_window_min = 500;
-    private int time_window_max = 5000;
-    private int time_window_step_up = 500;
-    private int time_window_step_down = 1000;
-    
-    public ContadorAmostragem(){}
+    private int time_window_min = 500; //Tamanho mínimo da janela de tempo.
+    private int time_window_max = 5000; //Tamanho máximo da janela de tempo.
+    private int time_window_step_up = 500; //Step para cima da janela de tempo.
+    private int time_window_step_down = 1000; //Step para baixo da janela de tempo.
+
+    public ContadorAmostragem() {
+    }
 
     public ContadorAmostragem(int time_window, int time_window_min, int time_window_max) {
         this.time_window = time_window;
         this.time_window_min = time_window_min;
         this.time_window_max = time_window_max;
     }
-    
-    public synchronized void novaAmostra(long timestamp){
-        if(time_window_start == -1){ //Executado na primeira amostra
+
+    /**
+     * Informa o recebimento de uma nova amostra.
+     *
+     * @param timestamp Horario do recebimento da amostra.
+     */
+    public synchronized void novaAmostra(long timestamp) {
+        if (time_window_start == -1) { //Executado na primeira amostra
             time_window_start = timestamp;
         }
         time_window_read_count++;
@@ -45,7 +54,7 @@ public class ContadorAmostragem {
                 time_window_read_count = 0;
             }
         }
-    }   
+    }
 
     public synchronized float getSample_rate() {
         return sample_rate;

@@ -3,9 +3,19 @@ package visual.gui;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JSlider;
 
+/**
+ * JSlider que trabalha com representação de pontos flutuantes.
+ * @author stefan
+ */
 public class FloatJSlider extends JSlider {
 
+    /**
+     * Representação interna dos limites mínimo e máximo (só pode ser feita com inteiros).
+     */
     public static final int I_MIN = 0, I_MAX = 1000;
+    /**
+     * Limites inferior e superior.
+     */
     public float f_max, f_min;
 
     public FloatJSlider() {
@@ -50,6 +60,10 @@ public class FloatJSlider extends JSlider {
         this.f_max = (float) I_MAX;
     }
 
+    /**
+     * Retorna o valor equivalente em ponto futuante.
+     * @return 
+     */
     public float getFloatValue() {
         //Calcula a proporção
         float valor_porcentagem = (float) (getValue() - I_MIN) / (float) (I_MAX - I_MIN);
@@ -57,6 +71,10 @@ public class FloatJSlider extends JSlider {
         return v;
     }
 
+    /**
+     * Muda o valor equivalente em ponto flutuante.
+     * @param value 
+     */
     public void setFloatValue(float value) {
         //Calcula a proporção
         float valor_porcentagem = (float) (value - f_min) / (float) (f_max - f_min);

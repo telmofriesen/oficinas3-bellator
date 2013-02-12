@@ -16,18 +16,26 @@ import visual.Ponto;
  */
 public class ControleSensores {
 
+    /**
+     * Estados de amostragem
+     */
     public static final int SAMPLE_STOPPED = 1,
             SAMPLE_CHANGING = 2,
             SAMPLE_STARTED = 3;
+    //Estado atual da amostragem
+    private int sensorSampleStatus;
     private Robo robo;
     private Obstaculos obstaculos;
+    //Gravação de amostras habilitada ou não
     private boolean recordEnabled = false;
+    //Gravação de amostras foi interrompida e continuada posteriormente?
     private boolean recordInterruptedAndResumed = false;
+    //Contadores do total de amostras.
     private int leituras_gravadas = 0, leituras_descartadas = 0;
-    //Informações da taxa de leituras por segundo
+    //Controle de taxas de amostragem
     ContadorAmostragem amostragemRobo; //Taxa de amostragem efetiva no robô
     ContadorAmostragemTempoReal amostragemEstacaoBase; //Taxa de recebimento de amostras na estação base
-    private int sensorSampleStatus; //Status do recebimento de amostras pelo robo
+    //Listeners de eventos da classe
     private final CopyOnWriteArrayList<MyChangeListener> listeners;
 
     /**

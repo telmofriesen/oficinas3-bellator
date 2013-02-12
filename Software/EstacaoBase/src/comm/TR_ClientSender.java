@@ -5,13 +5,12 @@
 package comm;
 
 import java.io.*;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Thread responsável por enviar mensagens ao host de uma conexão.
  *
  * @author Stefan
  */
@@ -21,18 +20,16 @@ public class TR_ClientSender extends Thread {
     private final TR_ClientConnector connector;
     //Stream de saida
     private BufferedWriter output;
-    //Mensagem a ser enviada
-//    private String message = "";
-    //Vetor que armazena a fila de comandos
+    //Fila de mensagens normais
     private CopyOnWriteArrayList<SenderMessage> messages = new CopyOnWriteArrayList();
+    //Fila de mensagens prioritárias
     private CopyOnWriteArrayList<SenderMessage> priorityMessages = new CopyOnWriteArrayList();
+    //Indica se o loop principal deve executar ou não
     private boolean run = true;
 
-    //--------Classe construtora-------------
     public TR_ClientSender(TR_ClientConnector connector) {
         this.connector = connector;
     }
-    //---------------------------------------
 
     @Override
     public void run() {
@@ -51,8 +48,7 @@ public class TR_ClientSender extends Thread {
                 }
                 sendPriorityMessage = false;
                 sendNormalMessage = false;
-                //Loop de envio.
-                //Se o vetor não estiver vazio....
+                //Se o vetor de mensagens não estiver vazio....
                 if (!priorityMessages.isEmpty()) {
                     msg = priorityMessages.get(0);
                     sendPriorityMessage = true;
@@ -68,7 +64,7 @@ public class TR_ClientSender extends Thread {
                     System.out.println("[TR_ClientSender] Mensagem a ser enviada: " + str);
                     output.write(str, 0, str.length());
                     output.newLine();
-                    if (msg.isFlush_buffer()) output.flush();
+                    if (msg.isFlushBuffer()) output.flush();
                     System.out.println("[TR_ClientSender] Mensagem enviada!");
                     if (sendPriorityMessage) priorityMessages.remove(0); //Faz a fila andar.
                     else if (sendNormalMessage) messages.remove(0); //Faz a fila andar.
@@ -88,21 +84,43 @@ public class TR_ClientSender extends Thread {
         }
     }
 
+    /**
+     * Requisita a finalização da Thread.
+     * A finalização é feita amigavelmente, ou seja, aguarda-se que as mensagens da fila de envio sejam todas enviadas.
+     */
     public synchronized void terminate() {
         run = false;
         this.notifyAll();
     }
 
-    public synchronized void sendMessageWithPriority(String message) {
-        sendMessageWithPriority(new SenderMessage(message, true));
+    /**
+     * Força a finalização da thread.
+     */
+    public void kill() {
+        try {
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(TR_ClientSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.interrupt();
     }
 
+    /**
+     * Adiciona uma mensagem à fila prioritária de envio.
+     *
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
+     */
     public synchronized void sendMessageWithPriority(String message, boolean flush_buffer) {
         sendMessageWithPriority(new SenderMessage(message, flush_buffer));
     }
 
+    /**
+     * Adiciona uma mensagem à fila prioritária de envio.
+     *
+     * @param senderMessage Mensagem a ser enviada.
+     */
     public synchronized void sendMessageWithPriority(SenderMessage senderMessage) {
-        //Funcao que envia mensagens
         //Se o parametro nao for vazio....
         if (!senderMessage.getMessage().isEmpty() && senderMessage.getMessage() != null) {
             priorityMessages.add(senderMessage);
@@ -110,14 +128,21 @@ public class TR_ClientSender extends Thread {
         }
     }
 
-    public synchronized void sendMessage(String message) {
-        sendMessage(new SenderMessage(message, true));
-    }
-
+    /**
+     * Adiciona uma mensagem à fila de envio.
+     *
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
+     */
     public synchronized void sendMessage(String message, boolean flush_buffer) {
         sendMessage(new SenderMessage(message, flush_buffer));
     }
 
+    /**
+     * Adiciona uma mensagem à fila de envio.
+     *
+     * @param senderMessage Mensagem a ser enviada.
+     */
     public synchronized void sendMessage(SenderMessage senderMessage) {
         //Funcao que envia mensagens
         //Se o parametro nao for vazio....

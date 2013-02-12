@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.Timer;
 
 /**
- * Thread que fica "escutando" novas conexões de clientes
+ * Thread que escuta novas conexões de clientes
  *
  * @author Stefan
  */
@@ -57,11 +57,13 @@ public class TR_ServerListener extends Thread {
                 System.out.println("[TR_ServerListener] Conexão aceita:" + acceptedSocket);
                 //Adiciona instancias para a conexao aceita.
                 //As threads para envio(sender) e recebimento(receiver) são armazenadas nos vetores.
-                final TR_ServerConnection connection = new TR_ServerConnection(server, this, acceptedSocket);
-                if (getNumServerConnections() >= 1) { //Servidor já conectado a um cliente.
+                final TR_ServerConnection connection = new TR_ServerConnection(this, acceptedSocket);
+                //Servidor já conectado a um cliente.
+                if (getNumServerConnections() >= 1) { 
                     System.out.println("[TR_Serverlistener] Servidor cheio!");
                     connection.getSender().start();
-                    connection.sendMessage("SERVER FULL");
+                    //Manda uma mensagem informando que o servidor está cheio.
+                    connection.sendMessageWithPriority("SERVER FULL", true);
                     try {
                         sleep(200);
                     } catch (InterruptedException ex) {
@@ -75,6 +77,7 @@ public class TR_ServerListener extends Thread {
                     };
                     t.start(); //Roda a função de disconnect em background (outra Thread).
                 } else {
+                    //Inicializa as threads da conexão
                     connection.startThreads();
                     //System.out.println("[TR_ServerListener] Sender: " + Sender);
                     //Armazena os objetos nos vetores
@@ -85,10 +88,8 @@ public class TR_ServerListener extends Thread {
             } catch (IOException ex) {
                 //System.out.println(ex);
                 Logger.getLogger(TR_ServerListener.class.getName()).log(Level.SEVERE, null, ex);
-
             }
         }
-
     }
 
     public Server getServer() {
@@ -117,6 +118,10 @@ public class TR_ServerListener extends Thread {
         }
     }
 
+    /**
+     * Retorna o número de conexões ativas.
+     * @return O número de conexões ativas.
+     */
     public synchronized int getNumServerConnections() {
         return connectionsArray.size();
     }

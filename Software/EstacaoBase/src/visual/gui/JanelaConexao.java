@@ -4,63 +4,21 @@
  */
 package visual.gui;
 
+import comm.ClientConnectedException;
 import comm.TR_ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /**
+ * Janela com informações e configurações da conexão com o robô.
  *
  * @author stefan
  */
 public class JanelaConexao extends javax.swing.JFrame {
 
-    class ConnectionChangeListener implements MyChangeListener {
-
-        JFrame janela;
-
-        public ConnectionChangeListener(JFrame janela) {
-            this.janela = janela;
-        }
-
-        @Override
-        public void changeEventReceived(MyChangeEvent evt) {
-            connectionLogTextArea.changeEventReceived(evt);
-            if (evt.getSource() instanceof TR_ClientConnector) {
-                TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
-                int status = connector.getConnectionStatus();
-                if (status == TR_ClientConnector.CONNECTED) {
-                    ipComboBox.setEnabled(false);
-                    portaComboBox.setEnabled(false);
-                    connectButton.setText("Desconectar");
-                    connectButton.setEnabled(true);
-                    janela.setTitle("Bellator - Conexão [Conectado]");
-                    statusLabel.setText("Conectado");
-                } else if (status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
-                    ipComboBox.setEnabled(false);
-                    portaComboBox.setEnabled(false);
-                    connectButton.setText("Desconectar");
-                    connectButton.setEnabled(true);
-                    janela.setTitle("Bellator - Conexão [Conectado (handshake...)]");
-                    statusLabel.setText("Conectado");
-                } else if (status == TR_ClientConnector.CONNECTING) {
-                    ipComboBox.setEnabled(false);
-                    portaComboBox.setEnabled(false);
-                    connectButton.setText("Conectando...");
-                    connectButton.setEnabled(false);
-                    janela.setTitle("Bellator - Conexão [Conectando...]");
-                    statusLabel.setText("Conectando...");
-                } else if (status == TR_ClientConnector.DISCONNECTED) {
-                    ipComboBox.setEnabled(true);
-                    portaComboBox.setEnabled(true);
-                    connectButton.setText("Conectar");
-                    connectButton.setEnabled(true);
-                    janela.setTitle("Bellator - Conexão [Desconectado]");
-                    statusLabel.setText("Desconectado");
-                }
-            }
-        }
-    }
     ConnectionChangeListener listener;
     TR_ClientConnector connector;
 
@@ -68,9 +26,9 @@ public class JanelaConexao extends javax.swing.JFrame {
      * Creates new form JanelaConexao
      */
     public JanelaConexao(TR_ClientConnector connector) {
+        this.connector = connector;
         initComponents();
         listener = new ConnectionChangeListener(this);
-        this.connector = connector;
         connector.addMyChangeListener(listener);
         statusLabel.setVisible(false);
     }
@@ -181,9 +139,15 @@ public class JanelaConexao extends javax.swing.JFrame {
         // TODO add your handling code here:
         int status = connector.getConnectionStatus();
         if (status == TR_ClientConnector.DISCONNECTED) {
-            connector.connect((String) ipComboBox.getSelectedItem(),
-                              Integer.parseInt((String) portaComboBox.getSelectedItem()));
+            try {
+                //Tenta conectar ao host especificado.
+                connector.connect((String) ipComboBox.getSelectedItem(),
+                                  Integer.parseInt((String) portaComboBox.getSelectedItem()));
+            } catch (ClientConnectedException ex) {
+                Logger.getLogger(JanelaConexao.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else if (status == TR_ClientConnector.CONNECTED || status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
+            //Tenta desconectar do host se já estiver conectado.
             connector.disconnect();
         }
     }//GEN-LAST:event_connectButtonActionPerformed
@@ -232,4 +196,61 @@ public class JanelaConexao extends javax.swing.JFrame {
     private javax.swing.JLabel portaLabel;
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Classe responsável por "escutar" mudanças na conexão.
+     */
+    class ConnectionChangeListener implements MyChangeListener {
+
+        //Janela pai
+        JFrame janelaConexao;
+
+        public ConnectionChangeListener(JFrame janela) {
+            this.janelaConexao = janela;
+        }
+
+        /**
+         * Ações a serem executadas quando um evento de mudança na conexão for detectado.
+         *
+         * @param evt Evento de mudança.
+         */
+        @Override
+        public void changeEventReceived(MyChangeEvent evt) {
+            connectionLogTextArea.changeEventReceived(evt);
+            //Mudança de status da conexão. 
+            if (evt.getSource() instanceof TR_ClientConnector) {
+                TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
+                int status = connector.getConnectionStatus();
+                if (status == TR_ClientConnector.CONNECTED) {
+                    ipComboBox.setEnabled(false);
+                    portaComboBox.setEnabled(false);
+                    connectButton.setText("Desconectar");
+                    connectButton.setEnabled(true);
+                    janelaConexao.setTitle("Bellator - Conexão [Conectado]");
+                    statusLabel.setText("Conectado");
+                } else if (status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
+                    ipComboBox.setEnabled(false);
+                    portaComboBox.setEnabled(false);
+                    connectButton.setText("Desconectar");
+                    connectButton.setEnabled(true);
+                    janelaConexao.setTitle("Bellator - Conexão [Conectado (handshake...)]");
+                    statusLabel.setText("Conectado");
+                } else if (status == TR_ClientConnector.CONNECTING) {
+                    ipComboBox.setEnabled(false);
+                    portaComboBox.setEnabled(false);
+                    connectButton.setText("Conectando...");
+                    connectButton.setEnabled(false);
+                    janelaConexao.setTitle("Bellator - Conexão [Conectando...]");
+                    statusLabel.setText("Conectando...");
+                } else if (status == TR_ClientConnector.DISCONNECTED) {
+                    ipComboBox.setEnabled(true);
+                    portaComboBox.setEnabled(true);
+                    connectButton.setText("Conectar");
+                    connectButton.setEnabled(true);
+                    janelaConexao.setTitle("Bellator - Conexão [Desconectado]");
+                    statusLabel.setText("Desconectado");
+                }
+            }
+        }
+    }
 }

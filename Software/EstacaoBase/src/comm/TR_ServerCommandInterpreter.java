@@ -1,46 +1,50 @@
 package comm;
 
-import controle.ControleSensores;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Interpretador de comandos.
+ * Os comandos recebidos são inseridos em uma fila, de modo a serem posteriormente executados pela thread.
+ * O objetivo é que o Receiver não fique bloqueado para esprar que cada comando seja executado.
+ * OBS: Ver especificação do protocolo (Estação base <-> Robô) para maior esclarecimento.
  *
  * @author Stefan
  */
-//Interpretador de comandos
 public class TR_ServerCommandInterpreter extends Thread {
 
     //Vetor que armazena a fila de comandos
     private ArrayList<String> commandsList = new ArrayList();
     //Referecia ao objeto connector
     private final TR_ServerConnection connection;
+    //Indica se a thread deve rodar ou não
     private boolean run = true;
-    private boolean terminated;
-    
+
     public TR_ServerCommandInterpreter(TR_ServerConnection connection) {
         this.connection = connection;
         this.setName(this.getClass().getName());
     }
-    
+
     @Override
     public void run() {
         String command;
-        boolean run_status = this.run;
-        while (run_status) {
+        int num_elementos = 0;
+        while (run) {
+            synchronized (this) {
+                num_elementos = commandsList.size();
+            }
             //Enquanto o vetor tiver elementos....
-            while (commandsList.size() > 0) {
+            while (num_elementos > 0) {
                 synchronized (this) {
                     command = commandsList.get(0);
-                }
-                //Executa o comando da posicao 0...
-                if (!runCommand(command)) {
-                    System.out.printf("[TR_ServerCommandInterpreter] Comando invalido recebido: \"%s\"\n", command);
-                }
-                //Faz a fila andar....
-                synchronized (this) {
+                    //Executa o comando da posicao 0...
+                    if (!runCommand(command)) {
+                        System.out.printf("[TR_ServerCommandInterpreter] Comando invalido recebido: \"%s\"\n", command);
+                    }
+                    //Faz a fila andar....
                     commandsList.remove(0);
+                    num_elementos = commandsList.size();
                 }
             }
             synchronized (this) {
@@ -51,13 +55,13 @@ public class TR_ServerCommandInterpreter extends Thread {
                         Logger.getLogger(TR_ServerCommandInterpreter.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                run_status = this.run;
             }
         }
     }
 
     /**
      * Adiciona o comado à lista de execução. Ele será posteriormente executado pela thread.
+     * OBS: Método thread-safe.
      *
      * @param message
      */
@@ -83,7 +87,7 @@ public class TR_ServerCommandInterpreter extends Thread {
                 if (split[1].equals("HANDSHAKE")) {
                     if (split[2].equals("REQUEST")) {
                         connection.handShakeRequestReceived();
-                        connection.sendMessage("BELLATOR HANDSHAKE REPLY");
+                        connection.sendMessageWithPriority("BELLATOR HANDSHAKE REPLY", true);
                         connection.handShakeReplySent();
                         return true;
                     } else if (split[2].equals("REPLY2")) {
@@ -92,7 +96,7 @@ public class TR_ServerCommandInterpreter extends Thread {
                     }
                 }
             } else {
-                if (handshakeStatus != TR_ServerConnection.FULL_HANDSHAKE) {
+                if (handshakeStatus != TR_ServerConnection.HANDSHAKE_FULL) {
                     System.out.printf("[TR_ServerCommandInterpreter] ERRO: recebido comando sem handshake prévio: \"%s\"\n", command);
                     return false;
                 } else if (split[0].equals("KEEPALIVE")) { //KEEPALIVE
@@ -101,7 +105,7 @@ public class TR_ServerCommandInterpreter extends Thread {
                 } else if (split[0].equals("ECHO")) { //ECHO
                     if (split[1].equals("REQUEST")) {
                         // Responde ao echo request
-                        connection.sendMessageWithPriority("ECHO REPLY"); 
+                        connection.sendMessageWithPriority("ECHO REPLY", true);
                         return true;
                     } else if (split[1].equals("REPLY")) {
                         connection.echoReplyReceived();
@@ -109,16 +113,16 @@ public class TR_ServerCommandInterpreter extends Thread {
                     }
                 } else if (split[0].equals("SENSORS")) { //SENSORS
                     if (split[1].equals("START")) {
-                        connection.getServer().startSend_sensor_info();
+                        connection.getListener().getServer().startSend_sensor_info();
                         connection.sendMessageWithPriority("SENSORS STATUS STARTED", true);
                         return true;
                     } else if (split[1].equals("STOP")) {
-                        connection.getServer().stopSend_sensor_info();
+                        connection.getListener().getServer().stopSend_sensor_info();
                         connection.sendMessageWithPriority("SENSORS STATUS STOPPED", true);
                         return true;
                     } else if (split[1].equals("STATUS")) {
                         if (split[2].equals("REQUEST")) {
-                            if (connection.getServer().isSend_sensor_info()) {
+                            if (connection.getListener().getServer().isSend_sensor_info()) {
                                 connection.sendMessageWithPriority("SENSORS STATUS STARTED", true);
                             } else {
                                 connection.sendMessageWithPriority("SENSORS STATUS STOPPED", true);
@@ -126,13 +130,13 @@ public class TR_ServerCommandInterpreter extends Thread {
                         }
                     } else if (split[1].equals("SAMPLE_RATE")) {
                         float sample_rate = Float.parseFloat(split[2]);
-                        connection.getServer().setSample_rate(sample_rate);
+                        connection.getListener().getServer().setSample_rate(sample_rate);
                         return true;
                     }
                 } else if (split[0].equals("ENGINES")) { //ENGINES
                     float dir = Float.parseFloat(split[1]);
                     float esq = Float.parseFloat(split[2]);
-                    connection.getServer().setVelocidadeRodas(dir, esq);
+                    connection.getListener().getServer().setVelocidadeRodas(dir, esq);
                     return true;
                 } else if (split[0].equals("DISCONNECT")) { //DISCONNECT
                     connection.closeConnection();
@@ -146,13 +150,20 @@ public class TR_ServerCommandInterpreter extends Thread {
         }
         return false;
     }
-    
+
+    /**
+     * Requisita a finalização da Thread.
+     * A finalização é feita amigavelmente, ou seja, aguarda-se que o loop principal finalize.
+     */
     public synchronized void terminate() {
         run = false;
         this.notifyAll();
     }
     
-    public synchronized boolean isTerminated() {
-        return terminated;
+    /**
+     * Força a finalização da thread.
+     */
+    public void kill() {
+        this.terminate();
     }
 }

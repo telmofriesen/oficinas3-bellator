@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package visual.gui;
 
 import comm.TR_ClientCommandInterpreter;
@@ -22,6 +18,7 @@ import processing.core.PApplet;
 import visual.*;
 
 /**
+ * Janela principal da interface gráfica do Bellator.
  *
  * @author stefan
  */
@@ -42,16 +39,21 @@ public class JanelaPrincipal extends javax.swing.JFrame {
      */
     public JanelaPrincipal() {
         initComponents();
-        initMapaTeste();
+        //Inicializa Robo, Obstaculos, Mapa, Viewer2D's e Drawable2D's.
+        initMapa();
         //Cria um objeto seletor de arquivos na pasta atual, com a extensão "bellator"
         fc = new CustomFileChooser(new File(".").getAbsolutePath(), "bellator");
+        //Inicializa conector e interpretador de comandos.
         connector = new TR_ClientConnector();
         TR_ClientCommandInterpreter interpreter = new TR_ClientCommandInterpreter(connector, controleSensores);
         connector.setInterpreter(interpreter);
+        //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
         janelaSensores = new JanelaSensores(controleSensores, connector);
+        //Inicia as threads.
         interpreter.start();
         connector.start();
+        //Inicializa listeners.
         initListeners();
 
         //Acao de fechamento de janela
@@ -63,34 +65,33 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     int response = JOptionPane.showConfirmDialog(we.getWindow(),
                                                                  "O mapa atual não foi salvo. Você deseja finalizar o programa e perder todas as alterações?",
                                                                  "Finalizar (Mapa não salvo)", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    if (response == JOptionPane.YES_OPTION) {
+                    if (response == JOptionPane.YES_OPTION)
                         exit = true;
-                    } else {
+                    else
                         exit = false;
-                    }
                 } else {
                     int response = JOptionPane.showConfirmDialog(we.getWindow(),
                                                                  "Você deseja realmente fechar o programa?",
                                                                  "Finalizar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (response == JOptionPane.YES_OPTION) {
+                    if (response == JOptionPane.YES_OPTION)
                         exit = true;
-                    } else {
+                    else
                         exit = false;
-                    }
                 }
                 if (exit) {
                     connector.disconnect();
-                    int count = 1;
-                    while (connector.isConnected() && count < 5) {
-                        System.out.printf("Aguardando connector finalizar.... (%d)\n", count);
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-                            System.exit(1);
-                        }
-                        count++;
-                    }
+//                    int count = 1;
+//                    while (connector.isConnected() && count < 5) {
+//                        System.out.printf("Aguardando connector finalizar.... (%d)\n", count);
+//                        try {
+//                            Thread.sleep(1000);
+//                        } catch (InterruptedException ex) {
+//                            Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+//                            System.exit(1);
+//                        }
+//                        count++;
+//                    }
+                    //Finaliza o programa.
                     dispose();
                     System.exit(0);
                 }
@@ -141,7 +142,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 //
 //        mapa = new Mapa(robo, obstaculos);
 //    }
-    private void initMapaTeste() {
+    private void initMapa() {
 
         //
         //Inicializa Obstaculos
@@ -150,7 +151,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         ObstaculosDrawable obstaculosDrawable = new ObstaculosDrawable(obstaculos);
 
         //
-        //Iniciliza o Robo
+        //Inicializa o Robo
         //
         Robo robo = new Robo(400, 500, new Ponto(-200, 200));
         robo.addSensorIR(new SensorIR(new Ponto(200, -200), PApplet.radians(-60), 200, 1500));
@@ -182,7 +183,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         controleSensores = new ControleSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
     }
 
+    /**
+     * Inicializa os listeners.
+     */
     private void initListeners() {
+        //
+        //Labels presentes no canto inferior da janela.
+        //
         JLabelListener bottomLabel1 = new JLabelListener() {
             @Override
             public void changeEventReceived(MyChangeEvent evt) {
@@ -232,12 +239,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 }
             }
         };
+        //Adiciona as labels (listeners) aos objetos.
         controleSensores.addMyChangeListener(bottomLabel1);
         controleSensores.addMyChangeListener(bottomLabel2);
         controleSensores.addMyChangeListener(bottomLabel3);
         controleSensores.addMyChangeListener(bottomLabel4);
         controleSensores.getAmostragemEstacaoBase().addMyChangeListener(bottomLabel2);
 
+        //Adiciona as labels à barra inferior.
         bottomToolBar.add(bottomLabel1);
         bottomToolBar.add(new javax.swing.JToolBar.Separator());
         bottomToolBar.add(bottomLabel2);
@@ -246,6 +255,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         bottomToolBar.add(new javax.swing.JToolBar.Separator());
         bottomToolBar.add(bottomLabel4);
 
+        //Adiciona outros listeners aos objetos.
         controleSensores.addMyChangeListener(janelaSensores);
         controleSensores.addMyChangeListener(recordButton);
         controleSensores.addMyChangeListener(sensoresButtonListener);
@@ -394,11 +404,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             try {
                 mapa.save(file.getAbsolutePath());
             } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "ERRO: " + ex.getMessage());
                 Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                JOptionPane.showMessageDialog(this, "Arquivo \"" + file.getName() + "\" salvo com sucesso!");
-                saved = true;
+                return;
             }
+            JOptionPane.showMessageDialog(this, "Arquivo \"" + file.getName() + "\" salvo com sucesso!");
+            saved = true;
         }
     }//GEN-LAST:event_saveButtonActionPerformed
 
@@ -409,8 +420,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             File file = fc.getSelectedFile();
             if (!saved) {
                 int response = JOptionPane.showConfirmDialog(this,
-                                                             "O mapa atual não foi salvo. Você deseja carregar outro mapa e perder todas as alterações?",
+                                                             "O mapa atual não foi salvo. Você deseja carregar o mapa do arquivo \"" + file.getName() + "\"  e perder todas as alterações?",
                                                              "Mapa não salvo", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (response != JOptionPane.YES_OPTION)
+                    return;
+            } else {
+                int response = JOptionPane.showConfirmDialog(this,
+                                                             "Você deseja realmente fechar este mapa e carregar o arquivo \"" + file.getName() + "\"?",
+                                                             "Carregar mapa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (response != JOptionPane.YES_OPTION)
                     return;
             }
@@ -421,16 +438,21 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 //Carrega o mapa a partir do arquivo
                 mapa.load(file.getAbsolutePath());
             } catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "ERRO: " + ex.getMessage());
                 Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                return;
             } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "ERRO: " + ex.getMessage());
                 Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                return;
             } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "ERRO: " + ex.getMessage());
                 Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                viewer2D.resetView();
-                JOptionPane.showMessageDialog(this, "Arquivo \"" + file.getName() + "\" carregado com sucesso!");
-                saved = true;
+                return;
             }
+            viewer2D.resetView();
+            JOptionPane.showMessageDialog(this, "Arquivo \"" + file.getName() + "\" carregado com sucesso!");
+            saved = true;
         }
     }//GEN-LAST:event_openButtonActionPerformed
 

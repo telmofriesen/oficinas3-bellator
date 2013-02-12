@@ -1,16 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package comm;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Thread responsável por enviar mensagens ao host de uma conexão.
  *
  * @author Stefan
  * TODO resolver problema com flush do buffer. Se o tempo de limite de tempo de ECHO é muito pequeno, o buffer demora muito para ser enviado com amostras de leituras dos sensores.
@@ -21,19 +17,17 @@ public class TR_ServerSender extends Thread {
     private final TR_ServerConnection connection;
     //Stream de saida
     private BufferedWriter output;
+    //Fila de mensagens normais
     private CopyOnWriteArrayList<SenderMessage> messages = new CopyOnWriteArrayList();
+    //Fila de mensagens prioritárias
     private CopyOnWriteArrayList<SenderMessage> priorityMessages = new CopyOnWriteArrayList();
-//    //Mensagem a ser enviada
-//    private String message = "";
+    //Indica se o loop principal deve executar ou não
     private boolean run = true;
-    private boolean terminated = false;
 
-    //--------Classe construtora-------------
     public TR_ServerSender(TR_ServerConnection connection) {
         this.connection = connection;
         this.setName(this.getClass().getName());
     }
-    //---------------------------------------
 
     @Override
     public void run() {
@@ -52,8 +46,8 @@ public class TR_ServerSender extends Thread {
                 }
                 sendPriorityMessage = false;
                 sendNormalMessage = false;
-                //Loop de envio.
-                //Se o vetor não estiver vazio....
+                //Verifica primeiro a fila de mensagens prioritárias
+                //Se o vetor de mensagens não estiver vazio....
                 if (!priorityMessages.isEmpty()) {
                     msg = priorityMessages.get(0);
                     sendPriorityMessage = true;
@@ -69,7 +63,7 @@ public class TR_ServerSender extends Thread {
                     System.out.println("[TR_ServerSender] Mensagem a ser enviada: " + str);
                     output.write(str, 0, str.length());
                     output.newLine();
-                    if (msg.isFlush_buffer()) output.flush();
+                    if (msg.isFlushBuffer()) output.flush();
                     System.out.println("[TR_ServerSender] Mensagem enviada!");
                     if (sendPriorityMessage) priorityMessages.remove(0); //Faz a fila andar.
                     else if (sendNormalMessage) messages.remove(0); //Faz a fila andar.
@@ -89,21 +83,44 @@ public class TR_ServerSender extends Thread {
         messages.clear(); //TODO verificar se é melhor solucao para liberar memoria
     }
 
+    /**
+     * Requisita a finalização da Thread.
+     * A finalização é feita amigavelmente, ou seja, aguarda-se que as mensagens da fila de envio sejam todas enviadas.
+     */
     public synchronized void terminate() {
         run = false;
         this.notifyAll();
     }
 
-    public synchronized void sendMessageWithPriority(String message) {
-        sendMessageWithPriority(new SenderMessage(message, true));
+    /**
+     * Força a finalização da thread.
+     */
+    public synchronized void kill() {
+        run = false;
+        try {
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(TR_ClientSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.interrupt();
     }
 
+    /**
+     * Adiciona uma mensagem à fila prioritária de envio.
+     *
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
+     */
     public synchronized void sendMessageWithPriority(String message, boolean flush_buffer) {
         sendMessageWithPriority(new SenderMessage(message, flush_buffer));
     }
 
+    /**
+     * Adiciona uma mensagem à fila prioritária de envio.
+     *
+     * @param senderMessage Mensagem a ser enviada.
+     */
     public synchronized void sendMessageWithPriority(SenderMessage senderMessage) {
-        //Funcao que envia mensagens
         //Se o parametro nao for vazio....
         if (!senderMessage.getMessage().isEmpty() && senderMessage.getMessage() != null) {
             priorityMessages.add(senderMessage);
@@ -112,18 +129,20 @@ public class TR_ServerSender extends Thread {
     }
 
     /**
-     * Agenda envio de uma mensagem pelo socket (com flush do buffer). Uma quebra de linha é automaticamente adicionada no final da String antes do envio.
+     * Adiciona uma mensagem à fila de envio.
      *
-     * @param message
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
      */
-    public synchronized void sendMessage(String message) {
-        sendMessage(new SenderMessage(message, true));
-    }
-
     public synchronized void sendMessage(String message, boolean flush_buffer) {
         sendMessage(new SenderMessage(message, flush_buffer));
     }
 
+    /**
+     * Adiciona uma mensagem à fila de envio.
+     *
+     * @param senderMessage Mensagem a ser enviada.
+     */
     public synchronized void sendMessage(SenderMessage senderMessage) {
         //Funcao que envia mensagens
         //Se o parametro nao for vazio....
@@ -131,9 +150,5 @@ public class TR_ServerSender extends Thread {
             messages.add(senderMessage);
             this.notifyAll();
         }
-    }
-
-    public boolean isTerminated() {
-        return terminated;
     }
 }

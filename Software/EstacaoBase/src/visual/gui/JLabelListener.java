@@ -11,13 +11,12 @@ import java.util.Observer;
 import javax.swing.JLabel;
 
 /**
+ * Classe abstrata para JLabels que são listeners.
  *
  * @author stefan
  */
-public class JLabelListener extends JLabel implements MyChangeListener  {
+public abstract class JLabelListener extends JLabel implements MyChangeListener {
 
     @Override
-    public void changeEventReceived(MyChangeEvent evt) {
-        throw new UnsupportedOperationException("A classe deve ser instanciada para usar este método corretamente!");
-    }    
+    public abstract void changeEventReceived(MyChangeEvent evt);
 }

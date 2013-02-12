@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package controle;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -17,8 +14,10 @@ import visual.Drawable2D;
 import visual.Ponto;
 
 /**
- * Classe que contém o mapa. Ela armazena somente as informações essenciais, que
- * consistem no robô e os obstáculos detectados por ele.
+ * Classe que representa o mapa. 
+ * Somente as informações essenciais são armazenadas. Elas consistem em:
+ * - Robô
+ * - Obstáculos detectados
  *
  * @author stefan
  */
@@ -32,6 +31,11 @@ public class Mapa {
         this.obstaculos = obstaculos;
     }
 
+    /**
+     * Salva o mapa em um arquivo (texto). Se o arquivo já existir ele será substituído.
+     * @param filename Nome do arquivo para salvar.
+     * @throws IOException
+     */
     public void save(String filename) throws IOException {
         BufferedWriter out;
         out = new BufferedWriter(new FileWriter(filename));
@@ -42,16 +46,28 @@ public class Mapa {
         out.close();
     }
 
+    /**
+     * Carrega o mapa a partir de um arquivo (texto).
+     * TODO verificar se o formato do arquivo está correto.
+     *
+     * @param filename O nome do arquivo.
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws Exception
+     */
     public void load(String filename) throws FileNotFoundException, IOException, Exception {
-
         BufferedReader br = new BufferedReader(new FileReader(filename));
-        robo.reset();
-        obstaculos.reset();
-        String line;
-        int sequencia = 0;
+        robo.reset(); //Limpa as informações do robo
+        obstaculos.reset(); //Limpa as informações de obstaculos
+        //Linha atual lida do arquivo
+        String line; 
+        //Grupo de dados atualmente sendo lido 
+        int sequencia = 0; 
+        //Loop de leitura do arquivo
         while ((line = br.readLine()) != null) {
-            // process the line.
+            //Processa a linha
             if (line.equals("")) {
+                //Caso seja lida uma linha em branco, incrementa o numero de sequencia
                 sequencia++;
                 continue;
             }
