@@ -45,7 +45,7 @@ Solicita formalmente a desconexão.
 		Parâmetros:
 		[velocidade_roda_x] (float) Valor de -1 a 1, sendo 1 a máxima velocidade para frente, -1 a máxima velocidade para trás e 0 parada total.
 
-//TODO: adicionar comandos de movimento do robô em alto nível.
+//TODO: adicionar comandos de movimento do robô em alto nível (mover para frente, girar para esquerda/direita, parar, etc....).
 
 
 -- Servidor (Robô) -> Cliente (Estação base) --
