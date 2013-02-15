@@ -1,0 +1,73 @@
+\section{Requisitos}
+
+
+\subsection{Estação base}
+%
+%TODO verificar objetivos do projeto
+Esta seção descreve os requisitos da estação base, que foram elaborados de forma a satisfazer os objetivos do projeto.
+
+\begin{itemize} %-------------------
+
+  \item O \textit{software} será executado em um computador pessoal.
+    \begin{itemize}
+%      \item O computador deverá possuir recursos de \textit{hardware} comparável aos padrões atuais (pelo menos 2GB de memória RAM DDR2 ou melhor e processador \textit{dual-core}).
+      \item O \textit{software} deverá ser multiplataforma, ou seja, executar em diferentes sistemas operacionais (ao menos Linux e Windows).
+      \item Preferencialmente bibliotecas e ferramentas livres (e gratuitas) deverão ser utilizadas no desenvolvimento do \textit{software}.
+    \end{itemize}
+
+  \item O software deve possuir uma interface gráfica.
+    \begin{itemize}
+      \item Um utilizador, através da interface gráfica, será capaz de controlar o robô enviando comandos de movimentação (especificados pelo teclado). 
+      \item O usuário receberá a imagem em tempo real (preferencialmente com atrasos não muito consideráveis) de uma câmera fixa instalada no robô. 
+      \item Os dados instantâneos de velocidade e posição do robô serão mostrados ao usuário na interface gráfica.
+      \item Um mapa 2D do caminho percorrido e dos obstáculos detectados pelo robô será gerado, na interface gráfica, à medida em que o robô se movimentar. O caminho percorrido por ele será representado por pontos interpolados que demonstrem visulamente a trilha percorrida por ele. Os obstáculos serão representados por pontos, não interpolados, nos quais houve detecção de objetos pelos sensores. Todos os pontos representados no mapa serão gerados a partir de amostras em intervalos de tempo discretos de leituras de sensores do robô.
+      \item O mapa 2D gerado na interface poderá ser salvo em um arquivo, podendo ser posteriormente carregado.
+    \end{itemize}
+
+\end{itemize} %----------------------
+
+
+
+\subsection{Sistema de comunicação}
+Esta seção descreve os requisitos do sistema de comunicação entre a estação base e o sistema embarcado.
+
+\begin{itemize} %----------------------
+
+  \item Distância entre robô e estação base.
+    \begin{itemize}
+      \item O sistema de comunicação deve possuir alcance máximo de 20 metros, de modo que ambientes de tamanho razoável possam ser mapeados.
+    \end{itemize}
+
+  \item Velocidade e direção do fluxo de transmissão de dados.
+    \begin{itemize}
+      \item A velocidade de transmissão do canal de comunicação deve ser suficiente para o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera em tempo real -- visto que toda a comunicação entre a estação base e o sistema embarcado será feita por um único canal.
+      \item O fluxo de dados deve ser bidirecional (\textit{full-duplex}).
+    \end{itemize}
+
+\end{itemize} %----------------------
+
+
+
+\subsection{Sistema embarcado}
+Esta seção descreve os requisitos do sistema embarcado (robô).
+
+\begin{itemize} %----------------------
+
+  \item Movimentação do robô.
+    \begin{itemize}
+      \item O robô deve ser capaz de mover-se para frente, para trás e girar para a esquerda e direita em velocidades baixas.
+%      \item A velocidade de movimentação pode ser relativamente pequena. %%TODO verificar velocidade do bellator nas monografias anteriores
+    \end{itemize}
+
+  \item Controle de posicionamento e velocidade.
+    \begin{itemize}
+      \item O robô deve ser capaz de obter dados que permitam calcular sua velocidade (linear e angular) e posição (deslocamento e rotação), enviando-os à estação base.
+    \end{itemize}
+
+  \item Detecção de obstáculos.
+    \begin{itemize}
+      \item O robô deverá ser capaz de detectar obstáculos próximos -- com distância de no mínimo 30 cm e no máximo 150 cm -- localizados ao seu redor, determinando a distância de cada objeto detectado.
+    \end{itemize}
+
+\end{itemize} %----------------------
+
