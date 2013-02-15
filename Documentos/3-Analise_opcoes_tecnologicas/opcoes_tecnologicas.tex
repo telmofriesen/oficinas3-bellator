@@ -1,1 +1,99 @@
 \section{Análise de opções tecnológicas}
+
+Nesta seção está apresentada a análise das opções tecnológicas plausíveis para o atendimento dos requisitos. As alternativas pesquisadas e as escolhidas estão presentes.
+
+\subsection{Estação base}
+
+As alternativas pesquisadas para a estação base estão apresentadas a seguir.
+
+\subsubsection{Biblioteca para desenhos 2D}
+Tendo em vista o requisito de geração de um mapa 2D na interface gráfica da estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas e que possa ser integrada facilmente à interface gráfica. Deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
+
+Uma biblioteca importante disponível em Java que possui o recurso de produzir desenhos dinâmicos e integrá-los à interface gráfica é o Processing [REFERENCIA], \textit{open-source}. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, há recursos que permitem o recebimento de informações de posicionamento de mouse e comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do \textit{swing}.
+
+
+Outra biblioteca para a confecção de desenhos em 2D é o Cairo [REFERENCIA], que é \textit{open-source}. Essa biblioteca possui recursos em alto nível para renderização de formas, assim como o Processing. Porém, a integração com a interface gráfica é dependente na biblioteca externa utilizada para tal.
+
+Na Tabela \ref{tab:alternativas_desenho} está presente uma comparção entre as duas bibliotecas. Ambas as bibliotecas são dependentes de linguagens específicas, como demonstrado na tabela.
+
+
+\begin{table}
+  \caption{Comparação entre Bibliotecas para desenhos 2D.}
+  \centering
+  \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
+    \toprule
+    \textbf{Característica} & \textbf{Cairo} & \textbf{Processing} \\
+    \midrule
+    Linguagem de programação & C e C++ & Java \\
+    \hline
+    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (no \textit{swing} do Java) \\
+    \hline
+    Ferramentas de interação com o usuário & Sim & Sim \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_desenho}
+\end{table}
+
+A escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação. A biblioteca escolhida, dentre essas opções foi o Processing, visto que pode ser facilmente integrada à interface do Java. 
+
+\subsubsection{Linguagem de programação}
+
+Nessa etapa de avaliação das opções, a escolha de uma boa linguagem de programação que atenda aos requisitos é fundamental. Abaixo está presente uma lista dos aspectos desejáveis da linguagem:
+
+\begin{itemize}
+  \item Deve ser multiplataforma (ao menos compatível com Linux e Windows sem muitas modificações);
+  \item Deve possuir orientação a objetos;
+  \item Deve possuir recursos multiplataforma e \textit{open-source} para o desenvolvimento de interface gráfica;
+  \item Deve ter a disponibilidade de ferramentas \textit{open-source} e multiplataforma para a criação visual da interface gráfica, dessa forma agilizando o processo de desenvolvimento;
+  \item Deve possuir recursos, integrados ou em bibliotecas \textit{open-source}, para o desenvolvimento de desenhos dinâmicos (para a geração do mapa 2D). Os desenhos devem ser facilmente integráveis à interface gráfica.
+\end{itemize}
+
+
+Abaixo está presente uma comparação entre duas linguagens, o C++ e Java, que são amplamente usadas atualmente.
+
+\textbf{Java}
+
+O Java [REFERENCIA] é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que muito facilmente programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, possuindo ainda frequente manutenção pelos desenvolvedores.
+
+Há disponibilidade, na API do Java, da biblioteca \textit{swing} -- ferramenta completa para a criação de interfaces gráficas (GUI) interativas. Existem ferramentas visuais \textit{open-source} que consideravelmente agilizam o processo de desenvolvimento de interfaces \textit{swing}, entre elas o \textit{NetBeans} e o \textit{Eclipse} (através de plugins ou extensões). 
+
+Para efetuar desenhos em 2D e integrá-los à interface gráfica, a biblioteca do Processing (explicada anteriormente) está disponível nessa linguagem.
+
+
+\textbf{C++}
+
+O C++ é uma linguagem orientada a objetos, que foi evoluída a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que o programa será utilizado. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
+
+Recursos para desenvolvimento visual de interfaces gráficas são disponíveis através de bibliotecas e ferramentas externas. Como o C++ não possui recursos de interface gráfica na própria API, essa é uma dificuldade que se faz presente no quesito da portabilidade entre diferentes sistemas. 
+
+Para a integração de desenhos 2D à interface gráfica, a biblioteca Cairo (explicada anteriormente) pode ser utilizada com essa linguagem. Porém, a integração é dependente da biblioteca de GUI utilizada.
+
+
+\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. Notavelmente, há a facilidade em portar, sem adaptações, programas para diferentes plataformas -- ao contrário do que ocorre com o C++.
+
+\begin{table}
+  \caption{Comparação entre linguagens de programação.}
+  \centering
+  \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
+    \toprule
+    \textbf{Característica} & \textbf{C++} & \textbf{Java} \\
+    \hline
+    Multiplataforma (Linux e Windows) & Sim (com adaptação) & Sim (sem adaptação) \\
+    \hline
+    Orientação a objetos & Sim & Sim \\
+    \hline
+    Recursos multi-plataforma e \textit{open-source} para desenvolvimento de interface gráfica (GUI) & Sim (com bibliotecas externas) & Sim (integrado à API da linguagem) \\
+    \hline
+    Ferramentas \textit{open-source} e multiplataforma para criação visual de interface gráfica & Sim (ferramentas externas) & Sim (ferramentas externas) \\
+    \hline
+    Recursos \textit{open-source} para desenvolvimento de desenhos dinâmicos, facilmente integráveis à interface gráfica & Sim (biblitoeca externa, integração à interface gráfica dependente da GUI utilizada) & Sim (biblioteca externa) \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_linguagens}
+\end{table}
+
+
+
+\subsection{Sistema de comunicação}
+
+

@@ -11,16 +11,16 @@ Esta seção descreve os requisitos da estação base, que foram elaborados de f
   \item O \textit{software} será executado em um computador pessoal.
     \begin{itemize}
 %      \item O computador deverá possuir recursos de \textit{hardware} comparável aos padrões atuais (pelo menos 2GB de memória RAM DDR2 ou melhor e processador \textit{dual-core}).
-      \item O \textit{software} deverá ser multiplataforma, ou seja, executar em diferentes sistemas operacionais (ao menos Linux e Windows).
+      \item O \textit{software} deverá ser multiplataforma, ou seja, executar em diferentes sistemas operacionais (no mínimo Linux e Windows).
       \item Preferencialmente bibliotecas e ferramentas livres (e gratuitas) deverão ser utilizadas no desenvolvimento do \textit{software}.
     \end{itemize}
 
-  \item O software deve possuir uma interface gráfica.
+  \item O \textit{software} deve possuir uma interface gráfica.
     \begin{itemize}
-      \item Um utilizador, através da interface gráfica, será capaz de controlar o robô enviando comandos de movimentação (especificados pelo teclado). 
+      \item Um utilizador, através da interface gráfica, será capaz de controlar o robô enviando comandos de movimentação especificados pelo teclado. 
       \item O usuário receberá a imagem em tempo real (preferencialmente com atrasos não muito consideráveis) de uma câmera fixa instalada no robô. 
       \item Os dados instantâneos de velocidade e posição do robô serão mostrados ao usuário na interface gráfica.
-      \item Um mapa 2D do caminho percorrido e dos obstáculos detectados pelo robô será gerado, na interface gráfica, à medida em que o robô se movimentar. O caminho percorrido por ele será representado por pontos interpolados que demonstrem visulamente a trilha percorrida por ele. Os obstáculos serão representados por pontos, não interpolados, nos quais houve detecção de objetos pelos sensores. Todos os pontos representados no mapa serão gerados a partir de amostras em intervalos de tempo discretos de leituras de sensores do robô.
+      \item Um mapa 2D do caminho percorrido e dos obstáculos detectados pelo robô será gerado, na interface gráfica, à medida em que o robô se movimentar. O caminho percorrido por ele será representado por pontos que demonstrem visulamente a trilha percorrida por ele. Os obstáculos serão representados por pontos nos quais houve detecção de objetos pelos sensores. Todos os pontos representados no mapa serão gerados a partir de amostras em intervalos de tempo discretos de leituras de sensores do robô.
       \item O mapa 2D gerado na interface poderá ser salvo em um arquivo, podendo ser posteriormente carregado.
     \end{itemize}
 
