@@ -1,23 +1,25 @@
 \section{Análise de opções tecnológicas}
 
-Nesta seção está apresentada a análise das opções tecnológicas plausíveis para o atendimento dos requisitos. As alternativas pesquisadas e as escolhidas estão presentes.
+Nesta seção está apresentada a análise das opções tecnológicas plausíveis para o atendimento dos requisitos. As alternativas pesquisadas e as escolhidas para cada parte do projeto estão explicitadas a seguir.
 
 \subsection{Estação base}
 
-As alternativas pesquisadas para a estação base estão apresentadas a seguir.
+As alternativas pesquisadas para a estação base estão apresentadas nesta subseção.
 
 \subsubsection{Biblioteca para desenhos 2D}
-Tendo em vista o requisito de geração de um mapa 2D na interface gráfica da estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas e que possa ser integrada facilmente à interface gráfica. Deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
+\label{subsec:alternativas_desenho}
 
-Uma biblioteca importante disponível em Java que possui o recurso de produzir desenhos dinâmicos e integrá-los à interface gráfica é o Processing [REFERENCIA], \textit{open-source}. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, há recursos que permitem o recebimento de informações de posicionamento de mouse e comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do \textit{swing}.
+Tendo em vista que um dos requisitos é a geração de um mapa em duas dimensões na estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas diversas e que possa ser integrada facilmente à interface gráfica. Ela deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
 
-
-Outra biblioteca para a confecção de desenhos em 2D é o Cairo [REFERENCIA], que é \textit{open-source}. Essa biblioteca possui recursos em alto nível para renderização de formas, assim como o Processing. Porém, a integração com a interface gráfica é dependente na biblioteca externa utilizada para tal.
-
-Na Tabela \ref{tab:alternativas_desenho} está presente uma comparção entre as duas bibliotecas. Ambas as bibliotecas são dependentes de linguagens específicas, como demonstrado na tabela.
+Uma biblioteca interessante disponível em Java que possui o recurso de produzir desenhos dinâmicos (e integrá-los a interfaces gráficas) é o Processing \cite{processing}, \textit{open-source}. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, na biblioteca existem recursos que permitem o recebimento de informações de posicionamento do mouse e de comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do Swing -- biblioteca de interface gráfica (GUI) do Java.
 
 
-\begin{table}
+Outra biblioteca para a confecção de desenhos em 2D é o Cairo \cite{cairo}, que é \textit{open-source}, disponível nas linguagens C e C++. Ele possui recursos em alto nível para renderização de formas e interação com o usuário, assim como o Processing. Nos aspectos gerais as duas ferramentas não muito semelhantes. A integração do Cairo com a interface gráfica, porém, é dependente na biblioteca externa de GUI utilizada para tal.
+
+Um aspecto importante a notar é que ambas as bibliotecas foram desenvolvidas e otimizadas para terem bom desempenho em máquinas atuais -- o que é desejavel tendo em vista os requisitos. Na Tabela \ref{tab:alternativas_desenho} está presente uma comparção entre as duas bibliotecas.
+
+
+\begin{table}[h]
   \caption{Comparação entre Bibliotecas para desenhos 2D.}
   \centering
   \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
@@ -26,7 +28,7 @@ Na Tabela \ref{tab:alternativas_desenho} está presente uma comparção entre as
     \midrule
     Linguagem de programação & C e C++ & Java \\
     \hline
-    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (no \textit{swing} do Java) \\
+    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (na biblioteca Swing do Java) \\
     \hline
     Ferramentas de interação com o usuário & Sim & Sim \\
     \bottomrule
@@ -34,7 +36,7 @@ Na Tabela \ref{tab:alternativas_desenho} está presente uma comparção entre as
   \label{tab:alternativas_desenho}
 \end{table}
 
-A escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação. A biblioteca escolhida, dentre essas opções foi o Processing, visto que pode ser facilmente integrada à interface do Java. 
+A escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação. A biblioteca escolhida, dentre as duas opções, foi o Processing, visto que a integração a interfaces gráficas do Java é muito simples. 
 
 \subsubsection{Linguagem de programação}
 
@@ -43,35 +45,35 @@ Nessa etapa de avaliação das opções, a escolha de uma boa linguagem de progr
 \begin{itemize}
   \item Deve ser multiplataforma (ao menos compatível com Linux e Windows sem muitas modificações);
   \item Deve possuir orientação a objetos;
-  \item Deve possuir recursos multiplataforma e \textit{open-source} para o desenvolvimento de interface gráfica;
+  \item Deve possuir recursos multiplataforma e \textit{open-source} para o desenvolvimento de interfaces gráficas;
   \item Deve ter a disponibilidade de ferramentas \textit{open-source} e multiplataforma para a criação visual da interface gráfica, dessa forma agilizando o processo de desenvolvimento;
   \item Deve possuir recursos, integrados ou em bibliotecas \textit{open-source}, para o desenvolvimento de desenhos dinâmicos (para a geração do mapa 2D). Os desenhos devem ser facilmente integráveis à interface gráfica.
 \end{itemize}
 
 
-Abaixo está presente uma comparação entre duas linguagens, o C++ e Java, que são amplamente usadas atualmente.
+Abaixo está presente uma descrição das duas linguagens, o C++ e Java, atualmente utilizadas em inúmeras aplicações, e que são potenciais alternativas ao projeto. A Tabela \ref{tab:alternativas_linguagens} sumariza os recursos de cada uma.
 
 \textbf{Java}
 
-O Java [REFERENCIA] é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que muito facilmente programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, possuindo ainda frequente manutenção pelos desenvolvedores.
+O Java \cite{java} é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que muito facilmente programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, e a manutenção pelos desenvolvedores é frequente.
 
-Há disponibilidade, na API do Java, da biblioteca \textit{swing} -- ferramenta completa para a criação de interfaces gráficas (GUI) interativas. Existem ferramentas visuais \textit{open-source} que consideravelmente agilizam o processo de desenvolvimento de interfaces \textit{swing}, entre elas o \textit{NetBeans} e o \textit{Eclipse} (através de plugins ou extensões). 
+Há disponibilidade, na API do Java, da biblioteca Swing -- que contém recursos completos para a criação de interfaces gráficas (GUI) interativas. Existem ferramentas visuais de código aberto que consideravelmente agilizam o processo de desenvolvimento de interfaces Swing, entre elas o NetBeans \cite{netbeans} e o Eclipse \cite{eclipse}, através de plugins ou extensões. 
 
-Para efetuar desenhos em 2D e integrá-los à interface gráfica, a biblioteca do Processing (explicada anteriormente) está disponível nessa linguagem.
+Para o preenchimento do requisito de confecção de desenhos em 2D com integração à interface gráfica, a biblioteca do Processing (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) está disponível nessa linguagem.
 
 
 \textbf{C++}
 
-O C++ é uma linguagem orientada a objetos, que foi evoluída a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que o programa será utilizado. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
+O C++ é uma linguagem orientada a objetos, que foi desenvolvida a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que os programas desenvolvidos forem utilizados. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
 
-Recursos para desenvolvimento visual de interfaces gráficas são disponíveis através de bibliotecas e ferramentas externas. Como o C++ não possui recursos de interface gráfica na própria API, essa é uma dificuldade que se faz presente no quesito da portabilidade entre diferentes sistemas. 
+Recursos para desenvolvimento visual de interfaces gráficas estão disponíveis através de bibliotecas e ferramentas externas. O C++ não possui recursos de interface gráfica na própria API. Deve-se notar que esse é um aspecto que adiciona complexidade ao portar programas entre diferentes sistemas. 
 
-Para a integração de desenhos 2D à interface gráfica, a biblioteca Cairo (explicada anteriormente) pode ser utilizada com essa linguagem. Porém, a integração é dependente da biblioteca de GUI utilizada.
+Para a confecção de desenhos 2D e incorporação dos mesmos à interface gráfica, a biblioteca Cairo (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) pode ser utilizada com essa linguagem. A possibilidade de haver integração com a interface, porém, é dependente da biblioteca de GUI utilizada.
 
 
-\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. Notavelmente, há a facilidade em portar, sem adaptações, programas para diferentes plataformas -- ao contrário do que ocorre com o C++.
+\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. A escolha do Java foi feita em conjunto com a escolha da bilbioteca do Processing. Notavelmente, há a facilidade em portar, sem adaptações, programas para diferentes plataformas, processo este que é mais complexo no C++.  Com relação ao quesito de desempenho em computadores atuais, a linguagem escolhida é satisfatória, visto que há manutenção constante da implementação das bibliotecas e da máquina virtual do Java pelos desenvolvedores -- que buscam, entre outros aspectos, otimizar a linguagem para tecnologias atuais.
 
-\begin{table}
+\begin{table}[h]
   \caption{Comparação entre linguagens de programação.}
   \centering
   \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
@@ -96,4 +98,24 @@ Para a integração de desenhos 2D à interface gráfica, a biblioteca Cairo (ex
 
 \subsection{Sistema de comunicação}
 
+Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação entre diferentes tecnologias de comunicação sem fios. O Wi-Fi é o recurso mais atrativo em todos os aspectos que foram comparados, preenchendo satisfatoriamente os requisitos do sistema de comunicação. Sua velocidade e alcance são suficientes para satisfazer as necessidades, e o fluxo de dados pode ser \textit{full-duplex}. Notavelmente, o Wi-Fi é o único sistema comparado que oferece simplicidade no uso dos protocolos TCP e UDP -- o que é um requisito importante para o desenvolvimento ágil e satisfatório do projeto.
 
+
+\begin{table}[h]
+  \caption{Comparação entre tecnologias de comunicação sem fios.}
+  \centering
+  \begin{tabular}{p{4.5cm}|p{3cm}p{4cm}p{2cm}}
+    \toprule
+    \textbf{Característica} & \textbf{802.11g (Wi-Fi)} & \multicolumn{1}{l}{\textbf{Rádio Frequência (RF)}} & \textbf{Bluetooth}  \\
+    \hline
+    Distância máxima de alcance & 50-100 metros  & 30-100 metros & 10 metros \\
+    \hline
+    Velocidade de transmissão máxima & 54 Mbits/s & 2 Mbits/s & 1 Mbits/s \\
+    \hline
+    Fluxo de dados \textit{full-duplex} & Sim & Sim & Sim \\
+    \hline
+    Possibilidade e simplicidade de uso de TCP e UDP & Sim & Não & Não \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_comunicacao}
+\end{table}
