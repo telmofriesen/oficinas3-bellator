@@ -45,9 +45,9 @@ Esta seção descreve os requisitos do sistema de comunicação entre a estaçã
       \item O fluxo de dados deve ser bidirecional (\textit{full-duplex}).
     \end{itemize}
 
-  \item Complexidade de implementação.
+  \item Protocolo de transporte.
     \begin{itemize}
-      \item A tecnologia utilizada para a comunicação deve permitir fácil utilização dos protocolos de transporte TCP e UDP, simplificando o desenvolvimento do protocolo da camada de aplicação.
+      \item A tecnologia utilizada para a comunicação deve permitir fácil utilização do protocolo de transporte TCP. Como as leituras de sensores devem obrigatoriamente ser recebidas na estação base na mesma ordem em que forem enviadas pelo robô (e também os comandos de movimentação enviados pela estação base devem chegar ao robô em ordem), o uso desse protocolo de transporte simplificará muito a implementação do protocolo em alto nível entre os dois pontos. Outro aspecto positivo do TCP é que além de garantir a ordem de chegada, existem mecanismos de detecção de perdas de pacotes -- que efetuam o reenvio caso necessário.
     \end{itemize}
 
 \end{itemize} %----------------------
