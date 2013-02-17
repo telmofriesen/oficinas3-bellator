@@ -1,0 +1,7 @@
+saidas medidas do IR
+140mV - 3.82V
+TODO: 
+mudar conector encoder para 4 pinos e deixar um desconectado
+Levar um cabo USB ou Serial
+Ver como enviar e receber comandos em hexa
+Adicionar Jack de alimentacao na placa

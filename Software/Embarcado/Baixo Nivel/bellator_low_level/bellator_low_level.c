@@ -271,6 +271,22 @@ static inline void protocol_init(void){
 
 	dummy = U1IIR;   // Read IrqID - Required to Get Interrupts Started
 	U1IER = 1;       // Enable UART1 RX (and THRE Interrupts)
+
+	protocol_out_char('p');
+	protocol_out_char('r');
+	protocol_out_char('o');
+	protocol_out_char('t');
+	protocol_out_char('c');
+	protocol_out_char('o');
+	protocol_out_char('l');
+	protocol_out_char(' ');
+	protocol_out_char('s');
+	protocol_out_char('t');
+	protocol_out_char('a');
+	protocol_out_char('r');
+	protocol_out_char('t');
+	protocol_out_char('e');
+	protocol_out_char('d');
 }
 
 /**
@@ -293,8 +309,8 @@ void protocol_in(void){
 		case 0x0C: // Character Time-Out
 			cmd_in.buff[cmd_in.i] = U1RBR;
 
-			if (cmd_in.buff[cmd_in.i] == /*'e'*/ END_CMD) {
-				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'y'*/ SYNC) {
+			if (cmd_in.buff[cmd_in.i] == 'e') {
+				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'y') {
 					// Send IR info
 					for (int i = OPTICAL_SENSOR_0; i <= OPTICAL_SENSOR_4; i++) {
 						cmd_out.buff[0] = i;
@@ -315,15 +331,15 @@ void protocol_in(void){
 						cmd_out.i = 5;
 						protocol_out_cmd();
 					}
-				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'s'*/ STOP ) {
+				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 's' ) {
 					// Stop PWMs
 					set_wheel_pwm(LEFT_WHEEL,0);
 					set_wheel_pwm(RIGHT_WHEEL,0);
 
-				} else if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'l'*/ LEFT_WHEEL
-						|| cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'r'*/ RIGHT_WHEEL) {
+				} else if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l'
+						|| cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'r') {
 
-					/*if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l') {
+					if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l') {
 						if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l') {
 							set_wheel_pwm(LEFT_WHEEL, 0x00 );
 						} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'm') {
@@ -341,10 +357,10 @@ void protocol_in(void){
 						} else {
 							set_wheel_pwm(RIGHT_WHEEL, 0x7F);
 						}
-					}*/
+					}
 
-					set_wheel_pwm(cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)],
-							(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));
+					/*set_wheel_pwm(cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)],
+							(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));*/
 				}
 			}
 			cmd_in.i = (cmd_in.i + 1) & (CMD_BUFF_SIZE-1);
