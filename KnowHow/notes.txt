@@ -6,6 +6,26 @@ https://help.github.com/articles/set-up-git
 e ir aqui para adicionar uma chave ssh:
 https://help.github.com/articles/generating-ssh-keys
 
+
+Fazer update do repositorio local:
+git remote update
+
+Adicionar arquivos:
+git add . -A
+
+Fazer commit:
+git commit -m "Changes in the schematic and component list."
+git push
+
+Fazer update do codigo local:
+git pull
+
+remover ultimo commit local:
+git reset --soft HEAD^
+
+Moodle:
+http://ead.ct.utfpr.edu.br/moodle/course/view.php?id=258
+
 ----------------------------------------------------------------------------------
 Ambiente de desenvolvimento:
 
