@@ -1,3 +1,41 @@
+Git hub:
+para baixar o repositorio e comecar a fazer commits seguir:
+http://myprogrammingblog.com/2012/01/20/github-how-clone-github-repo-how-to-push-to-github-how-to-get-files-from-github-ubuntu/
+e esse quando pedido no anterior:
+https://help.github.com/articles/set-up-git
+e ir aqui para adicionar uma chave ssh:
+https://help.github.com/articles/generating-ssh-keys
+
+
+Fazer update do repositorio local:
+git pull
+
+criar branch:
+git checkout -b nome
+
+Adicionar arquivos:
+git add . -A
+
+Fazer commit:
+git commit -m "Changes in the schematic and component list."
+
+remover ultimo commit local:
+git reset --soft HEAD^
+
+fazer merge do branch criado com o master:
+git checkout master
+git merge nome
+
+deletar branch
+git branch -d nome
+
+enviar commits
+git push
+
+Moodle:
+http://ead.ct.utfpr.edu.br/moodle/course/view.php?id=258
+
+----------------------------------------------------------------------------------
 Ambiente de desenvolvimento:
 
 - instalar eclipse-cdt (pelo synaptic)
