@@ -25,6 +25,7 @@ git reset --soft HEAD^
 fazer merge do branch criado com o master:
 git checkout master
 git merge nome
+(caso houverem conflitos basta editar o arquivo em conflito, adiciona-lo novamente e fazer o commit já no branch master)
 
 deletar branch
 git branch -d nome
