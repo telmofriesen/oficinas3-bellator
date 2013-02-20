@@ -2,6 +2,7 @@
 
 
 \subsection{Estação base}
+\label{subsec:req_estacao-base}
 %
 %TODO verificar objetivos do projeto
 Esta seção descreve os requisitos da estação base, que foram elaborados de forma a satisfazer os objetivos do projeto.
@@ -10,18 +11,18 @@ Esta seção descreve os requisitos da estação base, que foram elaborados de f
 
   \item O \textit{software} será executado em um computador pessoal.
     \begin{itemize}
-      \item O programa deverá ser executado razoavelmente em computadores com recursos de \textit{hardware} comparáveis aos padrões atuais (pelo menos 2GB de memória RAM DDR2 ou melhor e processador \textit{dual-core}).
-      \item O \textit{software} deverá ser multiplataforma, ou seja, executar em diferentes sistemas operacionais (no mínimo Linux e Windows).
+      \item O programa poderá ser executado em computadores pessoais de desempenho médio (de acordo com os padrões atuais). Não haverá necessidade de uma máquina de alto desempenho e custo relativo para executar o \textit{software}. %Para referência, supôe-se que um computador com recursos de \textit{hardware} de desempenho médio equivale a pelo menos 2GB de memória RAM DDR2 ou melhor e processador \textit{dual-core}.
+      \item O \textit{software} primariamente será executado em um único sistema operacional, sendo este Linux ou Windows. É desejável que o desenvolvimento (incluindo a escolha das ferramentas) seja feito de forma a simplificar o uso multiplataforma do \textit{software} futuramente. 
       \item Preferencialmente bibliotecas e ferramentas livres (e gratuitas) deverão ser utilizadas no desenvolvimento do \textit{software}.
     \end{itemize}
 
   \item O \textit{software} deve possuir uma interface gráfica.
     \begin{itemize}
       \item Um utilizador, através da interface gráfica, será capaz de controlar o robô enviando comandos de movimentação especificados pelo teclado. 
-      \item O usuário receberá a imagem em tempo real (preferencialmente com atrasos não muito consideráveis) de uma câmera fixa instalada no robô. 
+      \item O usuário receberá a imagem em tempo real de uma câmera fixa instalada no robô. 
       \item Os dados instantâneos de velocidade e posição do robô serão mostrados ao usuário na interface gráfica.
-      \item Um mapa 2D do caminho percorrido e dos obstáculos detectados pelo robô será gerado, na interface gráfica, à medida em que houver movimentação do mesmo. O caminho percorrido pelo robô será representado visualmente por pontos, gradualmente posicionados no mapa. Os obstáculos serão representados por marcações nas localidades onde houve detecção de objetos por sensores. Todos os pontos representados no mapa serão gerados a partir de amostras obtidas em intervalos de tempo discretos.
-      \item O mapa 2D gerado na interface poderá ser salvo em um arquivo, podendo ser posteriormente carregado.
+      \item Um mapa 2D do caminho percorrido e dos obstáculos detectados pelo robô será gerado, na interface gráfica, à medida em que houver movimentação do mesmo. O caminho percorrido pelo robô será representado visualmente por pontos, gradualmente posicionados no mapa. Os obstáculos serão representados por marcações nas localidades onde houve detecção de objetos por sensores do robô. Todos os pontos representados no mapa serão gerados a partir de amostras obtidas em intervalos de tempo discretos.
+      \item O mapa 2D gerado na interface gráfica poderá ser salvo em um arquivo, podendo ser posteriormente carregado.
     \end{itemize}
 
 \end{itemize} %----------------------
@@ -35,19 +36,19 @@ Esta seção descreve os requisitos do sistema de comunicação entre a estaçã
 
   \item Distância entre robô e estação base.
     \begin{itemize}
-      \item O sistema de comunicação deve possuir, ao menos, alcance máximo de 20 metros sem fios -- de modo que ambientes de tamanho razoável possam ser mapeados.
+      \item O sistema de comunicação deve possuir, ao menos, alcance de 20 metros sem fios -- de modo que ambientes de tamanho razoável possam ser mapeados.
     \end{itemize}
 
   \item Velocidade e direção do fluxo de transmissão de dados.
     \begin{itemize}
       \item Toda a comunicação entre a estação base e o sistema embarcado será feita por um único canal e, portanto:
-      \item A velocidade de transmissão do canal de comunicação deve ser suficiente para o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera em tempo real; 
+      \item A velocidade de transmissão do canal de comunicação deve ser suficiente para, simultaneamente, o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera; 
       \item O fluxo de dados deve ser bidirecional (\textit{full-duplex}).
     \end{itemize}
 
   \item Protocolo de transporte.
     \begin{itemize}
-      \item A tecnologia utilizada para a comunicação deve permitir fácil utilização do protocolo de transporte TCP. Como as leituras de sensores devem obrigatoriamente ser recebidas na estação base na mesma ordem em que forem enviadas pelo robô (e também os comandos de movimentação enviados pela estação base devem chegar ao robô em ordem), o uso desse protocolo de transporte simplificará muito a implementação do protocolo em alto nível entre os dois pontos. Outro aspecto positivo do TCP é que além de garantir a ordem de chegada, existem mecanismos de detecção de perdas de pacotes -- que efetuam o reenvio caso necessário.
+      \item A tecnologia utilizada para a comunicação deve permitir fácil utilização do protocolo de transporte TCP. Como as leituras de sensores devem obrigatoriamente ser recebidas na estação base na mesma ordem em que forem enviadas pelo robô (e também os comandos de movimentação enviados pela estação base devem chegar ao robô em ordem), o uso desse protocolo de transporte simplificará muito a implementação do protocolo de aplicação ponto a ponto. O TCP possui ainda outro aspecto interessante: além de garantir a ordem de chegada, existem mecanismos de detecção de perdas de pacotes -- que efetuam o reenvio destes caso necessário.
     \end{itemize}
 
 \end{itemize} %----------------------
@@ -55,6 +56,7 @@ Esta seção descreve os requisitos do sistema de comunicação entre a estaçã
 
 
 \subsection{Sistema embarcado}
+\label{subsec:req_sistema-embarcado}
 Esta seção descreve os requisitos do sistema embarcado (robô).
 
 \begin{itemize} %----------------------
@@ -67,7 +69,7 @@ Esta seção descreve os requisitos do sistema embarcado (robô).
 
   \item Controle de posicionamento e velocidade.
     \begin{itemize}
-      \item O robô deve ser capaz de obter dados que permitam calcular sua velocidade (linear e angular) e posição atual (deslocamento e rotação em relação à posição inicial). Deve ser capaz de enviar os dados à estação base.
+      \item O robô deve ser capaz de obter dados que permitam calcular sua velocidade e posição atual (deslocamento e sentido em relação à posição inicial). Deve ser capaz de enviar os dados à estação base.
     \end{itemize}
 
   \item Detecção de obstáculos.

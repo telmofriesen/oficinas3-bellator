@@ -9,12 +9,12 @@ As alternativas pesquisadas para a estação base estão apresentadas nesta subs
 \subsubsection{Biblioteca para desenhos 2D}
 \label{subsec:alternativas_desenho}
 
-Tendo em vista que um dos requisitos é a geração de um mapa em duas dimensões na estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas diversas e que possa ser integrada facilmente à interface gráfica. Ela deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
+Tendo em vista que um dos requisitos é a geração de um mapa em duas dimensões na estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas em 2D (via código-fonte) e que possa ser integrada facilmente à interface gráfica. Ela deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
 
-Uma biblioteca interessante disponível em Java que possui o recurso de produzir desenhos dinâmicos (e integrá-los a interfaces gráficas) é o Processing \cite{processing}, \textit{open-source}. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, na biblioteca existem recursos que permitem o recebimento de informações de posicionamento do mouse e de comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do Swing -- biblioteca de interface gráfica (GUI) do Java.
+Uma biblioteca interessante disponível em Java que possui o recurso de produzir desenhos dinâmicos com integração a interfaces gráficas é o Processing \cite{processing}, de código livre. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, na biblioteca existem recursos que permitem o recebimento de informações de posicionamento do mouse e de comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do Swing -- biblioteca de interface gráfica (GUI) do Java.
 
 
-Outra biblioteca para a confecção de desenhos em 2D é o Cairo \cite{cairo}, que é \textit{open-source}, disponível nas linguagens C e C++. Ele possui recursos em alto nível para renderização de formas e interação com o usuário, assim como o Processing. Nos aspectos gerais as duas ferramentas são muito semelhantes. A integração do Cairo com a interface gráfica, porém, é dependente na biblioteca externa de GUI utilizada para tal.
+Outra biblioteca para a confecção de desenhos em 2D é o Cairo \cite{cairo}, que é \textit{open-source}, disponível nas linguagens C e C++. Ele possui recursos em alto nível para renderização de formas e interação com o usuário, assim como o Processing. Nos aspectos gerais as duas ferramentas são muito semelhantes. A integração do Cairo com a interface gráfica, porém, é dependente na biblioteca externa de GUI utilizada.
 
 Um aspecto importante a notar é que ambas as bibliotecas foram desenvolvidas e otimizadas para terem bom desempenho em máquinas atuais -- o que é desejável tendo em vista os requisitos. Na Tabela \ref{tab:alternativas_desenho} está presente uma comparação entre as duas bibliotecas.
 
@@ -28,7 +28,7 @@ Um aspecto importante a notar é que ambas as bibliotecas foram desenvolvidas e 
     \midrule
     Linguagem de programação & C e C++ & Java \\
     \hline
-    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (na biblioteca Swing do Java) \\
+    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (com a biblioteca Swing do Java) \\
     \hline
     Ferramentas de interação com o usuário & Sim & Sim \\
     \bottomrule
@@ -36,26 +36,26 @@ Um aspecto importante a notar é que ambas as bibliotecas foram desenvolvidas e 
   \label{tab:alternativas_desenho}
 \end{table}
 
-A escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação. A biblioteca escolhida, dentre as duas opções, foi o Processing, visto que a integração a interfaces gráficas do Java é muito simples. 
+\textbf{Escolha da equipe:} O Processing foi adotado como solução para desenhos 2D. Deve-se ressaltar que a escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação, tendo em vista a interdependência de ambas. Em razão dos motivos apresentados na próxima subseção -- que se constituem de principal argumento para a escolha do Processing -- o Java foi adotado. Um ponto interessante do Procesing é a simplicidade de integração a interfaces gráficas (Swing) do Java.
 
 \subsubsection{Linguagem de programação}
 
-Nessa etapa de avaliação das opções, a escolha de uma boa linguagem de programação que atenda aos requisitos é fundamental. Abaixo está presente uma lista dos aspectos desejáveis da linguagem:
+Na etapa de avaliação das opções tecnológicas, a escolha de uma boa linguagem de programação que atenda aos requisitos é fundamental. Abaixo está presente uma lista dos aspectos desejáveis da linguagem a ser utilizada neste projeto:
 
 \begin{itemize}
   \item Deve ser multiplataforma (ao menos compatível com Linux e Windows sem muitas modificações);
   \item Deve possuir orientação a objetos;
-  \item Deve possuir recursos multiplataforma e \textit{open-source} para o desenvolvimento de interfaces gráficas;
-  \item Deve ter a disponibilidade de ferramentas \textit{open-source} e multiplataforma para a criação visual da interface gráfica, dessa forma agilizando o processo de desenvolvimento;
-  \item Deve possuir recursos, integrados ou em bibliotecas \textit{open-source}, para o desenvolvimento de desenhos dinâmicos (para a geração do mapa 2D). Os desenhos devem ser facilmente integráveis à interface gráfica.
+  \item Deve possuir recursos multiplataforma e de código livre para o desenvolvimento de interfaces gráficas;
+  \item Deve ter a disponibilidade de ferramentas de código livre e multiplataforma para a criação \textit{visual} da interface gráfica, dessa forma agilizando o processo de desenvolvimento;
+  \item Deve possuir recursos, integrados ou em bibliotecas externas de código livre, para o desenvolvimento de desenhos dinâmicos (para a geração do mapa 2D). Os desenhos devem ser facilmente integráveis à interface gráfica.
 \end{itemize}
 
 
-Abaixo está presente uma descrição das duas linguagens, o C++ e Java, atualmente utilizadas em inúmeras aplicações, e que são potenciais alternativas ao projeto. A Tabela \ref{tab:alternativas_linguagens} sumariza os recursos de cada uma.
+Abaixo está presente uma descrição de duas linguagens, o C++ e Java, atualmente utilizadas em inúmeras aplicações, e que são potenciais alternativas ao projeto -- tendo em vista a experiência e conhecimento dos integrantes a respeito de ambas. A Tabela \ref{tab:alternativas_linguagens} sumariza os recursos de cada uma.
 
 \textbf{Java}
 
-O Java \cite{java} é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que muito facilmente programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, e a manutenção pelos desenvolvedores é frequente.
+O Java \cite{java} é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que, muito facilmente, programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, e a manutenção dele pelos desenvolvedores é frequente.
 
 Há disponibilidade, na API do Java, da biblioteca Swing -- que contém recursos completos para a criação de interfaces gráficas (GUI) interativas. Existem ferramentas visuais de código aberto que consideravelmente agilizam o processo de desenvolvimento de interfaces Swing, entre elas o NetBeans \cite{netbeans} e o Eclipse \cite{eclipse}, através de plugins ou extensões. 
 
@@ -64,14 +64,12 @@ Para o preenchimento do requisito de confecção de desenhos em 2D com integraç
 
 \textbf{C++}
 
-O C++ é uma linguagem orientada a objetos, que foi desenvolvida a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que os programas desenvolvidos forem utilizados. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
+O C++ é uma linguagem orientada a objetos, que foi desenvolvida a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que um programa desenvolvido for utilizado. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
 
-Recursos para desenvolvimento visual de interfaces gráficas estão disponíveis através de bibliotecas e ferramentas externas. O C++ não possui recursos de interface gráfica na própria API. Deve-se notar que esse é um aspecto que adiciona complexidade ao portar programas entre diferentes sistemas. 
+Recursos para desenvolvimento visual de interfaces gráficas estão disponíveis através de bibliotecas e ferramentas externas. O C++ não possui recursos de interface gráfica na própria API e, portanto, deve-se notar que este é um aspecto complicador ao portar programas entre diferentes sistemas. 
 
 Para a confecção de desenhos 2D e incorporação dos mesmos à interface gráfica, a biblioteca Cairo (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) pode ser utilizada com essa linguagem. A possibilidade de haver integração com a interface, porém, é dependente da biblioteca de GUI utilizada.
 
-
-\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. A escolha do Java foi feita em conjunto com a escolha da biblioteca do Processing. Notavelmente, há a facilidade em portar, sem adaptações, programas para diferentes plataformas, processo este que é mais complexo no C++.  Com relação ao quesito de desempenho em computadores atuais, a linguagem escolhida é satisfatória, visto que há manutenção constante da implementação das bibliotecas e da máquina virtual do Java pelos desenvolvedores -- que buscam, entre outros aspectos, otimizar a linguagem para tecnologias atuais.
 
 \begin{table}[h]
   \caption{Comparação entre linguagens de programação.}
@@ -94,11 +92,44 @@ Para a confecção de desenhos 2D e incorporação dos mesmos à interface gráf
   \label{tab:alternativas_linguagens}
 \end{table}
 
+\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. Ressalta-se novamente que a escolha do Java foi feita em conjunto com a escolha da biblioteca do Processing. Notavelmente, no Java há a facilidade em portar, sem adaptações consideráveis na maioria dos casos, programas para diferentes plataformas -- processo este que é mais complexo no C++.  Com relação ao quesito de desempenho em computadores atuais, a linguagem escolhida é satisfatória, visto que há manutenção constante da implementação das bibliotecas e da máquina virtual do Java pelos desenvolvedores -- que buscam, entre outros aspectos, otimizar a linguagem para as tecnologias disponíveis atualmente.
+
+\subsubsection{Sistema operacional}
+
+Estando escolhida a linguagem de programação, o próximo passo é escolher um sistema operacional que seja compatível com ela e que satisfaça os requisitos da seção \ref{subsec:req_estacao-base}. Os aspectos desejáveis, portanto, são:
+
+\begin{itemize}
+  \item Deve ser compatível com o Java;
+  \item Deve ser compatível com ferramentas de desenvolvimento \textit{visual} de interface gráfica;
+  \item Deve ser gratuito e de código aberto.
+\end{itemize}
+
+A Tabela \ref{tab:alternativas_SO} apresenta uma comparação entre dois sistemas operacionais, Linux e Windows -- sobre os quais a equipe tem considerável experiência e possibilidade de uso nos próprios computadores pessoais.
+
+\begin{table}[h]
+  \caption{Comparação entre sistemas operacionais.}
+  \centering
+  \begin{tabular}{p{6cm}|p{2cm}p{2cm}}
+    \toprule
+    \textbf{Característica} & \textbf{Linux} & \textbf{Windows} \\
+    \hline
+    Compatível com Java & Sim & Sim \\
+    \hline
+    Compatível com ferramentas visuais de desenvolvimento & Sim & Sim \\
+    \hline
+    Gratuito e de código aberto & Sim & Não \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_SO}
+\end{table}
+
+\textbf{Escolha da equipe:} Ambos os sistemas comparados são compatíveis com o Java e com ferramentas visuais de desenvolvimento de interface gráfica (NetBeans e Eclipse). Porém, o Linux é o único gratuito e de código aberto, e portanto foi o sistema operacional escolhido para o desenvolvimento do projeto da estação base.
+
 
 
 \subsection{Sistema de comunicação}
 
-Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação entre diferentes tecnologias de comunicação sem fios. O Wi-Fi é o recurso mais atrativo em todos os aspectos que foram comparados, preenchendo satisfatoriamente os requisitos do sistema de comunicação. Sua velocidade e alcance são suficientes para satisfazer as necessidades, e o fluxo de dados pode ser \textit{full-duplex}. Notavelmente, o Wi-Fi é o único sistema comparado que oferece a possibilidade (com simplicidade) de uso do protocolo TCP -- o que é um requisito importante para o desenvolvimento ágil e satisfatório do projeto.
+Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação entre diferentes tecnologias de comunicação sem fios, que potencialmente podem satisfazer às necessidades do projeto. 
 
 
 \begin{table}[h]
@@ -120,37 +151,38 @@ Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação ent
   \label{tab:alternativas_comunicacao}
 \end{table}
 
+\textbf{Escolha da equipe:} O Wi-Fi é o recurso mais atrativo em todos os aspectos que foram comparados, preenchendo satisfatoriamente os requisitos do sistema de comunicação. Sua velocidade e alcance são suficientes para satisfazer as necessidades do projeto, e o fluxo de dados pode ser \textit{full-duplex}. Notavelmente, o Wi-Fi é o único sistema comparado que oferece a possibilidade (com simplicidade) de uso do protocolo TCP -- o que é um requisito importante para o desenvolvimento ágil e satisfatório do projeto.
 
 
 \subsection{Sistema embarcado}
 
-Nesta seção apresentamos as alternativas pesquisadas para o sistema embarcado, levando em conta os requisitos já apresentados anteriormente.
+Nesta seção serão apresentadas as alternativas pesquisadas para o sistema embarcado, levando-se em conta os requisitos da Seção \ref{subsec:req_sistema-embarcado}.
 
 \subsubsection{Movimentação do robô}
 
-O sistema de movimentação do robô, incluindo motores, acionadores, drivers de potência e rodas não foram pesquisados pois já estão implementados no robô e atendem aos requisitos especificados nas seções anteriores. Sendo assim utilizaremos um chassi de 40 cm de largura por 50 cm de comprimento, duas rodas de tração e uma roda guia. As rodas de tração estão dispostas na parte posterior do robô, possuindo 20 cm de diâmetro e 4 cm de largura. O chassi está equipado com 2 motores Bosch FPG 12V, 2 baterias Unybatt 12V-7,2 Ampére-hora e duas pontes H L298 \cite{bellator_2012}. A disposição dos itens no robô pode ser vista na figura \ref{fig:disposicao_bellator_2012}.
+Uma vez que o sistema de movimentação do robô, incluindo motores, acionadores, drivers de potência e rodas já estão instalados no robô e atendem aos requisitos, não houve nova pesquisa sobre esses componentes. Um chassi de 40 cm de largura por 50 cm de comprimento, duas rodas de tração e uma roda guia estão presentes atualmente. As rodas de tração estão dispostas na parte posterior do robô, possuindo 20 cm de diâmetro e 4 cm de largura. O chassi está equipado com 2 motores Bosch FPG 12V, 2 baterias Unybatt 12V-7,2 Ampére-hora e duas pontes H L298 \cite{bellator_2012}. A disposição dos itens no robô pode ser vista na figura \ref{fig:disposicao_bellator_2012}.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.4\textwidth]{./figuras/disposicao-robo.png}
-\caption[Disposição dos itens no robô]{Disposição dos itens no robô}
+\caption{Disposição dos itens no robô}
 \fonte{\cite{bellator_2012}}
 \label{fig:disposicao_bellator_2012}
 \end{figure}
 
 \subsubsection{Odometria}
 
-Para a obtenção da direção e sentido do movimento do robô, assim como aceleração, velocidade e posição, pode-se optar por diversos tipos de tecnologias ou pela associação delas. Abaixo descrevemos as principais delas.
+Para a obtenção da aceleração, velocidade e posição do robô, diversas tecnologias podem ser escolhidas. Abaixo serão descritas as principais opções:
 
 \begin{itemize}
-  \item \textbf{Encoder:} Ligado ao eixo da roda do robô, conta a quantidade de voltas dadas pela roda. Permite assim calcular a distancia percorrida pelo robô. Caso sejam conectados dois encoders, um em cada roda, podemos obter também a direção do movimento pela diferença entre a contagem de voltas de cada roda.
-  \item \textbf{GPS:} Utiliza sinais de satélites para obter as coordenadas geográficas do robô. A direção e o sentido podem ser obtidos pela comparação das leituras com as anteriores.
-  \item 	\textbf{Acelerômetro:} pode utilizar a tecnologia chamada \textbf{MEMS} para medir a aceleração sofrida pelo componente.
-  \item 	\textbf{Giroscópio:} pode utilizar a tecnologia chamada \textbf{MEMS} para medir a aceleração angular sofrida pelo componente.
-  \item 	\textbf{Bussola:} Utiliza os campos magnéticos da terra para obter a direção com relação aos polos magnéticos da terra.
+  \item \textbf{Encoder:} Ligado ao eixo da roda do robô, efetua a contagem das rotações realizadas por ela, permitindo assim calcular a distancia percorrida. Se dois encoders forem instalados, um em cada roda, a direção do movimento poderá ser obtida a partir de cálculos baseados na contagem de voltas de cada roda.
+  \item \textbf{GPS:} Utiliza sinais de satélites para obter as coordenadas geográficas do robô. A direção e o sentido do movimento podem ser obtidos a partir da comparação das leituras atuais com as anteriores.
+  \item 	\textbf{Acelerômetro:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração do componente. A velocidade e deslocamento lineares podem ser obtidos por integração numérica da aceleração.
+  \item 	\textbf{Giroscópio:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração angular do componente. A velocidade angular e rotação podem ser obtidos por integração numérica da aceleração angular.
+  \item 	\textbf{Bússola:} Utiliza os campos magnéticos da terra para obter a orientação geográfica absoluta do robô.
 \end{itemize}
 
-A seguir, na tabela \ref{tab:alternativas_tecnologias_odometria}, comparamos as tecnologias apresentadas anteriormente. 
+Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma comparação entre as tecnologias apresentadas. 
 
 \begin{table}[h]
   \caption{Comparação entre tecnologias para odometria.}
@@ -159,27 +191,30 @@ A seguir, na tabela \ref{tab:alternativas_tecnologias_odometria}, comparamos as 
     \toprule
     \textbf{Característica} & \textbf{Encoder} & \textbf{GPS} & \textbf{Acelerômetro} & \textbf{Giroscópio} & \textbf{Bussola} \\
     \hline
-    Sujeito a influencias externas & Deslizamentos & Não & Não & Não & Campo magnético dos motores \\
+    Sujeito a influencias externas & Deslizamentos & Não & Não & Não & Ruídos de campos magnéticos diversos \\
     \hline
     Ambiente de operação & Interno / Externo & Externo & Interno / Externo & Interno / Externo & Interno / Externo \\
     \hline
-    Posicionamento & Relativo & Absoluto & Relativo & Relativo & Relativo \\
+    Posicionamento & Relativo & Absoluto & Relativo & Relativo & Absoluto \\
     \bottomrule
   \end{tabular}
   \label{tab:alternativas_tecnologias_odometria}
 \end{table}
 
-Com base no comparativo da tabela \ref{tab:alternativas_tecnologias_odometria} optamos por utilizar um acelerômetro em conjunto com um giroscópio para obter os dados para odometria. Encoders estão sujeitos a erros causados por deslizamento nas rodas, GPS apenas funciona em ambientes externos e a bussola pode ser influenciada pelo campo magnético dos motores. Como o robô já apresenta encoders instalado, utilizaremos também os dois encoders, possibilitando assim aumentar a precisão e confiabilidade dos dados de odometrias.
-Justificada nossa escolha por acelerômetros e giroscópios, na tabela \ref{tab:alternativas_componentes_odometria} fazemos um comparativo entre as opções de menor custo disponíveis no mercado. Listamos na tabela apenas as alternativas que possuem placas de desenvolvimento pois acelerômetros e giroscópios são geralmente são vendidos em encapsulamento LGA, os quais são de difícil soldagem.
+Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. 
+
+\textbf{Escolha da equipe:} Tendo em vista que o acelerômetro e o giroscópio não sofrem influência externa (ruído) considerável, eles foram escolhidos como principal meio de obtenção dos dados de odometria. Um acelerômetro e um giroscópio serão utilizados para tal fim, sendo que ambos serão posicionados no ponto médio entre as duas rodas do robô (que representa o centro de movimento deste). Como o robô já apresenta dois \textit{encoders} instalados, eles serão utilizados como recurso extra para possibilitar o aumento da exatidão e confiabilidade dos dados.
+
+Apresentada e justificada a escolha dos sensores, na Tabela \ref{tab:alternativas_componentes_odometria} está presente um comparativo entre as opções de acelerômetro e giroscópio de menor custo disponível no mercado. Na Tabela estão listados apenas os modelos que possuem placas de desenvolvimento, pois acelerômetros e giroscópios são geralmente são vendidos em encapsulamento LGA (que é de difícil soldagem).
 
 \begin{table}[h]
   \caption{Comparação entre acelerômetros/giroscópios para odometria.}
   \centering
-  \begin{tabular}{p{2.4cm}|p{3cm}p{0.8cm}p{1.4cm}p{1.8cm}p{1.7cm}p{1.3cm}}
+  \begin{tabular}{p{2.4cm}|p{3cm}p{0.8cm}p{1.4cm}p{1.9cm}p{1.7cm}p{1.3cm}}
     \toprule
     \textbf{Modelo} & \textbf{Fabricante} & \textbf{Acel.} & \textbf{Giro.} & \textbf{Faixa} & \textbf{Interface} & \textbf{Preço} \\
     \hline
-    STEVAL-MKI009V1	& STMicroeletronics & 3x	& - & $ \pm 2g / \pm6g $ & I2c / SPI & \$23.94 \\
+    STEVAL-MKI009V1	& STMicroeletronics & 3x	& - & $ \pm 2g$ ou $\pm 6g $ & I2C / SPI & \$23.94 \\
     \hline
 	ATAVRSBIN1 & Atmel & 1x & - & - & I2c & \$26.25 \\
 	\hline
@@ -187,9 +222,9 @@ Justificada nossa escolha por acelerômetros e giroscópios, na tabela \ref{tab:
 	\hline
 	ATAVRSBIN1 & Atmel & - & 1x & & I2C & \$26.25 \\
 	\hline
-	MPU-6050	 & IvenSense & 3x & 3x & $ \pm 2g / \pm 4g $ $ \pm 250 ^{o}/seg /$ $ \pm 500 ^{o}/seg $ & I2C & \$8.78 \\
+	MPU-6050	 & IvenSense & 3x & 3x & $ \pm 2g$ ou $\pm 4g $; $ \pm 250 ^{o}/seg$ ou $ \pm 500 ^{o}/seg $ & I2C & \$8.78 \\
     \hline
-	MKI086V1	 & STMicroeletronics & 1x & $ \pm 30^{o}/seg $ & Analog & & \$31.50 \\
+	MKI086V1	 & STMicroeletronics & - & 1x & $ \pm 30^{o}/seg $ & Analog & \$31.50 \\
 	\hline
 	STEVAL-MKI094V1 & STMicroeletronics & - & 3x & $ \pm 400^{o}/seg $ & Analog & \$31.50 \\
 	\hline
@@ -203,25 +238,25 @@ Justificada nossa escolha por acelerômetros e giroscópios, na tabela \ref{tab:
 
 \textbf{MPU-6050}
 
-Com base na tabela \ref{tab:alternativas_componentes_odometria} escolhemos o modelo MPU-6050 da IvenSense principalmente devido ao seu baixo custo: \$8.78. Este modelo possui um acelerômetro de 3 eixos, um giroscópio e 3 eixos e entradas para uma bussola externa integrados em um único chip \cite{mpu6050}. A faixa de operação para o acelerômetro é de $ \pm 2g ou \pm 4g $ e para o giroscópio é de $ \pm 250 ^{o}/seg $ ou $ \pm 500 ^{o}/seg $. A sensibilidade do acelerômetro é de $ 16384 LSB/g $ e $ 8192 LSB/g $. A sensibilidade do giroscópio é de $ 131 LSB/ ^{o} / seg $ e $ 65.5 LSB/ ^{o} / seg $. A interface de comunicação do módulo suporta o protocolo I2C. O módulo contendo o chip MPU-6050 e alguns componentes necessários para seu funcionamento pode ser visto na figura \ref{fig:mpu6050}.
+Com base na Tabela \ref{tab:alternativas_componentes_odometria}, o modelo MPU-6050 da IvenSense foi escolhido, principalmente devido ao seu baixo custo: \$8.78. Este modelo possui um acelerômetro e um giroscópio (ambos de 3 eixos), além entradas para uma bussola externa de 3 eixos, tudo integrado a um único chip \cite{mpu6050}. A faixa de operação para o acelerômetro é de $ \pm 2g$ ou $\pm 4g $ e para o giroscópio é de $ \pm 250~ ^{o}/seg $ ou $ \pm 500~ ^{o}/seg $. A sensibilidade do acelerômetro é de $ 16384~ LSB/g $ ou $ 8192~ LSB/g $. A sensibilidade do giroscópio é de $ 131~ LSB/ (^{o} / seg) $ ou $ 65.5~ LSB/ (^{o} / seg) $. A interface de comunicação do módulo suporta o protocolo I2C. O módulo contendo o chip MPU-6050 e alguns componentes necessários para seu funcionamento pode ser visto na figura \ref{fig:mpu6050}.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.4\textwidth]{./figuras/mpu6050.JPG}
-\caption[Placa de desenvolvimento contendo o chip MPU-6050]{Placa de desenvolvimento contendo o chip MPU-6050}
+\caption{Placa de desenvolvimento contendo o chip MPU-6050}
 \fonte{\cite{mpu6050}}
 \label{fig:mpu6050}
 \end{figure}
 
 \textbf{Encoder Optico HEDS-9700}
 
-Como já foi dito, utilizaremos também os encoders já existentes no robô. O robô está equipado com dois encoders HEDS-9700.
-Esses encoders geram em sua saída uma onda quadrada à medida em que o encoder é rotacionado, sendo 1800 pulsos gerados em uma rotação \cite{heds9700}. A forma de onda da saída do encoder pode ser vista na figura \ref{fig:heds9700}. Podemos ver na figura que o encoder possui duas saidas, A e B com defasamento $\phi$ entre elas. Com as duas saídas podemos determinar o sentido de rotação. Porém na implementação existente esse recurso não é utilizado.
+Como foi explicitado anteriormente, os \textit{encoders} ópticos já existentes no robô serão utilizados. Ele está equipado com duas peças do modelo HEDS-9700.
+Quanto ao funcionamento, este modelo gera em sua saída uma onda quadrada à medida em que o há rotação, sendo 1800 pulsos gerados em uma revolução completa \cite{heds9700}. A forma de onda da saída do \textit{encoder} pode ser vista na Figura \ref{fig:heds9700}. Pode-se ver na Figura que o encoder possui duas saidas, A e B com defasamento $\phi$ entre elas. O sentido de rotação pode ser determinado a partir dessas saídas.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.6\textwidth]{./figuras/heds9700.png}
-\caption[Forma de onda de saída do encoder]{Forma de onda de saída do encoder}
+\caption{Forma de onda na saída do encoder}
 \fonte{\cite{heds9700}}
 \label{fig:heds9700}
 \end{figure}
@@ -230,22 +265,22 @@ Esses encoders geram em sua saída uma onda quadrada à medida em que o encoder 
 
 \textbf{Sensor de proximidade Infra Vermelho IR 2Y0A02F98}
 
-A detecção de obstáculos, que é um requisito deste robô, será atendido pelos sensores de Infra vermelho já existentes no robô. Logo serão utilizados sensores IR 2Y0A02F98 \cite{ir_sensor}. Este modelo é pouco influenciado pelas cores dos objetos detectados devido ao método de medição baseado em triangulação. Na figura \ref{fig:ir_sensor_response} podemos ver isso. A linha tracejada é a resposta para reflexão em um papel cinza e a linha contínua é a resposta para reflexão em um papel branco.
+A detecção de obstáculos, que é um requisito para o projeto robô, será feita pelos sensores de Infra Vermelho já existentes no mesmo. Estão presentes 5 peças do modelo IR 2Y0A02F98 \cite{ir_sensor}. Uma característica interessante deste sensor é que ele sofre pouca influência das cores dos objetos, devido ao método de medição baseado em triangulação. Na figura \ref{fig:ir_sensor_response} pode-se verificar o fato. A linha tracejada é a resposta para reflexão em uma superfície cinza e a linha contínua é a resposta para reflexão em uma superfície branca.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{./figuras/ir-sensor-response.png}
-\caption[Curva de resposta do encoder]{Curva de resposta do encoder}
+\caption{Curva de resposta do sensor Infra Vermelho IR 2Y0A02F98}
 \fonte{\cite{ir_sensor}}
 \label{fig:ir_sensor_response}
 \end{figure}
 
 \subsubsection{Microcontrolador}
 
-A interface entre os sensores, atuadores e a placa TS-7260 já existente no robô \cite{bellator_2012} será feita por um sistema micro controlado. Uma vez escolhidos os sensores, o sistema micro controlado deve possuir as interfaces adequadas para comunicação com os sensores e também para comunicação com o hardware já existente no robô, como o sistema de acionamento dos motores e interface com a placa TS-7260. Desta forma, na tabela \ref{tab:requisitos_microcontrolador} listamos os requisitos para escolha do microcontrolador. Na tabela \ref{tab:requisitos_desejaveis_microcontrolador} listamos os requisitos que não são obrigatórios, porém desejáveis para o microcontrolador.
+A interface entre sensores e atuadores (sistemas de acionamento dos motores) com a placa TS-7260 \footnote{Deve-se ressaltar que os atuadores (sistemas de acionamento dos motores) e a placa TS-7260 já existem no robô \cite{bellator_2012}} será feita por um sistema microcontrolado. Este sistema deve possuir as interfaces adequadas para comunicação com todos os componentes. Na Tabela \ref{tab:requisitos_microcontrolador} estão listados os requisitos mandatórios para escolha do microcontrolador, e na Tabela \ref{tab:requisitos_desejaveis_microcontrolador} estão listados os requisitos desejáveis (porém não obrigatórios).
 
 \begin{table}[h]
-  \caption{Requisitos para escolha do microcontrolador.}
+  \caption{Requisitos mandatórios para escolha do microcontrolador.}
   \centering
   \begin{tabular}{p{7cm}|p{8cm}}
     \toprule
@@ -272,19 +307,19 @@ A interface entre os sensores, atuadores e a placa TS-7260 já existente no rob�
     \toprule
     \textbf{Requisito desejável} & \textbf{Justificativa} \\
     \hline
-    Desenvolvimento em plataforma livre	 & Diminui o custo de softwares para desenvolvimento \\
+    Desenvolvimento em plataforma livre	 & Diminuição do custo de softwares para desenvolvimento \\
     \hline
-    32 bits & Facilita manipulações numéricas na programação, diminuindo esforço e custo para programação \\
+    32 bits & Simplificação de manipulações numéricas na programação, reduzindo o esforço e custo para desenvolvimento \\
     \hline
-    2 Interfaces seriais ou JTAG & Utilização para debug ou logs \\
+    2 Interfaces seriais ou JTAG & Utilização para \textit{debug} ou \textit{logs} \\
     \hline
-    Solução integrada & Redução do tamanho da placa e quantidade de componentes, diminuindo assim o custo e melhorando a organização e disposição dos componentes \\
+    Solução integrada & Redução do tamanho da placa e da quantidade de componentes, diminuindo assim o custo e melhorando a organização e disposição dos mesmos \\
     \bottomrule
   \end{tabular}
   \label{tab:requisitos_desejaveis_microcontrolador}
 \end{table}
 
-Na tabela \ref{tab:alternativas_microcontrolador} listamos diversas opções de microcontroladores que foram pesquisados para o projeto. Todas as opções atendem aos requisitos da tabela \ref{tab:requisitos_microcontrolador}, e são 32 bits.
+Na Tabela \ref{tab:alternativas_microcontrolador} estão listados diversos microcontroladores que foram pesquisadas para o projeto. Todos os modelos atendem aos requisitos da Tabela \ref{tab:requisitos_microcontrolador}, e são de 32 bits.
 
 \begin{table}[h]
 \caption{Comparativo entre microcontroladores.}
@@ -327,11 +362,11 @@ Custo & \$7.1 & \$9.14 & \$6.1 \\ \bottomrule
 \label{tab:alternativas_microcontrolador}
 \end{table}
 
-Dentre as opções listadas na tabela \ref{tab:alternativas_microcontrolador} escolhemos a opção \textbf{LPC2103}. Esta escolha foi feita baseada principalmente no custo do microcontrolador. Porém ao compará-lo com o \textbf{SIM3C146} vemos que esta última opção possui desempenho melhor com custo menor. Nossa escolha pelo \textbf{LPC2103} e não pelo \textbf{SIM3C146} justifica-se pela melhor documentação e disponibilidade de recursos para o \textbf{LPC2103}. A documentação fornecida pelo fabricante do microcontrolador \textbf{LPC2103} é mais completa, e por já estar a mais tempo no mercado a quantidade de informações e recursos disponíveis na internet é maior.
+\textbf{Escolha da equipe:} Dentre as opções listadas na Tabela \ref{tab:alternativas_microcontrolador}, o modelo LPC2103 foi escolhido. A escolha foi feita baseando-se principalmente no custo do microcontrolador. Nota-se, a primeira vista ao efetuar-se uma comparação com o SIM3C146, que essa última opção possui desempenho melhor e custo ligeiramente menor. Porém a escolha do LPC2103 justifica-se pela melhor documentação e mais ampla disponibilidade de recursos para o mesmo. A documentação fornecida pelo fabricante desse microcontrolador é mais completa e, pelo fato do modelo estar há mais tempo no mercado, a quantidade de informações e recursos disponíveis na \textit{internet} é maior.
 
 \textbf{LCP2103}
 
-O \textbf{LCP2103} é um microcontrolador baseado na arquitetura ARM7TDMI-S da NXP \cite{lpc2103}. Este microcontrolador pode operar em até $ 70MHz $ executando a $ 63MIPS $. O Microcontrolador possui 2 interfaces I2C, 2 interfaces seriais, até 14 saídas de PWM, até 13 canais de interrupções externas, 8 canais de conversão para um conversor analógico digital de 10 bits, 32kbytes de memória FLASH para código e 8kbytes de memória RAM. Ele também suporta \textit{debug} via JTag por meio de um \textit{debugger} JTag externo. O custo desse microcontrolador é de \$6.16 \cite{digikey}.
+O LCP2103 é um microcontrolador baseado na arquitetura ARM7TDMI-S da NXP \cite{lpc2103}. Este microcontrolador pode operar em até $ 70MHz $ executando a $ 63MIPS $. O Microcontrolador possui 2 interfaces I2C, 2 interfaces seriais, até 14 saídas de PWM, até 13 canais de interrupções externas, 8 canais de conversão para um conversor analógico digital de 10 bits, 32kbytes de memória FLASH para código e 8kbytes de memória RAM. Ele também suporta \textit{debug} via JTag por meio de um \textit{debugger} externo. O custo desse microcontrolador é de \$6.16 \cite{digikey}.
 
-O microcontrolador escolhido também pode ser programado utilizando o protocolo ISP por meio de ferramentas livres como o lpc21isp \cite{lpc21isp}. Para geração do código hexadecimal utilizado pelo lpc21isp basta compilar o código em C utilizando o GCC \cite{gcc}.
-Portanto o \textbf{LCP2103} além de atender aos requisitos propostos anteriormente também atende aos requisitos desejáveis que foram propostos na tabela \ref{tab:requisitos_desejaveis_microcontrolador}.
+O microcontrolador escolhido pode também ser programado utilizando o protocolo ISP, por meio de ferramentas livres como o lpc21isp \cite{lpc21isp}. Para a geração do código hexadecimal utilizado pelo lpc21isp, basta efetuar a compilação de código em C utilizando o GCC \cite{gcc}.
+Pode-se notar que o LCP2103, além de atender aos requisitos mandatórios da Tabela \ref{tab:requisitos_microcontrolador}, também atende aos requisitos desejáveis que foram expostos na Tabela \ref{tab:requisitos_desejaveis_microcontrolador}.
