@@ -129,6 +129,19 @@ A Tabela \ref{tab:alternativas_SO} apresenta uma comparação entre dois sistema
 
 \subsection{Sistema de comunicação}
 
+Como foi explicitado nos requisitos, o sistema de comunicação ter as seguintes características:
+
+\begin{itemize}
+  \item Alcance de, no mínimo, 20 metros sem fios;
+  \item Velocidade suficiente para, simultaneamente, o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera;
+  \item Fluxo de dados bidirecional (\textit{full-duplex});
+  \item Utilização simples do protocolo TCP.
+\end{itemize}
+
+Para o cálculo da taxa de transmissão mínima necessária, faz-se uma estimativa inicial. Prevê-se que o envio de imagens da câmera é o que mais utilizará os recursos da conexão. Supondo serem usadas a máxima qualidade e taxa de amostragem suportadas por uma câmera VGA comum (resolução 640x480, RGB 24 bits, 30 FPS), além de uso de compressão JPEG com 90\% de qualidade, haverá uso de aproximadamente 2,4 MB/s ou 19,2 MBits/s \cite{webcam_resolution}. 
+
+O envio de comandos ao robô, supondo que cada comando tenha 2 KB e hajam 10 comandos por segundo (estimativa exaregada), gastará em torno de 160 KBits/s. O recebimento de informações do robô e leituras dos sensores, supondo que cada pacote tenha 2 KB (com exagero) e haja recebimento de 10 pacotes por segundo, utilizará 160 KBits/s na banda da conexão. Portanto, o valor mínimo desejável da taxa de transferência é de 19,2 + 0,16 + 0,16 = 19,52 MBits/s.
+
 Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação entre diferentes tecnologias de comunicação sem fios, que potencialmente podem satisfazer às necessidades do projeto. 
 
 
@@ -153,10 +166,56 @@ Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação ent
 
 \textbf{Escolha da equipe:} O Wi-Fi é o recurso mais atrativo em todos os aspectos que foram comparados, preenchendo satisfatoriamente os requisitos do sistema de comunicação. Sua velocidade e alcance são suficientes para satisfazer as necessidades do projeto, e o fluxo de dados pode ser \textit{full-duplex}. Notavelmente, o Wi-Fi é o único sistema comparado que oferece a possibilidade (com simplicidade) de uso do protocolo TCP -- o que é um requisito importante para o desenvolvimento ágil e satisfatório do projeto.
 
+É importante ressaltar que uma conexão Wi-Fi 802.11g dedicada será utilizada para a comunicação entre o robô e a estação base, de modo que a velocidade de conexão possa ser utilizada com maior eficiência sem interferências de outros utilizadores.
+
 
 \subsection{Sistema embarcado}
-
+\label{subsec:opcoes_sist-embarcado}
 Nesta seção serão apresentadas as alternativas pesquisadas para o sistema embarcado, levando-se em conta os requisitos da Seção \ref{subsec:req_sistema-embarcado}.
+
+\subsubsection{Imagens intantãneas do ambiente}
+
+Para a obtenção de imagens do ambiente onde o robô se encontra, optou-se pór utilizar uma \textit{webcam} USB conectada à placa TS-7260 já presente no robô. A placa possuirá o \textit{hardware} do sistema de comunicação Wi-Fi do robô e, visto que um único canal sem fio será utilizado, o uso de uma câmera USB se mostra adequado. Abaixo estão listadas as características desejáveis da \textit{webcam}:
+
+\begin{itemize}
+  \item Possuir conexão USB 2.0;
+  \item Ser compatível com Linux;
+  \item Ser capaz de, no mínimo, produzir imagens em resolução VGA (640x480), RGB 24 bits, para que a visualização possa ser feita com qualidade satisfatória.
+\end{itemize}
+
+A compatibilidade com o Linux pode ser garantida com a escolha de uma \textit{webcam} em conformidade com o padrão UVC (\textit{USB Video Class}) e compatível com o driver Video4Linux 2 (V4L2), presente no Kernel do Linux a partir da versão 2.5. Uma lista de dispositivos compatíveis está disponível em \cite{uvc-linux}. A partir dos modelos presentes nessa lista, três câmeras de custo baixo e com disponibilidade no Brasil foram selecionadas, como apresentado na Tabela \ref{tab:alternativas_camera}.
+
+
+\begin{table}[h]
+  \caption{Comparação entre \textit{webcams} USB.}
+  \centering
+  \begin{tabular}{p{5cm}|p{3.3cm}p{3cm}p{2.5cm}}
+    \toprule
+    \textbf{Característica} & \textbf{Genius FaceCam 2000} & \multicolumn{1}{l}{\textbf{Microsoft VX-500}} & \textbf{Genius iSlim 1300}  \\
+    \hline
+     Conexão USB 2.0 & Sim & Sim & Sim  \\
+     \hline
+     Compatível com Linux & Sim & Sim & Sim \\
+     \hline
+     Resolução máxima de vídeo & 1620X1200 & 640x480 & 1280X1024 \\
+     \hline
+     RGB 24 bits & Sim & Sim & Sim \\
+     \hline
+     Custo & R\$ 82,00 & R\$ 79,50 & R\$ 34,99 \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_camera}
+\end{table}
+
+\textbf{Escolha da equipe:} Percebe-se que as características técnicas das três câmeras são satisfatórias para o preenchimento dos requisitos. A \textit{webcam} escolhida foi a Genius iSlim 1300, principalmente tendo em vista o seu custo reduzido em relação às outras. Em Curitiba, há disponibilidade desse modelo em pronta entrega.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{./figuras/genius-slim1300.jpg}
+\caption{\textit{Webcam} Genius iSlim 1300.}
+\fonte{\cite{genius-islim-1300}}
+\label{fig:genius-islim-1300}
+\end{figure}
 
 \subsubsection{Movimentação do robô}
 
