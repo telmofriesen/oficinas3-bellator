@@ -180,10 +180,10 @@ Para a obtenção de imagens do ambiente onde o robô se encontra, optou-se pór
 \begin{itemize}
   \item Possuir conexão USB 2.0;
   \item Ser compatível com Linux;
-  \item Ser capaz de, no mínimo, produzir imagens em resolução VGA (640x480), RGB 24 bits, para que a visualização possa ser feita com qualidade satisfatória.
+  \item Ser capaz de, no mínimo, produzir imagens em resolução VGA (640x480), RGB 24 bits a 30 fps, para que a visualização possa ser feita com qualidade satisfatória.
 \end{itemize}
 
-A compatibilidade com o Linux pode ser garantida com a escolha de uma \textit{webcam} em conformidade com o padrão UVC (\textit{USB Video Class}) e compatível com o driver Video4Linux 2 (V4L2), presente no Kernel do Linux a partir da versão 2.5. Uma lista de dispositivos compatíveis está disponível em \cite{uvc-linux}. A partir dos modelos presentes nessa lista, três câmeras de custo baixo e com disponibilidade no Brasil foram selecionadas, como apresentado na Tabela \ref{tab:alternativas_camera}.
+A compatibilidade com o Linux pode ser garantida com a escolha de uma \textit{webcam} em conformidade com o padrão UVC (\textit{USB Video Class}) e compatível com o \textit{driver} Video4Linux 2 (V4L2), presente no Kernel do Linux a partir da versão 2.5. Uma lista de dispositivos que seguem esse padrão está disponível em \cite{uvc-linux}. A partir dos modelos presentes nesta lista, três câmeras de custo baixo e com disponibilidade no Brasil foram selecionadas, como apresentado na Tabela \ref{tab:alternativas_camera}.
 
 
 \begin{table}[h]
@@ -200,6 +200,8 @@ A compatibilidade com o Linux pode ser garantida com a escolha de uma \textit{we
      Resolução máxima de vídeo & 1620X1200 & 640x480 & 1280X1024 \\
      \hline
      RGB 24 bits & Sim & Sim & Sim \\
+     \hline 
+     Taxa de amostragem & 30 fps & 30 fps & 30 fps \\
      \hline
      Custo & R\$ 82,00 & R\$ 79,50 & R\$ 34,99 \\
     \bottomrule
@@ -207,7 +209,7 @@ A compatibilidade com o Linux pode ser garantida com a escolha de uma \textit{we
   \label{tab:alternativas_camera}
 \end{table}
 
-\textbf{Escolha da equipe:} Percebe-se que as características técnicas das três câmeras são satisfatórias para o preenchimento dos requisitos. A \textit{webcam} escolhida foi a Genius iSlim 1300, principalmente tendo em vista o seu custo reduzido em relação às outras. Em Curitiba, há disponibilidade desse modelo em pronta entrega.
+\textbf{Escolha da equipe:} Percebe-se que as características técnicas de todas as três câmeras são satisfatórias para o preenchimento dos requisitos. A \textit{webcam} escolhida foi a Genius iSlim 1300, principalmente tendo em vista o seu custo reduzido em relação às outras. Em Curitiba, há disponibilidade desse modelo em pronta entrega.
 
 \begin{figure}[H]
 \centering
