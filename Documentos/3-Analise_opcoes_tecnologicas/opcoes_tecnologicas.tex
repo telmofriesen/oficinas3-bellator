@@ -173,9 +173,9 @@ Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação ent
 \label{subsec:opcoes_sist-embarcado}
 Nesta seção serão apresentadas as alternativas pesquisadas para o sistema embarcado, levando-se em conta os requisitos da Seção \ref{subsec:req_sistema-embarcado}.
 
-\subsubsection{Imagens intantãneas do ambiente}
+\subsubsection{Imagens instantâneas do ambiente}
 
-Para a obtenção de imagens do ambiente onde o robô se encontra, optou-se pór utilizar uma \textit{webcam} USB conectada à placa TS-7260 já presente no robô. A placa possuirá o \textit{hardware} do sistema de comunicação Wi-Fi do robô e, visto que um único canal sem fio será utilizado, o uso de uma câmera USB se mostra adequado. Abaixo estão listadas as características desejáveis da \textit{webcam}:
+Para a obtenção de imagens do ambiente onde o robô se encontra, optou-se por utilizar uma \textit{webcam} USB conectada à placa TS-7260 já presente no robô. A placa possuirá o \textit{hardware} do sistema de comunicação Wi-Fi do robô e, visto que um único canal sem fio será utilizado, o uso de uma câmera USB se mostra adequado. Abaixo estão listadas as características desejáveis da \textit{webcam}:
 
 \begin{itemize}
   \item Possuir conexão USB 2.0;
@@ -257,16 +257,19 @@ Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma compar
     Ambiente de operação & Interno / Externo & Externo & Interno / Externo & Interno / Externo & Interno / Externo \\
     \hline
     Posicionamento & Relativo & Absoluto & Relativo & Relativo & Absoluto \\
+    \hline
+    Acumulo de erro para calculo da posição & sim & não & sim (2 Integrações) & sim (2 Integrações) & sim \\
     \bottomrule
   \end{tabular}
   \label{tab:alternativas_tecnologias_odometria}
 \end{table}
 
-Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. 
+Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. O acelerômetro e giroscópio por sua vez acumulam o erro de duas integrações para obtenção da posição.
 
-\textbf{Escolha da equipe:} Tendo em vista que o acelerômetro e o giroscópio não sofrem influência externa (ruído) considerável, eles foram escolhidos como principal meio de obtenção dos dados de odometria. Um acelerômetro e um giroscópio serão utilizados para tal fim, sendo que ambos serão posicionados no ponto médio entre as duas rodas do robô (que representa o centro de movimento deste). Como o robô já apresenta dois \textit{encoders} instalados, eles serão utilizados como recurso extra para possibilitar o aumento da exatidão e confiabilidade dos dados.
+\textbf{Escolha da equipe:} Os \textit{encoders} estão sujeito apenas aos erros de deslizamentos e acumulam menos erros na obtenção da posição do que os giroscópios e acelerômetros. Sendo assim eles foram a escolha como principal fonte de dados para odometria. O GPS não foi escolhido pois opera apenas em ambientes internos. A bussola por sua vez poderá sofrer influencias do campo magnético gerado pelos motores do robô. Como a utilização apenas dos \textit{encoders} pode levar a erros no posicionamento devido a deslizamentos, utilizaremos também um acelerômetro e um giroscópio como fonte de dados auxiliar para possibilitar o aumento da exatidão e confiabilidade dos dados obtidos dos \textit{encoders}. Esses dados servirão como entrada para um filtro de Kalman Extendido que calculará o estado (aceleração, velocidade e posição) do robô para um dado instante de tempo \cite{kalman_made_easy}, \cite{handbook_of_robotics}.
 
-Apresentada e justificada a escolha dos sensores, na Tabela \ref{tab:alternativas_componentes_odometria} está presente um comparativo entre as opções de acelerômetro e giroscópio de menor custo disponível no mercado. Na Tabela estão listados apenas os modelos que possuem placas de desenvolvimento, pois acelerômetros e giroscópios são geralmente são vendidos em encapsulamento LGA (que é de difícil soldagem).
+Os \textit{encoders} que serão utilizados já se encontram acoplados ao robô, logo não analisaremos a escolha dos \textit{encoders}.
+Quanto ao acelerômetro e giroscópio, apresentamos a seguir, na Tabela \ref{tab:alternativas_componentes_odometria}, um comparativo entre as opções de menor custo disponíveis no mercado. Na Tabela estão listados apenas os modelos que possuem placas de desenvolvimento, pois acelerômetros e giroscópios são geralmente são vendidos em encapsulamento \textbf{LGA} ou \textbf{BGA} (que é de difícil soldagem).
 
 \begin{table}[h]
   \caption{Comparação entre acelerômetros/giroscópios para odometria.}
@@ -311,8 +314,8 @@ Com base na Tabela \ref{tab:alternativas_componentes_odometria}, o modelo MPU-60
 
 \textbf{Encoder Optico HEDS-9700}
 
-Como foi explicitado anteriormente, os \textit{encoders} ópticos já existentes no robô serão utilizados. Ele está equipado com duas peças do modelo HEDS-9700.
-Quanto ao funcionamento, este modelo gera em sua saída uma onda quadrada à medida em que o há rotação, sendo 1800 pulsos gerados em uma revolução completa \cite{heds9700}. A forma de onda da saída do \textit{encoder} pode ser vista na Figura \ref{fig:heds9700}. Pode-se ver na Figura que o encoder possui duas saidas, A e B com defasamento $\phi$ entre elas. O sentido de rotação pode ser determinado a partir dessas saídas.
+Como foi explicitado anteriormente, os \textit{encoders} ópticos já existentes no robô serão utilizados. Ele está equipado com duas unidades do modelo HEDS-9700.
+Quanto ao funcionamento, este modelo gera em sua saída uma onda quadrada à medida em que é rotacionado, sendo 1800 pulsos gerados em uma rotação completa \cite{heds9700}. A forma de onda da saída do \textit{encoder} pode ser vista na Figura \ref{fig:heds9700}. Pode-se ver na Figura que o \textit{encoder} possui duas saídas, A e B com defasamento $\phi$ entre elas. O sentido de rotação pode ser determinado a partir dessas saídas.
 
 \begin{figure}[H]
 \centering
@@ -326,7 +329,7 @@ Quanto ao funcionamento, este modelo gera em sua saída uma onda quadrada à med
 
 \textbf{Sensor de proximidade Infra Vermelho IR 2Y0A02F98}
 
-A detecção de obstáculos, que é um requisito para o projeto robô, será feita pelos sensores de Infra Vermelho já existentes no mesmo. Estão presentes 5 peças do modelo IR 2Y0A02F98 \cite{ir_sensor}. Uma característica interessante deste sensor é que ele sofre pouca influência das cores dos objetos, devido ao método de medição baseado em triangulação. Na figura \ref{fig:ir_sensor_response} pode-se verificar o fato. A linha tracejada é a resposta para reflexão em uma superfície cinza e a linha contínua é a resposta para reflexão em uma superfície branca.
+A detecção de obstáculos, que é um requisito para o projeto robô, será feita pelos sensores de Infra Vermelho já existentes nele. Estão presentes 5 unidades do modelo IR 2Y0A02F98 \cite{ir_sensor}. Uma característica interessante deste sensor é que ele sofre pouca influência das cores dos objetos, devido ao método de medição baseado em triangulação. Na figura \ref{fig:ir_sensor_response} pode-se verificar o fato. A linha tracejada é a resposta para reflexão em uma superfície cinza e a linha contínua é a resposta para reflexão em uma superfície branca.
 
 \begin{figure}[H]
 \centering
@@ -353,7 +356,7 @@ A interface entre sensores e atuadores (sistemas de acionamento dos motores) com
     \hline
     Interface Serial	 & Comunicação com a placa TS-7260 \\
     \hline
-    Interrupções em 2 canais	 & Leitura do valor dos encoders \\
+    Interrupções em 2 canais	 \\ (com capacidade de processamento de no minimo 2865 interrupções/segundo em cada canal \footnote{Calculado com base no tamanho das rodas e suposição de velocidade máxima de deslocamento de $1m/s$.} ) & Leitura do valor dos \textit{encoders} \\
     \hline
     Conversor AD em 5 canais	 & Leitura dos sensores de IR \\
     \bottomrule
@@ -370,17 +373,15 @@ A interface entre sensores e atuadores (sistemas de acionamento dos motores) com
     \hline
     Desenvolvimento em plataforma livre	 & Diminuição do custo de softwares para desenvolvimento \\
     \hline
-    32 bits & Simplificação de manipulações numéricas na programação, reduzindo o esforço e custo para desenvolvimento \\
-    \hline
     2 Interfaces seriais ou JTAG & Utilização para \textit{debug} ou \textit{logs} \\
     \hline
-    Solução integrada & Redução do tamanho da placa e da quantidade de componentes, diminuindo assim o custo e melhorando a organização e disposição dos mesmos \\
+    Solução integrada em um único chip & Redução do tamanho da placa e da quantidade de componentes, diminuindo assim o custo e melhorando a organização e disposição dos mesmos \\
     \bottomrule
   \end{tabular}
   \label{tab:requisitos_desejaveis_microcontrolador}
 \end{table}
 
-Na Tabela \ref{tab:alternativas_microcontrolador} estão listados diversos microcontroladores que foram pesquisadas para o projeto. Todos os modelos atendem aos requisitos da Tabela \ref{tab:requisitos_microcontrolador}, e são de 32 bits.
+Na Tabela \ref{tab:alternativas_microcontrolador} estão listados diversos microcontroladores que foram pesquisadas para o projeto. Todos os modelos atendem aos requisitos da Tabela \ref{tab:requisitos_microcontrolador}.
 
 \begin{table}[h]
 \caption{Comparativo entre microcontroladores.}
@@ -425,9 +426,13 @@ Custo & \$7.1 & \$9.14 & \$6.1 \\ \bottomrule
 
 \textbf{Escolha da equipe:} Dentre as opções listadas na Tabela \ref{tab:alternativas_microcontrolador}, o modelo LPC2103 foi escolhido. A escolha foi feita baseando-se principalmente no custo do microcontrolador. Nota-se, a primeira vista ao efetuar-se uma comparação com o SIM3C146, que essa última opção possui desempenho melhor e custo ligeiramente menor. Porém a escolha do LPC2103 justifica-se pela melhor documentação e mais ampla disponibilidade de recursos para o mesmo. A documentação fornecida pelo fabricante desse microcontrolador é mais completa e, pelo fato do modelo estar há mais tempo no mercado, a quantidade de informações e recursos disponíveis na \textit{internet} é maior.
 
-\textbf{LCP2103}
+\textbf{LPC2103}
 
-O LCP2103 é um microcontrolador baseado na arquitetura ARM7TDMI-S da NXP \cite{lpc2103}. Este microcontrolador pode operar em até $ 70MHz $ executando a $ 63MIPS $. O Microcontrolador possui 2 interfaces I2C, 2 interfaces seriais, até 14 saídas de PWM, até 13 canais de interrupções externas, 8 canais de conversão para um conversor analógico digital de 10 bits, 32kbytes de memória FLASH para código e 8kbytes de memória RAM. Ele também suporta \textit{debug} via JTag por meio de um \textit{debugger} externo. O custo desse microcontrolador é de \$6.16 \cite{digikey}.
+O LPC2103 é um microcontrolador baseado na arquitetura ARM7TDMI-S da NXP \cite{lpc2103}. Este microcontrolador pode operar em até $ 70MHz $ executando a $ 63MIPS $. O Microcontrolador possui 2 interfaces I2C, 2 interfaces seriais, até 14 saídas de PWM, até 13 canais de interrupções externas, 8 canais de conversão para um conversor analógico digital de 10 bits, 32kbytes de memória FLASH para código e 8kbytes de memória RAM. Ele também suporta \textit{debug} via JTag por meio de um \textit{debugger} externo. O custo desse microcontrolador é de \$6.16 \cite{digikey}. O LPC2103 está disponível em encapsulamento \textbf{LQFP} com 48 pinos.
 
 O microcontrolador escolhido pode também ser programado utilizando o protocolo ISP, por meio de ferramentas livres como o lpc21isp \cite{lpc21isp}. Para a geração do código hexadecimal utilizado pelo lpc21isp, basta efetuar a compilação de código em C utilizando o GCC \cite{gcc}.
-Pode-se notar que o LCP2103, além de atender aos requisitos mandatórios da Tabela \ref{tab:requisitos_microcontrolador}, também atende aos requisitos desejáveis que foram expostos na Tabela \ref{tab:requisitos_desejaveis_microcontrolador}.
+Pode-se notar que o LPC2103, além de atender aos requisitos mandatórios da Tabela \ref{tab:requisitos_microcontrolador}, também atende aos requisitos desejáveis que foram expostos na Tabela \ref{tab:requisitos_desejaveis_microcontrolador}.
+
+\subsubsection{Placa de circuito impresso}
+
+A placa de circuito impresso será projetada utilizando ferramentas livres, como o gEDA \cite{geda} e PCB \cite{pcb}. Após o projeto da placa os arquivos Gerber serão enviado à empresa Stick \cite{stick} para impressão. A soldagem dos componentes será realizada pela própria equipe.
