@@ -222,33 +222,49 @@ public class JanelaConexao extends javax.swing.JFrame {
                 TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
                 int status = connector.getConnectionStatus();
                 if (status == TR_ClientConnector.CONNECTED) {
-                    ipComboBox.setEnabled(false);
-                    portaComboBox.setEnabled(false);
-                    connectButton.setText("Desconectar");
-                    connectButton.setEnabled(true);
-                    janelaConexao.setTitle("Bellator - Conexão [Conectado]");
-                    statusLabel.setText("Conectado");
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            ipComboBox.setEnabled(false);
+                            portaComboBox.setEnabled(false);
+                            connectButton.setText("Desconectar");
+                            connectButton.setEnabled(true);
+                            janelaConexao.setTitle("Bellator - Conexão [Conectado]");
+                            statusLabel.setText("Conectado");
+                        }
+                    });
                 } else if (status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
-                    ipComboBox.setEnabled(false);
-                    portaComboBox.setEnabled(false);
-                    connectButton.setText("Desconectar");
-                    connectButton.setEnabled(true);
-                    janelaConexao.setTitle("Bellator - Conexão [Conectado (handshake...)]");
-                    statusLabel.setText("Conectado");
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            ipComboBox.setEnabled(false);
+                            portaComboBox.setEnabled(false);
+                            connectButton.setText("Desconectar");
+                            connectButton.setEnabled(true);
+                            janelaConexao.setTitle("Bellator - Conexão [Conectado (handshake...)]");
+                            statusLabel.setText("Conectado");
+                        }
+                    });
                 } else if (status == TR_ClientConnector.CONNECTING) {
-                    ipComboBox.setEnabled(false);
-                    portaComboBox.setEnabled(false);
-                    connectButton.setText("Conectando...");
-                    connectButton.setEnabled(false);
-                    janelaConexao.setTitle("Bellator - Conexão [Conectando...]");
-                    statusLabel.setText("Conectando...");
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            ipComboBox.setEnabled(false);
+                            portaComboBox.setEnabled(false);
+                            connectButton.setText("Conectando...");
+                            connectButton.setEnabled(false);
+                            janelaConexao.setTitle("Bellator - Conexão [Conectando...]");
+                            statusLabel.setText("Conectando...");
+                        }
+                    });
                 } else if (status == TR_ClientConnector.DISCONNECTED) {
-                    ipComboBox.setEnabled(true);
-                    portaComboBox.setEnabled(true);
-                    connectButton.setText("Conectar");
-                    connectButton.setEnabled(true);
-                    janelaConexao.setTitle("Bellator - Conexão [Desconectado]");
-                    statusLabel.setText("Desconectado");
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            ipComboBox.setEnabled(true);
+                            portaComboBox.setEnabled(true);
+                            connectButton.setText("Conectar");
+                            connectButton.setEnabled(true);
+                            janelaConexao.setTitle("Bellator - Conexão [Desconectado]");
+                            statusLabel.setText("Desconectado");
+                        }
+                    });
                 }
             }
         }

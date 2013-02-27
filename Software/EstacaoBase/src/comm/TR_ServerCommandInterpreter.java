@@ -1,5 +1,9 @@
 package comm;
 
+import controle.robo.SensorsSampler;
+import controle.robo.WebcamManager;
+import controle.robo.WebcamSampler;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,25 +116,53 @@ public class TR_ServerCommandInterpreter extends Thread {
                         return true;
                     }
                 } else if (split[0].equals("SENSORS")) { //SENSORS
+                    SensorsSampler s = connection.getListener().getServer().getSensorsSampler();
                     if (split[1].equals("START")) {
-                        connection.getListener().getServer().startSend_sensor_info();
-                        connection.sendMessageWithPriority("SENSORS STATUS STARTED", true);
+                        s.startSampling();
+                        connection.sendMessageWithPriority(s.getStatusMessage(), true);
                         return true;
                     } else if (split[1].equals("STOP")) {
-                        connection.getListener().getServer().stopSend_sensor_info();
-                        connection.sendMessageWithPriority("SENSORS STATUS STOPPED", true);
+                        s.stopSampling();
+                        connection.sendMessageWithPriority(s.getStatusMessage(), true);
                         return true;
                     } else if (split[1].equals("STATUS")) {
                         if (split[2].equals("REQUEST")) {
-                            if (connection.getListener().getServer().isSend_sensor_info()) {
-                                connection.sendMessageWithPriority("SENSORS STATUS STARTED", true);
-                            } else {
-                                connection.sendMessageWithPriority("SENSORS STATUS STOPPED", true);
-                            }
+                            connection.sendMessageWithPriority(s.getStatusMessage(), true);
+                            return true;
                         }
                     } else if (split[1].equals("SAMPLE_RATE")) {
                         float sample_rate = Float.parseFloat(split[2]);
-                        connection.getListener().getServer().setSample_rate(sample_rate);
+                        connection.getListener().getServer().getSensorsSampler().setSample_rate(sample_rate);
+                        return true;
+                    }
+                } else if (split[0].equals("WEBCAM")) { //WEBCAM
+                    WebcamManager w = connection.getListener().getServer().getWebcamManager();
+                    if (split[1].equals("START")) {
+                        w.startSampling();
+//                        connection.sendMessageWithPriority(w.getStatusMessage(), true);
+                        return true;
+                    } else if (split[1].equals("STOP")) {
+                        w.stopSampling();
+//                        connection.sendMessageWithPriority(w.getStatusMessage(), true);
+                        return true;
+                    } else if (split[1].equals("STATUS")) {
+                        if (split[2].equals("REQUEST")) {
+                            connection.sendMessageWithPriority(w.getStatusMessage(), true);
+                            return true;
+                        }
+                    } else if (split[1].equals("FRAMERATE")) {
+                        float fps = Float.parseFloat(split[2]);
+                        w.setFps(fps);
+                        return true;
+                    } else if (split[1].equals("BITRATE")) {
+                        int bitrate = Integer.parseInt(split[2]);
+                        w.setBitrate(bitrate);
+                        return true;
+                    } else if (split[1].equals("RESOLUTION")) {
+                        String[] split_resolution = split[2].split("x");
+                        int width = Integer.parseInt(split_resolution[0]);
+                        int height = Integer.parseInt(split_resolution[1]);
+                        w.setResolution(new Dimension(width, height));
                         return true;
                     }
                 } else if (split[0].equals("ENGINES")) { //ENGINES
@@ -159,7 +191,7 @@ public class TR_ServerCommandInterpreter extends Thread {
         run = false;
         this.notifyAll();
     }
-    
+
     /**
      * Força a finalização da thread.
      */

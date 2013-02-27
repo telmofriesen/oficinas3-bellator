@@ -1,7 +1,7 @@
 Bellator
 Protocolo de comunicação estação base <-> robô
 
-Todos as mensagens são enviadas em forma de String. Os valores recebidos de uma mensagem são interpretados e armazenados nos respectivos formatos.
+Todos as mensagens são enviadas em forma de String. Os valores recebidos de uma mensagem são interpretados a partir da String que foi recebida e armazenados em variáveis (cujo tipo é especificado no protocolo).
 
 --- COMANDOS ---
 
@@ -33,11 +33,24 @@ Solicita formalmente a desconexão.
 		Por padrão, o robô no início da conexão não envia leituras dos sensores. O cliente deve requisitar o início do envio obrigatoriamente.
 		O Robô, ao receber esse comando do cliente, deve obrigatoriamente enviar uma resposta (SENSORS STATUS REPLY [STARTED | STOPPED]) para confirmar se o status foi mudado corretamente.
 	STATUS REQUEST
-		Requisita o estado atual de amostragem (STARTED ou STOPPED). Espera-se que o robõ responda com "STATUS REPLY [STARTED | STOPPED]".
-	SAMPLE_RATE [sample_rate]
+		Requisita o estado atual de amostragem (STARTED ou STOPPED). Espera-se que o robõ responda com "STATUS REPLY ...".
+	FRAMERATE [sample_rate]
 		Configura o robô para mudar a taxa de amostragem.
 		Parâmetros:
 		[sample_rate] (float) a nova taxa de amostragem.
+- WEBCAM 
+	[START | STOP]
+		Requisita ao robô o início (START) ou parada (STOP) do envio de amostras da webcam.
+		Por padrão, o robô no início da conexão não envia leituras dos sensores. O cliente deve requisitar o início do envio obrigatoriamente.
+		O Robô, ao receber esse comando do cliente, deve obrigatoriamente enviar uma resposta (WEBCAM STATUS REPLY [STARTED | STOPPED]) para confirmar se o status foi mudado corretamente.
+	STATUS REQUEST
+		Requisita o estado atual de amostragem da webcam (STARTED ou STOPPED). Espera-se que o robõ responda com "STATUS REPLY ...".
+	FRAMERATE [sample_rate]
+		Configura a webcam para mudar a taxa de amostragem.
+		Parâmetros:
+		[sample_rate] (float) a nova taxa de amostragem.
+	RESOLUTION [resolution]
+		[resolution] (String) Nova resolução widhtXheight da webcam
 
 - ENGINES 
 	[velocidade_roda_direita] [velocidade_roda_esquerda]
@@ -50,15 +63,29 @@ Solicita formalmente a desconexão.
 
 -- Servidor (Robô) -> Cliente (Estação base) --
 
--- SENSORS 
+- SENSORS 
 	SAMPLE [aceleração] [aceleração angular] [IR1 IR2 ... IRn] [timestamp]
 	Envia as leituras dos sensores ao cliente para que haja posterior processamento. Parâmetros:
 		[aceleracao] (float) Aceleracao em m/s^2, medida a partir do acelerômetro (posicionado no centro de movimento do robô).
 		[aceleracao_angular] (float) Aceleração angular em rad/s^2. Os ângulos começam em 0 e crescem no sentido HORÁRIO.
 		[IR1 IR2 ... IRn] (int) Cada distância detectada pelos sensores IR, em milímetros (com valores separados por espaço). O vetor deve obrigatoriamente conter um número de elementos igual ao número de sensores IR presentes no robô. Caso contrário uma exceção será lançada no cliente.
 		[timestamp] (long) Timestamp UNIX em milissegundos do horário da leitura.
-	STATUS REPLY [STARTED | STOPPED]
-		Resposta a um comando SENSORS STATUS REQUEST previamente recebido. Informa ao cliente o status do envio de amostras dos sensores.
+	STATUS REPLY [sampling_enabled]
+		Resposta a um comando SENSORS STATUS REQUEST previamente recebido, ou a uma requisição SENSORS [START | STOP]. Informa ao cliente o status do envio de amostras dos sensores.
+		[sampling_status] (boolean) status da amostragem (ativada ou desativada).
+		
+- WEBCAM 
+//	SAMPLE [imagem]
+//	Envia uma amostra instantânea da imagem da webcam. Parâmetros:
+//		[imagem] (String) String de imagem em formato JPG, codificada em Base64.
+	STATUS REPLY [sampling_enabled] [stream_available] [stream_port] [webcam_available] {webcam_name}
+	Resposta a um comando WEBCAM STATUS REQUEST previamente recebido, ou a uma requisição WEBCAM [START | STOP]. Parâmetros:
+		[sampling_enabled] (boolean) Status da amostragem da webcam (ativada ou desativada). A amostragem estar ativada significa que CASO A WEBCAM ESTEJA CONECTADA, ou seja, webcam_available=true, amostras serão enviadas à estação base. A amostragem pode estar ativada e ao mesmo tempo não haver conexão à webcam. Neste caso, o robô aguarda até que uma webcam seja conectada e efetua o envio de amostras automaticamente.
+		[stream_available] (boolean) Status do stream (aberto ou fechado).
+		[stream_port] (int) Porta da stream HTTP de imagens. 
+		[webcam_available] (boolean) Status da conexão à webcam (ativada ou desativada).
+		{webcam_name} (String) Nome da webcam conectada, string CODIFICADA EM BASE64 (parâmetro somente presente quando webcam_available=true).
+	
      
 - SERVER FULL
 Informa que o robô já está conectado a um cliente.

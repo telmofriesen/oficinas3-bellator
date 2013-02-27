@@ -49,7 +49,7 @@ public class TR_ServerListener extends Thread {
 //        listenerPort = 12312;
         System.out.println("Porta: " + listenerPort);
         //Cria o socket na porta
-        
+
         while (true) {
             try {
 //                System.out.println("[TR_ServerListener] Antes do accept: " + acceptedSocket);
@@ -59,7 +59,7 @@ public class TR_ServerListener extends Thread {
                 //As threads para envio(sender) e recebimento(receiver) são armazenadas nos vetores.
                 final TR_ServerConnection connection = new TR_ServerConnection(this, acceptedSocket);
                 //Servidor já conectado a um cliente.
-                if (getNumServerConnections() >= 1) { 
+                if (getNumServerConnections() >= 1) {
                     System.out.println("[TR_Serverlistener] Servidor cheio!");
                     connection.getSender().start();
                     //Manda uma mensagem informando que o servidor está cheio.
@@ -84,6 +84,12 @@ public class TR_ServerListener extends Thread {
                     synchronized (this) {
                         connectionsArray.add(connection);
                     }
+                    String a = acceptedSocket.getRemoteSocketAddress().toString();
+                    String first = a.split(":")[0];
+                    String ip = first.split("/")[1];
+
+                    System.out.println(ip + " -- " + acceptedSocket.getPort());
+                    server.mainHostConnected(ip, acceptedSocket.getPort());
                 }
             } catch (IOException ex) {
                 //System.out.println(ex);
@@ -99,14 +105,17 @@ public class TR_ServerListener extends Thread {
     public ServerSocket getServerSocket() {
         return serverSocket;
     }
-    
-    
-    public int getServerSocketPort(){
+
+    public int getServerSocketPort() {
         return serverSocket.getLocalPort();
     }
 
     public synchronized void removeConnection(TR_ServerConnection connection) {
 //        connection.disconnect();
+        //Se o host desconectado for o host principal, informa o fato ao servidor.
+        if (connectionsArray.indexOf(connection) == 0) {
+            server.mainHostDisconnected();
+        }
         connectionsArray.remove(connection);
     }
 
@@ -120,6 +129,7 @@ public class TR_ServerListener extends Thread {
 
     /**
      * Retorna o número de conexões ativas.
+     *
      * @return O número de conexões ativas.
      */
     public synchronized int getNumServerConnections() {

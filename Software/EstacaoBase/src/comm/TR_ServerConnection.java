@@ -201,7 +201,7 @@ public class TR_ServerConnection extends Thread {
             Logger.getLogger(TR_ServerConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
         //Remove esta conexão do listener.
-        listener.getServer().stopSend_sensor_info();
+//        listener.getServer().stopSend_sensor_info();
         listener.removeConnection(this);
         System.out.println("[TR_ServerConnection] Desconectado do host: " + sock);
     }

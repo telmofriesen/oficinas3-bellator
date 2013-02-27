@@ -23,7 +23,11 @@ public class RecordButtonListener extends JToggleButton implements MyChangeListe
             //Se o estado do botao e do ControleSensores forem diferentes, muda o estado do botao para mostrar o estado real.
             if ((this.isSelected() && !controle.isRecordEnabled())
                 || (!this.isSelected() && controle.isRecordEnabled())) {
-                doClick();
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        doClick();
+                    }
+                });
             }
         }
         //Mudanças no Connector
@@ -31,11 +35,25 @@ public class RecordButtonListener extends JToggleButton implements MyChangeListe
             TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
             if (connector.getConnectionStatus() != TR_ClientConnector.CONNECTED) {
                 //Se não houver conexão, desabilita a gravação de leituras.
-                if (this.isSelected())
-                    this.doClick();
-                this.setEnabled(false);
+                if (this.isSelected()) {
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            doClick();
+                        }
+                    });
+                }
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(false);
+                    }
+                });
             } else {
-                this.setEnabled(true);
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
+
             }
         }
     }

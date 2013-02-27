@@ -1,11 +1,18 @@
 package comm;
 
+import controle.ControleCamera;
 import controle.ControleSensores;
 import controle.NumIRException;
 import controle.TimestampException;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import sun.misc.BASE64Decoder;
 
 /**
  * Interpretador de comandos.
@@ -23,12 +30,16 @@ public class TR_ClientCommandInterpreter extends Thread {
     private TR_ClientConnector connector;
     //Referecia ao objeto ControleSensores do cliente
     private ControleSensores controleSensores;
+    //Referencia ao objeto ControleCamera do cliente
+    private ControleCamera controleCamera;
     //Indica se a thread deve rodar ou não
     private boolean run = true;
 
-    public TR_ClientCommandInterpreter(TR_ClientConnector connector, ControleSensores controleSensores) {
+    public TR_ClientCommandInterpreter(TR_ClientConnector connector, ControleSensores controleSensores, ControleCamera controleCamera) {
+        this.setName("TR_ClientCommandInterpreter");
         this.connector = connector;
         this.controleSensores = controleSensores;
+        this.controleCamera = controleCamera;
     }
 
     @Override
@@ -121,11 +132,44 @@ public class TR_ClientCommandInterpreter extends Thread {
                     controleSensores.novaLeituraSensores(aceleracao, aceleracao_angular, dist_IR, timestamp);
                     return true;
                 } else if (split[1].equals("STATUS")) {
-                    if (split[2].equals("STOPPED")) {
-                        controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_STOPPED);
-                        return true;
-                    } else if (split[2].equals("STARTED")) {
-                        controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_STARTED);
+                    if (split[2].equals("REPLY")) {
+                        if (split[3].equals("false")) {
+                            controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_STOPPED);
+                            return true;
+                        } else if (split[3].equals("true")) {
+                            controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_STARTED);
+                            return true;
+                        }
+                    }
+                }
+            } else if (split[0].equals("WEBCAM")) { //WEBCAM
+//                if (split[1].equals("SAMPLE")) {
+////                    //Decodifica a imagem
+//////                    String base64Image = split[1].replace('\0', '\n');
+//////                    byte[] imgBytes = new BASE64Decoder().decodeBuffer(base64Image);
+//                    byte[] imgBytes = Base64new.decode(split[2]);
+//                    BufferedImage img = ImageIO.read(new ByteArrayInputStream(imgBytes));
+////                    ImageIO.write(img, "jpg", new File("/home/stefan/oi.jpg"));
+//                    controleCamera.novaImagemCamera(img, split[2].length());
+//                    return true;
+//                } 
+                if (split[1].equals("STATUS")) {
+                    if (split[2].equals("REPLY")) {
+                        String webcam_name = "";
+                        //Lê todo o final do comando para pegar o parâmetro webcam_name.
+                        for (int i = 7; i < split.length; i++) {
+                            webcam_name += split[i];
+                            webcam_name += " ";
+                        }
+                        controleCamera.setWebcam_name(webcam_name);
+                        boolean sampling_enabled = Boolean.parseBoolean(split[3]);
+                        boolean stream_available = Boolean.parseBoolean(split[4]);
+                        int stream_port = Integer.parseInt(split[5]);
+                        boolean webcam_available = Boolean.parseBoolean(split[6]);
+                        controleCamera.setSampling_enabled(sampling_enabled);
+                        controleCamera.setWebcam_available(webcam_available);
+                        controleCamera.setStream_available(stream_available);
+                        controleCamera.setStream_port(stream_port);
                         return true;
                     }
                 }

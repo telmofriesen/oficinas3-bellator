@@ -21,26 +21,35 @@ import java.util.logging.Logger;
  */
 public class ContadorAmostragemTempoReal extends Thread {
 
-    private int update_delay = 1000; //Intervalo entre cada atualização;
-    private float sample_rate = 0; //leituras por segundo atual
-    private int time_window = 2000; //Tamanho da janela (ms). Número de milissegundos entre cada janela de contagem de amostras.
-    private int time_window_min = 2000;
-    private int time_window_max = 10000;
-    private int time_window_step_up = 1000;
-    private int time_window_step_down = 1000;
-    private ArrayList<Long> samples;
-    private final CopyOnWriteArrayList<MyChangeListener> listeners = new CopyOnWriteArrayList();
-//    private int update_interval = 1000;
-    private boolean run_timer = true;
-    private boolean run = true;
+    protected int update_delay = 1000; //Intervalo entre cada atualização;
+    protected float sample_rate = 0; //leituras por segundo atual
+    protected int time_window = 2000; //Tamanho da janela (ms). Número de milissegundos entre cada janela de contagem de amostras.
+    protected int time_window_min = 2000;
+    protected int time_window_max = 10000;
+    protected int time_window_step_up = 1000;
+    protected int time_window_step_down = 1000;
+    protected ArrayList<Long> samples;
+    protected final CopyOnWriteArrayList<MyChangeListener> listeners = new CopyOnWriteArrayList();
+//    protected int update_interval = 1000;
+    protected boolean run_timer = true;
+    protected boolean run = true;
 //    private Timer timer;
 
     public ContadorAmostragemTempoReal() {
         samples = new ArrayList<Long>();
+        this.setName("ContadorAmostragemTempoReal");
+//        update_delay = 1000;
+//        sample_rate = 0;
+//        time_window = 2000;
+//        time_window_min = 2000;
+//        time_window_max = 10000;
+//        time_window_step_up = 1000;
+//        time_window_step_down = 1000;
     }
 
     public ContadorAmostragemTempoReal(int time_window, int time_window_min, int time_window_max, int update_delay) {
         samples = new ArrayList<Long>();
+        this.setName("ContadorAmostragemTempoReal");
         this.time_window = time_window;
         this.time_window_min = time_window_min;
         this.time_window_max = time_window_max;
@@ -61,6 +70,7 @@ public class ContadorAmostragemTempoReal extends Thread {
             }
             while (run_timer) {
                 updateSampleRate();
+                fireChangeEvent();
                 try {
                     sleep(update_delay);
                 } catch (InterruptedException ex) {
@@ -108,15 +118,6 @@ public class ContadorAmostragemTempoReal extends Thread {
             //Como o array está ordenado em ordem crescente, verifica apenas o começo do array a cada iteração.
             samples.remove(0);
         }
-//        for (int i = 0; i < samples.size(); i++) {
-//            if (samples.get(i) < time_window_start) {
-//                //Remove os elementos que estejam fora da janela de tempo.
-//                samples.remove(i);
-//            } else {
-//                //Como o array está ordenado em ordem crescente, não precisa verificar os outros elementos.
-//                break;
-//            }
-//        }
         int read_count = samples.size();
 
         if (read_count == 0) { //Aumenta a janela de tempo se não houver nenhuma leitura
@@ -127,7 +128,7 @@ public class ContadorAmostragemTempoReal extends Thread {
         //Atualiza a taxa de transferencia
         sample_rate = (float) read_count / ((float) time_window / 1000); // Amostras/s
 
-        fireChangeEvent();
+//        fireChangeEvent();
     }
 
     public synchronized void startUpdateTimer() {

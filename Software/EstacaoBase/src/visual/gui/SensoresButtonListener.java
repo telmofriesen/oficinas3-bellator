@@ -13,28 +13,51 @@ import javax.swing.JButton;
  */
 public class SensoresButtonListener extends JButton implements MyChangeListener {
 
+    public int lastStatus = -1;
+
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
         if (evt.getSource() instanceof TR_ClientConnector) {
             //Mudanças no status da conexão
             TR_ClientConnector c = (TR_ClientConnector) evt.getSource();
             if (!c.isConnected()) { //Desabilita o botão se estiver desconectado.
-                this.setEnabled(false);
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(false);
+                    }
+                });
             } else { //Habilita caso contrário.
-                this.setEnabled(true);
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(true);
+                    }
+                });
             }
         }
         //Detecta mudanças no status da amostragem.
         if (evt.getSource() instanceof ControleSensores) {
             ControleSensores c = (ControleSensores) evt.getSource();
             int status = c.getSensorSampleStatus();
-            switch (status) {
-                case ControleSensores.SAMPLE_STOPPED:
-                    setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/camera-web_red.png")));
-                    break;
-                case ControleSensores.SAMPLE_STARTED:
-                    setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/camera-web.png")));
-                    break;
+            synchronized (this) {
+                if (status != lastStatus) {
+                    switch (status) {
+                        case ControleSensores.SAMPLE_STOPPED:
+                            java.awt.EventQueue.invokeLater(new Runnable() {
+                                public void run() {
+                                    setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/camera-web_red.png")));
+                                }
+                            });
+                            break;
+                        case ControleSensores.SAMPLE_STARTED:
+                            java.awt.EventQueue.invokeLater(new Runnable() {
+                                public void run() {
+                                    setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/camera-web.png")));
+                                }
+                            });
+                            break;
+                    }
+                    lastStatus = status;
+                }
             }
         }
     }

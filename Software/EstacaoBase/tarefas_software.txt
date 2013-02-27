@@ -1,0 +1,29 @@
+- Especificação geral de requisitos (OK) (análise tecnológica)
+- Especificação de tecnologias (OK) (análise tecnológica)
+
+- Modelagem UML do software (parcial) - 10 dias
+    - Especificação formal de requisitos (não) - 5 dias
+    - Diagrama de classes (parcial) - 5 dias
+
+- Especificação do protocolo (parcial) - 5 dias
+    - Formato e significado das mensagens (OK) - 2 dias
+    - Diagrama de estados (não) - 3 dias
+   
+- Implementação do software da estação base (em progresso) - 15 dias
+     - Backend (em progresso) - 7 dias
+            - Abstração em alto nível do controle dos sensores, webcam, motores e do mapa (em progresso) - 4 dias
+            - Salvar/carregar mapa (OK)  - 1 dia
+            - Protocolo de comunicação (OK) - 2 dias
+     - Frontend, ou seja, interface gráfica (em progresso) - 9 dias
+            - Desenho do mapa 2D (OK) - 3 dias
+            - Display de imagens da webcam (em progresso) - 3 dias
+            - Interface gráfica integrada  (em progresso) - 3 dias
+
+- Implementação do software do sistema embarcado (em progresso) - 7 dias
+     - Abstração em alto nível dos sensores, motores e webcam (em progresso) - 3 dias
+     - Implementação do protocolo de comunicação (OK) - 2 dias
+     - Captura e envio de imagens da webcam (em progresso) - 2 dias
+
+- Simulação, testes no computador e ajustes. (em progresso) - 5 dias
+
+- Testes no robô e ajustes (não) - 10 dias

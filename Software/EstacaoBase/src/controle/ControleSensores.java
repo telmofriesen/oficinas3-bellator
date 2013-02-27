@@ -14,7 +14,7 @@ import visual.Ponto;
  *
  * @author stefan
  */
-public class ControleSensores {
+public class ControleSensores implements MyChangeListener {
 
     /**
      * Estados de amostragem
@@ -37,6 +37,8 @@ public class ControleSensores {
     ContadorAmostragemTempoReal amostragemEstacaoBase; //Taxa de recebimento de amostras na estação base
     //Listeners de eventos da classe
     private final CopyOnWriteArrayList<MyChangeListener> listeners;
+    //Indicação se esta classe (this) foi adicionada como listener no contador de amostragem de tempo real
+//    private boolean listener_added = false;
 
     /**
      *
@@ -71,18 +73,23 @@ public class ControleSensores {
      * recebido OU o número de sensores no vetor distIR diferir do número de
      * sensores presentes no robô.
      */
-    public synchronized void novaLeituraSensores(float aceleracao, float aceleracao_angular, float[] distIR, long timestamp)
+    public void novaLeituraSensores(float aceleracao, float aceleracao_angular, float[] distIR, long timestamp)
             throws NumIRException, TimestampException {
-        amostragemRobo.novaAmostra(timestamp);
-        amostragemEstacaoBase.novaAmostra();
+        synchronized (this) {
+//            if (!listener_added) {
+//                amostragemEstacaoBase.addMyChangeListener(this);
+//            }
+            amostragemRobo.novaAmostra(timestamp);
+            amostragemEstacaoBase.novaAmostra();
 //        amostragemEstacaoBase.novaAmostra(System.currentTimeMillis());
 //        if (amostragemRobo.isSample_rate_changed() || amostragemEstacaoBase.isSample_rate_changed())
 //            fireChangeEvent(); //Se houver mudanças no valor da taxa de amostragem, avisa os listeners.
-        if (!recordEnabled) {
-            leituras_descartadas++;
-        } else {
-            _novaLeituraSensores(aceleracao, aceleracao_angular, distIR, timestamp);
-            leituras_gravadas++;
+            if (!recordEnabled) {
+                leituras_descartadas++;
+            } else {
+                _novaLeituraSensores(aceleracao, aceleracao_angular, distIR, timestamp);
+                leituras_gravadas++;
+            }
         }
         fireChangeEvent();
     }
@@ -224,11 +231,11 @@ public class ControleSensores {
         fireChangeEvent();
     }
 
-    public synchronized float getTaxaAmostragemRobo() {
+    public float getTaxaAmostragemRobo() {
         return amostragemRobo.getSample_rate();
     }
 
-    public synchronized float getTaxaAmostragemEstacaoBase() {
+    public float getTaxaAmostragemEstacaoBase() {
         return amostragemEstacaoBase.getSample_rate();
     }
 
@@ -240,7 +247,7 @@ public class ControleSensores {
             fireChangeEvent();
     }
 
-    public int getSensorSampleStatus() {
+    public synchronized int getSensorSampleStatus() {
         return sensorSampleStatus;
     }
 
@@ -262,5 +269,10 @@ public class ControleSensores {
 
     public ContadorAmostragemTempoReal getAmostragemEstacaoBase() {
         return amostragemEstacaoBase;
+    }
+
+    @Override
+    public void changeEventReceived(MyChangeEvent evt) {
+        fireChangeEvent();
     }
 }

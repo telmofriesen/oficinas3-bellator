@@ -100,7 +100,7 @@ public class TR_ServerSender extends Thread {
         try {
             output.close();
         } catch (IOException ex) {
-            Logger.getLogger(TR_ClientSender.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(TR_ClientSender.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.interrupt();
     }

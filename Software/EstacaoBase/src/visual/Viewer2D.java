@@ -3,6 +3,7 @@ package visual;
 import java.awt.Event;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -18,8 +19,9 @@ import processing.core.PVector;
  */
 public class Viewer2D extends PApplet {
 
-    private ArrayList<Drawable2D> listaDrawable2D = new ArrayList<Drawable2D>();
-    private ArrayList<MouseListener2D> listaMouseListener2D = new ArrayList<MouseListener2D>();
+    private CopyOnWriteArrayList<Drawable2D> listaDrawable2D = new CopyOnWriteArrayList<Drawable2D>();
+    private CopyOnWriteArrayList<MouseListener2D> listaMouseListener2D = new CopyOnWriteArrayList<MouseListener2D>();
+    private CopyOnWriteArrayList<KeyboardListener> listaKeyboardListener = new CopyOnWriteArrayList<KeyboardListener>();
     //Escala em px/mm
     //escala=d/D
     private float escala = 0.1f;
@@ -275,6 +277,26 @@ public class Viewer2D extends PApplet {
         listaMouseListener2D.remove(obj);
         redraw();
     }
+    
+    /**
+     * Adiciona um KeyboardListener
+     *
+     * @param obj
+     */
+    public synchronized void addKeyboardListener(KeyboardListener obj) {
+        listaKeyboardListener.add(obj);
+        redraw();
+    }
+
+    /**
+     * Remove um KeyboardListener
+     *
+     * @param obj
+     */
+    public void removeKeyboardListener(KeyboardListener obj) {
+        listaKeyboardListener.remove(obj);
+        redraw();
+    }
 
     public float getEscala() {
         return escala;
@@ -319,24 +341,27 @@ public class Viewer2D extends PApplet {
         setAngulo(angulo_visao + step);
         origemRealNaInterface.rotate(step);
     }
-
+    
     @Override
     public void keyPressed() {
         super.keyPressed();
+        for(KeyboardListener x : listaKeyboardListener){
+            x.keyPressed(keyCode);
+        }
         System.out.println("keyCode: " + keyCode);
         switch (keyCode) {
-            case RIGHT:
-                rotate_view(angulo_step);
-                break;
-            case LEFT:
-                rotate_view(-angulo_step);
-                break;
-            case UP:
-                zoom_view(escala_step);
-                break;
-            case DOWN:
-                zoom_view(-escala_step);
-                break;
+//            case RIGHT:
+//                rotate_view(angulo_step);
+//                break;
+//            case LEFT:
+//                rotate_view(-angulo_step);
+//                break;
+//            case UP:
+//                zoom_view(escala_step);
+//                break;
+//            case DOWN:
+//                zoom_view(-escala_step);
+//                break;
             case 32: //SPACE
                 //1ª vez: restaura a origem real para (0,0) na visualização.
                 //2ª vez: restaura o angulo de visão para 0.
@@ -360,6 +385,9 @@ public class Viewer2D extends PApplet {
 
     @Override
     public void keyReleased() {
+        for(KeyboardListener x : listaKeyboardListener){
+            x.keyReleased(keyCode);
+        }
         if (keyCode == CONTROL) {
             controlPressed = false;
         }

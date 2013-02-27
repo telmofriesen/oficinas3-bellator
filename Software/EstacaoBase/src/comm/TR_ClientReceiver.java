@@ -29,7 +29,7 @@ public class TR_ClientReceiver extends Thread {
         try {
             //System.out.println("[TR_ClientReceiver] Entrando na função de recebimento.");
             //Cria a Stream de saida
-            input = new BufferedReader(new InputStreamReader(connector.getSock().getInputStream()));
+            input = new BufferedReader(new InputStreamReader(connector.getSock().getInputStream()), 100000);
             while (run) {
                 synchronized (this) {
                     //Loop de recebimento de mensagens 

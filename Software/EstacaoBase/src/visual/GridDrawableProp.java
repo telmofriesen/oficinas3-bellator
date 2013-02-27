@@ -13,10 +13,10 @@ import java.awt.Color;
 public class GridDrawableProp {
     private Color corGrid = new Color(0,0,0,20);
     //Limite para desenhar as linhas da grade
-    private int limite_inf_x = -5000;
-    private int limite_sup_x = 5000;
-    private int limite_inf_y = -5000;
-    private int limite_sup_y = 5000;
+    private int limite_inf_x = -10000;
+    private int limite_sup_x = 10000;
+    private int limite_inf_y = -10000;
+    private int limite_sup_y = 10000;
     //Intervalo entre cada linha (mm)
     private int step_x = 1000;
     private int step_y = 1000;
