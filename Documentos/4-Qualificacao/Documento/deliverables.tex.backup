@@ -1,0 +1,23 @@
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\begin{table}[!h]
+  \centering
+  \caption{Relação dos entregáveis com seus respectivos responsáveis e prazos}
+    \begin{tabular}{rrr}
+    \toprule
+    Dia   & Auxiliar de Gerenciamento & Deliverable \\
+    \midrule
+    13/03/2013 & Stefan Campana Fuchs & Especificação do diagrama esquemático do hardware
+Montagem do protótipo em protoboard (no caso aqui seria algo material como foto ou testes)
+Modelagem UML do software
+Especificação formal do protocolo de comunicação  \\
+    27/03/2013 & Telmo Friesen & Migração do firmware do 8051 para o ARM (Testes e afins)
+Teste e ajustes do protótipo
+Demonstração do software da estação basenicação  \\
+    10/04/2013 & Ricardo Farah & Placa Impressa ou documentos que provem que o projeto já está sendo impresso \\
+    24/04/2013 & Stefan Campana Fuchs & Placa Impressa e relato do progresso da Implementação do software de alto nível do sistema embarcado.  \\
+    08/05/2013 & Pedro Alberto de Borba & Robô e projetos completos de acordo com o escopo definido.  \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:addlabel}%
+\end{table}%

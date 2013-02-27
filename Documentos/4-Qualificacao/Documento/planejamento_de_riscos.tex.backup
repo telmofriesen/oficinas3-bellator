@@ -1,0 +1,3 @@
+\chapter{P}
+\includepdf[pages=1, scale=0.5]{Planejamento_de_Riscos_v3.pdf}
+\includepdf[pages=2-9, pagecommand=]{Planejamento_de_Riscos_v3.pdf}
