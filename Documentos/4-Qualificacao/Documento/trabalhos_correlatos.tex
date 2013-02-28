@@ -5,12 +5,12 @@ O mapeamento de ambientes realizado por robôs visa ao desenvolvimento de softwa
 Esta última opção mostra-se bastante adequada para a maioria dos projetos, pois garante uma medição satisfatória da distância de objetos próximos ao robô a um custo não muito elevado. Um dos sensores mais populares deste tipo é o sensor de proximidade de infravermelho. Quando integrado ao robô permite a obtenção várias medidas discretas da distância do robô a objetos, um dos elementos básicos que permitem a geração do mapa do ambiente.
 
 \subsection{PatrolBot}
-O PatrolBot \cite{patrol_bot} é um robô configurável desenvolvido com interesses comerciais. Ele pode criar uma planta do interior de construções. Utilizando a tecnologia WI-FI ele pode ser controlado remotamente ou se movimentar de forma autônoma, sendo apenas monitorado pela estação base. Tal comunicação é feita por WI-FI.
+O PatrolBot \cite{patrol_bot} é um robô configurável desenvolvido com interesses comerciais. Ele pode criar uma planta do interior de construções. Utilizando a tecnologia Wi-Fi ele pode ser controlado remotamente ou se movimentar de forma autônoma, sendo apenas monitorado pela estação base. Tal comunicação é feita por Wi-Fi.
 
 Ele permite a inclusão de acessórios adicionais tais como uma câmera e microfones que permitirão ver e ouvir o que se passa no ambiente que está sendo mapeado. Há diversos outros periféricos que podem ser incluídos no robô, que também oferece a opção de ser programado, por meio de um kit de desenvolvimento próprio.
 
 \subsection{Sistema de mapeamento robótico bidimensional por infravermelho}
 
-Nesta implementação \cite{wii}, um telêmetro infravermelho é utilizado para obter a distância de objetos próximos. A câmera infravermelha do Wii é utilizada juntamente com sinalizadores (LEDs) para triangular a posição do robô e sua direção.
+Nesta implementação \cite{wii}, um telêmetro infravermelho é utilizado para obter a distância de objetos próximos. A câmera infravermelha do Nintendo Wii é utilizada juntamente com sinalizadores (LEDs) para triangular a posição do robô e sua direção.
 
-Como hardware, foram utilizados: um Arduino Mini Pro, um cartão microSD, telêmetro inframervelho, câmera do Wii. Não há comunicação em tempo real com a estação base. Isto significa que os dados são obtidos e armazenados no cartão microSD. Para leitura, o cartão deve ser inserido em um computador e, então, carregado na estação base. Os resultados foram visualizados em um arquivo textual simples, no qual a letra "O" simbolizava a posição do robô e a letra "X" os obtáculos detectados.
+Como hardware, foram utilizados: um Arduino Mini Pro, um cartão microSD, telêmetro inframervelho, câmera do Wii. Não há comunicação em tempo real com a estação base. Isto significa que os dados são obtidos e armazenados no cartão microSD. Para leitura, o cartão deve ser inserido em um computador e, então, carregado na estação base. Os resultados são visualizados em um arquivo textual simples, no qual a letra "O" simboliza a posição do robô e a letra "X" os obtáculos detectados.
