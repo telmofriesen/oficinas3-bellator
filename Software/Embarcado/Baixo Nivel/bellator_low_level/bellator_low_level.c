@@ -290,7 +290,7 @@ static inline void protocol_init(void){
 }
 
 /**
- *
+ * Usar cutecom para testar o envio de comandos em hexa
  */
 void protocol_in(void){
 	volatile char dummy;
@@ -309,8 +309,13 @@ void protocol_in(void){
 		case 0x0C: // Character Time-Out
 			cmd_in.buff[cmd_in.i] = U1RBR;
 
-			if (cmd_in.buff[cmd_in.i] == 'e') {
-				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'y') {
+			/*for (int i=0; i< CMD_BUFF_SIZE; i++) {
+				cmd_out.buff[i] = cmd_in.buff[(cmd_in.i-1-i) & (CMD_BUFF_SIZE-1)];
+				protocol_out_cmd();
+			}*/
+
+			if (cmd_in.buff[cmd_in.i] == /*'e'*/ END_CMD) {
+				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'y'*/ SYNC) {
 					// Send IR info
 					for (int i = OPTICAL_SENSOR_0; i <= OPTICAL_SENSOR_4; i++) {
 						cmd_out.buff[0] = i;
@@ -331,15 +336,15 @@ void protocol_in(void){
 						cmd_out.i = 5;
 						protocol_out_cmd();
 					}
-				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 's' ) {
+				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'s'*/ STOP ) {
 					// Stop PWMs
 					set_wheel_pwm(LEFT_WHEEL,0);
 					set_wheel_pwm(RIGHT_WHEEL,0);
 
-				} else if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l'
-						|| cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'r') {
+				} else if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'l'*/ LEFT_WHEEL
+						|| cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'r'*/ RIGHT_WHEEL) {
 
-					if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l') {
+					/*if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l') {
 						if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l') {
 							set_wheel_pwm(LEFT_WHEEL, 0x00 );
 						} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'm') {
@@ -357,10 +362,10 @@ void protocol_in(void){
 						} else {
 							set_wheel_pwm(RIGHT_WHEEL, 0x7F);
 						}
-					}
+					}*/
 
-					/*set_wheel_pwm(cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)],
-							(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));*/
+					set_wheel_pwm(cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)],
+							(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));
 				}
 			}
 			cmd_in.i = (cmd_in.i + 1) & (CMD_BUFF_SIZE-1);

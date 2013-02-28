@@ -62,24 +62,3 @@ Ambiente para desenvolvimento do hardware
 instalar geda (gschem) e pcb pelo synaptic
 copiar a biblioteca de comoponentes para /usr/share/gEDA/sym e dar permicoes adequadas
 
-
-------------------------------------------------------------------------------------
-
-requisitos do hardware:
-
-gyro
-acelerometro
-pwm-out 2 canais
-leitura de pulsos com 2 canais
-adc com 5 canais
-interface serial
-
-gyro e acelerometro: a melhor solucao eh a placa MPU-6050 por custar apenas $20 e por ser 6 eixos
-como o valor do microcontrolador eh bem menor que do gyro, vale mudar para um outro de baixo custo que possui i2c
-foi escolhido o lpc por ser de baixo custo, ter todos os perifericos necessarios e ser 32 bits, acelerando o processo de desenvolvimento de software embarcado
-tambem pela disponibilidade de uma placa de desenvolvimento para testes
-Alem disso nao eh necessario software proprietario para o desenvolvimento, que eh feito em linux com eclipse e gcc
-
-foi optado pelos componentes smd pois a placa podera ser menor reduzindo o custo do projeto e por serem mais precisos
-
-a placa sera feita em bh pela confiabilidade
