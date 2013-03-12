@@ -9,7 +9,7 @@ package controle;
  *
  * @author stefan
  */
-public class EngineSpeed {
+public class EnginesSpeed {
 
     public final float leftSpeed, rightSpeed;
 
@@ -18,7 +18,7 @@ public class EngineSpeed {
      * @param leftSpeed Valor de -1 a 1, sendo 1 a máxima velocidade para frente, -1 a máxima velocidade para trás e 0 parada total.
      * @param rightSpeed Valor de -1 a 1, sendo 1 a máxima velocidade para frente, -1 a máxima velocidade para trás e 0 parada total.
      */
-    public EngineSpeed(float leftSpeed, float rightSpeed) {
+    public EnginesSpeed(float leftSpeed, float rightSpeed) {
         this.leftSpeed = leftSpeed;
         this.rightSpeed = rightSpeed;
     }
