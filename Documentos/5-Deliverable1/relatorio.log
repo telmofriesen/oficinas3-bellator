@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  12 MAR 2013 20:51
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  15 MAR 2013 15:09
 entering extended mode
  %&-line parsing enabled.
 **relatorio
@@ -671,11 +671,7 @@ Package: booktabs 2005/04/14 v1.61803 publication quality tables
 )
 (/usr/share/texmf-texlive/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen147
-) (./relatorio.aux
-
-LaTeX Warning: Label `fig:diagrama_classes' multiply defined.
-
-)
+) (./relatorio.aux)
 \openout1 = `relatorio.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
@@ -691,7 +687,8 @@ LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
 LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 49.
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
@@ -782,32 +779,43 @@ e-li-ve-ra-bles \OT1/ptm/m/n/12 do do-cu-mento de an[]alise tec-nol[]ogica,
 Cap\'{\i }tulo 2.
 [4
 
-] <./figuras/diagrama_casos_de_uso.png, id=20, 2020.54875pt x 904.1278pt>
+] <./figuras/diagrama_casos_de_uso.png, id=20, 1237.62375pt x 846.91406pt>
 File: ./figuras/diagrama_casos_de_uso.png Graphic file (type png)
 
-<use ./figuras/diagrama_casos_de_uso.png> [5]
-<./figuras/diagrama_classes.jpg, id=25, 2701.09125pt x 1478.52374pt>
-File: ./figuras/diagrama_classes.jpg Graphic file (type jpg)
+<use ./figuras/diagrama_casos_de_uso.png>
 
-<use ./figuras/diagrama_classes.jpg> [6 <./figuras/diagrama_casos_de_uso.png> <
-./figuras/diagrama_classes.jpg>]
-Underfull \hbox (badness 4328) in paragraph at lines 109--109
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<./figuras/diagrama_classes.png, id=22, 2097.33563pt x 1472.50125pt>
+File: ./figuras/diagrama_classes.png Graphic file (type png)
+
+<use ./figuras/diagrama_classes.png>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[5]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 4328) in paragraph at lines 106--106
 []\OT1/ptm/m/n/12 Respons[]avel por re-pre-sen-tar o rob[]o, este
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[7]
+[6 <./figuras/diagrama_casos_de_uso.png>]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[7 <./figuras/diagrama_classes.png>]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 ) (./diagrama_hardware.tex [8] [9]
 Cap\'{\i }tulo 3.
-<./figuras/diagrama_blocos_hardware.png, id=40, 712.91344pt x 595.47469pt>
+<./figuras/diagrama_blocos_hardware.png, id=41, 712.91344pt x 595.47469pt>
 File: ./figuras/diagrama_blocos_hardware.png Graphic file (type png)
 
 <use ./figuras/diagrama_blocos_hardware.png>
@@ -824,25 +832,22 @@ AED: lastpage setting LastPage [11]
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./relatorio.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+(./relatorio.aux) ) 
 Here is how much of TeX's memory you used:
  5823 strings out of 495041
- 84883 string characters out of 1181897
- 168009 words of memory out of 3000000
- 8807 multiletter control sequences out of 15000+50000
+ 84887 string characters out of 1181897
+ 168970 words of memory out of 3000000
+ 8808 multiletter control sequences out of 15000+50000
  20692 words of font info for 43 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
- 61i,14n,96p,471b,350s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
-ve/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/t
-imes/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on relatorio.pdf (12 pages, 666910 bytes).
+ 61i,14n,96p,1218b,354s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/
+share/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/
+fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/time
+s/utmri8a.pfb>
+Output written on relatorio.pdf (12 pages, 659673 bytes).
 PDF statistics:
- 59 PDF objects out of 1000 (max. 8388607)
+ 60 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

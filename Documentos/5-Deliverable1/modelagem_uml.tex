@@ -10,7 +10,7 @@
   \item O usuário pode carregar o mapa 2D do disco rígido. Representado pelo requisito funcional: \textbf{``O usuário pode carregar o mapa -- RF\arabic{enumi}''}.
   \item A estação base deve mostrar na interface gráfica a imagem captada pela \textit{webcam} do robô. Representado pelo requisito funcional: \textbf{``Estação base mostra a imagem captada pela webcam -- RF\arabic{enumi}''}.
   \item O usuário pode movimentar o robô, controlando a velocidade de suas rodas remotamente pelo teclado da estação base. Representado pelo requisito funcional: \textbf{``O usuário pode movimentar o robô -- RF\arabic{enumi}''}.
-  \item O usuário pode parar o robô remotamente através de comandos do teclado da estação base. Representado pelo requisito funcional: \textbf{``O usuário pode parar o robô -- RF\arabic{enumi}''}.
+%  \item O usuário pode parar o robô remotamente através de comandos do teclado da estação base. Representado pelo requisito funcional: \textbf{``O usuário pode parar o robô -- RF\arabic{enumi}''}.
   \item A estação base deve ser capaz de estabelecer conexão com o robô, informando o usuário caso a conexão ocorra com sucesso ou não. Representado pelo requisito funcional \textbf{``O usuário pode estabelecer a conexão entre o robô e a estação base -- RF\arabic{enumi}''}.
 \end{enumerate}
 
@@ -30,19 +30,17 @@
   \item Visualização de mapa 2D na interface gráfica segundo os dados lidos dos sensores do robô. Representado pelo caso de uso: \textbf{``Mostrar mapa - UC\arabic{enumi}''}.
   \item Gravação do mapa em um arquivo no disco rígido. Representado pelo caso de uso: \textbf{``Salvar mapa - UC\arabic{enumi}''}. 
   \item Leitura do mapa de um arquivo do disco rígido. Representado pelo caso de uso: \textbf{``Carregar mapa - UC\arabic{enumi}''}.
-  \item Leitura de informações dos sensores do robô. Representado pelo caso de uso: \textbf{``Leitura de sensores - UC\arabic{enumi}''}.
-  \item Captura de imagens da \textit{webcam} do robô. Representado pelo caso de uso: \textbf{``Capturar imagens da câmera - UC\arabic{enumi}''}.
+  \item Leitura de informações dos sensores do robô. Representado pelo caso de uso: \textbf{``Ler amostras dos sensores - UC\arabic{enumi}''}.
   \item Visualização de imagens da \textit{webcam} do robô. Representado pelo caso de uso: \textbf{``Visualizar imagens da câmera - UC\arabic{enumi}''}.
-  \item Alteração pelo usuário da velocidade das rodas do robô. Representado pelo caso de uso: \textbf{``Movimentar o robô - UC\arabic{enumi}''}.
-  \item Parada do robô solicitada pelo usuário. Representado pelo caso de uso: \textbf{``Parar o robô - UC\arabic{enumi}''}.
+  \item Alteração pelo usuário da velocidade das rodas do robô. Representado pelo caso de uso: \textbf{``Alterar velocidade das rodas - UC\arabic{enumi}''}.
   \item Solicitação de estabelecimento de conexão com o robô. \textbf{``Estabelecer conexão - UC\arabic{enumi}''}.
 %  \item Inclusão de novos obstáculos e suas posições lidos do robô. Representado pelo caso de uso: \textbf{``Mostrar posição dos novos obstáculos detectados na tela - UC\arabic{enumi}''}.
-  \item Consulta da documentação do robô solicitada pelo usuário. Representado pelo caso de uso: \textbf{``Consultar documentação do robô - UC\arabic{enumi}''}.
+  \item Consulta à documentação do robô pelo usuário. Representado pelo caso de uso: \textbf{``Consultar documentação do robô - UC\arabic{enumi}''}.
 \end{enumerate}
 
-Na Figura \ref{fig:diagrama_casos_de_uso} está presente o diagrama de casos de uso, que foi produzido tomando-se como base as especificações apresentadas anteriormente. Vale ressaltar que as flechas pontilhadas (que denotam dependência entre casos de uso), apesar de deixarem o aspecto visual mais complexo, foram inseridas para reforçar a relação entre as funcionalidades da estação base e do robô.
+Na Figura \ref{fig:diagrama_casos_de_uso} está presente o diagrama de casos de uso, que foi produzido tomando-se como base as especificações apresentadas anteriormente. A figura está disponível também como anexo, para permitir melhor visualização.
 
-\begin{figure}[H]
+\begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth, keepaspectratio]{./figuras/diagrama_casos_de_uso.png}
   \caption{Diagrama de casos de uso.}
@@ -51,23 +49,23 @@ Na Figura \ref{fig:diagrama_casos_de_uso} está presente o diagrama de casos de 
 
 \section{Diagrama de classes}
 
-A Figura \label{fig:diagrama_classes} mostra o diagrama de classes, tanto da estação base quanto do \textit{software} embarcado. A maior parte das classes pertence ao \textit{software} da estação base. As classes do \textit{software} do sistema embarcado que existem até o momento são as com prefixo \textit{Server} (no pacote \textit{comunicacao}). 
+A Figura \ref{fig:diagrama_classes} mostra o diagrama de classes da estação base. A Figura está disponível também como anexo, para permitir melhor visualização.
 
-\begin{figure}[H]
+\begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{./figuras/diagrama_classes.jpg}
+  \includegraphics[width=\textwidth]{./figuras/diagrama_classes.png}
   \caption{Diagrama de classes}
   \label{fig:diagrama_classes}
 \end{figure}
 
 \section{Descrição das classes}
 %O software da estação base do robô foi dividido em cinco pacotes:  visual, controle, comunicação, controle.robo e interface gráfica. Estes serão descritos com suas respectivas classes na Tabela \ref{tab:pacote_visual}.
-O software da estação base do robô foi dividido em cinco pacotes:  \textit{visual}, \textit{controle}, \textit{comunicao}, e \textit{gui}. A seguir há uma descrição de cada pacote e das suas respectivas classes.
+O software da estação base do robô foi dividido em cinco pacotes:  \textit{visual}, \textit{dados}, \textit{comunicao}, e \textit{gui}. A seguir há uma descrição de cada pacote e das suas respectivas classes.
 
 
 \subsection{Pacote \textit{visual}}
 
-Este pacote consiste de toda a parte visual da estação base e conta com as seguintes classes: Viewer2D, Drawable2D, EscalaDrawable, RoboDrawable, RoboTrilhaDrawable, ObstaculosDrawable, e Ponto. Na Tabela \ref{tab:pacote_visual} estão descritas as classes deste pacote.
+Este pacote consiste de toda a parte visual da estação base e conta com as seguintes classes: Viewer2D, Drawable2D, EscalaDrawable, RoboDrawable, RoboTrilhaDrawable e ObstaculosDrawable. Na Tabela \ref{tab:pacote_visual} estão descritas as classes deste pacote.
 
 
 \begin{table}[h]
@@ -82,24 +80,23 @@ Este pacote consiste de toda a parte visual da estação base e conta com as seg
     EscalaDrawable & Responsável por desenhar uma escala gráfica no mapa. \\ \hline
     RoboDrawable & Responsável por desenhar o robô no mapa. \\ \hline
     RoboTrilhaDrawable & Responsável por desenhar a trilha percorrida pelo robô no mapa. \\ \hline
-    ObstaculosDrawable & Responsável por desenhar os pontos de cada obstáculo no mapa. \\ \hline
-%    EscalaDrawableProp & Contém as propriedades visuais de desenho da escala. \\ \hline
+    ObstaculosDrawable & Responsável por desenhar os pontos de cada obstáculo no mapa. \\
+    %    EscalaDrawableProp & Contém as propriedades visuais de desenho da escala. \\ \hline
 %    RoboDrawableProp & Contém as propriedades visuais de desenho do robô \\ \hline
 %    RoboTrilhaDrawableProp & Contém as propriedades visuais de desenho da trilha do robô. \\ \hline
 %    ObstaculosDrawableProp & Contém as propriedades visuais de desenho dos obstáculos. \\ \hline
-    Ponto & Representa um ponto de cordenadas cartesianas (x,y). \\ 
     \bottomrule
     \end{tabular}%
   \label{tab:pacote_visual}%
 \end{table}%
 
-\subsection{Pacote \textit{controle}}
+\subsection{Pacote \textit{dados}}
 
-Este pacote consiste de toda a parte da estação base que controla as informações essenciais do robô. Conta com as seguintes classes: Mapa, Obstaculos, Robo, ControleSensores, Posinfo, SensorIR e ControleCamera. Na Tabela \ref{tab:pacote_controle} estão descritas as classes deste pacote.
+Este pacote consiste de toda a parte da estação base que processa e armazena as informações essenciais do robô e do mapa. Conta com as seguintes classes: Mapa, Obstaculos, Robo, ControleSensores, Posinfo, SensorIR e Ponto. Na Tabela \ref{tab:pacote_controle} estão descritas as classes deste pacote.
 
 \begin{table}[h]
   \centering
-  \caption{Pacote \textit{controle}}
+  \caption{Pacote \textit{dados}}
     \begin{tabular}{p{6cm}p{8cm}}
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\ 
@@ -107,9 +104,10 @@ Este pacote consiste de toda a parte da estação base que controla as informaç
     Mapa  & Responsável por representar o mapa. Armazena as informações essenciais do robô e dos obstáculos detectados. \\ \hline
     Obstaculos & Responsável por conter os obstáculos detectados pelo robô. \\ \hline
     Robo  & Responsável por representar o robô, este contêm largura, comprimento e centro de movimento (ponto central entre as duas rodas). \\ \hline
-    ControleSensores & Responsável em atualizar a posição do robô e dos pontos que representão os obstáculos, de acordo com as leituras feitas pelos sensores. \\ \hline
+    GerenciadorSensores & Responsável por atualizar a posição do robô e dos pontos que representam os obstáculos, de acordo com as leituras feitas pelos sensores. \\ \hline
     Posinfo & Responsável por conter as informações de uma posição do robô. \\ \hline
-    SensorIR & Responsável por representar um sensor IR do robô. \\ 
+    SensorIR & Responsável por representar um sensor IR do robô. \\ \hline 
+    Ponto & Representa um ponto de cordenadas cartesianas (x,y). \\ 
 %    ControleCamera & Responsável por controlar as imagens da câmera e o status do recebimento das imagens. \\ 
     \bottomrule
     \end{tabular}%
@@ -119,7 +117,9 @@ Este pacote consiste de toda a parte da estação base que controla as informaç
 \subsection{Pacote \textit{comunicacao}}
 
 %Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientCommandInterpreter, ClientConnection, ClientReceiver, ClientSender, ServerCommandInterpreter, ServerListener, ServerSender, ServerReceiver e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classe deste pacote.
-Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientConnection, ClientReceiver, ClientSender, Server, ServerListener, ServerSender, ServerReceiver e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classes deste pacote.
+Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientConnection, ClientReceiver, ClientSender e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classes deste pacote.
+
+É importante ressaltar que o protocolo TCP requer obrigatoriamente a especificação de um cliente e de um servidor para estabelecimento de uma conexão. Nas implementações desse protocolo em diversas linguagens (como Java e C++) existem tipos de \textit{socket} distintos para cliente e servidor. Na criação de um \textit{socket} de servidor, há obrigatoriamente a atribuição de uma porta de escuta, na qual o servidor aguarda que um cliente efetue uma requisição de conexão. Não é possível, ao menos nas implementações atuais do TCP, estabelecer conexão entre dois \textit{sockets} de cliente ou entre dois \textit{sockets} de servidor. Como neste projeto, o robô proverá serviços à estação base (envio de imagens da câmera, envio de leituras de sensores, além de prover a posibilidade de comando dos motores) o robô foi escolhido como servidor e a estação base como cliente. Enfatiza-se que o paradigma cliente-servidor não implica de forma alguma que a comunicação seja unidirecional. Pelo contrário, o envio de pacotes pode ser feito bidirecionalmente após uma conexão TCP ser estabelecida, sem nenhuma restrição quanto a isso.
 
 \begin{table}[h]
   \centering
@@ -133,11 +133,11 @@ Este pacote consiste em toda a parte de comunicação da estação base com o ro
     ClientReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
     ClientSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
 %    ServerCommandInterpreter & Responsável pela interpretação dos comandos do servidor. Os comandos recebidos são inseridos em uma fila, de modo a serem posteriormente executados pela thread. \\ \hline
-    Server & Responsável gerenciar o servidor (robô). \\ \hline
-    ServerListener & Responsável por escutar as novas conexões de clientes. \\ \hline
-    ServerSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
-    ServerReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
-    Message & Contém uma mensagem a ser enviada por um Sender. \\ 
+%    Server & Responsável gerenciar o servidor (robô). \\ \hline
+%    ServerListener & Responsável por escutar as novas conexões de clientes. \\ \hline
+%    ServerSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
+%    ServerReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
+    Message & Contém uma mensagem a ser enviada por um Sender. Esta classe atualmente é apenas um protótipo, pois o formato das mensagens ainda será definido. \\ 
     \bottomrule
     \end{tabular}%
   \label{tab:pacote_comunicacao}%
