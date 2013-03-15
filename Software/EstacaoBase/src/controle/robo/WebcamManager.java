@@ -30,6 +30,7 @@ import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
  * @author stefan
  */
 public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
+    public static final int WEBCAM_STREAM_DEFAULT_PORT = 5050;
 
     private Webcam webcam;
 //    private WebcamStreamerNew webcamStreamer;

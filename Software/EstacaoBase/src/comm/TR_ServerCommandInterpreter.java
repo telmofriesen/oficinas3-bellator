@@ -1,6 +1,6 @@
 package comm;
 
-import controle.robo.SensorsSampler;
+import controle.robo.SensorsManager;
 import controle.robo.WebcamManager;
 import controle.robo.WebcamSampler;
 import java.awt.Dimension;
@@ -116,7 +116,7 @@ public class TR_ServerCommandInterpreter extends Thread {
                         return true;
                     }
                 } else if (split[0].equals("SENSORS")) { //SENSORS
-                    SensorsSampler s = connection.getListener().getServer().getSensorsSampler();
+                    SensorsManager s = connection.getListener().getServer().getSensorsSampler();
                     if (split[1].equals("START")) {
                         s.startSampling();
                         connection.sendMessageWithPriority(s.getStatusMessage(), true);
@@ -166,9 +166,10 @@ public class TR_ServerCommandInterpreter extends Thread {
                         return true;
                     }
                 } else if (split[0].equals("ENGINES")) { //ENGINES
-                    float dir = Float.parseFloat(split[1]);
-                    float esq = Float.parseFloat(split[2]);
-                    connection.getListener().getServer().setVelocidadeRodas(dir, esq);
+                    float left = Float.parseFloat(split[1]);
+                    float right = Float.parseFloat(split[2]);
+                    connection.getListener().getServer().getEnginesManager().setEnginesSpeed(left, right);                    
+//                    connection.getListener().getServer().setVelocidadeRodas(dir, esq);
                     return true;
                 } else if (split[0].equals("DISCONNECT")) { //DISCONNECT
                     connection.closeConnection();

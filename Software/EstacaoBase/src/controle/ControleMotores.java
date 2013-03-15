@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ControleMotores implements MyChangeListener {
 
-    private EngineSpeed currentEngineSpeed = new EngineSpeed(0, 0);
+    private EnginesSpeed currentEngineSpeed = new EnginesSpeed(0, 0);
     private int movementType = 1;
     public static final int STOP = 1,
             FORWARD = 2,
@@ -83,40 +83,40 @@ public class ControleMotores implements MyChangeListener {
         return movementType;
     }
 
-    public synchronized EngineSpeed getNewEngineSpeed() {
+    public synchronized EnginesSpeed getNewEngineSpeed() {
         return getNewEngineSpeed(movementType);
     }
 
-    public EngineSpeed getNewEngineSpeed(int movementType) {
+    public EnginesSpeed getNewEngineSpeed(int movementType) {
         switch (movementType) {
             case ControleMotores.STOP:
-                return new EngineSpeed(0, 0);
+                return new EnginesSpeed(0, 0);
             case ControleMotores.FORWARD:
-                return new EngineSpeed(1, 1);
+                return new EnginesSpeed(1, 1);
             case ControleMotores.FORWARD_LEFT:
-                return new EngineSpeed(0.5f, 1);
+                return new EnginesSpeed(0.5f, 1);
             case ControleMotores.FORWARD_RIGHT:
-                return new EngineSpeed(1, 0.5f);
+                return new EnginesSpeed(1, 0.5f);
             case ControleMotores.BACKWARD:
-                return new EngineSpeed(-1, -1);
+                return new EnginesSpeed(-1, -1);
             case ControleMotores.BACKWARD_LEFT:
-                return new EngineSpeed(-0.5f, -1);
+                return new EnginesSpeed(-0.5f, -1);
             case ControleMotores.BACKWARD_RIGHT:
-                return new EngineSpeed(-1, -0.5f);
+                return new EnginesSpeed(-1, -0.5f);
             case ControleMotores.ROTATE_LEFT:
-                return new EngineSpeed(-1, 1);
+                return new EnginesSpeed(-1, 1);
             case ControleMotores.ROTATE_RIGHT:
-                return new EngineSpeed(1, -1);
+                return new EnginesSpeed(1, -1);
             default:
-                return new EngineSpeed(0, 0);
+                return new EnginesSpeed(0, 0);
         }
     }
 
-    public synchronized EngineSpeed getCurrentEngineSpeed() {
+    public synchronized EnginesSpeed getCurrentEngineSpeed() {
         return currentEngineSpeed;
     }
 
-    public synchronized void setCurrentEngineSpeed(EngineSpeed currentEngineSpeed) {
+    public synchronized void setCurrentEngineSpeed(EnginesSpeed currentEngineSpeed) {
         this.currentEngineSpeed = currentEngineSpeed;
         fireChangeEvent();
     }

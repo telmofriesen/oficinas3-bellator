@@ -21,6 +21,7 @@ import javax.swing.Timer;
  */
 public class TR_ServerListener extends Thread {
 
+    public static final int LISTENER_DEFAULT_PORT = 12312;
     //O Socket principal do servidor
     private ServerSocket serverSocket;
     //O socket de conexões aceitas

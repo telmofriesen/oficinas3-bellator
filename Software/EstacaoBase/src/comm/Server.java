@@ -9,7 +9,8 @@ import com.github.sarxos.webcam.WebcamResolution;
 import com.github.sarxos.webcam.WebcamStreamer;
 import com.github.sarxos.webcam.util.ImageUtils;
 import controle.AmostraSensores;
-import controle.robo.SensorsSampler;
+import controle.robo.EnginesManager;
+import controle.robo.SensorsManager;
 import controle.robo.WebcamManager;
 import controle.robo.WebcamSampler;
 import events.MyChangeEvent;
@@ -33,11 +34,12 @@ public class Server extends Thread {
     //listener, que escuta novas conexões de clientes (estações base)
     private TR_ServerListener listener;
     //Amostragem dos sensores
-    private SensorsSampler sensorsSampler;
-    private SensorsListnener sensorsListener;
+    private SensorsManager sensorsSampler;
+    private SensorsInfoListnener sensorsInfoListener;
     //Amostragem da webcam
     private WebcamManager webcamManager;
-    private WebcamInfoListener webcamListener;
+    private WebcamInfoListener webcamInfoListener;
+    private EnginesManager enginesManager;
 //    private WebcamStreamer webcamStreamer;
     //Indica se amostras de sensores devem ser enviadas ou não à estação base.
 //    private boolean send_sensor_info = false;
@@ -45,7 +47,7 @@ public class Server extends Thread {
     //TODO criar classe com thread para controle dos motores. Remover estas variáveis.
     private float velocidade_roda_direita = 0, velocidade_roda_esquerda = 0;
     //Porta de escuta do servidor
-    private int port = 12312;
+    private int port = TR_ServerListener.LISTENER_DEFAULT_PORT;
 
     /**
      * Inicializa os objetos do Server.
@@ -53,16 +55,17 @@ public class Server extends Thread {
      */
     public Server() {
         //Inicializa o listener, que escuta novas conexões de clientes (estações base)
-        listener = new TR_ServerListener(this, 12312);
-        sensorsSampler = new SensorsSampler(1);
-        sensorsListener = new SensorsListnener();
-        sensorsSampler.addMyChangeListener(sensorsListener);
+        listener = new TR_ServerListener(this, TR_ServerListener.LISTENER_DEFAULT_PORT);
+        sensorsSampler = new SensorsManager(1);
+        sensorsInfoListener = new SensorsInfoListnener();
+        sensorsSampler.addMyChangeListener(sensorsInfoListener);
         //[176x144] [320x240] [352x288] [480x400] [640x480] [1024x768] 
 //        webcamManager = new WebcamManager(1, new Dimension(176, 144));
         webcamManager = new WebcamManager(1, new Dimension(640, 480));
 
-        webcamListener = new WebcamInfoListener();
-        webcamManager.addMyChangeListener(webcamListener);
+        webcamInfoListener = new WebcamInfoListener();
+        webcamManager.addMyChangeListener(webcamInfoListener);
+        enginesManager = new EnginesManager();
 //        webcamStreamer = new WebcamStreamer(5050, Webcam.getDefault(), 30, true);
     }
 
@@ -92,10 +95,20 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Notifica que foi estabelecida uma conexão a um host.
+     *
+     * @param ip Ip do host
+     * @param port Porta da conexão
+     */
     public void mainHostConnected(String ip, int port) {
-        webcamManager.setHost(ip, 5050);
+        //Configura o ip e porta da stream da webcam.
+        webcamManager.setHost(ip, WebcamManager.WEBCAM_STREAM_DEFAULT_PORT);
     }
 
+    /**
+     * Notifica que a conexão com o host principal foi finalizada.
+     */
     public void mainHostDisconnected() {
         sensorsSampler.stopSampling();
         sensorsSampler.setSample_rate(1);
@@ -110,28 +123,27 @@ public class Server extends Thread {
      * @param dir Velocidade normalizada da roda direita.
      * @param esq Valocidade normalizada da roda esquerda.
      */
-    public synchronized void setVelocidadeRodas(float dir, float esq) {
-        this.velocidade_roda_direita = dir;
-        this.velocidade_roda_esquerda = esq;
-        System.out.printf("[Server] Velocidade rodas: %.2f %.2f\n", dir, esq);
-    }
-
-    public synchronized float getVelocidade_roda_direita() {
-        return velocidade_roda_direita;
-    }
-
-    public synchronized void setVelocidade_roda_direita(float velocidade_roda_direita) {
-        this.velocidade_roda_direita = velocidade_roda_direita;
-    }
-
-    public synchronized float getVelocidade_roda_esquerda() {
-        return velocidade_roda_esquerda;
-    }
-
-    public synchronized void setVelocidade_roda_esquerda(float velocidade_roda_esquerda) {
-        this.velocidade_roda_esquerda = velocidade_roda_esquerda;
-    }
-
+//    public synchronized void setVelocidadeRodas(float dir, float esq) {
+//        this.velocidade_roda_direita = dir;
+//        this.velocidade_roda_esquerda = esq;
+//        System.out.printf("[Server] Velocidade rodas: %.2f %.2f\n", dir, esq);
+//    }
+//
+//    public synchronized float getVelocidade_roda_direita() {
+//        return velocidade_roda_direita;
+//    }
+//
+//    public synchronized void setVelocidade_roda_direita(float velocidade_roda_direita) {
+//        this.velocidade_roda_direita = velocidade_roda_direita;
+//    }
+//
+//    public synchronized float getVelocidade_roda_esquerda() {
+//        return velocidade_roda_esquerda;
+//    }
+//
+//    public synchronized void setVelocidade_roda_esquerda(float velocidade_roda_esquerda) {
+//        this.velocidade_roda_esquerda = velocidade_roda_esquerda;
+//    }
     public synchronized int getPort() {
         return port;
     }
@@ -140,7 +152,7 @@ public class Server extends Thread {
         this.port = port;
     }
 
-    public SensorsSampler getSensorsSampler() {
+    public SensorsManager getSensorsSampler() {
         return sensorsSampler;
     }
 
@@ -148,7 +160,13 @@ public class Server extends Thread {
         return webcamManager;
     }
 
-    class SensorsListnener implements MyChangeListener {
+    public EnginesManager getEnginesManager() {
+        return enginesManager;
+    }
+    
+    
+
+    class SensorsInfoListnener implements MyChangeListener {
 
         private AmostraSensores lastSample;
         private boolean lastSamplingStatus = false;
@@ -157,8 +175,8 @@ public class Server extends Thread {
         public void changeEventReceived(MyChangeEvent evt) {
 
 //            long currentTime = System.currentTimeMillis();
-            if (evt.getSource() instanceof SensorsSampler) {
-                SensorsSampler s = (SensorsSampler) evt.getSource();
+            if (evt.getSource() instanceof SensorsManager) {
+                SensorsManager s = (SensorsManager) evt.getSource();
                 boolean samplingStatus = s.isSamplingEnabled();
                 //Verifica o numero de conexões abertas
                 if (listener.getNumServerConnections() < 1) {

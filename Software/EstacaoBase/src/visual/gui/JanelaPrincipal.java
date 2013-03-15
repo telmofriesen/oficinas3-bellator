@@ -931,9 +931,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                                 icon = "/visual/gui/icons/arrows/rotate_right.png";
                                 break;
                         }
+                        lastMovType = movType;
+
+
+                        if (connector.isConnected()) {
+                            movementImagePanel.changeImageFromRelativePath(icon);
+                            EnginesSpeed speed = c.getNewEngineSpeed();
+                            connector.sendMessage(String.format("ENGINES %.2f %.2f", speed.leftSpeed, speed.rightSpeed), true);
+                        }
                     }
-                    movementImagePanel.changeImageFromRelativePath(icon);
-                    lastMovType = movType;
                 }
             }
         }

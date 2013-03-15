@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author stefan
  */
-public class SensorsSampler extends Thread {
+public class SensorsManager extends Thread {
     //Indica se a amostragem está habilitada.
 
     private boolean sampling_enabled = false;
@@ -29,7 +29,7 @@ public class SensorsSampler extends Thread {
     private boolean first_sent = false;
     private boolean second_sent = false;
 
-    public SensorsSampler(float sample_rate) {
+    public SensorsManager(float sample_rate) {
         this.sample_rate = sample_rate;
     }
 
@@ -159,7 +159,7 @@ public class SensorsSampler extends Thread {
                 try {
                     sleep(500);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(SensorsSampler.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SensorsManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 second_sent = true;
                 return new AmostraSensores(0.1f, 0f, new float[]{300, 0, 300}, System.currentTimeMillis());
