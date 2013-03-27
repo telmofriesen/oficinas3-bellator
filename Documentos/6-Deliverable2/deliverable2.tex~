@@ -1,0 +1,11 @@
+\chapter{Segundo entregável - 27/03/2013}
+
+Conforme estabelecido na relação de \textit{deliverables} do documento de análise tecnológica, este segundo entregável consiste nos seguintes itens:
+\begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+	\item Versão inicial do diagrama de casos de uso (software embarcado). OK
+	\item Versão inicial do diagrama de fluxo de dados (software embarcado). OK
+	\item Versão inicial dos diagramas de estados (sistema de comunicação). OK
+	\item Versão inicial da descrição das mensagens e codificações dos comandos (sistema de comunicação).
+	\item Versão inicial do diagrama elétrico/eletrônico (hardware).
+\end{enumerate}
+
