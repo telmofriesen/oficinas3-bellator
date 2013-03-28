@@ -5,7 +5,7 @@
 
 Na figura \ref{fig:diagrama_blocos_hardware} mostra-se o diagrama de blocos do sistema embarcado e suas conexões com o restante do robô. A seguir está também uma descrição para cada um dos blocos da placa de circuito impresso do sistema embarcado.
 
-\begin{figure}[H]
+\begin{figure}[htpb!]
   \centering
   \includegraphics[width=\textwidth]{./figuras/diagrama_blocos_hardware.png}
   \caption{Diagrama de blocos do hardware}
@@ -24,7 +24,7 @@ Na figura \ref{fig:diagrama_blocos_hardware} mostra-se o diagrama de blocos do s
 
 \section{Diagrama elétrico/eletrônico}
 
-\begin{figure}[h]
+\begin{figure}[htpb!]
   \centering
   \includegraphics[width=0.9\textwidth, keepaspectratio]{./figuras/hardware2_1.pdf}
   \caption{Diagrama de elétrico/eletrônico.}
