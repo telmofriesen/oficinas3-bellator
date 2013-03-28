@@ -4,7 +4,7 @@
  */
 package visual.gui;
 
-import comm.TR_ClientConnector;
+import comunicacao.ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.text.SimpleDateFormat;
@@ -19,13 +19,13 @@ import javax.swing.JTextArea;
  */
 public class ConnectionLogTextArea extends JTextArea implements MyChangeListener {
 
-    private int lastStatus = TR_ClientConnector.DISCONNECTED;
-    private int lastErrorStatus = TR_ClientConnector.ERROR_NO;
+    private int lastStatus = ClientConnector.DISCONNECTED;
+    private int lastErrorStatus = ClientConnector.ERROR_NO;
 
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
-        if (evt.getSource() instanceof TR_ClientConnector) {
-            final TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
+        if (evt.getSource() instanceof ClientConnector) {
+            final ClientConnector connector = (ClientConnector) evt.getSource();
             synchronized (connector) {
                 int status = connector.getConnectionStatus();
                 int error = connector.getErrorStatus();
@@ -41,7 +41,7 @@ public class ConnectionLogTextArea extends JTextArea implements MyChangeListener
                 //Se o status mudar...
                 if (status != lastStatus) {
                     //Imprime uma mensagem de erro se o status mudar e houver um erro (qualquer que seja)
-                    if (error != TR_ClientConnector.ERROR_NO) {
+                    if (error != ClientConnector.ERROR_NO) {
                         java.awt.EventQueue.invokeLater(new Runnable() {
                             public void run() {
                                 append(String.format("%s - %s\n",
@@ -60,8 +60,8 @@ public class ConnectionLogTextArea extends JTextArea implements MyChangeListener
                 }
                 //Imprime uma mensagem de erro se o status do erro mudar OU
                 //se um aviso de tempo excessivo sem comunicação estiver ativo
-                if (error != lastErrorStatus && error != TR_ClientConnector.ERROR_NO
-                    || error == lastErrorStatus && error == TR_ClientConnector.WARNING_COMMUNICATION_TIME) {
+                if (error != lastErrorStatus && error != ClientConnector.ERROR_NO
+                    || error == lastErrorStatus && error == ClientConnector.WARNING_COMMUNICATION_TIME) {
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             append(String.format("%s - %s\n",

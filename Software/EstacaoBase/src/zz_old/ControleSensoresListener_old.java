@@ -4,7 +4,7 @@
  */
 package zz_old;
 
-import controle.ControleSensores;
+import dados.ControleSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JButton;

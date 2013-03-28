@@ -1,7 +1,7 @@
 package visual.gui;
 
-import comm.TR_ClientConnector;
-import controle.ControleSensores;
+import comunicacao.ClientConnector;
+import dados.ControleSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JButton;
@@ -17,9 +17,9 @@ public class SensoresButtonListener extends JButton implements MyChangeListener 
 
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
-        if (evt.getSource() instanceof TR_ClientConnector) {
+        if (evt.getSource() instanceof ClientConnector) {
             //Mudanças no status da conexão
-            TR_ClientConnector c = (TR_ClientConnector) evt.getSource();
+            ClientConnector c = (ClientConnector) evt.getSource();
             if (!c.isConnected()) { //Desabilita o botão se estiver desconectado.
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {

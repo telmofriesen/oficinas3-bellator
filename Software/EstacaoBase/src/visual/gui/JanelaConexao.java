@@ -4,8 +4,8 @@
  */
 package visual.gui;
 
-import comm.ClientConnectedException;
-import comm.TR_ClientConnector;
+import comunicacao.ClientConnectedException;
+import comunicacao.ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.util.logging.Level;
@@ -20,12 +20,12 @@ import javax.swing.JFrame;
 public class JanelaConexao extends javax.swing.JFrame {
 
     ConnectionChangeListener listener;
-    TR_ClientConnector connector;
+    ClientConnector connector;
 
     /**
      * Creates new form JanelaConexao
      */
-    public JanelaConexao(TR_ClientConnector connector) {
+    public JanelaConexao(ClientConnector connector) {
         this.connector = connector;
         initComponents();
         listener = new ConnectionChangeListener(this);
@@ -138,7 +138,7 @@ public class JanelaConexao extends javax.swing.JFrame {
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         // TODO add your handling code here:
         int status = connector.getConnectionStatus();
-        if (status == TR_ClientConnector.DISCONNECTED) {
+        if (status == ClientConnector.DISCONNECTED) {
             try {
                 //Tenta conectar ao host especificado.
                 connector.connect((String) ipComboBox.getSelectedItem(),
@@ -146,7 +146,7 @@ public class JanelaConexao extends javax.swing.JFrame {
             } catch (ClientConnectedException ex) {
                 Logger.getLogger(JanelaConexao.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else if (status == TR_ClientConnector.CONNECTED || status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
+        } else if (status == ClientConnector.CONNECTED || status == ClientConnector.CONNECTED_HANDSHAKE) {
             //Tenta desconectar do host se já estiver conectado.
             connector.disconnect();
         }
@@ -218,10 +218,10 @@ public class JanelaConexao extends javax.swing.JFrame {
         public void changeEventReceived(MyChangeEvent evt) {
             connectionLogTextArea.changeEventReceived(evt);
             //Mudança de status da conexão. 
-            if (evt.getSource() instanceof TR_ClientConnector) {
-                TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
+            if (evt.getSource() instanceof ClientConnector) {
+                ClientConnector connector = (ClientConnector) evt.getSource();
                 int status = connector.getConnectionStatus();
-                if (status == TR_ClientConnector.CONNECTED) {
+                if (status == ClientConnector.CONNECTED) {
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             ipComboBox.setEnabled(false);
@@ -232,7 +232,7 @@ public class JanelaConexao extends javax.swing.JFrame {
                             statusLabel.setText("Conectado");
                         }
                     });
-                } else if (status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
+                } else if (status == ClientConnector.CONNECTED_HANDSHAKE) {
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             ipComboBox.setEnabled(false);
@@ -243,7 +243,7 @@ public class JanelaConexao extends javax.swing.JFrame {
                             statusLabel.setText("Conectado");
                         }
                     });
-                } else if (status == TR_ClientConnector.CONNECTING) {
+                } else if (status == ClientConnector.CONNECTING) {
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             ipComboBox.setEnabled(false);
@@ -254,7 +254,7 @@ public class JanelaConexao extends javax.swing.JFrame {
                             statusLabel.setText("Conectando...");
                         }
                     });
-                } else if (status == TR_ClientConnector.DISCONNECTED) {
+                } else if (status == ClientConnector.DISCONNECTED) {
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             ipComboBox.setEnabled(true);

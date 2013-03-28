@@ -3,7 +3,11 @@
  * and open the template in the editor.
  */
 
-import controle.*;
+import dados.Robo;
+import dados.SensorIR;
+import dados.Obstaculos;
+import dados.ControleSensores;
+import dados.Mapa;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.*;

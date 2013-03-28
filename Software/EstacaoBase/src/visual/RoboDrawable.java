@@ -4,8 +4,8 @@
  */
 package visual;
 
-import controle.PosInfo;
-import controle.Robo;
+import dados.PosInfo;
+import dados.Robo;
 import java.awt.Color;
 import processing.core.PApplet;
 

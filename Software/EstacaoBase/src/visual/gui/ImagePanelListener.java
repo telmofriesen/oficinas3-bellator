@@ -4,7 +4,7 @@
  */
 package visual.gui;
 
-import controle.ControleCamera;
+import dados.ControleCamera;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.Dimension;

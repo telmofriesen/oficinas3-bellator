@@ -1,0 +1,53 @@
+\begin{itemize}
+	\item \textbf{ECHO_REQUEST}
+	\item \textbf{ECHO_REPLY}
+	\item \textbf{HANDSHAKE_REQUEST}
+	\item \textbf{HANDSHAKE_REPLY}
+	\item \textbf{HANDSHAKE_CONFIRMATION}
+	\item DISCONNECT
+	\item \textbf{SENSORS_START}
+	\item \textbf{SENSORS_STOP}
+	\item \textbf{SENSORS_RATE} \\
+		(float) Nova taxa de amostragem
+	\item \textbf{SENSORS_STATUS_REQUEST}
+	\item \textbf{SENSORS_STATUS_REPLY} \\
+		(boolean) Status [on | off] \\
+		(float) Taxa de amostragem
+	\item \textbf{WEBCAM_START}
+	\item \textbf{WEBCAM_STOP}
+	\item \textbf{WEBCAM_RATE} \\
+		(float) Nova taxa de quadros
+	\item \textbf{WEBCAM_RESOLUTION} \\
+		(int) Largura em pixels \\
+		(int) Altura em pixels
+	\item \textbf{WEBCAM_STATUS_REQUEST}
+	\item \textbf{WEBCAM_STATUS_REPLY} \\
+		(boolean) Nova taxa de amostragem \\
+		(float) Taxa de quadros \\
+		(int) Largura em pixels \\
+		(int) Altura em pixels \\
+		(boolean) Status da stream [on | off] \\
+		(boolean) Porta da stream
+	\item \textbf{ENGINES_SPEED} \\
+		(int) Nova velocidade da roda esquerda (Valor de 0 a 255) \\
+		(int) Nova velocidade da roda direita (Valor de 0 a 255)
+	\item \textbf{ENGINES_STATUS_REQUEST}
+	\item \textbf{ENGINES_STATUS_REPLY} \\
+		(int) Velocidade programada da roda esquerda (Valor de 0 a 255) \\
+		(int) Velocidade programada da roda direita (Valor de 0 a 255)
+	\item \textbf{ENCODERS} \\
+		(int) Leitura roda esquerda \\
+		(int) Leitura roda direita \\
+		(long) Timestamp em milissegundos
+	\item \textbf{ACEL_GYRO} \\
+		(float) Aceleração em X \\
+		(float) Aceleração em Y \\
+		(float) Aceleração em Z \\
+		(float) Aceleração angular em X \\
+		(float) Aceleração angular em Y \\
+		(float) Aceleração angular em Z \\
+		(long) Timestamp em milissegundos
+	\item \textbf{OPTICAL_SENSORS} \\
+		(float[]) Distâncias detectadas pelos sensores ópticos \\
+		(long) Timestamp em milissegundos
+\end{itemize}
