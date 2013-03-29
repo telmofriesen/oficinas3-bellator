@@ -6,7 +6,7 @@
 %  \item A estação base deve receber informações de posicionamento do robô, processá-las e armazená-las na memória. Representado pelo requisito funcional: \textbf{``Estação base mostra na interface gráfica a posição do robô - RF\arabic{enumi}"}
 %  \item A estação base deve receber informações de obstáculos detectados, processá-las e armazená-las na memória. Representado pelo requisito funcional: \textbf{"Estação base mostra na interface gráfica os novos obstáculos detectados pelo robô - RF\arabic{enumi}"}
   \item A estação base deve mostrar na interface gráfica um mapa 2D (atualizado automaticamente) representando o robô e os obstáculos detectados por ele. Representado pelo requisito funcional: \textbf{``Estação base mostra mapa 2D do robô e dos obstáculos detectados -- RF\arabic{enumi}''}.
-  \item O usuátio pode salvar o mapa 2D no disco rígido. Representado pelo requisito funcional: \textbf{``O usuário pode salvar o mapa -- RF\arabic{enumi}''}.
+  \item O usuário pode salvar o mapa 2D no disco rígido. Representado pelo requisito funcional: \textbf{``O usuário pode salvar o mapa -- RF\arabic{enumi}''}.
   \item O usuário pode carregar o mapa 2D do disco rígido. Representado pelo requisito funcional: \textbf{``O usuário pode carregar o mapa -- RF\arabic{enumi}''}.
   \item A estação base deve mostrar na interface gráfica a imagem captada pela \textit{webcam} do robô. Representado pelo requisito funcional: \textbf{``Estação base mostra a imagem captada pela webcam -- RF\arabic{enumi}''}.
   \item O usuário pode movimentar o robô, controlando a velocidade de suas rodas remotamente pelo teclado da estação base. Representado pelo requisito funcional: \textbf{``O usuário pode movimentar o robô -- RF\arabic{enumi}''}.
@@ -72,7 +72,7 @@ A Figura \ref{fig:diagrama_classes_estacao_base} mostra o diagrama de classes da
 
 \subsection{Descrição das classes da estação base}
 %O software da estação base do robô foi dividido em cinco pacotes:  visual, controle, comunicação, controle.robo e interface gráfica. Estes serão descritos com suas respectivas classes na Tabela \ref{tab:pacote_visual}.
-O \textit{software} da estação base do robô foi dividido em cinco pacotes:  \textit{visual}, \textit{dados}, \textit{comunicao}, e \textit{gui}. A seguir há uma descrição de cada pacote e das suas respectivas classes.
+O \textit{software} da estação base do robô foi dividido nos seguintes pacotes:  \textit{visual}, \textit{dados}, \textit{comunicacao}, e \textit{gui}. A seguir há uma descrição de cada pacote e das suas respectivas classes.
 
 
 \subsection{Pacote \textit{visual}}
@@ -80,7 +80,7 @@ O \textit{software} da estação base do robô foi dividido em cinco pacotes:  \
 Este pacote consiste de toda a parte visual da estação base e conta com as seguintes classes: Viewer2D, Drawable2D, EscalaDrawable, RoboDrawable, RoboTrilhaDrawable, ObstaculosDrawable, EscalaDrawableProp, RoboDrawableProp, RoboTrilhaDrawableProp e ObstaculosDrawableProp. Na Tabela \ref{tab:pacote_visual} estão descritas as classes deste pacote.
 
 
-\begin{table}[h]
+\begin{table}[H]
   \centering
   \caption{Pacote \textit{visual}}
   \begin{tabular}{p{6cm}p{8cm}}
@@ -106,7 +106,7 @@ Este pacote consiste de toda a parte visual da estação base e conta com as seg
 
 Este pacote consiste de toda a parte da estação base que processa e armazena as informações essenciais do robô e do mapa. Conta com as seguintes classes: Mapa, Obstaculos, Robo, ControleSensores, Posinfo, SensorIR e Ponto. Na Tabela \ref{tab:pacote_controle} estão descritas as classes deste pacote.
 
-\begin{table}[h]
+\begin{table}[H]
   \centering
   \caption{Pacote \textit{dados}}
   \begin{tabular}{p{6cm}p{8cm}}
@@ -132,10 +132,10 @@ Este pacote consiste de toda a parte da estação base que processa e armazena a
 %Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientCommandInterpreter, ClientConnection, ClientReceiver, ClientSender, ServerCommandInterpreter, ServerListener, ServerSender, ServerReceiver e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classe deste pacote.
 Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientMessageProcessor ClientConnection, ClientReceiver, ClientSender e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classes deste pacote.
 
-É importante ressaltar que o protocolo TCP requer obrigatoriamente a especificação de um cliente e de um servidor para estabelecimento de uma conexão. Nas implementações desse protocolo em diversas linguagens (como Java e C++) existem tipos de \textit{socket} distintos para cliente e servidor. Na criação de um \textit{socket} de servidor, há obrigatoriamente a atribuição de uma porta de escuta, na qual o servidor aguarda que um cliente efetue uma requisição de conexão. Não é possível, ao menos nas implementações atuais do TCP, estabelecer conexão entre dois \textit{sockets} de cliente ou entre dois \textit{sockets} de servidor. Como neste projeto, o robô proverá serviços à estação base (envio de imagens da câmera, envio de leituras de sensores, além de prover a posibilidade de comando dos motores) o robô foi escolhido como servidor e a estação base como cliente. Enfatiza-se que o paradigma cliente-servidor não implica de forma alguma que a comunicação seja unidirecional. Pelo contrário, o envio de pacotes 
+É importante ressaltar que o protocolo TCP requer obrigatoriamente a especificação de um cliente e de um servidor para estabelecimento de uma conexão. Nas implementações desse protocolo em diversas linguagens (como Java e C++) existem tipos de \textit{socket} distintos para cliente e servidor. Na criação de um \textit{socket} de servidor, há obrigatoriamente a atribuição de uma porta de escuta, na qual o servidor aguarda que um cliente efetue uma requisição de conexão. Não é possível, ao menos nas implementações atuais do TCP, estabelecer conexão entre dois \textit{sockets} de cliente ou entre dois \textit{sockets} de servidor. Como neste projeto, o robô proverá serviços à estação base (envio de imagens da câmera, envio de leituras de sensores, além de prover a possibilidade de comando dos motores) o robô foi escolhido como servidor e a estação base como cliente. Enfatiza-se que o paradigma cliente-servidor não implica de forma alguma que a comunicação seja unidirecional. Pelo contrário, o envio de pacotes 
 pode ser feito bidirecionalmente após uma conexão TCP ser estabelecida, sem nenhuma restrição quanto a isso.
 
-\begin{table}[h]
+\begin{table}[H]
   \centering
   \caption{Pacote \textit{comunicacao}}
   \begin{tabular}{p{6cm}p{8cm}}
@@ -161,7 +161,7 @@ pode ser feito bidirecionalmente após uma conexão TCP ser estabelecida, sem ne
 
 Este pacote consiste em toda a interface gráfica do sistema e conta com as seguintes classes: JanelaConexao, JanelaPrincipal e JanelaSensores. Na Tabela \ref{tab:pacote_interface_grafica} estão descritas as classes deste pacote.
 
-\begin{table}[h]
+\begin{table}[H]
   \centering
   \caption{Pacote \textit{gui}}
   \begin{tabular}{p{6cm}p{8cm}}
@@ -208,7 +208,7 @@ A Figura \ref{fig:diagrama_fluxo_dados} mostra o diagrama de fluxo de dados.
 \section{Diagrama de classes do sistema embarcado}
 
 
-A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes do sistema embarcado (placa TS-7260).
+A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes do sistema embarcado (placa TS-7260). A descrição das classes encontra-se na Tabela \ref{tab:descricao_sistema_embarcado}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{./figuras/diagrama_classes_sist_embarcado.png}
@@ -220,7 +220,7 @@ A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes 
 
 %\subsection{Descrição das classes do sistema embarcado (TS-7260)}
 
-\begin{table}[h]
+\begin{table}[H]
   \centering
   \caption{Descrição das classes do sistema embarcado (placa TS-7260)}
   \begin{tabular}{p{6cm}p{8cm}}
@@ -228,7 +228,7 @@ A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes 
     \textbf{Classe} & \textbf{Descrição} \\ 
     \midrule
    Main & Classe principal do robô. \\ \hline
-   SensorsSampler & Thread responsável por requisitar amostras dos sensores da plca de baixo nível em intervalos de tempo previamente programados. \\ \hline
+   SensorsSampler & Thread responsável por requisitar amostras dos sensores da placa de baixo nível em intervalos de tempo previamente programados. \\ \hline
    ServerMessageProcessor & Thread responsável por realizar o processamento de mensagens recebidas de um host de conexão. \\ \hline
    ServerListener & Thread responsável por escutar requisições de conexão. \\ \hline
    ServerSender & Thread responsável por enviar mensagens ao host de uma conexão. \\ \hline
@@ -236,5 +236,5 @@ A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes 
    SerialCommunicator & Responsável por gerenciar a comunicação via porta serial entre a TS-7260 e a LPC2103.\\
     \bottomrule
   \end{tabular}%
-  \label{tab:pacote_comunicacao}%
+  \label{tab:descricao_sistema_embarcado}%
 \end{table}%

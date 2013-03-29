@@ -7,16 +7,16 @@
 \contentsline {section}{\numberline {2.4}\MakeUppercase {Diagrama de classes da esta\IeC {\c c}\IeC {\~a}o base}}{7}
 \contentsline {subsection}{\numberline {2.4.1}Descri\IeC {\c c}\IeC {\~a}o das classes da esta\IeC {\c c}\IeC {\~a}o base}{8}
 \contentsline {subsection}{\numberline {2.4.2}Pacote \textit {visual}}{8}
-\contentsline {subsection}{\numberline {2.4.3}Pacote \textit {dados}}{8}
-\contentsline {subsection}{\numberline {2.4.4}Pacote \textit {comunicacao}}{9}
-\contentsline {subsection}{\numberline {2.4.5}Pacote \textit {gui}}{10}
-\contentsline {section}{\numberline {2.5}\MakeUppercase {Fluxo de dados}}{10}
+\contentsline {subsection}{\numberline {2.4.3}Pacote \textit {dados}}{9}
+\contentsline {subsection}{\numberline {2.4.4}Pacote \textit {comunicacao}}{10}
+\contentsline {subsection}{\numberline {2.4.5}Pacote \textit {gui}}{11}
+\contentsline {section}{\numberline {2.5}\MakeUppercase {Fluxo de dados}}{12}
 \contentsline {section}{\numberline {2.6}\MakeUppercase {Diagrama de classes do sistema embarcado}}{12}
-\contentsline {section}{\numberline {2.7}\MakeUppercase {Protocolo de comunica\IeC {\c c}\IeC {\~a}o}}{13}
-\contentsline {subsection}{\numberline {2.7.1}Diagramas de estados}{14}
-\contentsline {subsection}{\numberline {2.7.2}Diagramas de sequ\IeC {\^e}ncia}{20}
-\contentsline {subsection}{\numberline {2.7.3}Codifica\IeC {\c c}\IeC {\~a}o das mensagens}{21}
-\contentsline {chapter}{\numberline {3}\MakeUppercase {Diagrama de blocos do hardware}}{26}
-\contentsline {section}{\numberline {3.1}\MakeUppercase {Diagrama de blocos}}{26}
-\contentsline {section}{\numberline {3.2}\MakeUppercase {Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico}}{27}
-\contentsline {chapter}{REFER\^ENCIAS}{29}
+\contentsline {section}{\numberline {2.7}\MakeUppercase {Protocolo de comunica\IeC {\c c}\IeC {\~a}o}}{14}
+\contentsline {subsection}{\numberline {2.7.1}Diagramas de estados}{15}
+\contentsline {subsection}{\numberline {2.7.2}Diagramas de sequ\IeC {\^e}ncia}{21}
+\contentsline {subsection}{\numberline {2.7.3}Codifica\IeC {\c c}\IeC {\~a}o das mensagens}{22}
+\contentsline {chapter}{\numberline {3}\MakeUppercase {Diagrama de blocos do hardware}}{27}
+\contentsline {section}{\numberline {3.1}\MakeUppercase {Diagrama de blocos}}{27}
+\contentsline {section}{\numberline {3.2}\MakeUppercase {Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico}}{28}
+\contentsline {chapter}{REFER\^ENCIAS}{30}
