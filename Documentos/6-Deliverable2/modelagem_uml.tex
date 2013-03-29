@@ -62,12 +62,12 @@ Foram produzidos três Diagramas de Casos de Uso (Figuras \ref{fig:diagrama_caso
 
 \section{Diagrama de classes da estação base}
 
-A Figura \ref{fig:diagrama_classes} mostra o diagrama de classes da estação base.
+A Figura \ref{fig:diagrama_classes_estacao_base} mostra o diagrama de classes da estação base.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{./figuras/diagrama_classes_estacao_base.png}
-  \caption{Diagrama de classes}
-  \label{fig:diagrama_classes}
+  \caption{Diagrama de classes da estação base}
+  \label{fig:diagrama_classes_estacao_base}
 \end{figure}
 
 \subsection{Descrição das classes da estação base}
@@ -142,10 +142,10 @@ pode ser feito bidirecionalmente após uma conexão TCP ser estabelecida, sem ne
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\ 
     \midrule
-    ClientMessageProcessor & Responsável pela interpretação dos comandos recebidos pelo cliente. \\ \hline
-    ClientConnector & Responsável por efetuar a gerência da conexão do cliente (estação base) com o servidor (robô). \\ \hline
-    ClientReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
-    ClientSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
+    ClientMessageProcessor & Thread responsável pelo processamento de mensagens recebidas de um host de conexão. \\ \hline
+    ClientConnector & Thread responsável por efetuar a gerência da conexão do cliente (estação base) com o servidor (robô). \\ \hline
+    ClientReceiver & Thread responsável por receber mensagens de um host de uma conexão. \\ \hline
+    ClientSender & Thread responsável por enviar mensagens ao host de uma conexão. \\ \hline
 %    ServerCommandInterpreter & Responsável pela interpretação dos comandos do servidor. Os comandos recebidos são inseridos em uma fila, de modo a serem posteriormente executados pela thread. \\ \hline
 %    Server & Responsável gerenciar o servidor (robô). \\ \hline
 %    ServerListener & Responsável por escutar as novas conexões de clientes. \\ \hline
@@ -208,30 +208,31 @@ A Figura \ref{fig:diagrama_fluxo_dados} mostra o diagrama de fluxo de dados.
 \section{Diagrama de classes do sistema embarcado}
 
 
-A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes do sistema embarcado.
+A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes do sistema embarcado (placa TS-7260).
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{./figuras/diagrama_classes_sist_embarcado.png}
-  \caption{Diagrama de classes}
+  \caption{Diagrama de classes do sistema embarcado (placa TS-7260).}
   \label{fig:diagrama_classes_sist_embarcado}
 \end{figure}
 
 
 
-\subsection{Descrição das classes do software para o sistema embarcado (TS-7260)}
+%\subsection{Descrição das classes do sistema embarcado (TS-7260)}
 
 \begin{table}[h]
   \centering
-  \caption{Pacote \textit{comunicacao}}
+  \caption{Descrição das classes do sistema embarcado (placa TS-7260)}
   \begin{tabular}{p{6cm}p{8cm}}
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\ 
     \midrule
    Main & Classe principal do robô. \\ \hline
-   ServerMessageProcessor & Responsável pela interpretação dos mensagens recebidas pelo servidor (robô). \\ \hline
-   ServerListener & Responsável por escutar as novas conexões de clientes. \\ \hline
-   ServerSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
-   ServerReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
+   SensorsSampler & Thread responsável por requisitar amostras dos sensores da plca de baixo nível em intervalos de tempo previamente programados. \\ \hline
+   ServerMessageProcessor & Thread responsável por realizar o processamento de mensagens recebidas de um host de conexão. \\ \hline
+   ServerListener & Thread responsável por escutar requisições de conexão. \\ \hline
+   ServerSender & Thread responsável por enviar mensagens ao host de uma conexão. \\ \hline
+   ServerReceiver & Thread responsável por receber mensagens de um host de uma conexão. \\ \hline
    SerialCommunicator & Responsável por gerenciar a comunicação via porta serial entre a TS-7260 e a LPC2103.\\
     \bottomrule
   \end{tabular}%

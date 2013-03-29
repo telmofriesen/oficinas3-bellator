@@ -7,19 +7,22 @@ O protocolo desenvolvido para a comunicação (via Wi-Fi) entre a estação base
 Para possibilitar que o tráfego de mensagens pudesse ser feito de forma rápida, reduzindo atrasos, o envio e recebimento de mensagens é feito de forma assíncrona.
 Essa escolha foi feita tendo em vista que, em uma comunicação totalmente síncrona, um programa (ou thread) é bloqueado ao chamar uma função de recebimento ou envio, até que efetivamente seja completa a transação. Supondo que só houvesse uma thread gerenciando a conexão, o programa não poderia enviar ou receber dados ao mesmo tempo em \textit{full-duplex}, mas somente \textit{half-duplex} (somente enviar ou somente receber).
 
-A solução desenvolvida para possibilitar a comunicação assíncrona foi o uso de 4 threads (tanto na estação base quanto no sistema embarcado) para gerenciar os diversos aspectos envolvidos nela. A primeira \textit{thread} (a gerenciadora principal de conexão) é a responsável por estabelecer e manter a conexão, além de gerenciar os potenciais erros que possam ocorrer (tempo excessivo sem comunicação e fechamento de socket). No caso da estação base, os diagramas de estados dessa \textit{thread} estão representados na Figura \ref{fig:diagrama_estados_estacao_base}. Para o sistema embarcado há a representação da Figura \ref{fig:diagrama_estados_sist_embarcado}.
+A solução desenvolvida para possibilitar a comunicação assíncrona foi o uso de 4 threads (tanto na estação base quanto no sistema embarcado) para gerenciar os diversos aspectos envolvidos nela. A primeira \textit{thread} (a gerenciadora principal de conexão) é a responsável por estabelecer e manter a conexão, além de gerenciar os potenciais erros que possam ocorrer (tempo excessivo sem comunicação e fechamento de socket). Para a estação base, o diagrama de estados dessa \textit{thread} está representado na Figura \ref{fig:diagrama_estados_estacao_base}, e para o sistema embarcado na Figura \ref{fig:diagrama_estados_sist_embarcado}.
 
-A segunda \textit{thread} tem a função de gerenciar o envio de mensagens. O programa, ao necessitar enviar uma mensagem, faz uma requisição a essa \textit{thread} que insere-a em uma fila de envio. O programa principal não fica bloqueado, dessa forma, pois não necessita aguardar a mensagem ser completamente enviada, podendo efetuar outras tarefas. O diagrama de sequência dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_sender}.
+A segunda \textit{thread} tem a função de gerenciar o envio de mensagens. O programa, ao necessitar enviar uma mensagem, faz uma requisição a essa \textit{thread} que insere-a em uma fila de envio. O programa principal não fica bloqueado, dessa forma, pois não necessita aguardar a mensagem ser completamente enviada, podendo efetuar outras tarefas. O diagrama de estados dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_sender}.
 
-A terceira \textit{thread} gerencia o recebimento de mensagens. Seu funcionamento é muito simples: ela possui um loop, no qual aguarda até alguma mensagem ser recebida. Quando ocorre o recebimento de alguma mensagem, ela a encaminha para a quarta thread (explicada abaixo) que processa o conteúdo dela e executa as operações que são necessárias para cada tipo de mensagem. Dessa forma, novas mensagens podem ser recebidas rapidamente, pois o receptor não fica bloqueado realizando o processamento das informações recebidas. O diagrama de sequência dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_receiver}.
+A terceira \textit{thread} gerencia o recebimento de mensagens. Seu funcionamento é muito simples: ela possui um loop, no qual aguarda até alguma mensagem ser recebida. Quando ocorre o recebimento de alguma mensagem, ela a encaminha para a quarta \textit{thread} (cuja explicação está a seguir) que processa o conteúdo dela e executa as operações que são necessárias para cada tipo de mensagem. Dessa forma, novas mensagens podem ser recebidas rapidamente, pois o receptor não fica bloqueado realizando o processamento das informações recebidas. O diagrama de estados dessa terceira \textit{thread} está presente na Figura \ref{fig:diagrama_estados_receiver}.
 
-A quarta \textit{thread}, como já exposto, é a responsável por processar mensagens recebidas e realizar as operações que são necessárias para cada tipo de mensagem (o que depende da codificação exposta na seção \ref{sec:codificacao_mensagens}. Ela possui uma fila, na qual são inseridas as mensagens a serem processadas. Dessa forma o receptor não necessita ficar bloqueado aguardando o término do processamento. O diagrama de sequência dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_processor}.
+A quarta \textit{thread}, como já exposto, é a responsável por processar mensagens recebidas e realizar as operações que são necessárias para cada tipo de mensagem (o que depende da codificação exposta na seção \ref{sec:codificacao_mensagens}). Ela possui uma fila, na qual são inseridas as mensagens a serem processadas. Dessa forma o receptor não necessita ficar bloqueado aguardando o término do processamento. O diagrama de estados dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_processor}.
 
 \subsection{Diagramas de estados}
 
-Nesta seção estão expostos os diagramas de estados do protocolo de comunicação nas Figuras \ref{fig:diagrama_estados_estacao_base}, \ref{fig:diagrama_estados_sist_embarcado}, \ref{fig:diagrama_estados_sender}, \ref{fig:diagrama_estados_receiver} e \ref{fig:diagrama_estados_processor}.
+Nesta seção estão expostos os diagramas de estados do protocolo de comunicação nas Figuras \ref{fig:diagrama_estados_estacao_base}, \ref{fig:diagrama_estados_sist_embarcado}, \ref{fig:diagrama_estados_sender}, \ref{fig:diagrama_estados_receiver}, \ref{fig:diagrama_estados_processor} e \ref{fig:diagrama_estados_amostragem_sensores}.
 
 Um aspecto importante a ressaltar é que, nas \textit{threads} de envio (Figura \ref{fig:diagrama_estados_sender}) e de processamento de mensagens (Figura \ref{fig:diagrama_estados_processor}), pode haver adição assíncrona de elementos na fila. Ou seja, quando é feita a verificação do número de elementos presentes na fila (como representado nos diagramas), tem-se em vista que elementos podem ter sido adicionados a qualquer instante. Obviamente, no ponto de vista da implementação, existem as seções críticas que devem ser devidamente gerenciadas para evitar condições de disputa e outros problemas de concorrência. Porém, as seções críticas se resumem aos acessos à fila somente, o que reduz consideravelmente a complexidade do processo.
+
+Na Figura \ref{fig:diagrama_estados_amostragem_sensores} está exposto o diagrama de estados da \textit{thread} do sistema embarcado que é responsável por realizar a amostragem dos sensores em intervalos fixos de tempo. Ela realiza a amostragem enviando periodicamente -- quando programada -- comandos SYNC (vide seção \ref{sec:codificacao_mensagens}) para a placa de baixo nível. Vale ressaltar que para melhor explicar o processo de amostragem dos sensores, na Figura \ref{fig:diagrama_sequencia_motores} da próxima seção está exposto um diagrama de sequência que demonstra esses aspectos de um ponto de vista mais geral.
+
 
 
 \begin{figure}[H]
@@ -57,23 +60,32 @@ Um aspecto importante a ressaltar é que, nas \textit{threads} de envio (Figura 
   \label{fig:diagrama_estados_processor}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/diagrama_estados_amostragem_sensores.png}
+  \caption{Diagrama de estados da \textit{thread} responsável por efetuar a amostragem dos sensores (sistema embarcado).}
+  \label{fig:diagrama_estados_amostragem_sensores}
+\end{figure}
+
 
 
 \subsection{Diagramas de sequência}
 
-Nessa seção estão presentes as versões iniciais de dois diagramas de sequência. O primeiro (Figura \ref{fig:diagrama_sequencia_motores}) representa como um comando de mudança de velocidade das rodas dado pelo usuário chega até a placa de baixo nível. O segundo (Figura \ref{fig:diagrama_sequencia_sensores}) demonstra os dados de leituras dos sensores que saem da placa de baixo nível e chegam até o usuário. Vale ressaltar que nos diagramas foram representadas também as chamadas que são assíncronas, ou seja, que não bloqueiam a execução da \textit{thread} chamadora.
+Nessa seção estão presentes as versões iniciais de dois diagramas de sequência. O primeiro (Figura \ref{fig:diagrama_sequencia_motores}) representa como um comando de mudança de velocidade das rodas dado pelo usuário chega até a placa de baixo nível. O segundo (Figura \ref{fig:diagrama_sequencia_sensores}) demonstra a sequência dos dados de leituras dos sensores que saem da placa de baixo nível e chegam até o usuário. 
+
+Vale ressaltar que as chamadas assíncronas, ou seja, que não bloqueiam a execução da \textit{thread} chamadora, foram representadas também nestes diagramas.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth, keepaspectratio]{./figuras/diagrama_sequencia_motores.png}
-  \caption{Diagrama de sequência de um comando (dado pelo usuário) de mudança de velocidade dos motores.}
+  \caption{Diagrama de sequência de comando para mudança de velocidade dos motores.}
   \label{fig:diagrama_sequencia_motores}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth, keepaspectratio]{./figuras/diagrama_sequencia_sensores.png}
-  \caption{Diagrama de sequência de uma leitura dos sensores vinda da placa de baixo nível.}
+  \caption{Diagrama de sequência da amostragem dos sensores.}
   \label{fig:diagrama_sequencia_sensores}
 \end{figure}
 
@@ -112,7 +124,7 @@ Nessa seção estão presentes as versões iniciais de dois diagramas de sequên
 	  \textit{(byte) GX\_H}, \textit{(byte) GX\_L},\\
 	  \textit{(byte) GY\_H}, \textit{(byte) GY\_L},\\
 	  \textit{(byte) GZ\_H}, \textit{(byte) GZ\_L},\\
-	  \textit{(byte) TIMESTAMP}\\
+	  \textit{(byte) TIMESTAMP\_H}, \textit{(byte) TIMESTAMP\_L}\\
 	  \textit{(byte) END\_CMD}\\
 	  Representa a leitura de todos os sensores (encoders, infra-vermelhos, acelerômetro e giroscópio). 
 	  
@@ -122,7 +134,7 @@ Nessa seção estão presentes as versões iniciais de dois diagramas de sequên
 	  
 	  Após isso, os 12 bytes que se seguem representam as leituras do acelerômetro e do giroscópio. Os bytes que começam com `A' representam a leitura de cada um dos eixos do acelerômetro. Aqueles que começam com `G' representam a leitura de cada um dos eixos do giroscópio.
 	  
-	  O timestamp é um contador de 0 a 255 (que zera automaticamente quando chega ao valor máximo), usado para controlar a perda e ordem dos dados.
+	  O timestamp (valor alto e baixo) é um contador de 16 bits que zera automaticamente quando chega ao valor máximo, usado para controlar a perda e ordem dos dados.
 	  
 	  
 	\end{itemize}

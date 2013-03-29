@@ -20,8 +20,8 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Diagrama de casos de uso do \textit  {software} para a placa de baixo n\IeC {\'\i }vel.\relax }}{7}}
 \newlabel{fig:diagrama_caso_uso_placa_embarcada}{{3}{7}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.4}\MakeUppercase  {Diagrama de classes da esta\IeC {\c c}\IeC {\~a}o base}}{7}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Diagrama de classes\relax }}{8}}
-\newlabel{fig:diagrama_classes}{{4}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Diagrama de classes da esta\IeC {\c c}\IeC {\~a}o base\relax }}{8}}
+\newlabel{fig:diagrama_classes_estacao_base}{{4}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4.1}Descri\IeC {\c c}\IeC {\~a}o das classes da esta\IeC {\c c}\IeC {\~a}o base}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4.2}Pacote \textit  {visual}}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4.3}Pacote \textit  {dados}}{8}}
@@ -39,13 +39,12 @@
 \newlabel{tab:pacote_interface_grafica}{{4}{11}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Diagrama de fluxo de dados.\relax }}{11}}
 \newlabel{fig:diagrama_fluxo_dados}{{5}{11}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.6}\MakeUppercase  {Diagrama de classes do sistema embarcado}}{11}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de classes\relax }}{12}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.6}\MakeUppercase  {Diagrama de classes do sistema embarcado}}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de classes do sistema embarcado (placa TS-7260).\relax }}{12}}
 \newlabel{fig:diagrama_classes_sist_embarcado}{{6}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.6.1}Descri\IeC {\c c}\IeC {\~a}o das classes do software para o sistema embarcado (TS-7260)}{12}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Pacote \textit  {comunicacao}\relax }}{12}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Descri\IeC {\c c}\IeC {\~a}o das classes do sistema embarcado (placa TS-7260)\relax }}{12}}
 \newlabel{tab:pacote_comunicacao}{{5}{12}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.7}\MakeUppercase  {Protocolo de comunica\IeC {\c c}\IeC {\~a}o}}{12}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.7}\MakeUppercase  {Protocolo de comunica\IeC {\c c}\IeC {\~a}o}}{13}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.7.1}Diagramas de estados}{14}}
 \@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Diagrama estados da \textit  {thread} principal da conex\IeC {\~a}o da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{15}}
 \newlabel{fig:diagrama_estados_estacao_base}{{7}{15}}
@@ -57,26 +56,28 @@
 \newlabel{fig:diagrama_estados_receiver}{{10}{18}}
 \@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Diagrama de estados da \textit  {thread} que processa mensagens recebidas (igual para esta\IeC {\c c}\IeC {\~a}o base e sistema embarcado).\relax }}{19}}
 \newlabel{fig:diagrama_estados_processor}{{11}{19}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.7.2}Diagramas de sequ\IeC {\^e}ncia}{19}}
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de um comando (dado pelo usu\IeC {\'a}rio) de mudan\IeC {\c c}a de velocidade dos motores.\relax }}{20}}
-\newlabel{fig:diagrama_sequencia_motores}{{12}{20}}
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de uma leitura dos sensores vinda da placa de baixo n\IeC {\'\i }vel.\relax }}{20}}
-\newlabel{fig:diagrama_sequencia_sensores}{{13}{20}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.7.3}Codifica\IeC {\c c}\IeC {\~a}o das mensagens}{20}}
-\newlabel{sec:codificacao_mensagens}{{2.7.3}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de estados da \textit  {thread} respons\IeC {\'a}vel por efetuar a amostragem dos sensores (sistema embarcado).\relax }}{20}}
+\newlabel{fig:diagrama_estados_amostragem_sensores}{{12}{20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.7.2}Diagramas de sequ\IeC {\^e}ncia}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para mudan\IeC {\c c}a de velocidade dos motores.\relax }}{21}}
+\newlabel{fig:diagrama_sequencia_motores}{{13}{21}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia da amostragem dos sensores.\relax }}{21}}
+\newlabel{fig:diagrama_sequencia_sensores}{{14}{21}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.7.3}Codifica\IeC {\c c}\IeC {\~a}o das mensagens}{21}}
+\newlabel{sec:codificacao_mensagens}{{2.7.3}{21}}
 \citation{bellator_2012}
-\@writefile{toc}{\contentsline {chapter}{\numberline {3}\MakeUppercase  {Diagrama de blocos do hardware}}{25}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.1}\MakeUppercase  {Diagrama de blocos}}{25}}
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Diagrama de blocos do hardware\relax }}{25}}
-\newlabel{fig:diagrama_blocos_hardware}{{14}{25}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}\MakeUppercase  {Diagrama de blocos do hardware}}{26}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}\MakeUppercase  {Diagrama de blocos}}{26}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Diagrama de blocos do hardware\relax }}{26}}
+\newlabel{fig:diagrama_blocos_hardware}{{15}{26}}
 \bibdata{abnt-options,referencias}
-\@writefile{toc}{\contentsline {section}{\numberline {3.2}\MakeUppercase  {Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico}}{26}}
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico.\relax }}{27}}
-\newlabel{fig:diagrama_eletrico_eletronico}{{15}{27}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}\MakeUppercase  {Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico}}{27}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico.\relax }}{28}}
+\newlabel{fig:diagrama_eletrico_eletronico}{{16}{28}}
 \bibcite{bellator_2012}{Marin et al. 2012}
 \bibcite{bellator_2012++EXPL}{Marin et al.}
 \bibcite{bellator_2012++IMPL}{MARIN et al.}
 \bibcite{bellator_2012++YEAR}{2012}
-\@writefile{toc}{\contentsline {chapter}{REFER\^ENCIAS}{28}}
-\newlabel{LastPage}{{}{28}}
+\@writefile{toc}{\contentsline {chapter}{REFER\^ENCIAS}{29}}
+\newlabel{LastPage}{{}{29}}
 \bibstyle{abnt-alf}
