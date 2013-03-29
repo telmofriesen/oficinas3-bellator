@@ -4,7 +4,7 @@
  */
 package visual;
 
-import controle.*;
+import dados.Obstaculos;
 import java.awt.Color;
 import processing.core.PApplet;
 import processing.core.PVector;

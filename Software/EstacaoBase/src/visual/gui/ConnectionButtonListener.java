@@ -1,6 +1,6 @@
 package visual.gui;
 
-import comm.TR_ClientConnector;
+import comunicacao.ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JButton;
@@ -17,14 +17,14 @@ public class ConnectionButtonListener extends JButton implements MyChangeListene
 
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
-        if (evt.getSource() instanceof TR_ClientConnector) {
-            TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
+        if (evt.getSource() instanceof ClientConnector) {
+            ClientConnector connector = (ClientConnector) evt.getSource();
             int status = connector.getConnectionStatus();
             int error = connector.getErrorStatus();
             synchronized (this) {
                 if (lastStatus != status || lastError != error) {
-                    if (status == TR_ClientConnector.CONNECTED) {
-                        if (error == TR_ClientConnector.WARNING_COMMUNICATION_TIME) {
+                    if (status == ClientConnector.CONNECTED) {
+                        if (error == ClientConnector.WARNING_COMMUNICATION_TIME) {
                             java.awt.EventQueue.invokeLater(new Runnable() {
                                 public void run() {
                                     setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/wifi2-blue_dark.png")));
@@ -39,21 +39,21 @@ public class ConnectionButtonListener extends JButton implements MyChangeListene
                                 }
                             });
                         }
-                    } else if (status == TR_ClientConnector.CONNECTED_HANDSHAKE) {
+                    } else if (status == ClientConnector.CONNECTED_HANDSHAKE) {
                         java.awt.EventQueue.invokeLater(new Runnable() {
                             public void run() {
                                 setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/wifi2-yellow.png")));
                                 setToolTipText("Conectado (handshake...)");
                             }
                         });
-                    } else if (status == TR_ClientConnector.CONNECTING) {
+                    } else if (status == ClientConnector.CONNECTING) {
                         java.awt.EventQueue.invokeLater(new Runnable() {
                             public void run() {
                                 setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/wifi2-yellow.png")));
                                 setToolTipText("Conectando...");
                             }
                         });
-                    } else if (status == TR_ClientConnector.DISCONNECTED) {
+                    } else if (status == ClientConnector.DISCONNECTED) {
                         java.awt.EventQueue.invokeLater(new Runnable() {
                             public void run() {
                                 setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/wifi2-red.png")));

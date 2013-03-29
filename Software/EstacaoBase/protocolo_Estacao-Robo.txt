@@ -53,7 +53,7 @@ Solicita formalmente a desconexão.
 		[resolution] (String) Nova resolução widhtXheight da webcam
 
 - ENGINES 
-	[velocidade_roda_direita] [velocidade_roda_esquerda]
+	[velocidade_roda_esquerda] [velocidade_roda_direita]
 		Comanda o robô para mudar a velocidade das rodas direita e esquerda. 
 		Parâmetros:
 		[velocidade_roda_x] (float) Valor de -1 a 1, sendo 1 a máxima velocidade para frente, -1 a máxima velocidade para trás e 0 parada total.

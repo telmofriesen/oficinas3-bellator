@@ -1,0 +1,212 @@
+\documentclass{beamer}
+\usecolortheme{dove}
+% \usepackage[T1]{fontenc}
+% \usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+
+
+
+
+\begin{document}
+
+  %-----------------------------
+  \begin{frame}
+    \frametitle{Codificação das mensagens\\ (Linux Embarcado $\rightarrow$ Placa de baixo nível)}
+	\begin{itemize}
+	  \item \textbf{SYNC}\\
+	  \textit{(byte) END\_CMD}\\
+	  Quando o microcontrolador LPC2103 recebe esta mensagem, responde com as leituras mais recentes de cada sensor de distância, dos encoders, do acelerômetro e do giroscópio.
+	  \item \textbf{LEFT\_WHEEL}\\
+	  \textit{(byte) valor}\\
+	  \textit{(byte) END\_CMD}\\
+	  Ao receber este comando, o microcontrolador utiliza o valor para definir o nível de PWM para a roda esquerda do robô. Valor é representado por apenas um byte, onde o bit mais significativo indica o sentido de rotação da roda e os restantes a intensidade do PWM;
+	  
+	  \end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Linux Embarcado $\rightarrow$ Placa de baixo nível)}
+	  \begin{itemize}	  
+	  \item \textbf{RIGHT\_WHEEL}\\
+	  \textit{(byte) valor}\\
+	  \textit{(byte) END\_CMD}\\
+	  Funcionamento idêntico ao comando LEFT\_WHEEL, e mas para a roda direita.
+	  
+	   \end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Linux Embarcado $\leftarrow$ Placa de baixo nível)}
+	  \begin{itemize}
+	  
+	  \item \textbf{OPTICAL\_SENSOR}\\
+	   \textit{(byte) Número do sensor}\\
+	   \textit{(byte) Distância medida}\\
+	   \textit{(byte) END\_CMD}\\
+	   Representa a leitura de cada sensor, onde valor é um byte, cuja faixa de variação e [0, 255].
+	   
+	  \item \textbf{ENCODER}\\
+	  \textit{(byte) Número do encoder}\\
+	  \textit{(byte) valor\_high}\\
+	  \textit{(byte) valor\_low}\\
+	  \textit{(byte) END\_CMD}\\
+	  Representa a leitura de cada encoder, valor\_high e valor\_low juntos formam um inteiro de 16 bits que contém o valor da contagem do encoder.
+	  
+	  \end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Linux Embarcado $\leftarrow$ Placa de baixo nível)}
+	  \begin{itemize}
+	  \item \textbf{ACEL\_GYRO}\\
+	  \textit{(byte) TIMESTAMP}\\
+	  \textit{(byte) AX\_H}, \textit{(byte) AX\_L}\\
+	  \textit{(byte) AY\_H}, \textit{(byte) AY\_L}\\
+	  \textit{(byte) AZ\_H}, \textit{(byte) AZ\_L}\\
+	  \textit{(byte) GX\_H}, \textit{(byte) GX\_L}\\
+	  \textit{(byte) GY\_H}, \textit{(byte) GY\_L}\\
+	  \textit{(byte) GZ\_H}, \textit{(byte) GZ\_L}\\
+	  \textit{(byte) END\_CMD}\\
+	  Representa a leitura do acelerômetro e gisroscópio. Os bytes que começam com A representam a leitura de um dos eixos do acelerômetro. Aqueles que começam com G representam a leitura de um dos eixos do giroscópio.
+	\end{itemize}
+  \end{frame}
+  
+  
+  \begin{frame}
+    \frametitle{Codificação das mensagens\\ (Estação Base $\leftrightarrow$ Linux Embarcado)}
+    \begin{itemize}
+      \item \textbf{ECHO\_REQUEST}\\
+	Requisição de ping.
+      \item \textbf{ECHO\_REPLY}\\
+	Resposta de ping.
+      \item \textbf{DISCONNECT} \\
+	Solicitação de desconexão.
+    \end{itemize}
+  \end{frame}
+  
+  %--------------------
+  
+    \begin{frame}
+    \frametitle{Codificação das mensagens\\ (Estação Base $\rightarrow$ Linux Embarcado)}
+		\begin{itemize}
+		\item \textbf{HANDSHAKE\_REQUEST}\\
+		Solicitação de handshake.
+
+		\item \textbf{HANDSHAKE\_CONFIRMATION}\\
+		Confirmação de handshake.
+
+		\item \textbf{SENSORS\_START}\\
+		Solicitação de início da amostragem dos sensores.
+
+		\item \textbf{SENSORS\_STOP}\\
+		Solicitação de parada da amostragem dos sensores.
+
+		\item \textbf{SENSORS\_RATE} \\
+		\textit{(float) Nova taxa de amostragem (amostras/s)}\\
+		Solicitação de mudança da taxa de amostragem dos sensores.
+		
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Estação Base $\rightarrow$ Linux Embarcado)}
+		\begin{itemize}
+
+		\item \textbf{SENSORS\_STATUS\_REQUEST}\\
+		Solicitação de informações sobre status dos sensores.
+
+		\item \textbf{WEBCAM\_START}\\
+		Solicitação de início da amostragem da webcam.
+
+		\item \textbf{WEBCAM\_STOP}\\
+		Solicitação de parada da amostragem da webcam.
+
+		\item \textbf{WEBCAM\_RATE} \\
+		\textit{(float) Nova taxa de quadros por segundo}\\
+		Solicitação de mudança da taxa de quadros por segundo (fps) da webcam.
+		
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Estação Base $\rightarrow$ Linux Embarcado)}
+		\begin{itemize}
+
+		\item \textbf{WEBCAM\_RESOLUTION} \\
+		\textit{(int) Largura em pixels }\\
+		\textit{(int) Altura em pixels}\\
+		Solicitação de mudança da resolução da webcam.
+
+		\item \textbf{WEBCAM\_STATUS\_REQUEST}\\
+		Solicitação de informações sobre status da webcam.
+
+		\item \textbf{ENGINES\_SPEED} \\
+		\textit{(byte) Nova velocidade da roda esquerda (Valor de 0 a 255) }\\
+		\textit{(byte) Nova velocidade da roda direita (Valor de 0 a 255)}\\
+		Solicitação de mudança da velocidade dos motores.
+
+		\item \textbf{ENGINES\_STATUS\_REQUEST}\\
+		Solicitação de informações sobre status dos motores.
+		\end{itemize}
+  \end{frame}
+  
+  %-------------------------------------
+  \begin{frame}
+	\frametitle{Codificação das mensagens\\ (Estação Base $\leftarrow$ Linux Embarcado)}
+	\begin{itemize}
+		\item \textbf{HANDSHAKE\_REPLY}\\
+		Resposta de handshake.
+
+		\item \textbf{SENSORS\_STATUS} \\
+		\textit{(boolean) Status da amostragem [on - off] }\\
+		\textit{(float) Taxa de amostragem}\\
+		Informações de status dos sensores.
+
+		\item \textbf{WEBCAM\_STATUS} \\
+% 		\textit{(boolean) Nova taxa de amostragem }\\
+		\textit{(float) Taxa de quadros }\\
+		\textit{(int) Largura em pixels }\\
+		\textit{(int) Altura em pixels }\\
+		\textit{(boolean) Status da stream [on - off] }\\
+		\textit{(int) Porta da stream}\\
+		Informações de status da webcam.
+		
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Estação Base $\leftarrow$ Linux Embarcado)}
+		\begin{itemize}
+			
+		\item \textbf{ENGINES\_STATUS} \\
+		\textit{(byte) Velocidade programada da roda esquerda (Valor de 0 a 255) }\\
+		\textit{(byte) Velocidade programada da roda direita (Valor de 0 a 255)}\\
+		Informações de status dos motores.
+
+		\item \textbf{ENCODERS} \\
+		\textit{(int) Leitura roda esquerda }\\
+		\textit{(int) Leitura roda direita }\\
+		\textit{(long) Timestamp UNIX em milissegundos}\\
+		Envio de leituras dos encoders.
+		
+		\end{itemize}
+	\end{frame}
+	\begin{frame}
+	\frametitle{Codificação das mensagens\\ (Estação Base $\leftarrow$ Linux Embarcado)}
+		\begin{itemize}
+
+		\item \textbf{ACEL\_GYRO} \\
+		\textit{(int) Aceleração em X }\\
+		\textit{(int) Aceleração em Y }\\
+		\textit{(int) Aceleração em Z }\\
+		\textit{(int) Aceleração angular em X }\\
+		\textit{(int) Aceleração angular em Y }\\
+		\textit{(int) Aceleração angular em Z }\\
+		\textit{(long) Timestamp UNIX em milissegundos}\\
+		Envio de leituras do acelerômetro e giroscópio.
+
+		\item \textbf{OPTICAL\_SENSORS} \\
+% 		\textit{(byte) Número do sensor infra-vermelho} \\
+		\textit{(byte[]) Distâncias detectada pelos sensores} \\
+		\textit{(long) Timestamp UNIX em milissegundos}\\
+		Envio de leituras dos sensores ópticos.
+
+		\end{itemize}
+	\end{frame}
+  
+\end{document}

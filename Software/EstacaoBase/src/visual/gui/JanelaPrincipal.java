@@ -1,10 +1,19 @@
 package visual.gui;
 
+import dados.Robo;
+import dados.ControleCamera;
+import dados.SensorIR;
+import dados.Obstaculos;
+import dados.ContadorAmostragemTempoReal;
+import dados.EnginesSpeed;
+import dados.ControleSensores;
+import dados.ControleMotores;
+import dados.Mapa;
+import dados.MovementKeyboardListener;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
-import comm.TR_ClientCommandInterpreter;
-import comm.TR_ClientConnector;
-import controle.*;
+import comunicacao.ClientMessageInterpreter;
+import comunicacao.ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.BorderLayout;
@@ -58,7 +67,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private ControleCamera controleCamera;
     private ControleMotores controleMotores;
     private JanelaConexao janelaConexao;
-    private TR_ClientConnector connector;
+    private ClientConnector connector;
     private JanelaSensores janelaSensores;
     private ControleSensoresListener infoListenerControleSensores;
     private CameraInfoListener cameraInfoListener;
@@ -80,10 +89,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //Cria um objeto seletor de arquivos na pasta atual, com a extensão "bellator"
         fc = new CustomFileChooser(new File(".").getAbsolutePath(), "bellator");
         //Inicializa conector e interpretador de comandos.
-        connector = new TR_ClientConnector();
+        connector = new ClientConnector();
         controleCamera = new ControleCamera();
         controleMotores = new ControleMotores();
-        TR_ClientCommandInterpreter interpreter = new TR_ClientCommandInterpreter(connector, controleSensores, controleCamera);
+        ClientMessageInterpreter interpreter = new ClientMessageInterpreter(connector, controleSensores, controleCamera);
         connector.setInterpreter(interpreter);
         //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
@@ -704,8 +713,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         private int lastStreamPort = -1;
 
         private void startStreamPlayer(final String ip, final int port) {
-//            final String url = String.format("http://%s:%d", ip, port);
-            final String url = String.format("rtp://@%s:%d", ip, port);
+            final String url = String.format("http://%s:%d", ip, port);
+//            final String url = String.format("rtp://@%s:%d", ip, port);
             System.out.println("---- INICIANDO STREAM: " + url);
             mediaPlayerComponent.getMediaPlayer().playMedia(url);
 //            mediaPlayer.getVi
@@ -931,9 +940,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                                 icon = "/visual/gui/icons/arrows/rotate_right.png";
                                 break;
                         }
+                        lastMovType = movType;
+
+
+                        if (connector.isConnected()) {
+                            movementImagePanel.changeImageFromRelativePath(icon);
+                            EnginesSpeed speed = c.getNewEngineSpeed();
+                            connector.sendMessage(String.format("ENGINES %.2f %.2f", speed.leftSpeed, speed.rightSpeed), true);
+                        }
                     }
-                    movementImagePanel.changeImageFromRelativePath(icon);
-                    lastMovType = movType;
                 }
             }
         }

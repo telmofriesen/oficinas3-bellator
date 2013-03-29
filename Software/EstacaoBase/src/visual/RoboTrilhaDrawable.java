@@ -4,7 +4,7 @@
  */
 package visual;
 
-import controle.Robo;
+import dados.Robo;
 import java.awt.Color;
 import processing.core.PApplet;
 

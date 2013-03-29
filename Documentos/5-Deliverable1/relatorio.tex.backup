@@ -1,0 +1,58 @@
+% \documentclass{report}
+% \usepackage[utf8]{inputenc}
+% \usepackage[brazil]{babel}
+
+\documentclass[oneside,a4paper,12pt]{normas-utf-tex}
+
+\usepackage{breakurl}
+\usepackage[alf,abnt-emphasize=bf,bibjustif,recuo=0cm, abnt-etal-cite=2]{abntcite}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx,subfig}
+\usepackage{times}
+\usepackage[plain]{fancyref}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{amsmath}
+\usepackage{array}
+\newcolumntype{M}{>{\centering\arraybackslash}m{\dimexpr.3\linewidth-\tabcolsep}}
+
+%%% Complemento para tabelas
+\usepackage{booktabs, multirow}
+\setlength{\heavyrulewidth}{0.1em}
+\renewcommand{\toprule}{\midrule[\heavyrulewidth]}
+\renewcommand{\arraystretch}{1.2}
+%%%
+
+\instituicao{Universidade Tecnológica Federal do Paraná}
+\departamento{Departamento Acadêmico de Eletrônica}
+\departamentodois{Departamento Acadêmico de Informática}
+\programa{Curso de Engenharia de Computação}
+\unidade{Eletrônica Geral 2}
+
+\titulo{\MakeUppercase{Relatório de prática experimental 1}}
+\documento{Relatório}
+
+\autor{Pedro Alberto de Borba}
+\autordois{Rafael Barcelos Lemos dos Santos}
+
+\cita{CAMARGO, L.G.M; BORBA}
+
+\comentario{\UTFPRdocumentodata\ apresentada à Unidade Curricular de \UTFPRunidadedata\ do \UTFPRprogramadata\ da \ABNTinstituicaodata\ como requisito parcial para aprovação.}
+
+\local{Curitiba}
+\data{\the\year}
+
+\begin{document}
+
+%\capa
+%\folhaderosto
+\sumario
+\input{amplificadores}
+
+\raggedright
+%\bibliography{referencias}
+
+\end{document}
+

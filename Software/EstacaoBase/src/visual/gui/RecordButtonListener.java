@@ -1,7 +1,7 @@
 package visual.gui;
 
-import comm.TR_ClientConnector;
-import controle.ControleSensores;
+import comunicacao.ClientConnector;
+import dados.ControleSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JToggleButton;
@@ -31,9 +31,9 @@ public class RecordButtonListener extends JToggleButton implements MyChangeListe
             }
         }
         //Mudanças no Connector
-        if (evt.getSource() instanceof TR_ClientConnector) {
-            TR_ClientConnector connector = (TR_ClientConnector) evt.getSource();
-            if (connector.getConnectionStatus() != TR_ClientConnector.CONNECTED) {
+        if (evt.getSource() instanceof ClientConnector) {
+            ClientConnector connector = (ClientConnector) evt.getSource();
+            if (connector.getConnectionStatus() != ClientConnector.CONNECTED) {
                 //Se não houver conexão, desabilita a gravação de leituras.
                 if (this.isSelected()) {
                     java.awt.EventQueue.invokeLater(new Runnable() {

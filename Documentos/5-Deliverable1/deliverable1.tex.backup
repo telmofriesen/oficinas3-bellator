@@ -1,0 +1,153 @@
+\chapter{Deliverable 1 - 13/03/2013}
+
+Conforme estabelecido na relação de deliverables, este primeiro entregável consiste nos seguintes itens:
+\begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+	\item Versões iniciais dos diagramas de casos de uso e de classes (estação base).
+	\item Versão inicial do diagrama em blocos (hardware).
+	\item Explicação inicial de cada bloco (hardware).
+\end{enumerate}
+
+\section{Modelagem UML}
+\subsection{Diagrama de casos de uso}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/diagrama_casos_de_uso.png}
+  \caption{Diagrama de casos de uso}
+  \fonte{Autoria própria}
+  \label{fig:diagrama_casos_de_uso}
+\end{figure}
+
+\subsection{Descrição das classes}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Pacote visual}
+    \begin{tabular}{p{6cm}p{8cm}}
+    \toprule
+    \textbf{Classe} & \textbf{Descrição} \\ \hline
+    \midrule
+    Viewer2D & Responsável por exibir os objetos Drawable2D. Possui recursos de pan, zoom e rotate.   \\ \hline
+    Drawable2D & Interface genérica para objetos visuais que podem ser desenhados em um Viewer2D. \\ \hline
+    EscalaDrawable & Responsável por desenhar uma escala gráfica. \\ \hline
+    RoboDrawable & Responsável por desenhar o robô na interface gráfica. \\ \hline
+    RoboTrilhaDrawable & Responsável por desenhar a trilha percorrida pelo robô na interface gráfica. \\ \hline
+    ObstaculosDrawable & Responsável por desenhar os pontos de cada obstáculo na interface gráfica. \\ \hline
+    EscalaDrawableProp & Contém as propriedades visuais de desenho da escala. \\ \hline
+    RoboDrawableProp & Contém as propriedades visuais de desenho do robô \\ \hline
+    RoboTrilhaDrawableProp & Contém as propriedades visuais de desenho da trilha do robô. \\ \hline
+    ObstaculosDrawableProp & Contém as propriedades visuais de desenho dos obstáculos. \\ \hline
+    Ponto & Representa um ponto de cordenadas cartesianas. \\ \hline
+    \bottomrule
+    \end{tabular}%
+  \label{tab:pacote_visual}%
+\end{table}%
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{Pacote de controle}
+    \begin{tabular}{p{6cm}p{8cm}}
+    \toprule
+    \textbf{Classe} & \textbf{Descrição} \\ \hline
+    \midrule
+    Mapa  & Responsável por representar o mapa. Armazena as informações essenciais do robô e dos obstáculos detectados. \\ \hline
+    Obstaculos & Responsável por conter os obstáculos detectados pelo robô. \\ \hline
+    Robo  & Responsável por representar o robô, este contêm largura, comprimento e centro de movimento (ponto central entre as duas rodas). \\ \hline
+    ControleSensores & Responsável em atualizar a posição do robô e dos pontos que representão os obstáculos, de acordo com as leituras feitas pelos sensores. \\ \hline
+    Posinfo & Responsável por conter as informações de uma posição do robô. \\ \hline
+    SensorIR & Responsável por representar um sensor IR do robô. \\ \hline
+    ControleCamera & Responsável por controlar as imagens da câmera e o status do recebimento das imagens. \\ \hline
+    \bottomrule
+    \end{tabular}%
+  \label{tab:pacote_controle}%
+\end{table}%
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{Pacote de comunicação}
+    \begin{tabular}{p{6cm}p{8cm}}
+    \toprule
+    \textbf{Classe} & \textbf{Descrição} \\ \hline
+    \midrule
+    ClientCommandInterpreter & Responsável pela interpretação dos comandos do cliente. Os comandos recebidos são inseridos em uma fila, de modo a serem posteriormente executados pela thread. \\ \hline
+    ClientConnection & Responsável por efetuar a gerência da conexão do cliente (estação base) com o servidor (robô). \\ \hline
+    ClientReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
+    ClientSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
+    ServerCommandInterpreter & Responsável pela interpretação dos comandos do servidor. Os comandos recebidos são inseridos em uma fila, de modo a serem posteriormente executados pela thread. \\ \hline
+    ServerListener & Responsável por escutar as novas conexões de clientes. \\ \hline
+    ServerSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
+    ServerReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
+    Message & Contém uma mensagem a ser enviada por um Sender. \\ \hline
+    \bottomrule
+    \end{tabular}%
+  \label{tab:pacote_comunicacao}%
+\end{table}%
+
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{Pacote de interface gráfica}
+    \begin{tabular}{p{6cm}p{8cm}}
+    \toprule
+    \textbf{Classe} & \textbf{Descrição} \\ \hline
+    \midrule
+    JanelaConexao & Responsável por conter a janela com as informações e configurações da conexão com o Bellator. \\ \hline
+    JanelaPrincipal & Responsável por desenhar a janela principal da interface gráfica do Bellator. \\ \hline
+    JanelaSensores & Responsável por desenhar a janela responsável pela configuração dos sensores. \\ \hline
+    \bottomrule
+    \end{tabular}%
+  \label{tab:pacote_interface_grafica}%
+\end{table}%
+
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{Pacote de controle de robô}
+    \begin{tabular}{p{6cm}p{8cm}}
+    \toprule
+    \textbf{Classe} & \textbf{Descrição} \\ \hline
+    \midrule
+    SensorsManager & Responsável por gerenciar a coleta de informações dos sensores do robô. \\ \hline
+    WebcamManager & Responsável por gerenciar a captura de imagens da webcam. \\ \hline
+    EnginesManager & Responsável por gerenciar a ação dos motores do robô. \\ \hline
+    \bottomrule
+    \end{tabular}%
+  \label{tab:pacote_controle_robo}%
+\end{table}%
+
+
+
+\subsection{Diagrama de classes}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{./figuras/diagrama_classes.png}
+  \caption{Diagrama de classes}
+  \fonte{Autoria própria}
+  \label{fig:diagrama_classes}
+\end{figure}
+
+\section{Diagrama de blocos do hardware}
+Na figura \ref{fig:diagrama_blocos_hardware} mostra-se o diagrama de blocos do sistema embarcado e suas conexões com o restante do robô. A seguir está também uma descrição para cada um dos blocos da placa de circuito impresso do sistema embarcado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{./figuras/diagrama_blocos_hardware.png}
+  \caption{Diagrama de blocos do hardware}
+  \fonte{Autoria própria}
+  \label{fig:diagrama_blocos_hardware}
+\end{figure}
+
+
+\begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+    \item Microcontrolador: Este bloco fará a leitura dos sensores: encoders, infra-vermelhos, acelerômetro e giroscópios. Além disso possui a implementação do protocolo de comunicação para interação com o linux embarcado da placa TS-7260.
+    \item UART 0/1: Responsável por ajustar os níveis de tensão para comunicação serial no padrão RS-232 com a placa TS-7260.
+    \item Buffer: Responsável por fornecer corrente e elevar os níveis de tensão de saída do microcontrolador de 3,3V para 5,0V. Esse buffer é conectado às pontes H já existentes no robô.
+    \item IMU: possui o acelerômetro e o giroscópio e se comunicará com o microcontrolador por meio do protocolo I2C.
+    \item Limitador de tensão: Necessário pois os sinais de saída dos sensores de infravermelho que já existem no robô não estão limitados em 5V, podendo a saída ultrapassar 5,0V e danificar o microcontrolador. 
+    \item Tratamento de sinal: Composto com um filtro RC passa baixas e um schmitt trigger para remover qualquer falha que possa ocorrer na geração dos pulsos no encoder. A frequência de corte do filtro pode ser obtida pela velocidade máxima que o robô pode atingir e que foi suposta em 1m/s nos requisitos de hardware mencionados anteriormente.
+\end{enumerate}
+

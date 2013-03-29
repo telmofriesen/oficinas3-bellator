@@ -1,8 +1,8 @@
 package visual.gui;
 
-import comm.TR_ClientConnector;
-import controle.ControleCamera;
-import controle.ControleSensores;
+import comunicacao.ClientConnector;
+import dados.ControleCamera;
+import dados.ControleSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.event.ActionEvent;
@@ -27,8 +27,8 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
         //Se o status da conexão mudar...
-        if (evt.getSource() instanceof TR_ClientConnector) {
-            TR_ClientConnector c = (TR_ClientConnector) evt.getSource();
+        if (evt.getSource() instanceof ClientConnector) {
+            ClientConnector c = (ClientConnector) evt.getSource();
             if (!c.isConnected()) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
@@ -148,12 +148,12 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
     boolean lastCameraSamplingStatus = false;
     ControleSensores controleSensores;
     ControleCamera controleCamera;
-    TR_ClientConnector connector;
+    ClientConnector connector;
 
     /**
      * Creates new form JanelaSensores
      */
-    public JanelaSensores(ControleSensores controle, ControleCamera controleCamera, TR_ClientConnector connector) {
+    public JanelaSensores(ControleSensores controle, ControleCamera controleCamera, ClientConnector connector) {
         this.controleSensores = controle;
         this.controleCamera = controleCamera;
         this.connector = connector;

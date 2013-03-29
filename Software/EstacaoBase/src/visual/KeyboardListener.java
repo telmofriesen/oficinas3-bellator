@@ -9,6 +9,10 @@ package visual;
  * @author stefan
  */
 public interface KeyboardListener {
+    
+//    public void keyDown(int keyCode);
+//    
+//    public void keyUp(int keyCode);
 
     public void keyPressed(int keyCode);
 

@@ -1,0 +1,12 @@
+#Montar particao 4 
+sudo mount 512mbsd-7400-linux2629-lenny-eabi.dd part4 -oloop,offset=0xc40000
+
+#Carregar kernel via HTTP
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/zImage-72xx-2.6.21-ts
+load -r -v -b 0x00600000 -m http -h 192.168.10.36 /TS/initrd-9444.gz
+load -r -v -b 0x00800000 -m http -h 192.168.10.36 /TS/initrd-9444.gz
+exec -c 'console=ttyAM0,115200 root=/dev/mtdblock1'
+exec -b 0x00218000 -l 0x164BB3 -c "console=ttyAM0,115200 ip=dhcp nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4"
+exec -b 0x00218000 -l 0x164BB3 -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4"
+
+exec -b 0x00218000 -c 'console=ttyAM0,115200 nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4'

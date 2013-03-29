@@ -1,0 +1,110 @@
+\begin{itemize}
+  \item Mensagens bidirecionais:
+
+    \begin{itemize}
+      \item \textbf{ECHO\_REQUEST}\\
+	Requisição de ping.
+      \item \textbf{ECHO\_REPLY}\\
+	Resposta de ping.
+      \item \textbf{DISCONNECT} \\
+	Solicitação de desconexão.
+    \end{itemize}
+
+  \item Mensagens da estação base para o robô:
+
+    \begin{itemize}
+      \item \textbf{HANDSHAKE\_REQUEST}\\
+	Solicitação de handshake.
+
+      \item \textbf{HANDSHAKE\_CONFIRMATION}\\
+	Confirmação de handshake.
+
+      \item \textbf{SENSORS\_START}\\
+	Solicitação de início da amostragem dos sensores.
+
+      \item \textbf{SENSORS\_STOP}\\
+	Solicitação de parada da amostragem dos sensores.
+
+      \item \textbf{SENSORS\_RATE} \\
+	\textit{(float) Nova taxa de amostragem}\\
+	Solicitação de mudança da taxa de amostragem dos sensores.
+
+      \item \textbf{SENSORS\_STATUS\_REQUEST}\\
+	Solicitação de informações sobre status dos sensores.
+
+      \item \textbf{WEBCAM\_START}\\
+	Solicitação de início da amostragem da webcam.
+
+      \item \textbf{WEBCAM\_STOP}\\
+	Solicitação de parada da amostragem da webcam.
+
+      \item \textbf{WEBCAM\_RATE} \\
+	\textit{(float) Nova taxa de quadros}\\
+	Solicitação de mudança da taxa de quadros da webcam.
+
+      \item \textbf{WEBCAM\_RESOLUTION} \\
+	\textit{(int) Largura em pixels }\\
+	\textit{(int) Altura em pixels}\\
+	Solicitação de mudança da resolução da webcam.
+
+      \item \textbf{WEBCAM\_STATUS\_REQUEST}\\
+	Solicitação de informações sobre status  da webcam.
+
+      \item \textbf{ENGINES\_SPEED} \\
+	\textit{(byte) Nova velocidade da roda esquerda (Valor de 0 a 255) }\\
+	\textit{(byte) Nova velocidade da roda direita (Valor de 0 a 255)}\\
+	Solicitação de mudança da velocidade dos motores.
+
+      \item \textbf{ENGINES\_STATUS\_REQUEST}\\
+	Solicitação de informações sobre status dos motores.
+
+    \end{itemize}
+
+  \item Mensagens do robô para a estação base:
+
+    \begin{itemize}
+      \item \textbf{HANDSHAKE\_REPLY}\\
+	Resposta de handshake.
+
+      \item \textbf{SENSORS\_STATUS\_REPLY} \\
+	\textit{(boolean) Status da amostragem [on - off] }\\
+	\textit{(float) Taxa de amostragem}\\
+	Resposta de status da amostragem dos sensores.
+
+      \item \textbf{WEBCAM\_STATUS\_REPLY} \\
+	\textit{(boolean) Nova taxa de amostragem }\\
+	\textit{(float) Taxa de quadros }\\
+	\textit{(int) Largura em pixels }\\
+	\textit{(int) Altura em pixels }\\
+	\textit{(boolean) Status da stream [on - off] }\\
+	\textit{(int) Porta da stream}\\
+	Resposta de status da amostragem da webcam.
+
+      \item \textbf{ENGINES\_STATUS\_REPLY} \\
+	\textit{(byte) Velocidade programada da roda esquerda (Valor de 0 a 255) }\\
+	\textit{(byte) Velocidade programada da roda direita (Valor de 0 a 255)}\\
+	Resposta de status dos motores.
+
+      \item \textbf{ENCODERS} \\
+	\textit{(int) Leitura roda esquerda }\\
+	\textit{(int) Leitura roda direita }\\
+	\textit{(long) Timestamp em milissegundos}\\
+	Envio de leituras dos encoders.
+
+      \item \textbf{ACEL\_GYRO} \\
+	\textit{(int) Aceleração em X }\\
+	\textit{(int) Aceleração em Y }\\
+	\textit{(int) Aceleração em Z }\\
+	\textit{(int) Aceleração angular em X }\\
+	\textit{(int) Aceleração angular em Y }\\
+	\textit{(int) Aceleração angular em Z }\\
+	\textit{(long) Timestamp em milissegundos}\\
+	Envio de leituras do acelerômetro e giroscópio.
+
+      \item \textbf{OPTICAL\_SENSORS} \\
+	\textit{(byte[]) Distâncias detectadas pelos sensores ópticos} \\
+	\textit{(long) Timestamp em milissegundos}\\
+	Envio de leituras dos sensores ópticos.
+
+    \end{itemize}
+\end{itemize}

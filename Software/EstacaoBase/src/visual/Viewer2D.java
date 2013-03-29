@@ -1,6 +1,7 @@
 package visual;
 
 import java.awt.Event;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -121,7 +122,7 @@ public class Viewer2D extends PApplet {
 //        text(String.format("origemRealNaInterface.y=%.2f px", origemRealNaInterface.y), 5, 30);
         text(String.format("origemRealNaInterface:(%.2f, %.2f) px", origemRealNaInterface.x, origemRealNaInterface.y), 5, 15);
         text(String.format("angulo_visao=%.2f deg", degrees(angulo_visao)), 5, 30);
-        text(String.format("escala=%.2f px/cm", escala*10), 5, 45);
+        text(String.format("escala=%.2f px/cm", escala * 10), 5, 45);
         text(String.format("frameRate=%.2f fps", frameRate), 5, 60);
         //text(String.format("robo.", ), 5, 80);
 
@@ -277,7 +278,7 @@ public class Viewer2D extends PApplet {
         listaMouseListener2D.remove(obj);
         redraw();
     }
-    
+
     /**
      * Adiciona um KeyboardListener
      *
@@ -341,14 +342,14 @@ public class Viewer2D extends PApplet {
         setAngulo(angulo_visao + step);
         origemRealNaInterface.rotate(step);
     }
-    
+
     @Override
     public void keyPressed() {
         super.keyPressed();
-        for(KeyboardListener x : listaKeyboardListener){
+        for (KeyboardListener x : listaKeyboardListener) {
             x.keyPressed(keyCode);
         }
-        System.out.println("keyCode: " + keyCode);
+//        System.out.println("keyCode: " + keyCode);
         switch (keyCode) {
 //            case RIGHT:
 //                rotate_view(angulo_step);
@@ -385,7 +386,7 @@ public class Viewer2D extends PApplet {
 
     @Override
     public void keyReleased() {
-        for(KeyboardListener x : listaKeyboardListener){
+        for (KeyboardListener x : listaKeyboardListener) {
             x.keyReleased(keyCode);
         }
         if (keyCode == CONTROL) {
@@ -443,8 +444,8 @@ public class Viewer2D extends PApplet {
         origemRealNaInterface.y = (0);
         redraw();
     }
-    
-    public synchronized void reset(){
+
+    public synchronized void reset() {
         listaDrawable2D.clear();
         listaMouseListener2D.clear();
         resetView();
