@@ -1,0 +1,22 @@
+
+SYNC END_CMD = B0 FE
+
+8051:
+00000000: 22 30 fe a1 a4 c8 0a 24   fe fe 0a 25 4d fe 0a 26 
+00000010: 18 fe 0a 27 09 fe 0a 20   00 00 fe 0a 21 00 00 fe 
+00000020: 0a 
+ARM:
+
+
+
+LEFT WHEEL 0x0F END_CMD = A1 0F FE
+
+8051: gira a roda esquerda
+ARM:
+
+
+RIGHT WHEEL 0x0F END_CMD = A0 0F FE
+
+8051: gira a roda direita
+ARM:
+
