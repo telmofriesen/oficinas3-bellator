@@ -62,3 +62,10 @@ Ambiente para desenvolvimento do hardware
 instalar geda (gschem) e pcb pelo synaptic
 copiar a biblioteca de comoponentes para /usr/share/gEDA/sym e dar permicoes adequadas
 
+
+
+Para gerar pdf:
+- imprimir para arquivo.ps
+- ps2pdf -sPAPERSIZE=a1 ./bellator2.1.ps
+
+
