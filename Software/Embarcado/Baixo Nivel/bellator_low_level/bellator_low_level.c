@@ -250,10 +250,15 @@ inline void pulses_in_init(void){
 	log_string_debug(">> pulses_in_init\n");
 
 	// Set the pin function
+	PINSEL1 |= 0x1 << 0;  // EINT0
 	PINSEL1 |= 0x2 << 22; // CAP2.0
 	PINSEL1 |= 0x2 << 24; // CAP2.1
 	PINSEL1 |= 0x2 << 26; // CAP2.2
-	PINSEL1 |= 0x1 << 0;  // EINT0
+
+	// EINT setup
+	EXTMODE |= 0x1 << 0; // EINT is edge sensitive
+	EXTPOLAR |= 0x1 << 0; // EINT is rising edge sensitive
+	EXTINT |= 0x1 << 0; // reset EINT0
 
 	// Timer Setup
 	T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
@@ -261,16 +266,11 @@ inline void pulses_in_init(void){
 	T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
 	T2TCR = 1; //enable T2
 
-	// EINT setup
-	EXTMODE |= 0x1 << 0; // EINT is edge sensitive
-	EXTPOLAR |= 0x1 << 0; // EINT is rising edge sensitive
-	EXTINT |= 0x1 << 0; // reset EINT0
-
 	// Enable the interrupts
-	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
-	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
 	VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
 	VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
+	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
+	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
 
 	log_string_debug("<< pulses_in_init\n");
 }
@@ -540,23 +540,23 @@ void encoder_pulse_in_isr(void) {
 	const unsigned short ir = T2IR;
 
 	if (ir & (0x1 << 4)) { //CAP2.0 left encoder
-		log_string_debug("FIQ1\n");
-		encoder_count[0]++;
-		T2IR |= 0x1 << 4; // reset CAP2.0
-	}
-	else if (ir & (0x1 << 5)) { //CAP2.1 left encoder
 		log_string_debug("FIQ2\n");
 		//detectar sentido
+		T2IR |= 0x1 << 4; // reset CAP2.0
+	}
+	else if (ir & (0x1 << 5)) { //CAP2.1 right encoder
+		log_string_debug("FIQ3\n");
+		encoder_count[1]++;
 		T2IR |= 0x1 << 5; // reset CAP2.1
 	}
 	else if (ir & (0x1 << 6)) { //CAP2.2 right encoder
-		log_string_debug("FIQ3\n");
-		encoder_count[1]++;
-		T2IR |= 0x1 << 6; // reset CAP2.1
-	}
-	else {
 		log_string_debug("FIQ4\n");
 		//detectar sentido
+		T2IR |= 0x1 << 6; // reset CAP2.2
+	}
+	else { // EINT0 left encoder
+		log_string_debug("FIQ1\n");
+		encoder_count[0]++;
 		EXTINT |= 0x1 << 0; // reset EINT0
 	}
 
