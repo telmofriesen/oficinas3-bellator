@@ -1,0 +1,21 @@
+Element["" "SOT363" "SOT363" "SOT363" 824.81mil 121.0000mm -19.69mil 2.0000mm 0 100 ""]
+(
+	Pad[-15.75mil 0.0000 19.68mil 0.0000 15.75mil 39.37mil 19.69mil "1" "1" "square"]
+	Pad[-15.75mil 25.59mil 19.68mil 25.59mil 15.75mil 39.37mil 19.69mil "2" "2" "square"]
+	Pad[-15.75mil 51.18mil 19.68mil 51.18mil 15.75mil 39.37mil 19.69mil "3" "3" "square"]
+	Pad[84.64mil 51.18mil 120.07mil 51.18mil 15.75mil 39.37mil 19.69mil "4" "4" "square,edge2"]
+	Pad[84.64mil 25.59mil 120.07mil 25.59mil 15.75mil 39.37mil 19.69mil "5" "5" "square,edge2"]
+	Pad[84.64mil 0.0000 120.07mil 0.0000 15.75mil 39.37mil 19.69mil "6" "6" "square,edge2"]
+	ElementLine [31.50mil -1.97mil 43.31mil -13.78mil 6.00mil]
+	ElementLine [72.84mil 0.0000 94.49mil 0.0000 6.00mil]
+	ElementLine [72.84mil 25.59mil 94.49mil 25.59mil 6.00mil]
+	ElementLine [72.84mil 51.18mil 94.49mil 51.18mil 6.00mil]
+	ElementLine [31.50mil 51.18mil 9.84mil 51.18mil 6.00mil]
+	ElementLine [31.50mil 25.59mil 9.84mil 25.59mil 6.00mil]
+	ElementLine [31.50mil 0.0000 9.84mil 0.0000 6.00mil]
+	ElementLine [72.84mil -13.78mil 72.84mil 64.96mil 6.00mil]
+	ElementLine [72.84mil 64.96mil 31.50mil 64.96mil 6.00mil]
+	ElementLine [43.31mil -13.78mil 72.84mil -13.78mil 6.00mil]
+	ElementLine [31.50mil 64.96mil 31.50mil -1.97mil 6.00mil]
+
+	)

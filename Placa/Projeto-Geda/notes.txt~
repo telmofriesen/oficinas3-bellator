@@ -1,0 +1,27 @@
+saidas medidas do IR
+140mV - 3.82V
+TODO: 
+Adicionar Jack de alimentacao na placa
+Botar pra funcionar com o 8051
+mudar o protocolo para que o valor fique antes do Lef_wheel ou right_wheel.. do jeito que esta os valores do pwm podem ser interpretados como comandos. ie.:a1fffe
+implementar logica para detectar sentido do encoder
+
+Conector:
+
+verde		Esq	F	T1MT1
+amarelo		Esq	B	T1MT0
+azul		Dir	F	T0MT1
+cinza		Dir	B	T0MT2
+
+
+1. Criar esquematico com gschem.
+2. Achar footprints 
+	colocar na pasta footprints
+	configurar nos atributos dos componentes
+3. Rodar refdesrenum
+4. Rodar gschem2pcb
+
+Para gerar pdf:
+- imprimir para arquivo.ps no gschem
+- ps2pdf -sPAPERSIZE=a1 ./bellator2.1.ps
+
