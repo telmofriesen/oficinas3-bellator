@@ -44,7 +44,7 @@ LOAD /opt/arm-none-linux/bin/../lib/gcc/arm-none-linux-gnueabi/4.5.2/armv4t/libg
 END GROUP
                 0x00000400                STACK_SIZE = 0x400
 
-.text           0x00000000     0x1495
+.text           0x00000000     0x1894
  *crt0.o(.text)
  .text          0x00000000      0x10c build/crt0.o
                 0x00000000                _boot
@@ -56,146 +56,148 @@ END GROUP
                 0x000000ec                abort
                 0x000000ec                exit
  *(.text)
- .text          0x0000010c     0x1378 bellator_low_level.o
-                0x00000138                i2c_read_bytes_isr
-                0x0000028c                i2c_write_byte_isr
-                0x00000378                imu_data_ready
-                0x000003b4                error
-                0x000003b8                logger_init
-                0x00000414                log_int
-                0x000004b8                log_short
-                0x00000524                log_string
-                0x00000558                log_byte
-                0x000005a4                log2bytes
-                0x00000610                log4bytes
-                0x000006b4                i2c_init
-                0x00000714                i2c_read_bytes
-                0x0000076c                i2c_read_byte
-                0x00000778                i2c_write_byte
-                0x000007e0                i2c_write_bits
-                0x00000838                mpu_set_clock_source
-                0x0000084c                mpu_set_full_scale_gyro_range
-                0x00000860                mpu_set_full_scale_accel_range
-                0x00000874                mpu_set_sleep_enable
-                0x00000888                mpu_set_temperature_sensor_enabled
-                0x000008a0                mpu_set_gyro_rate
-                0x000008ac                mpu_set_DLPF_mode
-                0x000008c0                mpu_set_6axis_FIFO_enabled
-                0x000008cc                mpu_set_interrupt_mode
-                0x000008e0                mpu_set_interrupt_drive
-                0x000008f4                mpu_set_interrupt_latch
-                0x00000908                mpu_set_FIFO_overflow_interrupt
-                0x0000091c                mpu_set_data_ready_interrupt
-                0x00000930                mpu_clear_interrupt
-                0x0000093c                mpu_set_FIFO_enabled
-                0x00000950                mpu_reset_FIFO
-                0x00000964                mpu_init
-                0x000009ec                mpu_get_FIFO_size
-                0x00000a1c                mpu_get_motion6
-                0x00000ad0                mpu_get_FIFO_motion6
-                0x00000b84                main
-                0x0000104c                encoder_pulse_in_isr
-                0x000010e8                get_ir_sensor_data
-                0x0000117c                get_encoder_count
-                0x000011a0                set_wheel_pwm
-                0x0000120c                protocol_in
+ .text          0x0000010c     0x1748 bellator_low_level.o
+                0x0000012c                i2c_write_byte_isr
+                0x000002e8                protocol_in
+                0x00000494                logger_init
+                0x000004f8                log_int
+                0x000005a0                log_short
+                0x00000610                log_string
+                0x00000650                error
+                0x00000668                i2c_read_bytes_isr
+                0x0000094c                log_byte
+                0x0000099c                log2bytes
+                0x00000a0c                log4bytes
+                0x00000ab4                i2c_init
+                0x00000b18                i2c_read_bytes
+                0x00000b74                i2c_read_byte
+                0x00000b8c                i2c_write_byte
+                0x00000bf8                i2c_write_bits
+                0x00000c58                mpu_set_clock_source
+                0x00000c78                mpu_set_full_scale_gyro_range
+                0x00000c98                mpu_set_full_scale_accel_range
+                0x00000cb8                mpu_set_sleep_enable
+                0x00000cd8                mpu_set_temperature_sensor_enabled
+                0x00000cfc                mpu_set_gyro_rate
+                0x00000d14                mpu_set_DLPF_mode
+                0x00000d34                mpu_set_6axis_FIFO_enabled
+                0x00000d4c                mpu_set_interrupt_mode
+                0x00000d6c                mpu_set_interrupt_drive
+                0x00000d8c                mpu_set_interrupt_latch
+                0x00000dac                mpu_set_FIFO_overflow_interrupt
+                0x00000dcc                mpu_set_data_ready_interrupt
+                0x00000dec                mpu_clear_interrupt
+                0x00000e04                mpu_set_FIFO_enabled
+                0x00000e24                mpu_reset_FIFO
+                0x00000e44                mpu_init
+                0x00000e9c                mpu_get_FIFO_size
+                0x00000ed4                mpu_get_motion6
+                0x00000f5c                mpu_get_FIFO_motion6
+                0x00000fe4                main
+                0x00001500                pulse_in
+                0x00001634                get_ir_sensor_data
+                0x000016e0                get_encoders_count
+                0x00001714                sample
  *(.rodata)
- .rodata        0x00001484       0x11 bellator_low_level.o
-                0x00001484                ascii
+ .rodata        0x00001854       0x14 bellator_low_level.o
+                0x00001854                ascii
  *(.rodata*)
+ .rodata.str1.4
+                0x00001868       0x2c bellator_low_level.o
+                                 0x30 (size before relaxing)
  *(.glue_7)
  .glue_7        0x00000000        0x0 linker stubs
  *(.glue_7t)
  .glue_7t       0x00000000        0x0 linker stubs
 
-.ARM.extab      0x00001498       0x24
- .ARM.extab     0x00001498       0x24 bellator_low_level.o
+.ARM.extab      0x00001894      0x108
+ .ARM.extab     0x00001894      0x108 bellator_low_level.o
 
-.ARM.exidx      0x000014bc       0xa0
- .ARM.exidx     0x000014bc       0xa0 bellator_low_level.o
-                                0x168 (size before relaxing)
+.ARM.exidx      0x0000199c      0x120
+ .ARM.exidx     0x0000199c      0x120 bellator_low_level.o
+                                0x150 (size before relaxing)
 
-.interp         0x0000155c       0x13
- .interp        0x0000155c       0x13 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+.interp         0x00001abc       0x13
+ .interp        0x00001abc       0x13 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.gnu.version_d  0x00001570        0x0 load address 0x0000156f
+.gnu.version_d  0x00001ad0        0x0 load address 0x00001acf
  .gnu.version_d
                 0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.gnu.version    0x00001570        0xc
- .gnu.version   0x00001570        0xc /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+.gnu.version    0x00001ad0        0xc
+ .gnu.version   0x00001ad0        0xc /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.gnu.version_r  0x0000157c       0x20
+.gnu.version_r  0x00001adc       0x20
  .gnu.version_r
-                0x0000157c       0x20 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+                0x00001adc       0x20 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.dynsym         0x0000159c       0x60
- .dynsym        0x0000159c       0x60 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+.dynsym         0x00001afc       0x60
+ .dynsym        0x00001afc       0x60 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.dynstr         0x000015fc       0x6a
- .dynstr        0x000015fc       0x6a /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+.dynstr         0x00001b5c       0x6a
+ .dynstr        0x00001b5c       0x6a /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.hash           0x00001668       0x2c
- .hash          0x00001668       0x2c /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+.hash           0x00001bc8       0x2c
+ .hash          0x00001bc8       0x2c /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.vfp11_veneer   0x00001694        0x0
+.vfp11_veneer   0x00001bf4        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x00001694        0x0
+.v4_bx          0x00001bf4        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.plt            0x00001694        0x0
+.plt            0x00001bf4        0x0
  .plt           0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.rel.dyn        0x00001694        0x0
+.rel.dyn        0x00001bf4        0x0
  .rel.got       0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
  .rel.plt       0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
  .rel.bss       0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
-                0x00001694                . = ALIGN (0x4)
-                0x00001694                _etext = .
-                0x00001694                PROVIDE (etext, .)
+                0x00001bf4                . = ALIGN (0x4)
+                0x00001bf4                _etext = .
+                0x00001bf4                PROVIDE (etext, .)
 
-.data           0x40000000        0x0 load address 0x00001694
+.data           0x40000000        0x0 load address 0x00001bf4
                 0x40000000                _data = .
  *(.data)
  .data          0x40000000        0x0 build/crt0.o
  .data          0x40000000        0x0 bellator_low_level.o
 
-.dynamic        0x40000000       0x90 load address 0x00001694
+.dynamic        0x40000000       0x90 load address 0x00001bf4
  .dynamic       0x40000000       0x90 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
                 0x40000000                _DYNAMIC
 
-.got            0x40000090        0x0 load address 0x00001724
+.got            0x40000090        0x0 load address 0x00001c84
  .got           0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 
-.got.plt        0x40000090        0xc load address 0x00001724
+.got.plt        0x40000090        0xc load address 0x00001c84
  .got.plt       0x40000090        0xc /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
                 0x40000090                _GLOBAL_OFFSET_TABLE_
                 0x4000009c                . = ALIGN (0x4)
                 0x4000009c                _edata = .
                 0x4000009c                PROVIDE (edata, .)
 
-.bss            0x4000009c      0xe78 load address 0x00001730
+.bss            0x4000009c     0x1884 load address 0x00001c90
                 0x4000009c                __bss_start = .
                 0x4000009c                __bss_start__ = .
  *(.bss)
  .bss           0x4000009c        0x0 build/crt0.o
- .bss           0x4000009c      0xe78 bellator_low_level.o
+ .bss           0x4000009c     0x1884 bellator_low_level.o
  *(COMMON)
-                0x40000f14                . = ALIGN (0x4)
-                0x40000f14                __bss_end__ = .
-                0x40000f14                PROVIDE (__bss_end, .)
+                0x40001920                . = ALIGN (0x4)
+                0x40001920                __bss_end__ = .
+                0x40001920                PROVIDE (__bss_end, .)
 
-.dynbss         0x40000f14        0x0 load address 0x000025a8
+.dynbss         0x40001920        0x0 load address 0x00003514
  .dynbss        0x00000000        0x0 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
-                0x40000f14                . = ALIGN (0x4)
+                0x40001920                . = ALIGN (0x4)
 
-.stack          0x40000f14      0x400 load address 0x000025a8
-                0x40001314                . = (. + STACK_SIZE)
- *fill*         0x40000f14      0x400 00
-                0x40001314                PROVIDE (_stack, .)
-                0x40001314                _end = .
-                0x40001314                PROVIDE (end, .)
+.stack          0x40001920      0x400 load address 0x00003514
+                0x40001d20                . = (. + STACK_SIZE)
+ *fill*         0x40001920      0x400 00
+                0x40001d20                PROVIDE (_stack, .)
+                0x40001d20                _end = .
+                0x40001d20                PROVIDE (end, .)
 
 .stab
  *(.stab)
@@ -252,38 +254,38 @@ END GROUP
                 0x00000020       0x20 bellator_low_level.o
 
 .debug_pubnames
-                0x00000000      0x3a7
+                0x00000000      0x382
  *(.debug_pubnames)
  .debug_pubnames
-                0x00000000      0x3a7 bellator_low_level.o
+                0x00000000      0x382 bellator_low_level.o
 
-.debug_info     0x00000000      0xf27
+.debug_info     0x00000000      0xe95
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000       0x97 build/crt0.o
- .debug_info    0x00000097      0xe90 bellator_low_level.o
+ .debug_info    0x00000097      0xdfe bellator_low_level.o
 
-.debug_abbrev   0x00000000      0x3a7
+.debug_abbrev   0x00000000      0x397
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0x14 build/crt0.o
- .debug_abbrev  0x00000014      0x393 bellator_low_level.o
+ .debug_abbrev  0x00000014      0x383 bellator_low_level.o
 
-.debug_line     0x00000000      0x458
+.debug_line     0x00000000      0x3ef
  *(.debug_line)
  .debug_line    0x00000000       0x77 build/crt0.o
- .debug_line    0x00000077      0x3e1 bellator_low_level.o
+ .debug_line    0x00000077      0x378 bellator_low_level.o
 
-.debug_frame    0x00000000      0x41c
+.debug_frame    0x00000000      0x4dc
  *(.debug_frame)
- .debug_frame   0x00000000      0x41c bellator_low_level.o
+ .debug_frame   0x00000000      0x4dc bellator_low_level.o
 
-.debug_str      0x00000000      0x58e
+.debug_str      0x00000000      0x5d0
  *(.debug_str)
- .debug_str     0x00000000      0x58e bellator_low_level.o
-                                0x5fb (size before relaxing)
+ .debug_str     0x00000000      0x5d0 bellator_low_level.o
+                                0x63d (size before relaxing)
 
-.debug_loc      0x00000000      0xa2f
+.debug_loc      0x00000000      0xb09
  *(.debug_loc)
- .debug_loc     0x00000000      0xa2f bellator_low_level.o
+ .debug_loc     0x00000000      0xb09 bellator_low_level.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -302,12 +304,12 @@ END GROUP
 OUTPUT(bellator_low_level.elf elf32-littlearm)
 
 .debug_pubtypes
-                0x00000000       0x2c
+                0x00000000       0x30
  .debug_pubtypes
-                0x00000000       0x2c bellator_low_level.o
+                0x00000000       0x30 bellator_low_level.o
 
-.debug_ranges   0x00000000       0x90
- .debug_ranges  0x00000000       0x90 bellator_low_level.o
+.debug_ranges   0x00000000       0x80
+ .debug_ranges  0x00000000       0x80 bellator_low_level.o
 
 Cross Reference Table
 
@@ -980,8 +982,6 @@ duplocale@GLIBC_2.4                               /opt/arm-none-linux/bin/../arm
 eaccess                                           /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 eaccess@@GLIBC_2.4                                /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 eaccess@GLIBC_2.4                                 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
-encoder_pulse_in_isr                              bellator_low_level.o
-                                                  build/crt0.o
 endmntent                                         /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 endmntent@@GLIBC_2.4                              /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 endmntent@GLIBC_2.4                               /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
@@ -1287,7 +1287,7 @@ gammal@GLIBC_2.4                                  /opt/arm-none-linux/bin/../arm
 get_avphys_pages                                  /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 get_avphys_pages@@GLIBC_2.4                       /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 get_avphys_pages@GLIBC_2.4                        /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
-get_encoder_count                                 bellator_low_level.o
+get_encoders_count                                bellator_low_level.o
 get_ir_sensor_data                                bellator_low_level.o
 get_kernel_syms                                   /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 get_kernel_syms@@GLIBC_2.4                        /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
@@ -1470,7 +1470,6 @@ imaxabs@GLIBC_2.4                                 /opt/arm-none-linux/bin/../arm
 imaxdiv                                           /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 imaxdiv@@GLIBC_2.4                                /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 imaxdiv@GLIBC_2.4                                 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
-imu_data_ready                                    bellator_low_level.o
 inb                                               /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 inb@@GLIBC_2.4                                    /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 inb@GLIBC_2.4                                     /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
@@ -2085,6 +2084,8 @@ pthread_setspecific                               /opt/arm-none-linux/bin/../arm
 ptsname_r                                         /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 ptsname_r@@GLIBC_2.4                              /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 ptsname_r@GLIBC_2.4                               /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
+pulse_in                                          bellator_low_level.o
+                                                  build/crt0.o
 putc                                              /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 putc@@GLIBC_2.4                                   /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 putc@GLIBC_2.4                                    /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
@@ -2239,6 +2240,7 @@ roundf@GLIBC_2.4                                  /opt/arm-none-linux/bin/../arm
 roundl                                            /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/usr/lib/libm.so
 roundl@@GLIBC_2.4                                 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/usr/lib/libm.so
 roundl@GLIBC_2.4                                  /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/usr/lib/libm.so
+sample                                            bellator_low_level.o
 sbrk                                              /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 sbrk@@GLIBC_2.4                                   /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 sbrk@GLIBC_2.4                                    /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
@@ -2317,7 +2319,6 @@ sendmsg@GLIBC_2.4                                 /opt/arm-none-linux/bin/../arm
 sendto                                            /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 sendto@@GLIBC_2.4                                 /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 sendto@GLIBC_2.4                                  /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
-set_wheel_pwm                                     bellator_low_level.o
 setbuffer                                         /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 setbuffer@@GLIBC_2.4                              /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6
 setbuffer@GLIBC_2.4                               /opt/arm-none-linux/bin/../arm-none-linux-gnueabi/libc/armv4t/lib/libc.so.6

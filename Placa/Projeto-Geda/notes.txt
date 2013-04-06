@@ -1,10 +1,18 @@
 saidas medidas do IR
 140mV - 3.82V
 TODO: 
-Adicionar Jack de alimentacao na placa
 Botar pra funcionar com o 8051
-mudar o protocolo para que o valor fique antes do Lef_wheel ou right_wheel.. do jeito que esta os valores do pwm podem ser interpretados como comandos. ie.:a1fffe
 implementar logica para detectar sentido do encoder
+
+Impedancia de saida do IR + voltage limiter
+CLKDIV The APB clock (PCLK) is divided by (this value plus one) to produce the clock for the
+A/D converter, which should be less than or equal to 4.5 MHz. Typically, software should
+program the smallest value in this field that yields a clock of 4.5 MHz or slightly less, but
+in certain cases (such as a high-impedance analog source) a slower clock may be
+desirable.
+
+
+
 
 Conector:
 

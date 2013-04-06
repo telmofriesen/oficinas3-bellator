@@ -31,24 +31,26 @@ void mpu_init(void) {
     mpu_set_full_scale_gyro_range(MPU6050_GYRO_FS_250);
     mpu_set_full_scale_accel_range(MPU6050_ACCEL_FS_2);
 
-    // divide gyro output rate do 7, if DLPF>0 set back to 0 to keep output rate 1kHz
+    // divide gyro output rate by 7+1, if DLPF>0 set back to 0 to keep output rate 1kHz
     mpu_set_gyro_rate(7);
     // set digital low pass filter cut off frequency (disabled)
     mpu_set_DLPF_mode(0);
 
+    // FIFO WAS NOT USED
     // enable FIFO
     mpu_set_6axis_FIFO_enabled(1);
 
+    // DATAREADY INTERRUPT WAS NOT USED
     // configure interruption
-    mpu_set_interrupt_mode(0); // active high
-    mpu_set_interrupt_drive(0); // push/pull
-    mpu_set_interrupt_latch(0); // 50us pulse on interrupt
-    mpu_set_FIFO_overflow_interrupt(1); // generate interrupt on FIFO overflow
-    mpu_set_data_ready_interrupt(1); // data ready interrupt
+    //mpu_set_interrupt_mode(0); // active high
+    //mpu_set_interrupt_drive(0); // push/pull
+    //mpu_set_interrupt_latch(0); // 50us pulse on interrupt
+    //mpu_set_FIFO_overflow_interrupt(1); // generate interrupt on FIFO overflow
+    //mpu_set_data_ready_interrupt(1); // data ready interrupt
 
     // clear interrupts
-	char source;
-	mpu_clear_interrupt(&source);
+	//char source;
+	//mpu_clear_interrupt(&source);
     // reset FIFO
     mpu_reset_FIFO();
     // enable fifo
@@ -296,35 +298,34 @@ void mpu_get_FIFO_size(int* size) {
 * @param gx 16-bit signed integer container for gyroscope X-axis value
 * @param gy 16-bit signed integer container for gyroscope Y-axis value
 * @param gz 16-bit signed integer container for gyroscope Z-axis value
+*
+* buff:
+* ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l,
+*
 * @see getAcceleration()
 * @see getRotation()
 * @see MPU6050_RA_ACCEL_XOUT_H
 */
-//void MPU6050::getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz) {
-//    I2Cdev::readBytes(devAddr, MPU6050_RA_ACCEL_XOUT_H, 14, buffer);
-//    *ax = (((int16_t)buffer[0]) << 8) | buffer[1];
-//    *ay = (((int16_t)buffer[2]) << 8) | buffer[3];
-//    *az = (((int16_t)buffer[4]) << 8) | buffer[5];
-//    *gx = (((int16_t)buffer[8]) << 8) | buffer[9];
-//    *gy = (((int16_t)buffer[10]) << 8) | buffer[11];
-//    *gz = (((int16_t)buffer[12]) << 8) | buffer[13];
-//}
-void mpu_get_motion6(char* ax_h, char* ax_l, char* ay_h, char* ay_l, char* az_h, char* az_l,
-		char* gx_h, char* gx_l, char* gy_h, char* gy_l, char* gz_h, char* gz_l) {
+void mpu_get_motion6(char* buff) {
+
+	log_string_mpu(">> mpu_get_motion6\n");
+
 	char c[14];
 	i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, 14, c);
-	*ax_h = c[0];
-	*ax_l = c[1];
-	*ay_h = c[2];
-	*ay_l = c[3];
-	*az_h = c[4];
-	*az_l = c[5];
-	*gx_h = c[8];
-	*gx_l = c[9];
-	*gy_h = c[10];
-	*gy_l = c[11];
-	*gz_h = c[12];
-	*gz_l = c[13];
+	*buff = c[0];
+	*(buff+1) = c[1];
+	*(buff+2) = c[2];
+	*(buff+3) = c[3];
+	*(buff+4) = c[4];
+	*(buff+5) = c[5];
+	*(buff+6) = c[8];
+	*(buff+7) = c[9];
+	*(buff+8) = c[10];
+	*(buff+9) = c[11];
+	*(buff+10) = c[12];
+	*(buff+11) = c[13];
+
+	log_string_mpu("<< mpu_get_motion6\n");
 }
 
 /** Get byte from FIFO buffer.
@@ -349,24 +350,28 @@ void mpu_get_motion6(char* ax_h, char* ax_l, char* ay_h, char* ay_l, char* az_h,
 * that was previously read from the FIFO until new data is available. The user
 * should check FIFO_COUNT to ensure that the FIFO buffer is not read when
 * empty.
+*
+* buff:
+* ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l,
+*
 */
-void mpu_get_FIFO_motion6(char* ax_h, char* ax_l, char* ay_h, char* ay_l, char* az_h, char* az_l,
-		char* gx_h, char* gx_l, char* gy_h, char* gy_l, char* gz_h, char* gz_l) {
+void mpu_get_FIFO_motion6(char* buff) {
 
 	char c[12];
 	i2c_read_bytes(MPU6050_RA_FIFO_R_W, 12, c);
-	*ax_h = c[0];
-	*ax_l = c[1];
-	*ay_h = c[2];
-	*ay_l = c[3];
-	*az_h = c[4];
-	*az_l = c[5];
-	*gx_h = c[6];
-	*gx_l = c[7];
-	*gy_h = c[8];
-	*gy_l = c[9];
-	*gz_h = c[10];
-	*gz_l = c[11];
+
+	*buff = c[0];
+	*(buff+1) = c[1];
+	*(buff+2) = c[2];
+	*(buff+3) = c[3];
+	*(buff+4) = c[4];
+	*(buff+5) = c[5];
+	*(buff+6) = c[6];
+	*(buff+7) = c[7];
+	*(buff+8) = c[8];
+	*(buff+9) = c[9];
+	*(buff+10) = c[10];
+	*(buff+11) = c[11];
 
 //	i2c_read_byte(MPU6050_RA_FIFO_R_W, ax_h);
 //	i2c_read_byte(MPU6050_RA_FIFO_R_W, ax_l);

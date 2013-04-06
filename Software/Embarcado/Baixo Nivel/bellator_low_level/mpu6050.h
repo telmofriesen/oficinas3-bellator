@@ -409,9 +409,7 @@ int mpu_clear_interrupt(char* data);
 void mpu_set_FIFO_enabled(char enabled);
 void mpu_reset_FIFO(void);
 void mpu_get_FIFO_size(int* size);
-void mpu_get_motion6(char* ax_h, char* ax_l, char* ay_h, char* ay_l, char* az_h, char* az_l,
-		char* gx_h, char* gx_l, char* gy_h, char* gy_l, char* gz_h, char* gz_l);
-void mpu_get_FIFO_motion6(char* ax_h, char* ax_l, char* ay_h, char* ay_l, char* az_h, char* az_l,
-		char* gx_h, char* gx_l, char* gy_h, char* gy_l, char* gz_h, char* gz_l);
+void mpu_get_motion6(char* buff);
+void mpu_get_FIFO_motion6(char* buff);
 
 #endif /* MPU6050_H_ */

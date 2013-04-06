@@ -43,12 +43,17 @@
 
 void __attribute__ ((interrupt("IRQ"))) i2c_read_bytes_isr(void);
 void __attribute__ ((interrupt("IRQ"))) i2c_write_byte_isr(void);
+
 void i2c_init(void);
+//void i2c_isr(void);
 
 int i2c_read_byte(char reg_addr, char* data);
 int i2c_read_bytes(char reg_addr, char length, char* data);
+//void i2c_read_bytes_isr(void);
+
 int i2c_write_bits(char reg_addr, char bit, char length, char data);
 int i2c_write_byte(char reg_addr, char data);
+//void i2c_write_byte_isr(void);
 
 static volatile int busy = 0;
 

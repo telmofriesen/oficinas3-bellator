@@ -9,7 +9,6 @@
 #include "logger.h"
 #include "mpu6050.h"
 
-
 /**
  * I2C 1
  *
@@ -41,8 +40,16 @@ void i2c_init(void){
 	VICVectCntl0 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
 	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
 
+	// Enable i2c as FIQ
+	//VICIntSelect |= 0x1 << 19;// I2C1 as FIQ
+	//VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
+
 	log_string_i2c("<< i2c_init\n");
 }
+
+//void i2c_isr(void) {
+//	(*current_isr)();
+//}
 
 int i2c_read_byte(char reg_addr, char* data) {
 	log_string_i2c("read_byte\n");
@@ -65,6 +72,7 @@ int i2c_read_bytes(char reg_addr, char length, char* data) {
 
 	//Setting the interrupt handler location for write byte
 	VICVectAddr0 = (unsigned int) &i2c_read_bytes_isr;
+	//current_isr = &i2c_read_bytes_isr;
 	// Send Start bit
 	I2C1CONSET = 0x20; // Transmit start condition
 
@@ -81,7 +89,7 @@ int i2c_read_bytes(char reg_addr, char length, char* data) {
  */
 void i2c_read_bytes_isr(void) {
 	log_string_i2c(">> read_bytes_isr\n");
-	int temp = 0;
+	volatile int temp = 0;
 	temp = I2C1STAT;
 
 	switch (temp) {
@@ -117,7 +125,8 @@ void i2c_read_bytes_isr(void) {
 
 	case TW_MR_SLA_ACK: // SLA+R has been transmitted; ACK has been received.
 		log_string_i2c("TW_MR_SLA_ACK\n");
-		I2C1CONSET = 0x04; // Transmit ACK on data receives
+		if(buff_size > 1)
+			I2C1CONSET = 0x04; // Transmit ACK on data receives
 		I2C1CONCLR = 0x08; // Clear SI
 		break;
 	case TW_MR_SLA_NACK: // SLA+R has been transmitted; NOT ACK or has been received.
@@ -151,7 +160,12 @@ void i2c_read_bytes_isr(void) {
 		break;
 
 	default:
-		log_string_i2c("[i2c] default\n");
+		log_string_warning("[i2c] default: ");
+		log_int_warning(temp);
+		log_string_warning("\n");
+		//I2C1CONSET = 0x10; // Transmit stop condition
+		I2C1CONCLR = 0x08; // Clear SI
+		//busy = 0; // data ready to be returned
 		break;
 	}
 
@@ -190,6 +204,7 @@ int i2c_write_byte(char reg_addr, char data) {
 
 	//Setting the interrupt handler location for write byte
 	VICVectAddr0 = (unsigned int) &i2c_write_byte_isr;
+	//current_isr = &i2c_write_byte_isr;
 	// Send Start bit
 	I2C1CONSET = 0x20; // Transmit start condition
 
@@ -204,7 +219,7 @@ int i2c_write_byte(char reg_addr, char data) {
  */
 void i2c_write_byte_isr(void) {
 	log_string_i2c(">> i2c_write_byte_isr\n");
-	int temp = 0;
+	volatile int temp = 0;
 	temp = I2C1STAT;
 
 	switch (temp) {
