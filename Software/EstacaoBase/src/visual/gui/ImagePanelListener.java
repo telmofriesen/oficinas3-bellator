@@ -4,7 +4,7 @@
  */
 package visual.gui;
 
-import dados.ControleCamera;
+import dados.GerenciadorCamera;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.Dimension;
@@ -38,9 +38,9 @@ public class ImagePanelListener extends JPanel implements MyChangeListener {
 
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
-        if (evt.getSource() instanceof ControleCamera) {
+        if (evt.getSource() instanceof GerenciadorCamera) {
             synchronized (this) {
-                ControleCamera c = (ControleCamera) evt.getSource();
+                GerenciadorCamera c = (GerenciadorCamera) evt.getSource();
                 image = c.getImage();
                 if (image != null) {
                     //Redimensiona a imagem para caber no JPanel

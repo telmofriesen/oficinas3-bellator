@@ -14,7 +14,7 @@ import visual.Ponto;
  *
  * @author stefan
  */
-public class ControleSensores implements MyChangeListener {
+public class GerenciadorSensores implements MyChangeListener {
 
     /**
      * Estados de amostragem
@@ -46,7 +46,7 @@ public class ControleSensores implements MyChangeListener {
      * @param obstaculos O objeto da classe Obstaculos a ser atualizado com as
      * leituras dos sensores.
      */
-    public ControleSensores(Robo robo, Obstaculos obstaculos) {
+    public GerenciadorSensores(Robo robo, Obstaculos obstaculos) {
         this.robo = robo;
         this.obstaculos = obstaculos;
 //        instant_time_window_start = System.currentTimeMillis();

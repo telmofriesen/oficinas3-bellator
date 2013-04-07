@@ -23,10 +23,10 @@ public class SerialCommunicator implements SerialNetwork_iface {
     public static int speed = 115200;
     private static SerialNetwork network;
     private static boolean resend_active = false;
-    private Main server;
+    private Main main;
 
     public SerialCommunicator(Main server) {
-        this.server = server;
+        this.main = server;
         network = new SerialNetwork(0, this, (byte) 0xFE);
 
         // initializing reader from command line
@@ -186,7 +186,7 @@ public class SerialCommunicator implements SerialNetwork_iface {
         }
         str += "\n";
         //Manda a mensagem para a estação base (sem modificações)
-        server.getListener().getServerConnection(0).sendMessage(str, false);
+        main.getListener().getServerConnection(0).sendMessage(str, false);
 //        System.out.println();
     }
 

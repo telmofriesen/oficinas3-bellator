@@ -6,7 +6,7 @@
 import dados.Robo;
 import dados.SensorIR;
 import dados.Obstaculos;
-import dados.ControleSensores;
+import dados.GerenciadorSensores;
 import dados.Mapa;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,7 +104,7 @@ public class Main {
         //
         // Inicializa o controle dos sensores
         //
-        ControleSensores controleSensores = new ControleSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        GerenciadorSensores controleSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
 //        ControleSensoresKalman controleSensores = new ControleSensoresKalman(robo, obstaculos, 0.1f, 0.05f, 5f); //Com filtragem por filtro de Kalman
         //
         // Insere leituras de teste

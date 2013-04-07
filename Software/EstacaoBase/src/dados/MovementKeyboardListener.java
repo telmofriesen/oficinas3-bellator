@@ -57,29 +57,29 @@ public class MovementKeyboardListener implements KeyboardListener {
     public int getMovementType() {
         if (up) {
             if (left) {
-                return ControleMotores.FORWARD_LEFT;
+                return GerenciadorMotores.FORWARD_LEFT;
             }
             if (right) {
-                return ControleMotores.FORWARD_RIGHT;
+                return GerenciadorMotores.FORWARD_RIGHT;
             }
-            return ControleMotores.FORWARD;
+            return GerenciadorMotores.FORWARD;
         }
         if (down) {
             if (left) {
-                return ControleMotores.BACKWARD_LEFT;
+                return GerenciadorMotores.BACKWARD_LEFT;
             }
             if (right) {
-                return ControleMotores.BACKWARD_RIGHT;
+                return GerenciadorMotores.BACKWARD_RIGHT;
             }
-            return ControleMotores.BACKWARD;
+            return GerenciadorMotores.BACKWARD;
         }
         if (left) {
-            return ControleMotores.ROTATE_LEFT;
+            return GerenciadorMotores.ROTATE_LEFT;
         }
         if (right) {
-            return ControleMotores.ROTATE_RIGHT;
+            return GerenciadorMotores.ROTATE_RIGHT;
         }
-        return ControleMotores.STOP;
+        return GerenciadorMotores.STOP;
     }
 
     @Override

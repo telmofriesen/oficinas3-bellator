@@ -1,7 +1,7 @@
 package visual.gui;
 
 import comunicacao.ClientConnector;
-import dados.ControleSensores;
+import dados.GerenciadorSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JToggleButton;
@@ -17,8 +17,8 @@ public class RecordButtonListener extends JToggleButton implements MyChangeListe
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
         //Mudanças em ControleSensores
-        if (evt.getSource() instanceof ControleSensores) {
-            ControleSensores controle = (ControleSensores) evt.getSource();
+        if (evt.getSource() instanceof GerenciadorSensores) {
+            GerenciadorSensores controle = (GerenciadorSensores) evt.getSource();
 //            this.setSelected(controle.isRecordEnabled());
             //Se o estado do botao e do ControleSensores forem diferentes, muda o estado do botao para mostrar o estado real.
             if ((this.isSelected() && !controle.isRecordEnabled())

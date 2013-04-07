@@ -75,7 +75,7 @@ public class ClientConnector extends Thread {
     //Interpretador de comandos (thread que interpreta comandos, ou seja, mensagens vindas do Receiver). 
     //Por padrão não há interpretador, ele deve ser adicionado pelo método setInterpreter().
     //Se não houver Interpreter registrado, os comandos recebidos não são interpretados.
-    public ClientMessageProcessor interpreter = null;
+    private ClientMessageProcessor processor = null;
     //Host atual de conexão
     private String host;
     //Porta atual de conexão
@@ -419,10 +419,10 @@ public class ClientConnector extends Thread {
      * @param command O comando a ser executado.
      */
     public void processCommand(String command) {
-        if (interpreter == null) {
+        if (processor == null) {
             System.out.printf("[TR_ClientConnector] Não há interpretador de comandos registrado! Mensagem recebida: %s\n", command);
         } else {
-            interpreter.processCommand(command);
+            processor.processCommand(command);
         }
     }
 //</editor-fold>
@@ -624,7 +624,7 @@ public class ClientConnector extends Thread {
     }
 
     public synchronized void setInterpreter(ClientMessageProcessor interpreter) {
-        this.interpreter = interpreter;
+        this.processor = interpreter;
     }
 
     public synchronized String getHost() {

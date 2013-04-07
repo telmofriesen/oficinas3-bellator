@@ -1,7 +1,7 @@
 package visual.gui;
 
 import comunicacao.ClientConnector;
-import dados.ControleSensores;
+import dados.GerenciadorSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JButton;
@@ -35,20 +35,20 @@ public class SensoresButtonListener extends JButton implements MyChangeListener 
             }
         }
         //Detecta mudanças no status da amostragem.
-        if (evt.getSource() instanceof ControleSensores) {
-            ControleSensores c = (ControleSensores) evt.getSource();
+        if (evt.getSource() instanceof GerenciadorSensores) {
+            GerenciadorSensores c = (GerenciadorSensores) evt.getSource();
             int status = c.getSensorSampleStatus();
             synchronized (this) {
                 if (status != lastStatus) {
                     switch (status) {
-                        case ControleSensores.SAMPLE_STOPPED:
+                        case GerenciadorSensores.SAMPLE_STOPPED:
                             java.awt.EventQueue.invokeLater(new Runnable() {
                                 public void run() {
                                     setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/camera-web_red.png")));
                                 }
                             });
                             break;
-                        case ControleSensores.SAMPLE_STARTED:
+                        case GerenciadorSensores.SAMPLE_STARTED:
                             java.awt.EventQueue.invokeLater(new Runnable() {
                                 public void run() {
                                     setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/camera-web.png")));

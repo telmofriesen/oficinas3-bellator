@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author stefan
  */
-public class ControleCamera implements MyChangeListener {
+public class GerenciadorCamera implements MyChangeListener {
 
     private BufferedImage image;
     private ContadorAmostragemTempoReal contadorFramerate;
@@ -26,7 +26,7 @@ public class ControleCamera implements MyChangeListener {
     private int stream_port = 5050;
     private String webcam_name = "";
 
-    public ControleCamera() {
+    public GerenciadorCamera() {
         this.listeners = new CopyOnWriteArrayList<MyChangeListener>();
         this.image = null;
         contadorFramerate = new ContadorAmostragemTempoReal(500, 500, 1000, 500);

@@ -42,7 +42,7 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
     private String host_ip = "127.0.0.1";
     private int host_port = 5050;
     MediaPlayerFactory mediaFactory;
-    HeadlessMediaPlayer mediaPlayer;
+    HeadlessMediaPlayer mediaStreamer;
     //Taxa de amostragem máxima
     private float fps = 10; //Amostras/s
     private int bitrate = 2048;
@@ -57,7 +57,7 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
         this.bitrate = bitrate;
         this.resolution = resolution;
         this.mediaFactory = new MediaPlayerFactory();
-        this.mediaPlayer = mediaFactory.newHeadlessMediaPlayer();
+        this.mediaStreamer = mediaFactory.newHeadlessMediaPlayer();
         Webcam w = Webcam.getDefault();
 
         if (w == null) {
@@ -87,7 +87,7 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
             String options = formatStream(resolution, bitrate, fps, "127.0.0.1", host_port);
             System.out.println("---- INICIANDO STREAM: " + mrl + " -- " + options);
 
-            mediaPlayer.playMedia(mrl, options);
+            mediaStreamer.playMedia(mrl, options);
             stream_available = true;
             fireChangeEvent();
         }
@@ -95,7 +95,7 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
 
     public final synchronized void stopStream() {
         if (stream_available) {
-            mediaPlayer.stop();
+            mediaStreamer.stop();
 //            webcamStreamer.stop();
             stream_available = false;
             fireChangeEvent();

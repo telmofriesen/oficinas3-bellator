@@ -7,7 +7,7 @@ package dados;
  * @see Kalman
  * @author stefan
  */
-public class ControleSensoresKalman extends ControleSensores {
+public class GerenciadorSensoresKalman extends GerenciadorSensores {
 
     private float R_velocidade, R_angulo, R_sensoresIR;
     private Kalman kalman_vel, kalman_angulo, kalman_IR[];
@@ -22,7 +22,7 @@ public class ControleSensoresKalman extends ControleSensores {
      * @param R_sensoresIR Amplitude esperada de ruidos nas medidas dos sensores
      * IR
      */
-    public ControleSensoresKalman(Robo robo, Obstaculos obstaculos, float R_velocidade, float R_angulo, float R_sensoresIR) {
+    public GerenciadorSensoresKalman(Robo robo, Obstaculos obstaculos, float R_velocidade, float R_angulo, float R_sensoresIR) {
         super(robo, obstaculos);
         this.R_velocidade = R_velocidade;
         this.R_angulo = R_angulo;

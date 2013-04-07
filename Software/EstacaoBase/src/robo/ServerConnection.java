@@ -49,7 +49,7 @@ public class ServerConnection extends Thread {
     //Listener do servidor
     private ServerListener listener;
     //Interpretador de comandos
-    private ServerMessageProcessor interpreter;
+    private ServerMessageProcessor processor;
     //O socket da conexão aceita
     private Socket sock;
     //Estado atual de handshake
@@ -77,7 +77,7 @@ public class ServerConnection extends Thread {
         this.sock = sock;
         this.receiver = new ServerReceiver(this);
         this.sender = new ServerSender(this);
-        this.interpreter = new ServerMessageProcessor(this);
+        this.processor = new ServerMessageProcessor(this);
         lastHandshakeActivity = System.currentTimeMillis();
         handshakeStatus = HANDSHAKE_NO;
         this.setName(this.getClass().getName());
@@ -90,7 +90,7 @@ public class ServerConnection extends Thread {
     public void startThreads() {
         receiver.start();
         sender.start();
-        interpreter.start();
+        processor.start();
         this.start();
     }
 
@@ -177,10 +177,10 @@ public class ServerConnection extends Thread {
         //Requisita finalização das threads
         sender.terminate();
         receiver.terminate();
-        interpreter.terminate();
+        processor.terminate();
         int count = 0;
         //Espera o término das threads
-        while (sender.isAlive() && receiver.isAlive() && interpreter.isAlive() && count < 5) {
+        while (sender.isAlive() && receiver.isAlive() && processor.isAlive() && count < 5) {
             try {
                 System.out.printf("[TR_ServerConnection] Aguardando sender, receiver e interpreter finalizarem.... (%d)\n", count);
                 sleep(500);
@@ -192,7 +192,7 @@ public class ServerConnection extends Thread {
         //Força o término das threads 
         sender.kill();
         receiver.kill();
-        interpreter.kill();
+        processor.kill();
         try {
             synchronized (this) {
                 //Fecha o socket
@@ -329,7 +329,7 @@ public class ServerConnection extends Thread {
      * @param command O comando a ser executado.
      */
     public void processCommand(String command) {
-        interpreter.processCommand(command);
+        processor.processCommand(command);
     }
     //</editor-fold>
     //==========================================
@@ -350,7 +350,7 @@ public class ServerConnection extends Thread {
     }
 
     public synchronized ServerMessageProcessor getInterpreter() {
-        return interpreter;
+        return processor;
     }
 
     public ServerListener getListener() {

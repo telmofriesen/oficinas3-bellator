@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author stefan
  */
-public class ControleMotores implements MyChangeListener {
+public class GerenciadorMotores implements MyChangeListener {
 
     private EnginesSpeed currentEngineSpeed = new EnginesSpeed(0, 0);
     private int movementType = 1;
@@ -89,23 +89,23 @@ public class ControleMotores implements MyChangeListener {
 
     public EnginesSpeed getNewEngineSpeed(int movementType) {
         switch (movementType) {
-            case ControleMotores.STOP:
+            case GerenciadorMotores.STOP:
                 return new EnginesSpeed(0, 0);
-            case ControleMotores.FORWARD:
+            case GerenciadorMotores.FORWARD:
                 return new EnginesSpeed(1, 1);
-            case ControleMotores.FORWARD_LEFT:
+            case GerenciadorMotores.FORWARD_LEFT:
                 return new EnginesSpeed(0.5f, 1);
-            case ControleMotores.FORWARD_RIGHT:
+            case GerenciadorMotores.FORWARD_RIGHT:
                 return new EnginesSpeed(1, 0.5f);
-            case ControleMotores.BACKWARD:
+            case GerenciadorMotores.BACKWARD:
                 return new EnginesSpeed(-1, -1);
-            case ControleMotores.BACKWARD_LEFT:
+            case GerenciadorMotores.BACKWARD_LEFT:
                 return new EnginesSpeed(-0.5f, -1);
-            case ControleMotores.BACKWARD_RIGHT:
+            case GerenciadorMotores.BACKWARD_RIGHT:
                 return new EnginesSpeed(-1, -0.5f);
-            case ControleMotores.ROTATE_LEFT:
+            case GerenciadorMotores.ROTATE_LEFT:
                 return new EnginesSpeed(-1, 1);
-            case ControleMotores.ROTATE_RIGHT:
+            case GerenciadorMotores.ROTATE_RIGHT:
                 return new EnginesSpeed(1, -1);
             default:
                 return new EnginesSpeed(0, 0);

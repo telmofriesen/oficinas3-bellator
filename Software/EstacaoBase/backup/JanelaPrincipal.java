@@ -1,18 +1,18 @@
 package visual.gui;
 
 import dados.Robo;
-import dados.GerenciadorCamera;
+import dados.ControleCamera;
 import dados.SensorIR;
 import dados.Obstaculos;
 import dados.ContadorAmostragemTempoReal;
 import dados.EnginesSpeed;
-import dados.GerenciadorSensores;
-import dados.GerenciadorMotores;
+import dados.ControleSensores;
+import dados.ControleMotores;
 import dados.Mapa;
 import dados.MovementKeyboardListener;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
-import comunicacao.ClientMessageProcessor;
+import comunicacao.ClientMessageInterpreter;
 import comunicacao.ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
@@ -63,9 +63,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private Mapa mapa;
     private Viewer2D viewer2D;
     private boolean saved = true;
-    private GerenciadorSensores controleSensores;
-    private GerenciadorCamera controleCamera;
-    private GerenciadorMotores controleMotores;
+    private ControleSensores controleSensores;
+    private ControleCamera controleCamera;
+    private ControleMotores controleMotores;
     private JanelaConexao janelaConexao;
     private ClientConnector connector;
     private JanelaSensores janelaSensores;
@@ -90,9 +90,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         fc = new CustomFileChooser(new File(".").getAbsolutePath(), "bellator");
         //Inicializa conector e interpretador de comandos.
         connector = new ClientConnector();
-        controleCamera = new GerenciadorCamera();
-        controleMotores = new GerenciadorMotores();
-        ClientMessageProcessor interpreter = new ClientMessageProcessor(connector, controleSensores, controleCamera);
+        controleCamera = new ControleCamera();
+        controleMotores = new ControleMotores();
+        ClientMessageInterpreter interpreter = new ClientMessageInterpreter(connector, controleSensores, controleCamera);
         connector.setInterpreter(interpreter);
         //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
@@ -105,7 +105,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         webcamImagePanel.add(mediaPlayerComponent, BorderLayout.CENTER);
         mediaPlayerComponent.setSize(webcamImagePanel.getSize());
         webcamImagePanel.addComponentListener(new webcamImagePanelListener());
-        
 //        mediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener();
 
 //        MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory("--no-video-title-show");
@@ -281,7 +280,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //
         // Inicializa o controle dos sensores
         //
-        controleSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        controleSensores = new ControleSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
     }
 
     /**
@@ -670,8 +669,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         @Override
         public void changeEventReceived(MyChangeEvent evt) {
-            if (evt.getSource() instanceof GerenciadorSensores) {
-                final GerenciadorSensores controle = (GerenciadorSensores) evt.getSource();
+            if (evt.getSource() instanceof ControleSensores) {
+                final ControleSensores controle = (ControleSensores) evt.getSource();
                 final float amostragemRobo = controle.getTaxaAmostragemRobo();
                 final float amostragemEstacaoBase = controle.getTaxaAmostragemEstacaoBase();
                 final int leiturasGravadas = controle.getLeituras_gravadas();
@@ -729,8 +728,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         @Override
         public void changeEventReceived(MyChangeEvent evt) {
-            if (evt.getSource() instanceof GerenciadorCamera) {
-                final GerenciadorCamera c = (GerenciadorCamera) evt.getSource();
+            if (evt.getSource() instanceof ControleCamera) {
+                final ControleCamera c = (ControleCamera) evt.getSource();
                 final boolean stream_available = c.isStream_available();
                 final int stream_port = c.getStream_port();
                 synchronized (this) {
@@ -820,7 +819,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-//            mediaPlayerComponent.setSize(e.getComponent().getSize());
+            mediaPlayerComponent.setSize(e.getComponent().getSize());
         }
 
         @Override
@@ -845,58 +844,58 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         public void run() {
 //            boolean sampling_enabled;
 //            boolean webcam_available;
-////            Dimension dim;
-//            long play_start_time = System.currentTimeMillis();
-////            final MediaPlayer m = mediaPlayerComponent.getMediaPlayer();
-//            while (true) {
-//                final boolean sampling_enabled = controleCamera.isSampling_enabled();
-//                final boolean webcam_available = controleCamera.isWebcam_available();
-//                final Dimension dim = mediaPlayerComponent.getMediaPlayer().getVideoDimension();
-//                final float fps = m.isPlaying()
-//                        ? m.getFps()
-//                        : 0f;
-//                final long time = (System.currentTimeMillis() - play_start_time) / 1000;
-//                final float kbps = m.isPlaying() && time > 0
-//                        ? (float) m.getMediaStatistics().i_read_bytes / (float) time / (float) 1024
-//                        : 0f;
-//                final float scale = m.isPlaying() && dim != null
-//                        ? Math.min((float) webcamImagePanel.getSize().width / (float) dim.width, (float) webcamImagePanel.getSize().height / (float) dim.height)
-//                        : 0f;
-//                java.awt.EventQueue.invokeLater(new Runnable() {
-//                    public void run() {
-//                        if (sampling_enabled && webcam_available && dim != null) {
-//                            webcamTopLabel.setText(String.format("WEBCAM [ON] (%dx%d)", dim.width, dim.height));
-//                        } else {
-//                            webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
-//                        }
-//                        webcamBottomLabel.setText(String.format("Framerate: %.1f fps (%.1f kb/s).  Escala: %.2f",
-//                                                                fps, kbps, scale));
-//                    }
-//                });
-//                try {
-//                    sleep(1000);
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//                //Indica se entrou no loop 
-//                boolean a = false;
-//                while (!m.isPlaying()) {
-//                    try {
-//                        sleep(2000);
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                    if (a = false) {
-//                        java.awt.EventQueue.invokeLater(new Runnable() {
-//                            public void run() {
-//                                webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
-//                            }
-//                        });
-//                    }
-//                    a = true;
-//                }
-//                if (a) play_start_time = System.currentTimeMillis();
-//            }
+//            Dimension dim;
+            long play_start_time = System.currentTimeMillis();
+            final MediaPlayer m = mediaPlayerComponent.getMediaPlayer();
+            while (true) {
+                final boolean sampling_enabled = controleCamera.isSampling_enabled();
+                final boolean webcam_available = controleCamera.isWebcam_available();
+                final Dimension dim = mediaPlayerComponent.getMediaPlayer().getVideoDimension();
+                final float fps = m.isPlaying()
+                        ? m.getFps()
+                        : 0f;
+                final long time = (System.currentTimeMillis() - play_start_time) / 1000;
+                final float kbps = m.isPlaying() && time > 0
+                        ? (float) m.getMediaStatistics().i_read_bytes / (float) time / (float) 1024
+                        : 0f;
+                final float scale = m.isPlaying() && dim != null
+                        ? Math.min((float) webcamImagePanel.getSize().width / (float) dim.width, (float) webcamImagePanel.getSize().height / (float) dim.height)
+                        : 0f;
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        if (sampling_enabled && webcam_available && dim != null) {
+                            webcamTopLabel.setText(String.format("WEBCAM [ON] (%dx%d)", dim.width, dim.height));
+                        } else {
+                            webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
+                        }
+                        webcamBottomLabel.setText(String.format("Framerate: %.1f fps (%.1f kb/s).  Escala: %.2f",
+                                                                fps, kbps, scale));
+                    }
+                });
+                try {
+                    sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //Indica se entrou no loop 
+                boolean a = false;
+                while (!m.isPlaying()) {
+                    try {
+                        sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if (a = false) {
+                        java.awt.EventQueue.invokeLater(new Runnable() {
+                            public void run() {
+                                webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
+                            }
+                        });
+                    }
+                    a = true;
+                }
+                if (a) play_start_time = System.currentTimeMillis();
+            }
         }
     }
 
@@ -906,38 +905,38 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         @Override
         public void changeEventReceived(MyChangeEvent evt) {
-            if (evt.getSource() instanceof GerenciadorMotores) {
-                GerenciadorMotores c = (GerenciadorMotores) evt.getSource();
+            if (evt.getSource() instanceof ControleMotores) {
+                ControleMotores c = (ControleMotores) evt.getSource();
                 int movType = c.getMovementType();
                 String icon = "";
                 synchronized (this) {
                     if (movType != lastMovType) {
                         switch (movType) {
-                            case GerenciadorMotores.STOP:
+                            case ControleMotores.STOP:
                                 icon = "/visual/gui/icons/arrows/stop.png";
                                 break;
-                            case GerenciadorMotores.FORWARD:
+                            case ControleMotores.FORWARD:
                                 icon = "/visual/gui/icons/arrows/forward.png";
                                 break;
-                            case GerenciadorMotores.FORWARD_LEFT:
+                            case ControleMotores.FORWARD_LEFT:
                                 icon = "/visual/gui/icons/arrows/forward_left.png";
                                 break;
-                            case GerenciadorMotores.FORWARD_RIGHT:
+                            case ControleMotores.FORWARD_RIGHT:
                                 icon = "/visual/gui/icons/arrows/forward_right.png";
                                 break;
-                            case GerenciadorMotores.BACKWARD:
+                            case ControleMotores.BACKWARD:
                                 icon = "/visual/gui/icons/arrows/backward.png";
                                 break;
-                            case GerenciadorMotores.BACKWARD_LEFT:
+                            case ControleMotores.BACKWARD_LEFT:
                                 icon = "/visual/gui/icons/arrows/backward_left.png";
                                 break;
-                            case GerenciadorMotores.BACKWARD_RIGHT:
+                            case ControleMotores.BACKWARD_RIGHT:
                                 icon = "/visual/gui/icons/arrows/backward_right.png";
                                 break;
-                            case GerenciadorMotores.ROTATE_LEFT:
+                            case ControleMotores.ROTATE_LEFT:
                                 icon = "/visual/gui/icons/arrows/rotate_left.png";
                                 break;
-                            case GerenciadorMotores.ROTATE_RIGHT:
+                            case ControleMotores.ROTATE_RIGHT:
                                 icon = "/visual/gui/icons/arrows/rotate_right.png";
                                 break;
                         }

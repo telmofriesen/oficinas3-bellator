@@ -1,0 +1,13 @@
+---
+Na primeira vez: instalar 'apache2' (sudo apt-get install apache2)
+
+---
+
+Conectar via serial (sudo minicom -D /dev/ttyUSB0) 
+Ligar TS na tomada (com o cabo serial já conectado e o minicom aberto)
+
+Executar os comandos para dar boot: (o seu IP é 192.168.10.36, e o da placa TS é 192.168.10.50)
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/kernel/new/output/zImage
+exec -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 init=/linuxrc root=/dev/nfs rw"
+
+

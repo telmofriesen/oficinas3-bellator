@@ -1,8 +1,8 @@
 package comunicacao;
 
 import robo.ServerMessageProcessor;
-import dados.ControleCamera;
-import dados.ControleSensores;
+import dados.GerenciadorCamera;
+import dados.GerenciadorSensores;
 import dados.NumIRException;
 import dados.TimestampException;
 import java.util.ArrayList;
@@ -24,13 +24,13 @@ public class ClientMessageProcessor extends Thread {
     //Referecia ao objeto connector do cliente
     private ClientConnector connector;
     //Referecia ao objeto ControleSensores do cliente
-    private ControleSensores controleSensores;
+    private GerenciadorSensores controleSensores;
     //Referencia ao objeto ControleCamera do cliente
-    private ControleCamera controleCamera;
+    private GerenciadorCamera controleCamera;
     //Indica se a thread deve rodar ou não
     private boolean run = true;
 
-    public ClientMessageProcessor(ClientConnector connector, ControleSensores controleSensores, ControleCamera controleCamera) {
+    public ClientMessageProcessor(ClientConnector connector, GerenciadorSensores controleSensores, GerenciadorCamera controleCamera) {
         this.setName("TR_ClientCommandInterpreter");
         this.connector = connector;
         this.controleSensores = controleSensores;
@@ -129,10 +129,10 @@ public class ClientMessageProcessor extends Thread {
                 } else if (split[1].equals("STATUS")) {
                     if (split[2].equals("REPLY")) {
                         if (split[3].equals("false")) {
-                            controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_STOPPED);
+                            controleSensores.setSensorSampleStatus(GerenciadorSensores.SAMPLE_STOPPED);
                             return true;
                         } else if (split[3].equals("true")) {
-                            controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_STARTED);
+                            controleSensores.setSensorSampleStatus(GerenciadorSensores.SAMPLE_STARTED);
                             return true;
                         }
                     }

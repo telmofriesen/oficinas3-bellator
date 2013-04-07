@@ -4,7 +4,7 @@
  */
 package zz_old;
 
-import dados.ControleSensores;
+import dados.GerenciadorSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import javax.swing.JButton;
@@ -19,22 +19,22 @@ public class ControleSensoresListener_old extends JButton implements MyChangeLis
 
     @Override
     public void changeEventReceived(MyChangeEvent evt) {
-        if (evt.getSource() instanceof ControleSensores) {
-            ControleSensores controle = (ControleSensores) evt.getSource();
+        if (evt.getSource() instanceof GerenciadorSensores) {
+            GerenciadorSensores controle = (GerenciadorSensores) evt.getSource();
             int status = controle.getSensorSampleStatus();
             switch (status) {
-                case ControleSensores.SAMPLE_STOPPED:
+                case GerenciadorSensores.SAMPLE_STOPPED:
                     this.setEnabled(true);
                     this.setText("Ativar");
                     break;
-                case ControleSensores.SAMPLE_CHANGING:
-                    if (lastStatus == ControleSensores.SAMPLE_STOPPED)
+                case GerenciadorSensores.SAMPLE_CHANGING:
+                    if (lastStatus == GerenciadorSensores.SAMPLE_STOPPED)
                         this.setText("Ativando...");
-                    if (lastStatus == ControleSensores.SAMPLE_STARTED)
+                    if (lastStatus == GerenciadorSensores.SAMPLE_STARTED)
                         this.setText("Desativando...");
                     this.setEnabled(false);
                     break;
-                case ControleSensores.SAMPLE_STARTED:
+                case GerenciadorSensores.SAMPLE_STARTED:
                     this.setEnabled(true);
                     this.setText("Desativar");
                     break;

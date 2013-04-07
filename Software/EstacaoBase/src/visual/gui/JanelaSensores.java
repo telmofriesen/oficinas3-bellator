@@ -1,8 +1,8 @@
 package visual.gui;
 
 import comunicacao.ClientConnector;
-import dados.ControleCamera;
-import dados.ControleSensores;
+import dados.GerenciadorCamera;
+import dados.GerenciadorSensores;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.event.ActionEvent;
@@ -51,11 +51,11 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
             }
         }
         //Se o status em ControleSensores mudar...
-        if (evt.getSource() instanceof ControleSensores) {
-            ControleSensores contr = (ControleSensores) evt.getSource();
+        if (evt.getSource() instanceof GerenciadorSensores) {
+            GerenciadorSensores contr = (GerenciadorSensores) evt.getSource();
             int status = contr.getSensorSampleStatus();
             switch (status) {
-                case ControleSensores.SAMPLE_STOPPED:
+                case GerenciadorSensores.SAMPLE_STOPPED:
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             sensorsStatusLabel.setText("Recebimento de amostras: Desativado.");
@@ -64,9 +64,9 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
                         }
                     });
                     break;
-                case ControleSensores.SAMPLE_CHANGING:
+                case GerenciadorSensores.SAMPLE_CHANGING:
                     synchronized (this) {
-                        if (lastSamplingStatus == ControleSensores.SAMPLE_STOPPED) {
+                        if (lastSamplingStatus == GerenciadorSensores.SAMPLE_STOPPED) {
                             java.awt.EventQueue.invokeLater(new Runnable() {
                                 public void run() {
                                     sensorsStatusLabel.setText("Recebimento de amostras: Ativando...");
@@ -74,7 +74,7 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
                                 }
                             });
                         }
-                        if (lastSamplingStatus == ControleSensores.SAMPLE_STARTED) {
+                        if (lastSamplingStatus == GerenciadorSensores.SAMPLE_STARTED) {
                             java.awt.EventQueue.invokeLater(new Runnable() {
                                 public void run() {
                                     sensorsStatusLabel.setText("Recebimento de amostras: Desativando...");
@@ -90,7 +90,7 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
 //                        }
 //                    });
                     break;
-                case ControleSensores.SAMPLE_STARTED:
+                case GerenciadorSensores.SAMPLE_STARTED:
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             sensorsStatusLabel.setText("Recebimento de amostras: Ativado.");
@@ -102,8 +102,8 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
             }
         }
         //Se o status em ControleSensores mudar...
-        if (evt.getSource() instanceof ControleCamera) {
-            ControleCamera cc = (ControleCamera) evt.getSource();
+        if (evt.getSource() instanceof GerenciadorCamera) {
+            GerenciadorCamera cc = (GerenciadorCamera) evt.getSource();
             final boolean sampling_enabled = cc.isSampling_enabled();
             final boolean sampling_status_changing = cc.isSampling_status_changing();
             final boolean webcam_available = cc.isWebcam_available();
@@ -146,14 +146,14 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
     int lastConnectionStatus = -1;
     boolean lastCameraAvailableStatus = false;
     boolean lastCameraSamplingStatus = false;
-    ControleSensores controleSensores;
-    ControleCamera controleCamera;
+    GerenciadorSensores controleSensores;
+    GerenciadorCamera controleCamera;
     ClientConnector connector;
 
     /**
      * Creates new form JanelaSensores
      */
-    public JanelaSensores(ControleSensores controle, ControleCamera controleCamera, ClientConnector connector) {
+    public JanelaSensores(GerenciadorSensores controle, GerenciadorCamera controleCamera, ClientConnector connector) {
         this.controleSensores = controle;
         this.controleCamera = controleCamera;
         this.connector = connector;
@@ -419,12 +419,12 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
         // TODO add your handling code here:
         int status = controleSensores.getSensorSampleStatus();
         switch (status) {
-            case ControleSensores.SAMPLE_STOPPED:
-                controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_CHANGING);
+            case GerenciadorSensores.SAMPLE_STOPPED:
+                controleSensores.setSensorSampleStatus(GerenciadorSensores.SAMPLE_CHANGING);
                 connector.sendMessageWithPriority("SENSORS START", true);
                 break;
-            case ControleSensores.SAMPLE_STARTED:
-                controleSensores.setSensorSampleStatus(ControleSensores.SAMPLE_CHANGING);
+            case GerenciadorSensores.SAMPLE_STARTED:
+                controleSensores.setSensorSampleStatus(GerenciadorSensores.SAMPLE_CHANGING);
                 connector.sendMessageWithPriority("SENSORS STOP", true);
                 break;
         }

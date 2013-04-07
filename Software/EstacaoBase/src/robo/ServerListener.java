@@ -31,10 +31,10 @@ public class ServerListener extends Thread {
     //O identificador de cada conexão(ip), sendo que cada elemento
     //do vetor tem o mesmo indice que em ServiceSocketVector
     private int listenerPort;
-    private Main server;
+    private Main main;
 
     public ServerListener(Main server, int port) {
-        this.server = server;
+        this.main = server;
         this.listenerPort = port;
         try {
             serverSocket = new ServerSocket(listenerPort, 3);
@@ -90,7 +90,7 @@ public class ServerListener extends Thread {
                     String ip = first.split("/")[1];
 
                     System.out.println(ip + " -- " + acceptedSocket.getPort());
-                    server.mainHostConnected(ip, acceptedSocket.getPort());
+                    main.mainHostConnected(ip, acceptedSocket.getPort());
                 }
             } catch (IOException ex) {
                 //System.out.println(ex);
@@ -100,7 +100,7 @@ public class ServerListener extends Thread {
     }
 
     public Main getServer() {
-        return server;
+        return main;
     }
 
     public ServerSocket getServerSocket() {
@@ -115,7 +115,7 @@ public class ServerListener extends Thread {
 //        connection.disconnect();
         //Se o host desconectado for o host principal, informa o fato ao servidor.
         if (connectionsArray.indexOf(connection) == 0) {
-            server.mainHostDisconnected();
+            main.mainHostDisconnected();
         }
         connectionsArray.remove(connection);
     }
