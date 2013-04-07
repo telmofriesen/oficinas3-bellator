@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  7 APR 2013 12:50
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  7 APR 2013 14:47
 entering extended mode
  %&-line parsing enabled.
 **entregavel3
@@ -671,11 +671,7 @@ Package: booktabs 2005/04/14 v1.61803 publication quality tables
 )
 (/usr/share/texmf-texlive/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen147
-) (./entregavel3.aux
-
-LaTeX Warning: Label `tab:pacote_comunicacao' multiply defined.
-
-)
+) (./entregavel3.aux)
 \openout1 = `entregavel3.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
@@ -691,7 +687,8 @@ LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
 LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 49.
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
@@ -788,31 +785,31 @@ Cap\'{\i }tulo 2.
 [4
 
 ]
-<./figuras/estacaoBase/usecase_estacao_base.png, id=20, 1302.36563pt x 846.9140
+<./figuras/estacaoBase/usecase_estacao_base.jpg, id=20, 1302.36563pt x 846.9140
 6pt>
-File: ./figuras/estacaoBase/usecase_estacao_base.png Graphic file (type png)
- <use ./figuras/estacaoBase/usecase_estacao_base.png> [5]
-<./figuras/sistEmbarcado/usecase_linux_embarcado.png, id=25, 1157.07281pt x 796
+File: ./figuras/estacaoBase/usecase_estacao_base.jpg Graphic file (type jpg)
+ <use ./figuras/estacaoBase/usecase_estacao_base.jpg> [5]
+<./figuras/sistEmbarcado/usecase_linux_embarcado.jpg, id=24, 1157.07281pt x 796
 .47563pt>
-File: ./figuras/sistEmbarcado/usecase_linux_embarcado.png Graphic file (type pn
+File: ./figuras/sistEmbarcado/usecase_linux_embarcado.jpg Graphic file (type jp
 g)
- <use ./figuras/sistEmbarcado/usecase_linux_embarcado.png>
-<./figuras/sistEmbarcado/usecase_placa_baixo_nivel.png, id=26, 1102.87032pt x 7
+ <use ./figuras/sistEmbarcado/usecase_linux_embarcado.jpg>
+<./figuras/sistEmbarcado/usecase_placa_baixo_nivel.jpg, id=25, 1102.87032pt x 7
 88.9475pt>
-File: ./figuras/sistEmbarcado/usecase_placa_baixo_nivel.png Graphic file (type 
-png)
- <use ./figuras/sistEmbarcado/usecase_placa_baixo_nivel.png> [6 <./figuras/esta
-caoBase/usecase_estacao_base.png> <./figuras/sistEmbarcado/usecase_linux_embarc
-ado.png>]
-<./figuras/estacaoBase/class_estacaoBase.png, id=33, 2460.94406pt x 1458.19781p
+File: ./figuras/sistEmbarcado/usecase_placa_baixo_nivel.jpg Graphic file (type 
+jpg)
+ <use ./figuras/sistEmbarcado/usecase_placa_baixo_nivel.jpg> [6 <./figuras/esta
+caoBase/usecase_estacao_base.jpg> <./figuras/sistEmbarcado/usecase_linux_embarc
+ado.jpg>]
+<./figuras/estacaoBase/class_estacaoBase.jpg, id=30, 5491.01437pt x 4650.12282p
 t>
-File: ./figuras/estacaoBase/class_estacaoBase.png Graphic file (type png)
- <use ./figuras/estacaoBase/class_estacaoBase.png> [7 <./figuras/sistEmbarcado/
-usecase_placa_baixo_nivel.png>]
+File: ./figuras/estacaoBase/class_estacaoBase.jpg Graphic file (type jpg)
+ <use ./figuras/estacaoBase/class_estacaoBase.jpg> [7 <./figuras/sistEmbarcado/
+usecase_placa_baixo_nivel.jpg>]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-
+[8 <./figuras/estacaoBase/class_estacaoBase.jpg>]
 Underfull \hbox (badness 4328) in paragraph at lines 118--118
 []\OT1/ptm/m/n/12 Respons[]avel por re-pre-sen-tar o rob[]o, este
  []
@@ -820,7 +817,7 @@ Underfull \hbox (badness 4328) in paragraph at lines 118--118
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[8 <./figuras/estacaoBase/class_estacaoBase.png>] [9]
+[9]
 Underfull \hbox (badness 2790) in paragraph at lines 145--145
 []\OT1/ptm/m/n/12 Thread res-pons[]avel pelo pro-ces-sa-mento de
  []
@@ -832,15 +829,12 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-<./figuras/sistEmbarcado/class_sistEmbarcado.png, id=45, 1141.26375pt x 644.407
-5pt>
-File: ./figuras/sistEmbarcado/class_sistEmbarcado.png Graphic file (type png)
- <use ./figuras/sistEmbarcado/class_sistEmbarcado.png> [10]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-) (./protocolo.tex [11 <./figuras/sistEmbarcado/class_sistEmbarcado.png>]
-[12] (./codificacao_mensagens.tex
+<./figuras/sistEmbarcado/class_sistEmbarcado.jpg, id=40, 2670.97874pt x 1349.79
+282pt>
+File: ./figuras/sistEmbarcado/class_sistEmbarcado.jpg Graphic file (type jpg)
+ <use ./figuras/sistEmbarcado/class_sistEmbarcado.jpg> [10] [11])
+(./protocolo.tex [12 <./figuras/sistEmbarcado/class_sistEmbarcado.jpg>]
+[13] (./codificacao_mensagens.tex
 LaTeX Font Info:    Try loading font information for OMS+ptm on input line 5.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
@@ -848,105 +842,104 @@ File: omsptm.fd
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 5.
- [13] [14] [15]
+ [14] [15] [16]
 Underfull \hbox (badness 10000) in paragraph at lines 134--146
 
  []
 
-[16]) [17]
-<./figuras/estacaoBase/statemachine_conexao_estacaoBase.png, id=73, 939.51pt x 
+[17]) [18]
+<./figuras/estacaoBase/statemachine_conexao_estacaoBase.jpg, id=71, 939.51pt x 
 993.7125pt>
-File: ./figuras/estacaoBase/statemachine_conexao_estacaoBase.png Graphic file (
-type png)
- <use ./figuras/estacaoBase/statemachine_conexao_estacaoBase.png>
-[18]
-<./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.png, id=78, 942.521
+File: ./figuras/estacaoBase/statemachine_conexao_estacaoBase.jpg Graphic file (
+type jpg)
+ <use ./figuras/estacaoBase/statemachine_conexao_estacaoBase.jpg>
+<./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.jpg, id=72, 942.521
 26pt x 928.21782pt>
-File: ./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.png Graphic fi
-le (type png)
+File: ./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.jpg Graphic fi
+le (type jpg)
 
-<use ./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.png> [19 <./fig
-uras/estacaoBase/statemachine_conexao_estacaoBase.png>]
-<./figuras/statemachine_Sender.png, id=83, 856.70062pt x 660.21657pt>
-File: ./figuras/statemachine_Sender.png Graphic file (type png)
+<use ./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.jpg> [19 <./fig
+uras/estacaoBase/statemachine_conexao_estacaoBase.jpg>]
+<./figuras/statemachine_Sender.jpg, id=76, 856.70062pt x 660.21657pt>
+File: ./figuras/statemachine_Sender.jpg Graphic file (type jpg)
 
-<use ./figuras/statemachine_Sender.png> [20 <./figuras/sistEmbarcado/statemachi
-ne_conexao_sistEmbarcado.png>]
-<./figuras/statemachine_Receiver.png, id=88, 750.55406pt x 497.60907pt>
-File: ./figuras/statemachine_Receiver.png Graphic file (type png)
+<use ./figuras/statemachine_Sender.jpg> [20 <./figuras/sistEmbarcado/statemachi
+ne_conexao_sistEmbarcado.jpg>]
+<./figuras/statemachine_Receiver.jpg, id=80, 750.55406pt x 497.60907pt>
+File: ./figuras/statemachine_Receiver.jpg Graphic file (type jpg)
 
-<use ./figuras/statemachine_Receiver.png> [21 <./figuras/statemachine_Sender.pn
-g>] <./figuras/statemachine_Processor.png, id=93, 713.66624pt x 566.115pt>
-File: ./figuras/statemachine_Processor.png Graphic file (type png)
+<use ./figuras/statemachine_Receiver.jpg> [21 <./figuras/statemachine_Sender.jp
+g>] <./figuras/statemachine_Processor.jpg, id=84, 713.66624pt x 566.115pt>
+File: ./figuras/statemachine_Processor.jpg Graphic file (type jpg)
 
-<use ./figuras/statemachine_Processor.png> [22 <./figuras/statemachine_Receiver
-.png>]
-<./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.png, id=
-98, 784.43062pt x 566.115pt>
-File: ./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.png
- Graphic file (type png)
+<use ./figuras/statemachine_Processor.jpg> [22 <./figuras/statemachine_Receiver
+.jpg>]
+<./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg, id=
+88, 784.43062pt x 566.115pt>
+File: ./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg
+ Graphic file (type jpg)
 
-<use ./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.png>
-[23 <./figuras/statemachine_Processor.png>]
-<./figuras/estacaoBase/statemachine_webcam_estacaoBase.png, id=103, 551.05875pt
- x 506.6428pt>
-File: ./figuras/estacaoBase/statemachine_webcam_estacaoBase.png Graphic file (t
-ype png)
- <use ./figuras/estacaoBase/statemachine_webcam_estacaoBase.png>
-[24 <./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.png>
+<use ./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg>
+[23 <./figuras/statemachine_Processor.jpg>]
+<./figuras/estacaoBase/statemachine_webcam_estacaoBase.jpg, id=92, 551.05875pt 
+x 506.6428pt>
+File: ./figuras/estacaoBase/statemachine_webcam_estacaoBase.jpg Graphic file (t
+ype jpg)
+ <use ./figuras/estacaoBase/statemachine_webcam_estacaoBase.jpg>
+[24 <./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg>
 ]
-<./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.png, id=109, 596.227
-5pt x 476.53032pt>
-File: ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.png Graphic fil
-e (type png)
+<./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg, id=97, 596.2275
+pt x 476.53032pt>
+File: ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg Graphic fil
+e (type jpg)
 
-<use ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.png> [25 <./figu
-ras/estacaoBase/statemachine_webcam_estacaoBase.png>]
-<./figuras/estacaoBase/sequence_motores_estacaoBase.png, id=114, 805.50937pt x 
+<use ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg> [25 <./figu
+ras/estacaoBase/statemachine_webcam_estacaoBase.jpg>]
+<./figuras/estacaoBase/sequence_motores_estacaoBase.jpg, id=101, 805.50937pt x 
 460.72125pt>
-File: ./figuras/estacaoBase/sequence_motores_estacaoBase.png Graphic file (type
- png)
- <use ./figuras/estacaoBase/sequence_motores_estacaoBase.png>
-[26 <./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.png>]
-<./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.png, id=119, 1145.02782
+File: ./figuras/estacaoBase/sequence_motores_estacaoBase.jpg Graphic file (type
+ jpg)
+ <use ./figuras/estacaoBase/sequence_motores_estacaoBase.jpg>
+[26 <./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg>]
+<./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg, id=105, 1145.02782
 pt x 530.73282pt>
-File: ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.png Graphic file (
-type png)
+File: ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg Graphic file (
+type jpg)
 
-<use ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.png>
-<./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.png, id=120, 916.92563
+<use ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg>
+<./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg, id=106, 916.92563
 pt x 548.0475pt>
-File: ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.png Graphic file 
-(type png)
+File: ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg Graphic file 
+(type jpg)
 
-<use ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.png> [27 <./figura
-s/estacaoBase/sequence_motores_estacaoBase.png> <./figuras/sistEmbarcado/sequen
-ce_motores_sistEmbarcado.png>]
-<./figuras/estacaoBase/sequence_sensores_estacaoBase.png, id=126, 1307.63531pt 
+<use ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> [27 <./figura
+s/estacaoBase/sequence_motores_estacaoBase.jpg> <./figuras/sistEmbarcado/sequen
+ce_motores_sistEmbarcado.jpg>]
+<./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg, id=110, 1307.63531pt 
 x 554.07pt>
-File: ./figuras/estacaoBase/sequence_sensores_estacaoBase.png Graphic file (typ
-e png)
- <use ./figuras/estacaoBase/sequence_sensores_estacaoBase.png>
-<./figuras/estacaoBase/sequence_webcam_estacaoBase.png, id=127, 1509.38907pt x 
+File: ./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg Graphic file (typ
+e jpg)
+ <use ./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg>
+<./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg, id=111, 1669.73813pt x 
 561.59813pt>
-File: ./figuras/estacaoBase/sequence_webcam_estacaoBase.png Graphic file (type 
-png)
- <use ./figuras/estacaoBase/sequence_webcam_estacaoBase.png>
-[28 <./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.png> <./figuras/es
-tacaoBase/sequence_sensores_estacaoBase.png>]
-<./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.png, id=133, 1172.12906p
+File: ./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg Graphic file (type 
+jpg)
+ <use ./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg>
+[28 <./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> <./figuras/es
+tacaoBase/sequence_sensores_estacaoBase.jpg>]
+<./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg, id=115, 1172.12906p
 t x 536.0025pt>
-File: ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.png Graphic file (t
-ype png)
+File: ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg Graphic file (t
+ype jpg)
 
-<use ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.png>)
+<use ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg>)
 (./diagrama_hardware.tex [29 <./figuras/estacaoBase/sequence_webcam_estacaoBase
-.png> <./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.png>]
+.jpg> <./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg>]
 Cap\'{\i }tulo 3.
-<./figuras/diagrama_blocos_hardware.png, id=139, 712.91344pt x 595.47469pt>
-File: ./figuras/diagrama_blocos_hardware.png Graphic file (type png)
+<./figuras/diagrama_blocos_hardware.jpg, id=119, 712.91344pt x 595.47469pt>
+File: ./figuras/diagrama_blocos_hardware.jpg Graphic file (type jpg)
 
-<use ./figuras/diagrama_blocos_hardware.png>
+<use ./figuras/diagrama_blocos_hardware.jpg>
 Overfull \hbox (4.01436pt too wide) in paragraph at lines 17--18
 \OT1/ptm/m/n/12 ler[]ometro e gi-rosc[]opios. Al[]em disso pos-sui a implementa
 [][]ao do pro-to-colo de comunica[][]ao
@@ -954,8 +947,8 @@ Overfull \hbox (4.01436pt too wide) in paragraph at lines 17--18
 
 [30
 
- <./figuras/diagrama_blocos_hardware.png (PNG copy)>]
-<./figuras/hardware2_1.pdf, id=144, 1690.315pt x 2392.94pt>
+ <./figuras/diagrama_blocos_hardware.jpg>]
+<./figuras/hardware2_1.pdf, id=124, 1690.315pt x 2392.94pt>
 File: ./figuras/hardware2_1.pdf Graphic file (type pdf)
 
 <use ./figuras/hardware2_1.pdf>) (./entregavel3.bbl [31] [32 <./figuras/hardwar
@@ -966,27 +959,23 @@ e2_1.pdf>]) AED: lastpage setting LastPage [33
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./entregavel3.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+(./entregavel3.aux) ) 
 Here is how much of TeX's memory you used:
- 5983 strings out of 495041
- 91215 string characters out of 1181897
- 167311 words of memory out of 3000000
- 8934 multiletter control sequences out of 15000+50000
+ 5984 strings out of 495041
+ 91231 string characters out of 1181897
+ 168281 words of memory out of 3000000
+ 8935 multiletter control sequences out of 15000+50000
  21677 words of font info for 46 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
- 61i,14n,96p,1107b,386s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/tim
-es/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/
-share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on entregavel3.pdf (34 pages, 1931225 bytes).
+ 61i,14n,96p,1107b,387s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</us
+r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/tex
+mf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/
+fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/time
+s/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+Output written on entregavel3.pdf (34 pages, 3510884 bytes).
 PDF statistics:
- 177 PDF objects out of 1000 (max. 8388607)
+ 157 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

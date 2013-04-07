@@ -238,5 +238,5 @@ A Figura \ref{fig:diagrama_classes_sist_embarcado} mostra o diagrama de classes 
    WebcamManager & Responsável por gerenciar a abertura e o fechamento da stream de imagens da webcam, além de configurar opções como resolução e taxa de frames. \\
    \bottomrule
   \end{tabular}%
-  \label{tab:classes_ts}%
+  \label{tab:pacote_comunicacao}%
 \end{table}%

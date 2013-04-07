@@ -7,13 +7,13 @@
 \contentsline {section}{\numberline {2.4}\MakeUppercase {Diagrama de classes da esta\IeC {\c c}\IeC {\~a}o base}}{7}
 \contentsline {subsection}{\numberline {2.4.1}Descri\IeC {\c c}\IeC {\~a}o das classes da esta\IeC {\c c}\IeC {\~a}o base}{8}
 \contentsline {subsection}{\numberline {2.4.2}Pacote \textit {visual}}{8}
-\contentsline {subsection}{\numberline {2.4.3}Pacote \textit {dados}}{8}
+\contentsline {subsection}{\numberline {2.4.3}Pacote \textit {dados}}{9}
 \contentsline {subsection}{\numberline {2.4.4}Pacote \textit {comunicacao}}{9}
 \contentsline {subsection}{\numberline {2.4.5}Pacote \textit {gui}}{10}
-\contentsline {section}{\numberline {2.5}\MakeUppercase {Diagrama de classes do sistema embarcado}}{10}
-\contentsline {section}{\numberline {2.6}\MakeUppercase {Protocolo de comunica\IeC {\c c}\IeC {\~a}o}}{12}
-\contentsline {subsection}{\numberline {2.6.1}Codifica\IeC {\c c}\IeC {\~a}o das mensagens}{13}
-\contentsline {subsection}{\numberline {2.6.2}Diagramas de estados}{17}
+\contentsline {section}{\numberline {2.5}\MakeUppercase {Diagrama de classes do sistema embarcado}}{11}
+\contentsline {section}{\numberline {2.6}\MakeUppercase {Protocolo de comunica\IeC {\c c}\IeC {\~a}o}}{13}
+\contentsline {subsection}{\numberline {2.6.1}Codifica\IeC {\c c}\IeC {\~a}o das mensagens}{14}
+\contentsline {subsection}{\numberline {2.6.2}Diagramas de estados}{18}
 \contentsline {subsection}{\numberline {2.6.3}Diagramas de sequ\IeC {\^e}ncia}{26}
 \contentsline {chapter}{\numberline {3}\MakeUppercase {Diagramas do hardware}}{30}
 \contentsline {section}{\numberline {3.1}\MakeUppercase {Diagrama de blocos}}{30}

@@ -136,7 +136,7 @@ Vale ressaltar que as chamadas assíncronas, ou seja, que não bloqueiam a execu
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.png}
-  \caption{Diagrama de sequência de comando para ativação da webcam (representa mensagem de ativação da webcam chegando no sistema embarcado e estação base sendo posteriormente notificada sobre o status).}
+  \caption{Diagrama de sequência de comando para ativação da webcam (representa mensagem de ativação da webcam chegando no sistema embarcado e estação base sendo posteriormente notificada sobre o novo status).}
   \label{fig:diagrama_sequencia_webcam_sist_embarcado}
 \end{figure}
 
