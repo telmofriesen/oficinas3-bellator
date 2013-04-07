@@ -1,0 +1,18 @@
+- Reposicionamento do robô na interface
+- Sugestão: teclado numérico; Timing para comandos
+- Diagrama representativo da arquitetura, máquinas de estados (placa de baixo nível)
+- Handshake do sistema != Handshake do TCP
+- Kalman -> filtrar leituras dos encoders
+- Frequência de amostragem: 10Hz até 100Hz. Sugestão: obter as amostras e realizar filtragem na TS. Realizar tratamento de dados para sensores: (média ?)
+- Taxa de envio para estação base: 10 amostras por segundo 
+- Diagrama de blocos
+- Corrigir diagramas máquina de estados
+- Diagramas de sequẽncia: dividir em mais diagramas, separar estação base do sistema embarcado.
+- Fazer diagramas de estado para placa de baixo nível
+- Verificar taxa de feedback visual
+- Remover digrama de fluxo de dados
+
+Taxa de amostragem:
+640x480 @ 30 fps -> 9216000 Bytes/s = 490 KB/s
+160x120 @ 10 fps -> 192000 -> 9,375 KB/s
+

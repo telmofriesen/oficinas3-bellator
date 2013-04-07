@@ -1,0 +1,143 @@
+
+
+\section{Protocolo de comunicação}
+
+Esta seção detalha o protocolo de comunicação estabelecido entre a estação base, a placa TS-7260 (sistema com linux embarcado) e a placa LPC2103 (sistema embarcado de baixo nível).
+
+O protocolo desenvolvido para a comunicação (via Wi-Fi) entre a estação base e a TS-7260 visa utilizar o TCP como camada de transporte. Como foi explicitado anteriormente na seção \ref{subsec:pacote_comunicacao}, o robô foi escolhido como servidor da conexão, e a estação base como cliente. Para haver confirmação da conexão entre os dois, optou-se por criar um protocolo de \textit{handshake} semelhante ao existente no TCP, de 3 passos: requisição, resposta, confirmação. A requisição é feita pelo cliente no início da conexão, a resposta é dada pelo servidor em seguida. Posteriormente, o cliente envia uma mensagem de confirmação, e a conexão é totalmente estabelecida. O uso do \textit{handshake} contribui para tanto a estação base como o sistema embarcado confirmarem que estão conectados um ao outro e não a um servidor/cliente qualquer.
+
+Para possibilitar que o tráfego de mensagens possa ser feito de forma rápida, reduzindo atrasos, o envio e recebimento de mensagens é feito de forma assíncrona.
+Essa escolha foi feita tendo em vista que, em uma comunicação totalmente síncrona, um programa (ou thread) é bloqueado ao chamar uma função de recebimento ou envio, até que efetivamente seja completa a transação. Supondo que só houvesse uma thread gerenciando a conexão, o programa não poderia enviar ou receber dados ao mesmo tempo em \textit{full-duplex}, mas somente \textit{half-duplex} (somente enviar ou somente receber).
+
+A solução desenvolvida para possibilitar a comunicação assíncrona foi o uso de 4 threads (tanto na estação base quanto no sistema embarcado) para gerenciar os diversos aspectos envolvidos nela. A primeira \textit{thread} (a gerenciadora principal de conexão) é a responsável por estabelecer e manter a conexão, além de gerenciar os potenciais erros que possam ocorrer (tempo excessivo sem comunicação e fechamento de socket). Para a estação base, o diagrama de estados dessa \textit{thread} está representado na Figura \ref{fig:diagrama_estados_estacao_base}, e para o sistema embarcado na Figura \ref{fig:diagrama_estados_sist_embarcado}.
+
+A segunda \textit{thread} tem a função de gerenciar o envio de mensagens. O programa principal, ao necessitar enviar uma mensagem, faz uma requisição a essa \textit{thread} que insere a mensagem em uma fila de envio. O programa principal não fica bloqueado, dessa forma, pois não necessita aguardar a mensagem ser completamente enviada, podendo efetuar outras tarefas. O diagrama de estados dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_sender}.
+
+A terceira \textit{thread} gerencia o recebimento de mensagens. Seu funcionamento é relativamente simples: ela possui um loop, no qual aguarda até alguma mensagem ser recebida. Quando ocorre o recebimento de alguma mensagem, ela é encaminhada para a quarta \textit{thread} (cuja explicação está a seguir) que processa o conteúdo dela e executa as operações que são necessárias para cada tipo de mensagem. Dessa forma, novas mensagens podem ser recebidas rapidamente, pois o receptor não fica bloqueado realizando o processamento das informações recebidas. O diagrama de estados dessa terceira \textit{thread} está presente na Figura \ref{fig:diagrama_estados_receiver}.
+
+A quarta \textit{thread}, como já exposto, é a responsável por processar mensagens recebidas e realizar as operações que são necessárias para cada tipo de mensagem, o que depende da codificação exposta na seção \ref{sec:codificacao_mensagens}. Ela possui uma fila, na qual são inseridas as mensagens a serem processadas. Dessa forma a \textit{thread} receptora não necessita ficar bloqueada aguardando o término do processamento. O diagrama de estados dessa quarta \textit{thread} está presente na Figura \ref{fig:diagrama_estados_processor}.
+
+
+\input{codificacao_mensagens}
+
+\subsection{Diagramas de estados}
+
+Nesta seção estão expostos os diagramas de estados do protocolo de comunicação.
+
+% nas Figuras \ref{fig:diagrama_estados_estacao_base}, \ref{fig:diagrama_estados_sist_embarcado}, \ref{fig:diagrama_estados_sender}, \ref{fig:diagrama_estados_receiver}, \ref{fig:diagrama_estados_processor} e \ref{fig:diagrama_estados_amostragem_sensores}.
+
+Um aspecto importante a ressaltar é que, nas \textit{threads} de envio (Figura \ref{fig:diagrama_estados_sender}) e de processamento de mensagens (Figura \ref{fig:diagrama_estados_processor}), pode haver adição assíncrona de elementos na fila. Ou seja, quando é feita a verificação do número de elementos presentes na fila (como representado nos diagramas), tem-se em vista que elementos podem ter sido adicionados a qualquer instante. Obviamente, no ponto de vista da implementação, existem as seções críticas que devem ser devidamente gerenciadas para evitar condições de disputa e outros problemas de concorrência. Porém, as seções críticas se resumem aos acessos à fila somente, o que reduz consideravelmente a complexidade do processo.
+
+Na Figura \ref{fig:diagrama_estados_amostragem_sensores_sist_embarcado} está exposto o diagrama de estados da \textit{thread} do Linux embarcado que é responsável por realizar a amostragem dos sensores em intervalos fixos de tempo. Ela realiza a amostragem enviando periodicamente -- quando programada -- comandos SYNC (vide seção \ref{sec:codificacao_mensagens}) para a placa de baixo nível. Vale ressaltar que para melhor explicar este processo, na Figuras \ref{fig:diagrama_sequencia_sensores_sist_embarcado} e \ref{fig:diagrama_sequencia_sensores_estacao_base} da próxima seção está exposto um diagrama de sequência que demonstra a amostragem dos sensores.
+
+Nas Figuras \ref{fig:diagrama_estados_webcam_estacao_base} e \ref{fig:diagrama_estados_webcam_sist_embarcado} estão presentes os diagramas de estados da captura e recebimento de imagens da webcam. Foi utilizada a biblioteca externa \textit{libVLC} \cite{vlc} -- a componente de baixo nível do \textit{player} de mídia VLC -- tanto na estação base como no Linux embarcado para efetuar o processo de transmissão e visualização de imagens. No Linux embarcado, quando um comando de início de webcam é dado pelo usuário, uma \textit{stream} HTTP de imagens é aberta pela \textit{libVLC}, e a estação base é posteriormente notificada sobre o fato. Na estação base, quando ocorre a notificação de que a stream foi aberta, a componente de \textit{player} da \textit{libVLC} da janela principal é ativada (conectando dessa forma, na stream HTTP de imagens).
+
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/estacaoBase/statemachine_conexao_estacaoBase.png}
+  \caption{Diagrama estados da \textit{thread} principal da conexão da estação base.}
+  \label{fig:diagrama_estados_estacao_base}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.png}
+  \caption{Diagrama de estados da \textit{thread} principal da conexão do sistema embarcado.}
+  \label{fig:diagrama_estados_sist_embarcado}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/statemachine_Sender.png}
+  \caption{Diagrama de estados da \textit{thread} que envia mensagens (igual para estação base e sistema embarcado).}
+  \label{fig:diagrama_estados_sender}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/statemachine_Receiver.png}
+  \caption{Diagrama de estados da \textit{thread} receptora de mensagens (igual para estação base e sistema embarcado).}
+  \label{fig:diagrama_estados_receiver}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/statemachine_Processor.png}
+  \caption{Diagrama de estados da \textit{thread} que processa mensagens recebidas (igual para estação base e sistema embarcado).}
+  \label{fig:diagrama_estados_processor}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.png}
+  \caption{Diagrama de estados da \textit{thread} responsável por efetuar a amostragem dos sensores (sistema embarcado).}
+  \label{fig:diagrama_estados_amostragem_sensores_sist_embarcado}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/estacaoBase/statemachine_webcam_estacaoBase.png}
+  \caption{Diagrama de estados do visualização de imagens da \textit{webcam} (estação base).}
+  \label{fig:diagrama_estados_webcam_estacao_base}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.png}
+  \caption{Diagrama de estados do envio de imagens da \textit{webcam} (sistema embarcado).}
+  \label{fig:diagrama_estados_webcam_sist_embarcado}
+\end{figure}
+
+
+
+\subsection{Diagramas de sequência}
+
+Nessa seção os diagramas de sequência de comandos dos motores, de mensagens de amostras dos sensores e da ativação da webcam. Os diagramas das Figuras \ref{fig:diagrama_sequencia_motores_estacao_base} e \ref{fig:diagrama_sequencia_motores_sist_embarcado} representam como um comando de mudança de velocidade das rodas dado pelo usuário chega até a placa de baixo nível. Os das Figuras \ref{fig:diagrama_sequencia_sensores_sist_embarcado} e \ref{fig:diagrama_sequencia_sensores_estacao_base} demonstram a sequência dos dados de leituras dos sensores que saem da placa de baixo nível e chegam até o usuário.  Os diagramas das Figuras \ref{fig:diagrama_sequencia_webcam_estacao_base} e \ref{fig:diagrama_sequencia_webcam_sist_embarcado} demonstram um comando de ativação da webcam dado pelo usuário, como ele chega até o Linux embarcado e como posteriormente o usuário recebe as imagens da webcam.
+
+Vale ressaltar que as chamadas assíncronas, ou seja, que não bloqueiam a execução da \textit{thread} chamadora, foram representadas também nestes diagramas.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/estacaoBase/sequence_motores_estacaoBase.png}
+  \caption{Diagrama de sequência de comando para mudança de velocidade dos motores (representa comando dado pelo usuário).}
+  \label{fig:diagrama_sequencia_motores_estacao_base}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.png}
+  \caption{Diagrama de sequência de comando para mudança de velocidade dos motores (representa mensagem chegando no sistema embarcado).}
+  \label{fig:diagrama_sequencia_motores_sist_embarcado}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.png}
+  \caption{Diagrama de sequência da amostragem dos sensores (representa amostras saindo do sistema embarcado).}
+  \label{fig:diagrama_sequencia_sensores_sist_embarcado}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/estacaoBase/sequence_sensores_estacaoBase.png}
+  \caption{Diagrama de sequência da amostragem dos sensores (representa mensagem chegando na estação base).}
+  \label{fig:diagrama_sequencia_sensores_estacao_base}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/estacaoBase/sequence_webcam_estacaoBase.png}
+  \caption{Diagrama de sequência de comando para ativação da webcam (representa comando dado pelo usuário e o \textit{player} da \textit{libVLC} sendo ativado posteriormente).}
+  \label{fig:diagrama_sequencia_webcam_estacao_base}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.png}
+  \caption{Diagrama de sequência de comando para ativação da webcam (representa mensagem de ativação da webcam chegando no sistema embarcado e estação base sendo posteriormente notificada sobre o novo status).}
+  \label{fig:diagrama_sequencia_webcam_sist_embarcado}
+\end{figure}
+
+

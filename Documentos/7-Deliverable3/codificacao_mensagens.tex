@@ -1,0 +1,175 @@
+\subsection{Codificação das mensagens}
+\label{sec:codificacao_mensagens}
+
+\begin{itemize}
+  \item Mensagens do TS-7260 para o LPC2103 (via porta serial)
+  
+	\begin{itemize}
+		
+	  \item \textbf{SYNC}\\
+	  \textit{(byte) END\_CMD}\\
+	  Quando o microcontrolador LPC2103 recebe esta mensagem, responde com as leituras mais recentes dos encoders, de cada sensor de distância, do acelerômetro e do giroscópio (enviando uma mensagem SENSORS, explicada abaixo).
+	  
+	  \item \textbf{ENGINES}\\
+	  \textit{(byte) vel\_roda\_esquerda}\\
+	  \textit{(byte) vel\_roda\_direita}\\
+	  \textit{(byte) END\_CMD}\\
+	  Ao receber este comando, o microcontrolador utiliza os valores para definir o nível de PWM para as rodas do robô. Os valores de velocidade são representados por um byte cada, nos quais o bit mais significativo indica o sentido de rotação da roda (1 para frente e 0 para trás) e os restantes a intensidade do PWM.
+	  
+	  \end{itemize}
+	  
+	  \item Mensagens do LPC2103 para a TS-7260 (via porta serial)
+	  
+	  \begin{itemize}
+	  
+	  \item \textbf{SENSORS}\\
+	  \textit{(byte) encoder\_esq\_H}, \textit{(byte) encoder\_esq\_L},\\
+	  \textit{(byte) encoder\_dir\_H}, \textit{(byte) encoder\_dir\_L},\\
+	  \textit{(byte) IR1}, \textit{(byte) IR2}, \textit{(byte) IR3}, \textit{(byte) IR4}, \textit{(byte) IR5},\\
+	  \textit{(byte) AX\_H}, \textit{(byte) AX\_L},\\
+	  \textit{(byte) AY\_H}, \textit{(byte) AY\_L},\\
+	  \textit{(byte) AZ\_H}, \textit{(byte) AZ\_L},\\
+	  \textit{(byte) GX\_H}, \textit{(byte) GX\_L},\\
+	  \textit{(byte) GY\_H}, \textit{(byte) GY\_L},\\
+	  \textit{(byte) GZ\_H}, \textit{(byte) GZ\_L},\\
+	  \textit{(byte) TIMESTAMP\_H}, \textit{(byte) TIMESTAMP\_L}\\
+	  \textit{(byte) END\_CMD}\\
+	  Representa a leitura de todos os sensores (encoders, infra-vermelhos, acelerômetro e giroscópio). 
+	  
+	  Os 4 primeiros bytes são os valores das leituras dos encoders esquerdo e direíto (cada um com um byte alto e um baixo). Os valores das leituras dos encoders representam a diferença entre a contagem atual a contagem anterior.
+	  
+	  Nos próximos 5 bytes, as leituras do sensores ópticos são enviadas em sequência. As distâncias que os sensores ópticos são capazes de mensurar são dividos em valores discretos de 0 a 255 \cite{bellator_2012}. 
+	  
+	  Após isso, os 12 bytes que se seguem representam as leituras do acelerômetro e do giroscópio. Os bytes que começam com `A' representam a leitura de cada um dos eixos do acelerômetro. Aqueles que começam com `G' representam a leitura de cada um dos eixos do giroscópio.
+	  
+	  O timestamp (valor alto e baixo) é um contador de 16 bits que é incrementado entre cada amostre e zera automaticamente quando chega ao valor máximo, usado para determinar o instante em que foi feita a leitura dos dados. Como a amostragem dos sensores na placa de baixo nível será efetuada em intervalos fixos, a informação do contador do timestamp pode ser utilizada para obter informações de tempo de cada amostra.
+	  
+	  
+	\end{itemize}
+
+  \item Mensagens bidirecionais entre estação base e TS-7260 (via Wi-Fi):
+
+    \begin{itemize}
+      \item \textbf{ECHO\_REQUEST}\\
+      \textit{(byte) END\_CMD}\\
+	Requisição de ping.
+      \item \textbf{ECHO\_REPLY}\\
+      \textit{(byte) END\_CMD}\\
+	Resposta de ping.
+      \item \textbf{DISCONNECT} \\
+      \textit{(byte) END\_CMD}\\
+	Solicitação de desconexão.
+    \end{itemize}
+
+  \item Mensagens da estação base para a TS-7260 (via Wi-Fi):
+
+    \begin{itemize}
+      \item \textbf{HANDSHAKE\_REQUEST}\\
+      \textit{(byte) END\_CMD}\\
+	Solicitação de handshake.
+
+      \item \textbf{HANDSHAKE\_CONFIRMATION}\\
+      \textit{(byte) END\_CMD}\\
+	Confirmação de handshake.
+
+      \item \textbf{SENSORS\_START}\\
+      \textit{(byte) END\_CMD}\\
+	Solicitação de início da amostragem dos sensores.
+
+      \item \textbf{SENSORS\_STOP}\\
+      \textit{(byte) END\_CMD}\\
+	Solicitação de parada da amostragem dos sensores.
+
+      \item \textbf{SENSORS\_RATE} \\
+	\textit{(float) Nova taxa de amostragem}\\
+	\textit{(byte) END\_CMD}\\
+	Solicitação de mudança da taxa de amostragem dos sensores (amostras/s).
+
+%       \item \textbf{SENSORS\_STATUS\_REQUEST}\\
+%       \textit{(byte) END\_CMD}\\
+% 	Requisição de status da amostragem dos sensores. Usado na interface gráfica para atualizar as informações sobre os sensores.
+
+      \item \textbf{WEBCAM\_START}\\
+      \textit{(byte) END\_CMD}\\
+	Solicitação de início da amostragem da webcam.
+
+      \item \textbf{WEBCAM\_STOP}\\
+      \textit{(byte) END\_CMD}\\
+	Solicitação de parada da amostragem da webcam.
+
+      \item \textbf{WEBCAM\_RATE} \\
+	\textit{(float) Nova taxa de quadros}\\
+	\textit{(byte) END\_CMD}\\
+	Solicitação de mudança da taxa de quadros da webcam.
+
+      \item \textbf{WEBCAM\_RESOLUTION} \\
+	\textit{(int) Largura em pixels }\\
+	\textit{(int) Altura em pixels}\\
+	\textit{(byte) END\_CMD}\\
+	Solicitação de mudança da resolução da webcam.
+
+%       \item \textbf{WEBCAM\_STATUS\_REQUEST}\\
+%       \textit{(byte) END\_CMD}\\
+% 	Solicitação de informações sobre status da webcam. Usado na interface gráfica para atualizar as informações sobre a webcam.
+
+      \item \textbf{ENGINES} \\
+	 \textit{(byte) vel\_roda\_esquerda}\\
+	 \textit{(byte) vel\_roda\_direita}\\
+	 \textit{(byte) END\_CMD}\\
+	Solicitação de mudança da velocidade dos motores.
+
+%       \item \textbf{ENGINES\_STATUS\_REQUEST}\\
+%       \textit{(byte) END\_CMD}\\
+% 	Solicitação de status dos motores. Usado na interface gráfica para confirmar o recebimento de comandos de movimentação efetuados pelo usuário.
+
+    \end{itemize}
+
+  \item Mensagens da TS-7260 para a estação base (via Wi-Fi):
+
+    \begin{itemize}
+      \item \textbf{HANDSHAKE\_REPLY}\\
+      \textit{(byte) END\_CMD}\\
+	Resposta de handshake.
+	
+	 \item \textbf{SENSORS}\\
+	  \textit{(byte) encoder1\_H}, \textit{(byte) encoder1\_L},\\
+	  \textit{(byte) encoder2\_H}, \textit{(byte) encoder2\_L},\\
+	  \textit{(byte) IR1}, \textit{(byte) IR2}, \textit{(byte) IR3}, \textit{(byte) IR4}, \textit{(byte) IR5},\\
+	  \textit{(byte) AX\_H}, \textit{(byte) AX\_L},\\
+	  \textit{(byte) AY\_H}, \textit{(byte) AY\_L},\\
+	  \textit{(byte) AZ\_H}, \textit{(byte) AZ\_L},\\
+	  \textit{(byte) GX\_H}, \textit{(byte) GX\_L},\\
+	  \textit{(byte) GY\_H}, \textit{(byte) GY\_L},\\
+	  \textit{(byte) GZ\_H}, \textit{(byte) GZ\_L},\\
+	  \textit{(byte) TIMESTAMP\_H}, \textit{(byte) TIMESTAMP\_L}\\
+	  \textit{(byte) END\_CMD}\\
+	  
+	  Possui a mesma funcionalidade e parâmetros que a mensagem SENSORS enviada da LPC2103 para a TS-7260.
+	  
+% 	  com exceção do timestamp, que é trocado por um timestamp UNIX em milissegundos (que representa a hora do recebimento das leituras na TS-7260). Essa informação de tempo é utilizada pela estação base para efetuar os cálculos de posicionamento do robô.
+
+      \item \textbf{SENSORS\_STATUS} \\
+	\textit{(boolean) Status da amostragem [on - off] }\\
+	\textit{(float) Taxa de amostragem}\\
+	\textit{(byte) END\_CMD}\\
+	Informações de status dos sensores. Usado na interface gráfica para confirmar o recebimento de comandos de mudança de taxa de amostragem e início/parada da amostragem.
+
+      \item \textbf{WEBCAM\_STATUS} \\
+% 	\textit{(boolean) Nova taxa de amostragem }\\
+	\textit{(float) Taxa de quadros }\\
+	\textit{(int) Largura em pixels }\\
+	\textit{(int) Altura em pixels }\\
+	\textit{(boolean) Status da stream [on - off] }\\
+	\textit{(int) Porta da stream}\\
+	\textit{(byte) END\_CMD}\\
+	Informações de status da webcam. Usado na interface gráfica para confirmar o recebimento de comandos relativos à webcam, e para que a estação base tenha conhecimento do status da stream da webcam.
+	
+      \item \textbf{ENGINES\_STATUS} \\
+	\textit{(byte) vel\_roda\_esquerda}\\
+	\textit{(byte) vel\_roda\_direita}\\
+	Informações sobre as velocidades programadas dos motores. Usado na interface gráfica para confirmar o recebimento de comandos de movimentação efetuados pelo usuário.
+
+	
+
+    \end{itemize}
+\end{itemize}
