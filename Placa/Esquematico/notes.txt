@@ -1,6 +1,0 @@
-saidas medidas do IR
-140mV - 3.82V
-TODO: 
-mudar conector encoder para 4 pinos e deixar um desconectado
-Adicionar Jack de alimentacao na placa
-Botar pra funcionar com o 8051

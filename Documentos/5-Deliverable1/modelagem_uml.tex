@@ -65,13 +65,13 @@ O software da estação base do robô foi dividido em cinco pacotes:  \textit{vi
 
 \subsection{Pacote \textit{visual}}
 
-Este pacote consiste de toda a parte visual da estação base e conta com as seguintes classes: Viewer2D, Drawable2D, EscalaDrawable, RoboDrawable, RoboTrilhaDrawable e ObstaculosDrawable. Na Tabela \ref{tab:pacote_visual} estão descritas as classes deste pacote.
+Este pacote consiste de toda a parte visual da estação base e conta com as seguintes classes: Viewer2D, Drawable2D, EscalaDrawable, RoboDrawable, RoboTrilhaDrawable, ObstaculosDrawable, EscalaDrawableProp, RoboDrawableProp, RoboTrilhaDrawableProp e ObstaculosDrawableProp. Na Tabela \ref{tab:pacote_visual} estão descritas as classes deste pacote.
 
 
 \begin{table}[h]
   \centering
   \caption{Pacote \textit{visual}}
-    \begin{tabular}{p{6cm}p{8cm}}
+  \begin{tabular}{p{6cm}p{8cm}}
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\
     \midrule
@@ -81,12 +81,12 @@ Este pacote consiste de toda a parte visual da estação base e conta com as seg
     RoboDrawable & Responsável por desenhar o robô no mapa. \\ \hline
     RoboTrilhaDrawable & Responsável por desenhar a trilha percorrida pelo robô no mapa. \\ \hline
     ObstaculosDrawable & Responsável por desenhar os pontos de cada obstáculo no mapa. \\
-    %    EscalaDrawableProp & Contém as propriedades visuais de desenho da escala. \\ \hline
-%    RoboDrawableProp & Contém as propriedades visuais de desenho do robô \\ \hline
-%    RoboTrilhaDrawableProp & Contém as propriedades visuais de desenho da trilha do robô. \\ \hline
-%    ObstaculosDrawableProp & Contém as propriedades visuais de desenho dos obstáculos. \\ \hline
+    EscalaDrawableProp & Contém as propriedades visuais de desenho da escala. \\ \hline
+    RoboDrawableProp & Contém as propriedades visuais de desenho do robô \\ \hline
+    RoboTrilhaDrawableProp & Contém as propriedades visuais de desenho da trilha do robô. \\ \hline
+    ObstaculosDrawableProp & Contém as propriedades visuais de desenho dos obstáculos. \\ \hline
     \bottomrule
-    \end{tabular}%
+  \end{tabular}%
   \label{tab:pacote_visual}%
 \end{table}%
 
@@ -97,7 +97,7 @@ Este pacote consiste de toda a parte da estação base que processa e armazena a
 \begin{table}[h]
   \centering
   \caption{Pacote \textit{dados}}
-    \begin{tabular}{p{6cm}p{8cm}}
+  \begin{tabular}{p{6cm}p{8cm}}
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\ 
     \midrule
@@ -108,27 +108,27 @@ Este pacote consiste de toda a parte da estação base que processa e armazena a
     Posinfo & Responsável por conter as informações de uma posição do robô. \\ \hline
     SensorIR & Responsável por representar um sensor IR do robô. \\ \hline 
     Ponto & Representa um ponto de cordenadas cartesianas (x,y). \\ 
-%    ControleCamera & Responsável por controlar as imagens da câmera e o status do recebimento das imagens. \\ 
+    GerenciadorCamera & Responsável por gerenciar o status da câmera e o recebimento de imagens. \\ 
     \bottomrule
-    \end{tabular}%
+  \end{tabular}%
   \label{tab:pacote_controle}%
 \end{table}%
 
 \subsection{Pacote \textit{comunicacao}}
 
 %Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientCommandInterpreter, ClientConnection, ClientReceiver, ClientSender, ServerCommandInterpreter, ServerListener, ServerSender, ServerReceiver e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classe deste pacote.
-Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientConnection, ClientReceiver, ClientSender e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classes deste pacote.
+Este pacote consiste em toda a parte de comunicação da estação base com o robô e conta com as seguintes classes: ClientMessageInterpreter ClientConnection, ClientReceiver, ClientSender e Message. Na Tabela \ref{tab:pacote_comunicacao} estão descritas as classes deste pacote.
 
 É importante ressaltar que o protocolo TCP requer obrigatoriamente a especificação de um cliente e de um servidor para estabelecimento de uma conexão. Nas implementações desse protocolo em diversas linguagens (como Java e C++) existem tipos de \textit{socket} distintos para cliente e servidor. Na criação de um \textit{socket} de servidor, há obrigatoriamente a atribuição de uma porta de escuta, na qual o servidor aguarda que um cliente efetue uma requisição de conexão. Não é possível, ao menos nas implementações atuais do TCP, estabelecer conexão entre dois \textit{sockets} de cliente ou entre dois \textit{sockets} de servidor. Como neste projeto, o robô proverá serviços à estação base (envio de imagens da câmera, envio de leituras de sensores, além de prover a posibilidade de comando dos motores) o robô foi escolhido como servidor e a estação base como cliente. Enfatiza-se que o paradigma cliente-servidor não implica de forma alguma que a comunicação seja unidirecional. Pelo contrário, o envio de pacotes pode ser feito bidirecionalmente após uma conexão TCP ser estabelecida, sem nenhuma restrição quanto a isso.
 
 \begin{table}[h]
   \centering
   \caption{Pacote \textit{comunicacao}}
-    \begin{tabular}{p{6cm}p{8cm}}
+  \begin{tabular}{p{6cm}p{8cm}}
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\ 
     \midrule
-%    ClientCommandInterpreter & Responsável pela interpretação dos comandos do cliente. Os comandos recebidos são inseridos em uma fila, de modo a serem posteriormente executados pela thread. \\ \hline
+    ClientMessageInterpreter & Responsável pela interpretação dos comandos recebidos pelo cliente. \\ \hline
     ClientConnection & Responsável por efetuar a gerência da conexão do cliente (estação base) com o servidor (robô). \\ \hline
     ClientReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
     ClientSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
@@ -137,28 +137,28 @@ Este pacote consiste em toda a parte de comunicação da estação base com o ro
 %    ServerListener & Responsável por escutar as novas conexões de clientes. \\ \hline
 %    ServerSender & Responsável por enviar mensagens ao host de uma conexão. \\ \hline
 %    ServerReceiver & Responsável por receber mensagens de um host de uma conexão. \\ \hline
-    Message & Contém uma mensagem a ser enviada por um Sender. Esta classe atualmente é apenas um protótipo, pois o formato das mensagens ainda será definido. \\ 
+    Message & Contém uma mensagem a ser enviada por um Sender. \\ 
     \bottomrule
-    \end{tabular}%
+  \end{tabular}%
   \label{tab:pacote_comunicacao}%
 \end{table}%
 
 \subsection{Pacote \textit{gui}}
 
-Este pacote consiste em toda a interface gráfica do sistema e conta com as seguintes classes: JanelaConexao e JanelaPrincipal. Na Tabela \ref{tab:pacote_interface_grafica} estão descritas as classes deste pacote.
+Este pacote consiste em toda a interface gráfica do sistema e conta com as seguintes classes: JanelaConexao, JanelaPrincipal e JanelaSensores. Na Tabela \ref{tab:pacote_interface_grafica} estão descritas as classes deste pacote.
 
 \begin{table}[h]
   \centering
   \caption{Pacote \textit{gui}}
-    \begin{tabular}{p{6cm}p{8cm}}
+  \begin{tabular}{p{6cm}p{8cm}}
     \toprule
     \textbf{Classe} & \textbf{Descrição} \\ 
     \midrule
     JanelaConexao & Janela com as informações e configurações da conexão com o Bellator. \\ \hline
     JanelaPrincipal & Janela principal da interface gráfica da estação base. \\ 
-%    JanelaSensores & Responsável por desenhar a janela responsável pela configuração dos sensores. \\ 
+    JanelaSensores & Janela de configuração dos sensores. \\ 
     \bottomrule
-    \end{tabular}%
+  \end{tabular}%
   \label{tab:pacote_interface_grafica}%
 \end{table}%
 
@@ -182,4 +182,115 @@ Este pacote consiste em toda a interface gráfica do sistema e conta com as segu
 %\end{table}%
 %
 %
+%\begin{itemize}
+%  \item Mensagens bidirecionais:
+%
+%    \begin{itemize}
+%      \item \textbf{ECHO\_REQUEST}\\
+%	Requisição de ping.
+%      \item \textbf{ECHO\_REPLY}\\
+%	Resposta de ping.
+%      \item \textbf{DISCONNECT} \\
+%	Solicitação de desconexão.
+%    \end{itemize}
+%
+%  \item Mensagens da estação base para o robô:
+%
+%    \begin{itemize}
+%      \item \textbf{HANDSHAKE\_REQUEST}\\
+%	Solicitação de handshake.
+%
+%      \item \textbf{HANDSHAKE\_CONFIRMATION}\\
+%	Confirmação de handshake.
+%
+%      \item \textbf{SENSORS\_START}\\
+%	Solicitação de início da amostragem dos sensores.
+%
+%      \item \textbf{SENSORS\_STOP}\\
+%	Solicitação de parada da amostragem dos sensores.
+%
+%      \item \textbf{SENSORS\_RATE} \\
+%	\textit{(float) Nova taxa de amostragem}\\
+%	Solicitação de mudança da taxa de amostragem dos sensores.
+%
+%      \item \textbf{SENSORS\_STATUS\_REQUEST}\\
+%	Resposta de status da amostragem dos sensores.
+%
+%      \item \textbf{WEBCAM\_START}\\
+%	Solicitação de início da amostragem da webcam.
+%
+%      \item \textbf{WEBCAM\_STOP}\\
+%	Solicitação de parada da amostragem da webcam.
+%
+%      \item \textbf{WEBCAM\_RATE} \\
+%	\textit{(float) Nova taxa de quadros}\\
+%	Solicitação de mudança da taxa de quadros da webcam.
+%
+%      \item \textbf{WEBCAM\_RESOLUTION} \\
+%	\textit{(int) Largura em pixels }\\
+%	\textit{(int) Altura em pixels}\\
+%	Solicitação de mudança da resolução da webcam.
+%
+%      \item \textbf{WEBCAM\_STATUS\_REQUEST}\\
+%	Solicitação de status da amostragem da webcam.
+%
+%      \item \textbf{ENGINES\_SPEED} \\
+%	\textit{(int) Nova velocidade da roda esquerda (Valor de 0 a 255) }\\
+%	\textit{(int) Nova velocidade da roda direita (Valor de 0 a 255)}\\
+%	Solicitação de mudança da velocidade dos motores.
+%
+%      \item \textbf{ENGINES\_STATUS\_REQUEST}\\
+%	Solicitação de status dos motores.
+%
+%    \end{itemize}
+%
+%  \item Mensagens do robô para a estação base:
+%
+%    \begin{itemize}
+%      \item \textbf{HANDSHAKE\_REPLY}\\
+%	Resposta de handshake.
+%
+%      \item \textbf{SENSORS\_STATUS\_REPLY} \\
+%	\textit{(boolean) Status da amostragem [on - off] }\\
+%	\textit{(float) Taxa de amostragem}\\
+%	Resposta de status da amostragem dos sensores.
+%
+%      \item \textbf{WEBCAM\_STATUS\_REPLY} \\
+%	\textit{(boolean) Nova taxa de amostragem }\\
+%	\textit{(float) Taxa de quadros }\\
+%	\textit{(int) Largura em pixels }\\
+%	\textit{(int) Altura em pixels }\\
+%	\textit{(boolean) Status da stream [on - off] }\\
+%	\textit{(int) Porta da stream}\\
+%	Resposta de status da amostragem da webcam.
+%
+%      \item \textbf{ENGINES\_STATUS\_REPLY} \\
+%	\textit{(int) Velocidade programada da roda esquerda (Valor de 0 a 255) }\\
+%	\textit{(int) Velocidade programada da roda direita (Valor de 0 a 255)}\\
+%	Resposta de status dos motores.
+%
+%      \item \textbf{ENCODERS} \\
+%	\textit{(int) Leitura roda esquerda }\\
+%	\textit{(int) Leitura roda direita }\\
+%	\textit{(long) Timestamp em milissegundos}\\
+%	Envio de leituras dos encoders.
+%
+%      \item \textbf{ACEL\_GYRO} \\
+%	\textit{(float) Aceleração em X }\\
+%	\textit{(float) Aceleração em Y }\\
+%	\textit{(float) Aceleração em Z }\\
+%	\textit{(float) Aceleração angular em X }\\
+%	\textit{(float) Aceleração angular em Y }\\
+%	\textit{(float) Aceleração angular em Z }\\
+%	\textit{(long) Timestamp em milissegundos}\\
+%	Envio de leituras do acelerômetro e giroscópio.
+%
+%      \item \textbf{OPTICAL\_SENSORS} \\
+%	\textit{(float[]) Distâncias detectadas pelos sensores ópticos} \\
+%	\textit{(long) Timestamp em milissegundos}\\
+%	Envio de leituras dos sensores ópticos.
+%
+%    \end{itemize}
+%\end{itemize}
+
 

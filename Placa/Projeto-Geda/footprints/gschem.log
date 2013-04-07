@@ -1,0 +1,17 @@
+gEDA/gschem version 1.4.3.20081231
+gEDA/gschem comes with ABSOLUTELY NO WARRANTY; see COPYING for more details.
+This is free software, and you are welcome to redistribute it under certain
+conditions; please see the COPYING file for more details.
+
+Library name [local] already in use.  Using [local<1>].
+Read system-gafrc file [/usr/share/gEDA/system-gafrc]
+Did not find optional ~/.gEDA/gafrc file [/root/.gEDA/gafrc]
+Did not find optional local gafrc file [/home/telmo/Documents/schematics/footprints/gafrc]
+Read system-gschemrc file [/usr/share/gEDA/system-gschemrc]
+Did not find optional ~/.gEDA/gschemrc file [/root/.gEDA/gschemrc]
+Did not find optional local gschemrc file [/home/telmo/Documents/schematics/footprints/gschemrc]
+Read init scm file [/usr/share/gEDA/scheme/gschem.scm]
+Loading schematic [/usr/share/gEDA/sym/connector/connector19-1.sym]
+Did not find specified gafrc file [/usr/share/gEDA/sym/connector/gafrc]
+Saved [/usr/share/gEDA/sym/connector/connector19-1.sym]
+Saved as [/usr/share/gEDA/sym/connector/connector18-1.sym]

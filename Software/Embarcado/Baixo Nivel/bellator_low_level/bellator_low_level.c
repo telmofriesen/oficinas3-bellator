@@ -6,8 +6,35 @@
 /* global defines */
 #define CRYSTAL12MHz
 //#define CRYSTAL14745600Hz
-#define CMD_BUFF_SIZE 8 // has to be a power of two
-#define DEBUG
+#define CMD_BUFF_SIZE 32 // has to be a power of two
+#define DATA_BUFF_SIZE 256 // has to be a power of two
+
+#define SAMPLE_RATE_1kHZ 0;
+#define SAMPLE_RATE_500HZ 1;
+#define SAMPLE_RATE_250HZ 2;
+#define SAMPLE_RATE_125HZ 4;
+#define SAMPLE_RATE_012HZ 4096;
+
+#define SAMPLE_RATE SAMPLE_RATE_012HZ
+
+#define ERROR
+#define WARNING
+//#define DEBUG
+//#define DEBUG_I2C
+//#define DEBUG_MPU
+
+#define IENABLE \
+		asm volatile ( "MRS		LR, SPSR" 		); /* copy SPSR_irq to LR */ \
+		asm volatile ( "STMFD	SP!, {LR}"		); /* save SPSR_irq */ \
+		asm volatile ( "MSR		CPSR_c, #0x1F"	); /* enable IRQ */ \
+		asm volatile ( "STMFD	SP!, {LR}"		); /* save LR */ \
+
+#define IDISABLE \
+		asm volatile ( "LDMFD	SP!, {LR}" 		); /* restore LR */ \
+		asm volatile ( "MSR		CPSR_c, #0x92"	); /* disable IRQ */ \
+		asm volatile ( "LDMFD	SP!, {LR}"		); /* Restore SPSR_irq to LR */ \
+		asm volatile ( "MSR		SPSR_cxsf, LR"	); /* copy LR to SPSR_irq */ \
+
 
 /* includes */
 #include "lpc2103.h"
@@ -15,12 +42,18 @@
 #include "logger.c"
 #include "irq.h"
 #include "irq.c"
+#include "i2c.h"
+#include "i2c.c"
 #include "protocol.h"
+#include "mpu6050.h"
+#include "mpu6050.c"
 
 /* interruptions */
+void __attribute__ ((interrupt("FIQ"))) pulse_in(void);
 void __attribute__ ((interrupt("IRQ"))) protocol_in(void);
-void __attribute__ ((interrupt("IRQ"))) encoder_pulse_in(void);
+void __attribute__ ((interrupt("IRQ"))) sample(void);
 void __attribute__ ((interrupt("IRQ"))) error(void);
+
 
 /* init functions */
 inline void PLL_Init(void);
@@ -28,19 +61,20 @@ inline void MAM_Init(void);
 inline void APB_Init(void);
 
 inline void pulses_in_init(void);
-inline void i2c_init(void);
+inline void imu_init(void);
 inline void adc_init(void);
 inline void pwm_out_init(void);
 static inline void protocol_init(void);
+inline void sampler_init(void);
 
 /* getters and setters */
-int get_ir_sensor_data(unsigned short i);
-int get_encoder_count(unsigned short i);
-void set_wheel_pwm(unsigned short wheel, unsigned short val);
+void get_ir_sensor_data(char * buff);
+void get_encoders_count(short * left_encoder, short * right_encoder);
+inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel);
 
 /* auxiliary functions */
-static void protocol_out_cmd(void);
-static void protocol_out_char(char c);
+static inline void protocol_out_cmd(void);
+static inline void protocol_out_char(char c);
 
 /* data structs defenitions */
 struct cmd_buff {
@@ -48,10 +82,24 @@ struct cmd_buff {
   char buff [CMD_BUFF_SIZE];      // Circular Buffer
 };
 
+struct sensors_data {
+	short encoder_left, encoder_right;
+	char ir_r, ir_mr, ir_m, ir_ml, ir_l;
+	char ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l;
+	unsigned short timestamp;
+};
+
 /* global variables */
 static struct cmd_buff cmd_out = { 0, };
 static struct cmd_buff cmd_in = { 0, };
-static int encoder_count[2] = { 0, 0};
+static volatile int encoder_count[2] = { 0, 0};
+static int sent_encoder_count[2] = { 0, 0};
+static int forward_r = 0, forward_l = 0;
+static unsigned volatile char send_data = 0;
+static struct sensors_data sensors_data_buff[DATA_BUFF_SIZE]; // Circular Buffer
+static unsigned volatile short data_in_pos = 0; // last valid data in
+static unsigned volatile short data_out_pos = 0; // last data sent
+static unsigned short timestamp = 0;
 
 /**
  * Entry point
@@ -62,23 +110,77 @@ int main(void){
 	MAM_Init(); // Turn on MAM pre-fetcher
 	APB_Init(); // Turn on the peripheral devices clock divider
 
-#ifdef DEBUG
-	logger_init();
-	log_string("iniciando...\n");
-#endif
+	logger_init(); // uart0
+	log_string_debug("iniciando\n");
 
 	enableIRQ(); // Enable interruptions
+	enableFIQ();
 
-	pulses_in_init(); // start counting pulses from the encoder	| Timer 2, Int prirority 0
-	i2c_init(); // start the communication with the IMU			| Int prirority 1
+	pulses_in_init(); // start counting pulses from the encoder	| Timer 2, FIQ, eint0, FIQ
+	imu_init(); // start the IMU								| i2c1 FIQ
 	adc_init(); // start reading the IR sensor signals			| Burst mode, no interruption
-	pwm_out_init(); // start pwm for the H bridges				| Timer 0 and Timer 1 operating in PWM mode
-	protocol_init(); // start the communication protocol		| Int prirority 3
+	pwm_out_init(); // start pwm for the H bridges				| Timer 0 and Timer 1 operating in PWM mode, no interruption
+	protocol_init(); // start the communication protocol		| uart1, Priority 2
+	sampler_init(); // start taking samples at 1kHz				| Timer 3, 1kH, Priority 1
 
 	VICDefVectAddr = (unsigned int) &error;
 
-	while(1){
+	//set_wheel_pwm(RIGHT_WHEEL,0x7F);
+	//set_wheel_pwm(LEFT_WHEEL,0x7F);
+
+	while (1) {
+		if (send_data) {
+			// while data available
+			while(data_out_pos != data_in_pos) {
+				// send next data
+				data_out_pos = ++data_out_pos % DATA_BUFF_SIZE;
+
+				struct sensors_data* data;
+				data = &(sensors_data_buff[data_out_pos]);
+
+				// encoders
+				cmd_out.buff[0] = (data->encoder_left >> 0x8) & 0xFF;
+				cmd_out.buff[1] = data->encoder_left & 0xFF;
+				cmd_out.buff[2] = (data->encoder_right >> 0x8) & 0xFF;
+				cmd_out.buff[3] = data->encoder_right & 0xFF;
+
+				// Infra Red
+				cmd_out.buff[4] = data->ir_l;
+				cmd_out.buff[5] = data->ir_ml;
+				cmd_out.buff[6] = data->ir_m;
+				cmd_out.buff[7] = data->ir_mr;
+				cmd_out.buff[8] = data->ir_r;
+
+				// IMU data
+				cmd_out.buff[9] = data->ax_h;
+				cmd_out.buff[10] = data->ax_l;
+				cmd_out.buff[11] = data->ay_h;
+				cmd_out.buff[12] = data->ay_l;
+				cmd_out.buff[13] = data->az_h;
+				cmd_out.buff[14] = data->az_l;
+				cmd_out.buff[15] = data->gx_h;
+				cmd_out.buff[16] = data->gx_l;
+				cmd_out.buff[17] = data->gy_h;
+				cmd_out.buff[18] = data->gy_l;
+				cmd_out.buff[19] = data->gz_h;
+				cmd_out.buff[20] = data->gz_l;
+
+				// Timestamp
+				cmd_out.buff[21] = (data->timestamp >> 8) & 0xFF;
+				cmd_out.buff[22] = data->timestamp & 0xFF;
+
+				// end cmd
+				cmd_out.buff[23] = END_CMD;
+				cmd_out.buff[24] = '\n';
+				cmd_out.i = 25;
+
+				protocol_out_cmd();
+			}
+
+			send_data = 0;
+		}
 	}
+
 	return 0;
 }
 
@@ -130,6 +232,7 @@ inline void MAM_Init(void){
 
 /**
  * Configure the peripheral devices clock divider
+ * for PCLK = CCLK/4
  */
 inline void APB_Init(void){
 	// peripheral clock = PCLK = CCLK/4
@@ -138,36 +241,82 @@ inline void APB_Init(void){
 }
 
 /**
- * Timer 2, capture pins generating interruptions for event counter
+ * Timer 2, capture pins generating FIQs for event counter
  * The timer has no function, except for the interrupt generation.
+ * and EINT0 also generating FIQs for event counter
+ * CAP20 - Left encoder
+ * CAP21 - Left encoder
+ * CAP22 - Right encoder
+ * EINT0 - Right encoder
  */
 inline void pulses_in_init(void){
 
+	log_string_debug(">> pulses_in_init\n");
+
 	// Set the pin function
+	PINSEL1 |= 0x1 << 0;  // EINT0
 	PINSEL1 |= 0x2 << 22; // CAP2.0
 	PINSEL1 |= 0x2 << 24; // CAP2.1
+	PINSEL1 |= 0x2 << 26; // CAP2.2
+
+	// EINT setup
+	EXTMODE |= 0x1 << 0; // EINT is edge sensitive
+	EXTPOLAR |= 0x1 << 0; // EINT is rising edge sensitive
+	EXTINT |= 0x1 << 0; // reset EINT0
 
 	// Timer Setup
 	T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
 	T2CCR |= 0x5 << 3; // capture and interrupt on CAP2.1 rising edge
+	T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
 	T2TCR = 1; //enable T2
 
-	VICVectAddr0 = (unsigned int) &encoder_pulse_in; //Setting the interrupt handler location
-	VICVectCntl0 = 0x3A; //Vectored Interrupt slot enabled with source #26 (TIMER2)
-	VICIntEnable |= 0x1 << 26; //source #26 enabled as FIQ or IRQ
+	// Enable the interrupts
+	VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
+	VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
+	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
+	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
+
+	log_string_debug("<< pulses_in_init\n");
 }
 
 /**
- * I2C 1
+ * Start i2c communication
+ * Configure MPU
+ * Setup eint2 with priority 1 for data ready interrupt
  */
-inline void i2c_init(void){
+inline void imu_init(void){
 
+	log_string_debug(">> imu_init\n");
+
+	// start the communication with the IMU
+	i2c_init();
+
+	// configure mpu and start taking samples
+	mpu_init();
+
+	// DATA READY INTERRUPT WAS NOT USED
+	// Configure data ready interrupt
+	// Set the pin function
+	//PINSEL0 |= 0x1 << 30;  // EINT2
+
+	// EINT setup
+	//EXTMODE |= 0x1 << 2; // EINT2 is edge sensitive
+	//EXTPOLAR |= 0x1 << 2; // EINT2 is rising edge sensitive
+	//EXTINT |= 0x1 << 2; // reset EINT2
+
+	//VICVectAddr1 = (unsigned int) &imu_data_ready; //Setting the interrupt handler location
+	//VICVectCntl1 = 0x30; //Vectored Interrupt slot enabled with source #16 (EINT2)
+	//VICIntEnable |= 0x1 << 16; //source #16 enabled as FIQ or IRQ
+
+	log_string_debug("<< imu_init\n");
 }
 
 /**
  * ADC0 Configured in BURST mode
  */
 inline void adc_init(void){
+
+	log_string_debug(">> adc_init\n");
 
 	// Set the pin function
 	PINSEL1 |= 0x3 << 12; // AD0.0
@@ -181,28 +330,33 @@ inline void adc_init(void){
 	ADCR |= 0x03 << 8; // 3,75MHz for adc if pclk=15MHz; 3,6864MHz if pclk=14.7456MHz
 	ADCR |= 0x1F; // Read AD0.0 - AD0.4
 	ADCR |= 0x01 << 21; // The ADC is operational
+
+	log_string_debug("<< adc_init\n");
 }
 
 /**
  * Timer 0,1, 200Hz, at least 76 levels to comply with the old version
  * Timer 0 -> left wheel
  * Timer 1 -> right wheel
+ * PCLK = 15MHz or 14.7456MHz
  */
 inline void pwm_out_init(void){
 
+	log_string_debug(">> pwm_out_init\n");
+
 	// Set the pin function
-	PINSEL1 |= 0x2 << 0;  // MAT0.2
+	PINSEL0 |= 0x2 << 6;  // MAT0.0
 	PINSEL0 |= 0x2 << 10; // MAT0.1
 	PINSEL0 |= 0x2 << 24; // MAT1.0
 	PINSEL0 |= 0x2 << 26; // MAT1.1
 
 #ifdef CRYSTAL12MHz
-	T0PR = 294; // 255 levels for T2TC in 5ms
-	T1PR = 294;
+	T0PR = 293; // 255 levels for T2TC in 5ms
+	T1PR = 293; // TC increments every PR + 1 PCLKs
 #endif
 #ifdef CRYSTAL14745600Hz
-	T0PR = 289; // 255 levels for T2TC in 5ms
-	T1PR = 289;
+	T0PR = 288; // 255 levels for T2TC in 5ms
+	T1PR = 288;
 #endif
 
 	T0PC = 0; // Prescale = 0
@@ -215,18 +369,20 @@ inline void pwm_out_init(void){
 	T0MR3 = 255; // MAT0.3 every 255 counts (5ms)
 	T1MR3 = 255; // MAT1.3 every 255 counts (5ms)
 
-	T0PWMCON |= (0x1 << 2); // MAT0.2 configured as PWM output
+	T0PWMCON |= (0x1 << 0); // MAT0.0 configured as PWM output
 	T0PWMCON |= (0x1 << 1); // MAT0.1 configured as PWM output
 	T1PWMCON |= (0x1 << 0); // MAT1.0 configured as PWM output
 	T1PWMCON |= (0x1 << 1); // MAT1.1 configured as PWM output
 
-	T0MR2 = 0; // initially LOW
-	T0MR1 = 84; // initially LOW
-	T1MR0 = 168; // initially LOW
-	T1MR1 = 255; // initially LOW
+	T0MR0 = 256; // initially LOW
+	T0MR1 = 256; // initially LOW
+	T1MR0 = 256; // initially LOW
+	T1MR1 = 256; // initially LOW
 
 	T0TCR = 1; // enable T0
 	T1TCR = 1; // enable T1
+
+	log_string_debug("<< pwm_out_init\n");
 }
 
 /**
@@ -240,9 +396,12 @@ inline void pwm_out_init(void){
  * 115131 = 15MHz / ( 16 * ( 256*0 + 6) * ( 1 + 5/14) )
  * 115200 = 14.7456MHz / ( 16 * ( 256*0 + 8) )
  *
- * Set UART1 interrupt to the third slot in the vectored interrupts.
+ * Set UART1 interrupt to the second slot in the vectored interrupts.
  */
 static inline void protocol_init(void){
+
+	log_string_debug(">> protocol_init\n");
+
 	volatile char dummy;
 
 	PINSEL0 |= 0x05 << 16; // Set the pins function
@@ -262,8 +421,8 @@ static inline void protocol_init(void){
 
 	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
 
-	VICVectAddr4 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the first vectored interruption slot
-	VICVectCntl4 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
+	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the 2th vectored interruption slot
+	VICVectCntl2 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
 	VICIntEnable |= 0x00000080; //source #7 enabled as FIQ or IRQ
 
 	cmd_out.i = 0;
@@ -272,31 +431,52 @@ static inline void protocol_init(void){
 	dummy = U1IIR;   // Read IrqID - Required to Get Interrupts Started
 	U1IER = 1;       // Enable UART1 RX (and THRE Interrupts)
 
-	protocol_out_char('p');
-	protocol_out_char('r');
-	protocol_out_char('o');
-	protocol_out_char('t');
-	protocol_out_char('c');
-	protocol_out_char('o');
-	protocol_out_char('l');
-	protocol_out_char(' ');
-	protocol_out_char('s');
-	protocol_out_char('t');
-	protocol_out_char('a');
-	protocol_out_char('r');
-	protocol_out_char('t');
-	protocol_out_char('e');
-	protocol_out_char('d');
+	log_string_debug("<< protocol_init\n");
 }
 
 /**
- * Usar cutecom para testar o envio de comandos em hexa
+ * PCLK = 15MHz or 14.7456MHz
+ */
+inline void sampler_init(void){
+	log_string_debug(">> sampler_init\n");
+
+	// set pre scale for sample rate
+	T3PR = SAMPLE_RATE; // Increment the timer every PCLK
+
+	T3PC = 0;
+	T3TC = 0; // Counter = 0
+
+	T3MCR |= (0x1 << 0); // Interrupt on MAT3.0
+	T3MCR |= (0x1 << 1); // Reset the counter on MAT3.0
+
+#ifdef CRYSTAL12MHz
+	T3MR0 = 15000; // MAT3.0 every 15000/(SAMPLE_RATE + 1) counts (1ms/(SAMPLE_RATE + 1))
+#endif
+#ifdef CRYSTAL14745600Hz
+	T3MR0 = 14746; // MAT3.0 every 14746/(SAMPLE_RATE + 1) counts (1.000027127ms/(SAMPLE_RATE + 1))
+#endif
+
+	VICVectAddr1 = (unsigned int) &sample; //Setting the interrupt handler location
+	VICVectCntl1 = 0x3B; //Vectored Interrupt slot enabled and with source #27 (TIMER3)
+	VICIntEnable |= 0x1 << 27; //source #27 enabled as FIQ or IRQ
+
+	T3TCR = 1; // enable T3
+
+	log_string_debug("<< sampler_init\n");
+}
+
+/**
+ * Communication Protocol state machine implementation;
+ * This is triggered on uart1 interruption
+ * This handles the following commands
+ *
  */
 void protocol_in(void){
+
+	log_string_debug(">> protocol_in\n");
+
 	volatile char dummy;
 	volatile char iir;
-
-	// TODO: disable interruptions
 
 	// Repeat while there is at least one interrupt source.
 	while (((iir = U1IIR) & 0x01) == 0) {
@@ -309,65 +489,18 @@ void protocol_in(void){
 		case 0x0C: // Character Time-Out
 			cmd_in.buff[cmd_in.i] = U1RBR;
 
-			/*for (int i=0; i< CMD_BUFF_SIZE; i++) {
-				cmd_out.buff[i] = cmd_in.buff[(cmd_in.i-1-i) & (CMD_BUFF_SIZE-1)];
-				protocol_out_cmd();
-			}*/
-
-			if (cmd_in.buff[cmd_in.i] == /*'e'*/ END_CMD) {
-				if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'y'*/ SYNC) {
-					// Send IR info
-					for (int i = OPTICAL_SENSOR_0; i <= OPTICAL_SENSOR_4; i++) {
-						cmd_out.buff[0] = i;
-						cmd_out.buff[1] = get_ir_sensor_data(i);
-						cmd_out.buff[2] = END_CMD;
-						cmd_out.buff[3] = '\n';
-						cmd_out.i = 4;
-						protocol_out_cmd();
-					}
-					// Send Encoders info
-					for (int i = ENCODER_L; i <= ENCODER_R; i++) {
-						int count = get_encoder_count(i);
-						cmd_out.buff[0] = i;
-						cmd_out.buff[1] = (count >> 0x8) & 0xFF;
-						cmd_out.buff[2] = count & 0xFF;
-						cmd_out.buff[3] = END_CMD;
-						cmd_out.buff[4] = '\n';
-						cmd_out.i = 5;
-						protocol_out_cmd();
-					}
-				} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == /*'s'*/ STOP ) {
-					// Stop PWMs
-					set_wheel_pwm(LEFT_WHEEL,0);
-					set_wheel_pwm(RIGHT_WHEEL,0);
-
-				} else if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'l'*/ LEFT_WHEEL
-						|| cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == /*'r'*/ RIGHT_WHEEL) {
-
-					/*if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'l') {
-						if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l') {
-							set_wheel_pwm(LEFT_WHEEL, 0x00 );
-						} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'm') {
-							set_wheel_pwm(LEFT_WHEEL, 0x0E);
-						} else {
-							set_wheel_pwm(LEFT_WHEEL, 0x7F);
-						}
-					}
-
-					if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == 'r') {
-						if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'l') {
-							set_wheel_pwm(RIGHT_WHEEL, 0x00 );
-						} else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == 'm') {
-							set_wheel_pwm(RIGHT_WHEEL, 0x0E);
-						} else {
-							set_wheel_pwm(RIGHT_WHEEL, 0x7F);
-						}
-					}*/
-
-					set_wheel_pwm(cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)],
-							(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));
+			if (cmd_in.buff[cmd_in.i] == END_CMD) {
+				// ENGINES
+				if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == ENGINES) {
+					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]),
+								(unsigned short) (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)]));
+				}
+				// SYNC
+				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == SYNC) {
+					send_data = 1;
 				}
 			}
+
 			cmd_in.i = (cmd_in.i + 1) & (CMD_BUFF_SIZE-1);
 			break;
 
@@ -384,25 +517,120 @@ void protocol_in(void){
 		}
 	}
 
-	// TODO: enable interruptions
+	log_string_debug("<< protocol_in\n");
 
 	VICVectAddr = 0;
 }
 
 /**
- * Count the encoder pulses using CAP2.0-1 as interrupt sources
+ * Hall the FIQ interrupts shoul be handled as fast as possible.
+ *
+ * Count the encoder pulses using CAP2.0-2 and EINT0 as interrupt sources
+ *
+ * Handle i2c requests
  */
-void encoder_pulse_in(void) {
+void pulse_in(void) {
+
+	log_string_debug(">> pulse_in\n");
 
 	const unsigned short ir = T2IR;
 
+	// pulses in int
 	if (ir & (0x1 << 4)) { //CAP2.0 left encoder
-		encoder_count[0]++;
+		//log_string_debug("FIQ2\n");
+		forward_l--;
 		T2IR |= 0x1 << 4; // reset CAP2.0
 	}
-	if (ir & (0x1 << 5)) { //CAP2.1 right encoder
-		encoder_count[1]++;
+	else if (ir & (0x1 << 5)) { //CAP2.1 right encoder
+		//log_string_debug("FIQ3\n");
+		forward_r++;
+		if (forward_r > 0)
+			encoder_count[1]++;
+		else
+			encoder_count[1]--;
 		T2IR |= 0x1 << 5; // reset CAP2.1
+	}
+	else if (ir & (0x1 << 6)) { //CAP2.2 right encoder
+		//log_string_debug("FIQ4\n");
+		forward_r--;
+		T2IR |= 0x1 << 6; // reset CAP2.2
+	}
+	else if (EXTINT & 0x1 << 0) { // EINT0 left encoder
+		//log_string_debug("FIQ1\n");
+		forward_l++;
+		if (forward_l > 0)
+			encoder_count[0]++;
+		else
+			encoder_count[0]--;
+		EXTINT |= 0x1 << 0; // reset EINT0
+	}
+
+	log_string_debug("<< pulse_in\n");
+
+	VICVectAddr = 0;
+}
+
+/**
+ * DATA READY INTERRUPT WAS NOT USED
+ * Read IMU data when triggered by EINT2
+ */
+/*void imu_data_ready(void) {
+
+	//log_string_debug(">> imu_data_ready\n");
+
+	imu_data_available = 1;
+
+	EXTINT |= 0x1 << 2; // reset EINT2
+
+	//log_string_debug("<< imu_data_ready\n");
+
+	VICVectAddr = 0;
+}
+*/
+
+/**
+ * Sample sensors every 1ms (1kHz)
+ * data_in_pos -
+ */
+void sample(void) {
+	const unsigned short ir = T3IR;
+	if(ir & 0x1) { // MAT3.0
+		log_string_debug(">> sample\n");
+
+		log_string_debug("IENABLE\n");
+		// enable nested interrupts for i2c and FIQ
+		T3IR |= 0x1 << 0; // clear MAT3.0 interrupt
+		IENABLE
+
+		// next position in buffer
+		data_in_pos = ++data_in_pos % DATA_BUFF_SIZE;
+
+		// check for overflow
+		if (data_in_pos == data_out_pos) {
+			log_string_warning("LPC overflow\n");
+			// the oldest data will be overwritten
+			data_out_pos = ++data_out_pos % DATA_BUFF_SIZE;
+		}
+
+		// read data and put on local circular buffer
+		struct sensors_data* data;
+		data = &(sensors_data_buff[data_in_pos]);
+
+		// read encoder counts
+		get_encoders_count(&(data->encoder_left), &(data->encoder_right));
+
+		// read the last IMU data
+		mpu_get_motion6(&(data->ax_h));
+
+		// read IR data
+		get_ir_sensor_data(&(data->ir_l));
+
+		data->timestamp = timestamp++;
+
+		log_string_debug("IDISABLE\n");
+		IDISABLE
+
+		log_string_debug("<< sample\n");
 	}
 
 	VICVectAddr = 0;
@@ -412,91 +640,93 @@ void encoder_pulse_in(void) {
  *
  */
 void error(void){
-	log_string("irq error");
+	log_string_error("irq error");
 }
 
 /**
  * Return the value read from the i'th sensor
+ * buff
+ * ir_l, ir_ml, ir_m, ir_mr, ir_r
+ *
  */
-int get_ir_sensor_data(unsigned short i) {
+void get_ir_sensor_data(char * buff) {
 
-	int val = 0;
-	switch (i) {
-	case OPTICAL_SENSOR_0:
-		while(ADDR0 & ((0x1 << 31) == 0));
-		val = (ADDR0 >> 6) & 0x3FF;
-		val >>= 0x2; // they want a value from 1 to 255
-		val += (val == 0);
-		break;
-	case OPTICAL_SENSOR_1:
-		while(ADDR1 & ((0x1 << 31) == 0));
-		val = (ADDR1 >> 6) & 0x3FF;
-		val >>= 0x2; // they want a value from 1 to 255
-		val += (val == 0);
-		break;
-	case OPTICAL_SENSOR_2:
-		while(ADDR2 & ((0x1 << 31) == 0));
-		val = (ADDR2 >> 6) & 0x3FF;
-		val >>= 0x2; // they want a value from 1 to 255
-		val += (val == 0);
-		break;
-	case OPTICAL_SENSOR_3:
-		while(ADDR3 & ((0x1 << 31) == 0));
-		val = (ADDR3 >> 6) & 0x3FF;
-		val >>= 0x2; // they want a value from 1 to 255
-		val += (val == 0);
-		break;
-	case OPTICAL_SENSOR_4:
-		while(ADDR4 & ((0x1 << 31) == 0));
-		val = (ADDR4 >> 6) & 0x3FF;
-		val >>= 0x2; // they want a value from 1 to 255
-		val += (val == 0);
-		break;
-	}
+	unsigned short val;
 
-	return val;
+	while(ADDR0 & ((0x1 << 31) == 0));
+	val = (ADDR0 >> 6) & 0x3FF;
+	val >>= 0x2; // they want a value from 1 to 255
+	val += (val == 0);
+	*buff = (char) val;
+
+	while(ADDR1 & ((0x1 << 31) == 0));
+	val = (ADDR1 >> 6) & 0x3FF;
+	val >>= 0x2; // they want a value from 1 to 255
+	val += (val == 0);
+	*(buff+1) = (char) val;
+
+	while(ADDR2 & ((0x1 << 31) == 0));
+	val = (ADDR2 >> 6) & 0x3FF;
+	val >>= 0x2; // they want a value from 1 to 255
+	val += (val == 0);
+	*(buff+2) = (char) val;
+
+	while(ADDR3 & ((0x1 << 31) == 0));
+	val = (ADDR3 >> 6) & 0x3FF;
+	val >>= 0x2; // they want a value from 1 to 255
+	val += (val == 0);
+	*(buff+3) = (char) val;
+
+	while(ADDR4 & ((0x1 << 31) == 0));
+	val = (ADDR4 >> 6) & 0x3FF;
+	val >>= 0x2; // they want a value from 1 to 255
+	val += (val == 0);
+	*(buff+4) = (char) val;
 }
 
 
 
 /**
- * Return the value read from the i'th sensor
+ * Return the count value read from the i'th sensor
  */
-int get_encoder_count(unsigned short i) {
+void get_encoders_count(short * left_encoder, short * right_encoder) {
+
 	int val;
-	val = encoder_count[i - ENCODER_L];
-	encoder_count[i - ENCODER_L] = 0;
-	return val;
+	val = encoder_count[ENCODER_L - ENCODER_L];
+	*left_encoder = val - sent_encoder_count[ENCODER_L - ENCODER_L];
+	sent_encoder_count[ENCODER_L - ENCODER_L] = val;
+
+	val = encoder_count[ENCODER_R - ENCODER_L];
+	*right_encoder = val - sent_encoder_count[ENCODER_R - ENCODER_L];
+	sent_encoder_count[ENCODER_R - ENCODER_L] = val;
 }
 
 /**
  * Set the output pwm value
  */
-void set_wheel_pwm(unsigned short wheel, unsigned short val) {
+inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel) {
 
-	if (wheel == LEFT_WHEEL) {
-		if (val & PWM_DIR) { // Forward
-			T0MR1 = 256;
-			T0MR2 = 256 - val;
-		} else { // Backwards
-			T0MR2 = 256;
-			T0MR1 = 256 - val;
-		}
-	} else if (wheel == RIGHT_WHEEL) {
-		if (val & PWM_DIR) { // Forward
-			T1MR1 = 256;
-			T1MR0 = 256 - val;
-		} else { // Backwards
-			T1MR0 = 256;
-			T1MR1 = 256 - val;
-		}
+	if (right_wheel & PWM_DIR) { // Forward
+		T0MR2 = 256;
+		T0MR1 = 256 - (right_wheel & ~PWM_DIR)*2;
+	} else { // Backwards
+		T0MR1 = 256;
+		T0MR2 = 256 - right_wheel*2;
+	}
+
+	if (left_wheel & PWM_DIR) { // Forward
+		T1MR0 = 256;
+		T1MR1 = 256 - (left_wheel & ~PWM_DIR)*2;
+	} else { // Backwards
+		T1MR1 = 256;
+		T1MR0 = 256 - left_wheel*2;
 	}
 }
 
 /**
  *
  */
-static void protocol_out_cmd(){
+static inline void protocol_out_cmd(){
 	for (unsigned short i = 0; i < cmd_out.i; i++)
 		protocol_out_char(cmd_out.buff[i]);
 }
@@ -504,7 +734,7 @@ static void protocol_out_cmd(){
 /**
  *
  */
-static void protocol_out_char(char c){
+static inline void protocol_out_char(char c){
 	U1THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
 	while(!(U1LSR & 0x40));
 }

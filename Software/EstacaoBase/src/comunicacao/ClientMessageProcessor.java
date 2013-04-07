@@ -1,6 +1,6 @@
 package comunicacao;
 
-import robo.ServerMessageInterpreter;
+import robo.ServerMessageProcessor;
 import dados.ControleCamera;
 import dados.ControleSensores;
 import dados.NumIRException;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author Stefan
  */
-public class ClientMessageInterpreter extends Thread {
+public class ClientMessageProcessor extends Thread {
 
     //Array que armazena a fila de comandos
     private ArrayList<String> commandsList = new ArrayList();
@@ -30,7 +30,7 @@ public class ClientMessageInterpreter extends Thread {
     //Indica se a thread deve rodar ou não
     private boolean run = true;
 
-    public ClientMessageInterpreter(ClientConnector connector, ControleSensores controleSensores, ControleCamera controleCamera) {
+    public ClientMessageProcessor(ClientConnector connector, ControleSensores controleSensores, ControleCamera controleCamera) {
         this.setName("TR_ClientCommandInterpreter");
         this.connector = connector;
         this.controleSensores = controleSensores;
@@ -63,7 +63,7 @@ public class ClientMessageInterpreter extends Thread {
                     try {
                         this.wait();
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(ServerMessageInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(ServerMessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }

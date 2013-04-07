@@ -75,7 +75,7 @@ public class ClientConnector extends Thread {
     //Interpretador de comandos (thread que interpreta comandos, ou seja, mensagens vindas do Receiver). 
     //Por padrão não há interpretador, ele deve ser adicionado pelo método setInterpreter().
     //Se não houver Interpreter registrado, os comandos recebidos não são interpretados.
-    public ClientMessageInterpreter interpreter = null;
+    public ClientMessageProcessor interpreter = null;
     //Host atual de conexão
     private String host;
     //Porta atual de conexão
@@ -623,7 +623,7 @@ public class ClientConnector extends Thread {
         return sock;
     }
 
-    public synchronized void setInterpreter(ClientMessageInterpreter interpreter) {
+    public synchronized void setInterpreter(ClientMessageProcessor interpreter) {
         this.interpreter = interpreter;
     }
 

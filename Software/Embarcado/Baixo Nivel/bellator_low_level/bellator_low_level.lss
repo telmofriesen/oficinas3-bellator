@@ -1,0 +1,3043 @@
+
+bellator_low_level.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00001894  00000000  00000000  00008000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .ARM.extab    00000108  00001894  00001894  00009894  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .ARM.exidx    00000120  0000199c  0000199c  0000999c  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  3 .interp       00000013  00001abc  00001abc  00009abc  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .gnu.version  0000000c  00001ad0  00001ad0  00009ad0  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  5 .gnu.version_r 00000020  00001adc  00001adc  00009adc  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  6 .dynsym       00000060  00001afc  00001afc  00009afc  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .dynstr       0000006a  00001b5c  00001b5c  00009b5c  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  8 .hash         0000002c  00001bc8  00001bc8  00009bc8  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  9 .dynamic      00000090  40000000  00001bf4  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+ 10 .got.plt      0000000c  40000090  00001c84  00010090  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+ 11 .bss          00001884  4000009c  00001c90  0001009c  2**2
+                  ALLOC
+ 12 .stack        00000400  40001920  00003514  0001009c  2**0
+                  ALLOC
+ 13 .ARM.attributes 0000002e  00000000  00000000  0001009c  2**0
+                  CONTENTS, READONLY
+ 14 .comment      0000002a  00000000  00000000  000100ca  2**0
+                  CONTENTS, READONLY
+ 15 .debug_aranges 00000040  00000000  00000000  000100f8  2**3
+                  CONTENTS, READONLY, DEBUGGING
+ 16 .debug_pubnames 00000382  00000000  00000000  00010138  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 17 .debug_info   00000e95  00000000  00000000  000104ba  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 18 .debug_abbrev 00000397  00000000  00000000  0001134f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 19 .debug_line   000003ef  00000000  00000000  000116e6  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 20 .debug_frame  000004dc  00000000  00000000  00011ad8  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 21 .debug_str    000005d0  00000000  00000000  00011fb4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 22 .debug_loc    00000b09  00000000  00000000  00012584  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 23 .debug_pubtypes 00000030  00000000  00000000  0001308d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 24 .debug_ranges 00000080  00000000  00000000  000130bd  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <_boot>:
+_boot:
+
+// Runtime Interrupt Vectors
+// -------------------------
+Vectors:
+        b     _start                    // reset - _start
+       0:	ea000012 	b	50 <_mainCRTStartup>
+        ldr   pc,_undf                  // undefined - _undf
+       4:	e59ff014 	ldr	pc, [pc, #20]	; 20 <_undf>
+        ldr   pc,_swi                   // SWI - _swi
+       8:	e59ff014 	ldr	pc, [pc, #20]	; 24 <_swi>
+        ldr   pc,_pabt                  // program abort - _pabt
+       c:	e59ff014 	ldr	pc, [pc, #20]	; 28 <_pabt>
+        ldr   pc,_dabt                  // data abort - _dabt
+      10:	e59ff014 	ldr	pc, [pc, #20]	; 2c <_dabt>
+        nop                             // reserved
+      14:	e1a00000 	nop			; (mov r0, r0)
+        ldr   pc,[pc,#-0xFF0]           // IRQ - read the VIC
+      18:	e51ffff0 	ldr	pc, [pc, #-4080]	; fffff030 <_end+0xbfffd310>
+        ldr   pc,_fiq                   // FIQ - _fiq
+      1c:	e59ff010 	ldr	pc, [pc, #16]	; 34 <_fiq>
+
+00000020 <_undf>:
+      20:	00000038 	.word	0x00000038
+
+00000024 <_swi>:
+      24:	0000003c 	.word	0x0000003c
+
+00000028 <_pabt>:
+      28:	00000040 	.word	0x00000040
+
+0000002c <_dabt>:
+      2c:	00000044 	.word	0x00000044
+
+00000030 <_irq>:
+      30:	00000048 	.word	0x00000048
+
+00000034 <_fiq>:
+      34:	0000004c 	.word	0x0000004c
+
+00000038 <__undf>:
+_pabt:  .word __pabt                    // program abort
+_dabt:  .word __dabt                    // data abort
+_irq:   .word __irq                     // IRQ
+_fiq:   .word __fiq                     // FIQ
+
+__undf: b     .                         // undefined
+      38:	eafffffe 	b	38 <__undf>
+
+0000003c <__swi>:
+__swi:  b     .                         // SWI
+      3c:	eafffffe 	b	3c <__swi>
+
+00000040 <__pabt>:
+__pabt: b     .                         // program abort
+      40:	eafffffe 	b	40 <__pabt>
+
+00000044 <__dabt>:
+__dabt: b     .                         // data abort
+      44:	eafffffe 	b	44 <__dabt>
+
+00000048 <__irq>:
+__irq:  b     .                         // IRQ
+      48:	eafffffe 	b	48 <__irq>
+
+0000004c <__fiq>:
+//__fiq:  b     .				            // FIQ
+__fiq:  b     pulse_in      // FIQ
+      4c:	ea00052b 	b	1500 <pulse_in>
+
+00000050 <_mainCRTStartup>:
+
+// Initialize Interrupt System
+// - Set stack location for each mode
+// - Leave in System Mode with Interrupts Disabled
+// -----------------------------------------------
+        ldr   r0,=_stack
+      50:	e59f0098 	ldr	r0, [pc, #152]	; f0 <abort+0x4>
+        msr   CPSR_c,#MODE_UND|I_BIT|F_BIT // Undefined Instruction Mode
+      54:	e321f0db 	msr	CPSR_c, #219	; 0xdb
+        mov   sp,r0
+      58:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#UND_STACK_SIZE
+      5c:	e2400004 	sub	r0, r0, #4
+        msr   CPSR_c,#MODE_ABT|I_BIT|F_BIT // Abort Mode
+      60:	e321f0d7 	msr	CPSR_c, #215	; 0xd7
+        mov   sp,r0
+      64:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#ABT_STACK_SIZE
+      68:	e2400004 	sub	r0, r0, #4
+        msr   CPSR_c,#MODE_FIQ|I_BIT|F_BIT // FIQ Mode
+      6c:	e321f0d1 	msr	CPSR_c, #209	; 0xd1
+        mov   sp,r0
+      70:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#FIQ_STACK_SIZE
+      74:	e2400004 	sub	r0, r0, #4
+        msr   CPSR_c,#MODE_IRQ|I_BIT|F_BIT // IRQ Mode
+      78:	e321f0d2 	msr	CPSR_c, #210	; 0xd2
+        mov   sp,r0
+      7c:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#IRQ_STACK_SIZE
+      80:	e2400080 	sub	r0, r0, #128	; 0x80
+        msr   CPSR_c,#MODE_SVC|I_BIT|F_BIT // Supervisor Mode
+      84:	e321f0d3 	msr	CPSR_c, #211	; 0xd3
+        mov   sp,r0
+      88:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#SVC_STACK_SIZE
+      8c:	e2400004 	sub	r0, r0, #4
+        msr   CPSR_c,#MODE_SYS|I_BIT|F_BIT // System Mode
+      90:	e321f0df 	msr	CPSR_c, #223	; 0xdf
+        mov   sp,r0
+      94:	e1a0d000 	mov	sp, r0
+
+
+// Copy initialized data to its execution address in RAM
+// -----------------------------------------------------
+#ifdef ROM_RUN
+        ldr   r1,=_etext                // -> ROM data start
+      98:	e59f1054 	ldr	r1, [pc, #84]	; f4 <abort+0x8>
+        ldr   r2,=_data                 // -> data start
+      9c:	e59f2054 	ldr	r2, [pc, #84]	; f8 <abort+0xc>
+        ldr   r3,=_edata                // -> end of data
+      a0:	e59f3054 	ldr	r3, [pc, #84]	; fc <abort+0x10>
+1:      cmp   r2,r3                     // check if data to move
+      a4:	e1520003 	cmp	r2, r3
+        ldrlo r0,[r1],#4                // copy it
+      a8:	34910004 	ldrcc	r0, [r1], #4
+        strlo r0,[r2],#4
+      ac:	34820004 	strcc	r0, [r2], #4
+        blo   1b                        // loop until done
+      b0:	3afffffb 	bcc	a4 <IRQ_STACK_SIZE+0x24>
+#endif
+// Clear .bss
+// ----------
+        mov   r0,#0                     // get a zero
+      b4:	e3a00000 	mov	r0, #0
+        ldr   r1,=__bss_start           // -> bss start
+      b8:	e59f1040 	ldr	r1, [pc, #64]	; 100 <abort+0x14>
+        ldr   r2,=__bss_end__           // -> bss end
+      bc:	e59f2040 	ldr	r2, [pc, #64]	; 104 <abort+0x18>
+2:      cmp   r1,r2                     // check if data to clear
+      c0:	e1510002 	cmp	r1, r2
+        strlo r0,[r1],#4                // clear 4 bytes
+      c4:	34810004 	strcc	r0, [r1], #4
+        blo   2b                        // loop until done
+      c8:	3afffffc 	bcc	c0 <IRQ_STACK_SIZE+0x40>
+
+// Call main program: main(0)
+// --------------------------
+        mov   r0,#0                     // no arguments (argc = 0)
+      cc:	e3a00000 	mov	r0, #0
+        mov   r1,r0
+      d0:	e1a01000 	mov	r1, r0
+        mov   r2,r0
+      d4:	e1a02000 	mov	r2, r0
+        mov   fp,r0                     // null frame pointer
+      d8:	e1a0b000 	mov	fp, r0
+        mov   r7,r0                     // null frame pointer for thumb
+      dc:	e1a07000 	mov	r7, r0
+        ldr   r10,=main
+      e0:	e59fa020 	ldr	sl, [pc, #32]	; 108 <abort+0x1c>
+        mov   lr,pc
+      e4:	e1a0e00f 	mov	lr, pc
+        bx    r10                       // enter main()
+      e8:	e12fff1a 	bx	sl
+
+000000ec <abort>:
+        ldr   r0,=(1<<23)               // P23
+        str   r0,[r1,#PIO_PER_OFF]      // make sure pin is contolled by PIO
+        str   r0,[r1,#PIO_CODR_OFF]     // set the pin low
+        str   r0,[r1,#PIO_OER_OFF]      // make it an output
+#endif
+        b     .                         // loop until reset
+      ec:	eafffffe 	b	ec <abort>
+      f0:	40001d20 	.word	0x40001d20
+      f4:	00001bf4 	.word	0x00001bf4
+      f8:	40000000 	.word	0x40000000
+      fc:	4000009c 	.word	0x4000009c
+     100:	4000009c 	.word	0x4000009c
+     104:	40001920 	.word	0x40001920
+     108:	00000fe4 	.word	0x00000fe4
+
+0000010c <log_char>:
+
+	U0LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+}
+
+static void log_char(char c){
+	U0THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
+     10c:	e59f3014 	ldr	r3, [pc, #20]	; 128 <log_char+0x1c>
+     110:	e5c30000 	strb	r0, [r3]
+	while(!(U0LSR & 0x40));
+     114:	e1a02003 	mov	r2, r3
+     118:	e5d23014 	ldrb	r3, [r2, #20]
+     11c:	e3130040 	tst	r3, #64	; 0x40
+     120:	0afffffc 	beq	118 <log_char+0xc>
+}
+     124:	e12fff1e 	bx	lr
+     128:	e000c000 	.word	0xe000c000
+
+0000012c <i2c_write_byte_isr>:
+}
+
+/**
+ * i2c interrupt handler
+ */
+void i2c_write_byte_isr(void) {
+     12c:	e92d000f 	push	{r0, r1, r2, r3}
+     130:	e24dd008 	sub	sp, sp, #8
+	log_string_i2c(">> i2c_write_byte_isr\n");
+	volatile int temp = 0;
+     134:	e3a03000 	mov	r3, #0
+     138:	e58d3004 	str	r3, [sp, #4]
+	temp = I2C1STAT;
+     13c:	e59f319c 	ldr	r3, [pc, #412]	; 2e0 <i2c_write_byte_isr+0x1b4>
+     140:	e5d33004 	ldrb	r3, [r3, #4]
+     144:	e20330ff 	and	r3, r3, #255	; 0xff
+     148:	e58d3004 	str	r3, [sp, #4]
+
+	switch (temp) {
+     14c:	e59d3004 	ldr	r3, [sp, #4]
+     150:	e2433008 	sub	r3, r3, #8
+     154:	e3530028 	cmp	r3, #40	; 0x28
+     158:	979ff103 	ldrls	pc, [pc, r3, lsl #2]
+     15c:	ea000059 	b	2c8 <i2c_write_byte_isr+0x19c>
+     160:	00000204 	.word	0x00000204
+     164:	000002c8 	.word	0x000002c8
+     168:	000002c8 	.word	0x000002c8
+     16c:	000002c8 	.word	0x000002c8
+     170:	000002c8 	.word	0x000002c8
+     174:	000002c8 	.word	0x000002c8
+     178:	000002c8 	.word	0x000002c8
+     17c:	000002c8 	.word	0x000002c8
+     180:	000002c8 	.word	0x000002c8
+     184:	000002c8 	.word	0x000002c8
+     188:	000002c8 	.word	0x000002c8
+     18c:	000002c8 	.word	0x000002c8
+     190:	000002c8 	.word	0x000002c8
+     194:	000002c8 	.word	0x000002c8
+     198:	000002c8 	.word	0x000002c8
+     19c:	000002c8 	.word	0x000002c8
+     1a0:	0000021c 	.word	0x0000021c
+     1a4:	000002c8 	.word	0x000002c8
+     1a8:	000002c8 	.word	0x000002c8
+     1ac:	000002c8 	.word	0x000002c8
+     1b0:	000002c8 	.word	0x000002c8
+     1b4:	000002c8 	.word	0x000002c8
+     1b8:	000002c8 	.word	0x000002c8
+     1bc:	000002c8 	.word	0x000002c8
+     1c0:	000002c8 	.word	0x000002c8
+     1c4:	000002c8 	.word	0x000002c8
+     1c8:	000002c8 	.word	0x000002c8
+     1cc:	000002c8 	.word	0x000002c8
+     1d0:	000002c8 	.word	0x000002c8
+     1d4:	000002c8 	.word	0x000002c8
+     1d8:	000002c8 	.word	0x000002c8
+     1dc:	000002c8 	.word	0x000002c8
+     1e0:	00000238 	.word	0x00000238
+     1e4:	000002c8 	.word	0x000002c8
+     1e8:	000002c8 	.word	0x000002c8
+     1ec:	000002c8 	.word	0x000002c8
+     1f0:	000002c8 	.word	0x000002c8
+     1f4:	000002c8 	.word	0x000002c8
+     1f8:	000002c8 	.word	0x000002c8
+     1fc:	000002c8 	.word	0x000002c8
+     200:	000002a0 	.word	0x000002a0
+	case TW_START: // A START condition has been transmitted.
+		log_string_i2c("TW_START\n");
+		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+     204:	e59f30d4 	ldr	r3, [pc, #212]	; 2e0 <i2c_write_byte_isr+0x1b4>
+     208:	e3e0202f 	mvn	r2, #47	; 0x2f
+     20c:	e5c32008 	strb	r2, [r3, #8]
+		I2C1CONCLR = 0x28; // Clear SI and STA flag
+     210:	e3a02028 	mov	r2, #40	; 0x28
+     214:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     218:	ea00002a 	b	2c8 <i2c_write_byte_isr+0x19c>
+	case TW_REP_START: // A repeated START	condition has been transmitted.
+		log_string_i2c("TW_REP_START\n");
+		break;
+	case TW_MT_SLA_ACK: // SLA+W has been transmitted; ACK has been received.
+		log_string_i2c("TW_MT_SLA_ACK\n");
+		I2C1DAT = ra_buff; // Register address to be written
+     21c:	e59f30c0 	ldr	r3, [pc, #192]	; 2e4 <i2c_write_byte_isr+0x1b8>
+     220:	e5d32000 	ldrb	r2, [r3]
+     224:	e59f30b4 	ldr	r3, [pc, #180]	; 2e0 <i2c_write_byte_isr+0x1b4>
+     228:	e5c32008 	strb	r2, [r3, #8]
+		I2C1CONCLR = 0x08; // Clear SI
+     22c:	e3a02008 	mov	r2, #8
+     230:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     234:	ea000023 	b	2c8 <i2c_write_byte_isr+0x19c>
+	case TW_MT_SLA_NACK: // SLA+W has been transmitted; NOT ACK has been received.
+		log_string_i2c("TW_MT_SLA_NACK\n");
+		break;
+	case TW_MT_DATA_ACK: // Data byte in I2DAT has been transmitted; ACK has been received.
+		log_string_i2c("TW_MT_DATA_ACK\n");
+		if (buff_pos < buff_size) {
+     238:	e59f20a4 	ldr	r2, [pc, #164]	; 2e4 <i2c_write_byte_isr+0x1b8>
+     23c:	e5923004 	ldr	r3, [r2, #4]
+     240:	e5922008 	ldr	r2, [r2, #8]
+     244:	e1530002 	cmp	r3, r2
+     248:	aa000009 	bge	274 <i2c_write_byte_isr+0x148>
+			I2C1DAT = c_buff[buff_pos++]; // Send data
+     24c:	e59f1090 	ldr	r1, [pc, #144]	; 2e4 <i2c_write_byte_isr+0x1b8>
+     250:	e591200c 	ldr	r2, [r1, #12]
+     254:	e7d20003 	ldrb	r0, [r2, r3]
+     258:	e59f2080 	ldr	r2, [pc, #128]	; 2e0 <i2c_write_byte_isr+0x1b4>
+     25c:	e5c20008 	strb	r0, [r2, #8]
+     260:	e2833001 	add	r3, r3, #1
+     264:	e5813004 	str	r3, [r1, #4]
+			I2C1CONCLR = 0x08; // Clear SI
+     268:	e3a03008 	mov	r3, #8
+     26c:	e5c23018 	strb	r3, [r2, #24]
+     270:	ea000014 	b	2c8 <i2c_write_byte_isr+0x19c>
+		} else {
+			I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+     274:	e59f3064 	ldr	r3, [pc, #100]	; 2e0 <i2c_write_byte_isr+0x1b4>
+     278:	e5d32000 	ldrb	r2, [r3]
+     27c:	e20220ff 	and	r2, r2, #255	; 0xff
+     280:	e3822010 	orr	r2, r2, #16
+     284:	e5c32000 	strb	r2, [r3]
+			I2C1CONCLR = 0x08; // Clear SI
+     288:	e3a02008 	mov	r2, #8
+     28c:	e5c32018 	strb	r2, [r3, #24]
+			busy = 0; // done
+     290:	e3a02000 	mov	r2, #0
+     294:	e59f3048 	ldr	r3, [pc, #72]	; 2e4 <i2c_write_byte_isr+0x1b8>
+     298:	e5832010 	str	r2, [r3, #16]
+     29c:	ea000009 	b	2c8 <i2c_write_byte_isr+0x19c>
+		}
+		break;
+	case TW_MT_DATA_NACK: // Data byte in I2DAT has been transmitted; NOT ACK has been received.
+		log_string_i2c("TW_MT_DATA_NACK\n");
+		I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+     2a0:	e59f3038 	ldr	r3, [pc, #56]	; 2e0 <i2c_write_byte_isr+0x1b4>
+     2a4:	e5d32000 	ldrb	r2, [r3]
+     2a8:	e20220ff 	and	r2, r2, #255	; 0xff
+     2ac:	e3822010 	orr	r2, r2, #16
+     2b0:	e5c32000 	strb	r2, [r3]
+		I2C1CONCLR = 0x08; // Clear SI
+     2b4:	e3a02008 	mov	r2, #8
+     2b8:	e5c32018 	strb	r2, [r3, #24]
+		busy = 0; // done
+     2bc:	e3a02000 	mov	r2, #0
+     2c0:	e59f301c 	ldr	r3, [pc, #28]	; 2e4 <i2c_write_byte_isr+0x1b8>
+     2c4:	e5832010 	str	r2, [r3, #16]
+	default:
+		log_string_i2c("default\n");
+		break;
+	}
+
+	VICVectAddr = 0;
+     2c8:	e3a02000 	mov	r2, #0
+     2cc:	e3e03000 	mvn	r3, #0
+     2d0:	e5032fcf 	str	r2, [r3, #-4047]	; 0xfffff031
+}
+     2d4:	e28dd008 	add	sp, sp, #8
+     2d8:	e8bd000f 	pop	{r0, r1, r2, r3}
+     2dc:	e25ef004 	subs	pc, lr, #4
+     2e0:	e005c000 	.word	0xe005c000
+     2e4:	4000009c 	.word	0x4000009c
+
+000002e8 <protocol_in>:
+ * Communication Protocol state machine implementation;
+ * This is triggered on uart1 interruption
+ * This handles the following commands
+ *
+ */
+void protocol_in(void){
+     2e8:	e92d10ff 	push	{r0, r1, r2, r3, r4, r5, r6, r7, ip}
+     2ec:	e24dd00c 	sub	sp, sp, #12
+			dummy = U1LSR; // Just clear the interrupt source
+			break;
+
+		case 0x04: // Receive Data Available
+		case 0x0C: // Character Time-Out
+			cmd_in.buff[cmd_in.i] = U1RBR;
+     2f0:	e59f318c 	ldr	r3, [pc, #396]	; 484 <STACK_SIZE+0x84>
+ * Communication Protocol state machine implementation;
+ * This is triggered on uart1 interruption
+ * This handles the following commands
+ *
+ */
+void protocol_in(void){
+     2f4:	e5931014 	ldr	r1, [r3, #20]
+
+	volatile char dummy;
+	volatile char iir;
+
+	// Repeat while there is at least one interrupt source.
+	while (((iir = U1IIR) & 0x01) == 0) {
+     2f8:	e59f2188 	ldr	r2, [pc, #392]	; 488 <STACK_SIZE+0x88>
+			dummy = U1LSR; // Just clear the interrupt source
+			break;
+
+		case 0x04: // Receive Data Available
+		case 0x0C: // Character Time-Out
+			cmd_in.buff[cmd_in.i] = U1RBR;
+     2fc:	e1a00003 	mov	r0, r3
+					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]),
+								(unsigned short) (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)]));
+				}
+				// SYNC
+				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == SYNC) {
+					send_data = 1;
+     300:	e3a06001 	mov	r6, #1
+
+	if (left_wheel & PWM_DIR) { // Forward
+		T1MR0 = 256;
+		T1MR1 = 256 - (left_wheel & ~PWM_DIR)*2;
+	} else { // Backwards
+		T1MR1 = 256;
+     304:	e59f5180 	ldr	r5, [pc, #384]	; 48c <STACK_SIZE+0x8c>
+     308:	e3a04c01 	mov	r4, #256	; 0x100
+
+	if (right_wheel & PWM_DIR) { // Forward
+		T0MR2 = 256;
+		T0MR1 = 256 - (right_wheel & ~PWM_DIR)*2;
+	} else { // Backwards
+		T0MR1 = 256;
+     30c:	e59fc17c 	ldr	ip, [pc, #380]	; 490 <STACK_SIZE+0x90>
+
+	volatile char dummy;
+	volatile char iir;
+
+	// Repeat while there is at least one interrupt source.
+	while (((iir = U1IIR) & 0x01) == 0) {
+     310:	ea00004d 	b	44c <STACK_SIZE+0x4c>
+		switch (iir & 0x0E) {
+     314:	e5dd3006 	ldrb	r3, [sp, #6]
+     318:	e203300e 	and	r3, r3, #14
+     31c:	e353000c 	cmp	r3, #12
+     320:	979ff103 	ldrls	pc, [pc, r3, lsl #2]
+     324:	ea000048 	b	44c <STACK_SIZE+0x4c>
+     328:	00000440 	.word	0x00000440
+     32c:	0000044c 	.word	0x0000044c
+     330:	00000430 	.word	0x00000430
+     334:	0000044c 	.word	0x0000044c
+     338:	0000036c 	.word	0x0000036c
+     33c:	0000044c 	.word	0x0000044c
+     340:	0000035c 	.word	0x0000035c
+     344:	0000044c 	.word	0x0000044c
+     348:	0000044c 	.word	0x0000044c
+     34c:	0000044c 	.word	0x0000044c
+     350:	0000044c 	.word	0x0000044c
+     354:	0000044c 	.word	0x0000044c
+     358:	0000036c 	.word	0x0000036c
+		case 0x06: // Receive Line Status
+			dummy = U1LSR; // Just clear the interrupt source
+     35c:	e5d23014 	ldrb	r3, [r2, #20]
+     360:	e20330ff 	and	r3, r3, #255	; 0xff
+     364:	e5cd3007 	strb	r3, [sp, #7]
+			break;
+     368:	ea000037 	b	44c <STACK_SIZE+0x4c>
+
+		case 0x04: // Receive Data Available
+		case 0x0C: // Character Time-Out
+			cmd_in.buff[cmd_in.i] = U1RBR;
+     36c:	e5d23000 	ldrb	r3, [r2]
+     370:	e20330ff 	and	r3, r3, #255	; 0xff
+     374:	e0807001 	add	r7, r0, r1
+     378:	e5c73018 	strb	r3, [r7, #24]
+
+			if (cmd_in.buff[cmd_in.i] == END_CMD) {
+     37c:	e35300fe 	cmp	r3, #254	; 0xfe
+     380:	1a000027 	bne	424 <STACK_SIZE+0x24>
+				// ENGINES
+				if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == ENGINES) {
+     384:	e2413002 	sub	r3, r1, #2
+     388:	e203301f 	and	r3, r3, #31
+     38c:	e0803003 	add	r3, r0, r3
+     390:	e5d33018 	ldrb	r3, [r3, #24]
+     394:	e35300b0 	cmp	r3, #176	; 0xb0
+     398:	1a00001b 	bne	40c <STACK_SIZE+0xc>
+					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]),
+     39c:	e2413001 	sub	r3, r1, #1
+     3a0:	e203301f 	and	r3, r3, #31
+     3a4:	e0803003 	add	r3, r0, r3
+     3a8:	e5d33018 	ldrb	r3, [r3, #24]
+								(unsigned short) (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)]));
+     3ac:	e201701f 	and	r7, r1, #31
+     3b0:	e0807007 	add	r7, r0, r7
+/**
+ * Set the output pwm value
+ */
+inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel) {
+
+	if (right_wheel & PWM_DIR) { // Forward
+     3b4:	e5d77018 	ldrb	r7, [r7, #24]
+     3b8:	e3170080 	tst	r7, #128	; 0x80
+		T0MR2 = 256;
+     3bc:	158c4020 	strne	r4, [ip, #32]
+		T0MR1 = 256 - (right_wheel & ~PWM_DIR)*2;
+     3c0:	13c77080 	bicne	r7, r7, #128	; 0x80
+     3c4:	12677080 	rsbne	r7, r7, #128	; 0x80
+     3c8:	11a07087 	lslne	r7, r7, #1
+     3cc:	158c701c 	strne	r7, [ip, #28]
+	} else { // Backwards
+		T0MR1 = 256;
+     3d0:	058c401c 	streq	r4, [ip, #28]
+		T0MR2 = 256 - right_wheel*2;
+     3d4:	02677080 	rsbeq	r7, r7, #128	; 0x80
+     3d8:	01a07087 	lsleq	r7, r7, #1
+     3dc:	058c7020 	streq	r7, [ip, #32]
+	}
+
+	if (left_wheel & PWM_DIR) { // Forward
+     3e0:	e3130080 	tst	r3, #128	; 0x80
+		T1MR0 = 256;
+     3e4:	15854018 	strne	r4, [r5, #24]
+		T1MR1 = 256 - (left_wheel & ~PWM_DIR)*2;
+     3e8:	13c33080 	bicne	r3, r3, #128	; 0x80
+     3ec:	12633080 	rsbne	r3, r3, #128	; 0x80
+     3f0:	11a03083 	lslne	r3, r3, #1
+     3f4:	1585301c 	strne	r3, [r5, #28]
+	} else { // Backwards
+		T1MR1 = 256;
+     3f8:	0585401c 	streq	r4, [r5, #28]
+		T1MR0 = 256 - left_wheel*2;
+     3fc:	02633080 	rsbeq	r3, r3, #128	; 0x80
+     400:	01a03083 	lsleq	r3, r3, #1
+     404:	05853018 	streq	r3, [r5, #24]
+     408:	ea000005 	b	424 <STACK_SIZE+0x24>
+				if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == ENGINES) {
+					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]),
+								(unsigned short) (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)]));
+				}
+				// SYNC
+				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == SYNC) {
+     40c:	e2413001 	sub	r3, r1, #1
+     410:	e203301f 	and	r3, r3, #31
+     414:	e0803003 	add	r3, r0, r3
+     418:	e5d33018 	ldrb	r3, [r3, #24]
+     41c:	e35300a0 	cmp	r3, #160	; 0xa0
+					send_data = 1;
+     420:	05c06038 	strbeq	r6, [r0, #56]	; 0x38
+				}
+			}
+
+			cmd_in.i = (cmd_in.i + 1) & (CMD_BUFF_SIZE-1);
+     424:	e2811001 	add	r1, r1, #1
+     428:	e201101f 	and	r1, r1, #31
+			break;
+     42c:	ea000006 	b	44c <STACK_SIZE+0x4c>
+
+		case 0x02: // THRE Interrupt, transmit interrupt
+			U1THR = dummy; // Just clear the interrupt source
+     430:	e5dd3007 	ldrb	r3, [sp, #7]
+     434:	e20330ff 	and	r3, r3, #255	; 0xff
+     438:	e5c23000 	strb	r3, [r2]
+			break;
+     43c:	ea000002 	b	44c <STACK_SIZE+0x4c>
+
+		case 0x00: // Modem Interrupt
+			dummy = U1MSR; // Just clear the interrupt source
+     440:	e5d23018 	ldrb	r3, [r2, #24]
+     444:	e20330ff 	and	r3, r3, #255	; 0xff
+     448:	e5cd3007 	strb	r3, [sp, #7]
+
+	volatile char dummy;
+	volatile char iir;
+
+	// Repeat while there is at least one interrupt source.
+	while (((iir = U1IIR) & 0x01) == 0) {
+     44c:	e5d23008 	ldrb	r3, [r2, #8]
+     450:	e20330ff 	and	r3, r3, #255	; 0xff
+     454:	e5cd3006 	strb	r3, [sp, #6]
+     458:	e5dd3006 	ldrb	r3, [sp, #6]
+     45c:	e3130001 	tst	r3, #1
+     460:	0affffab 	beq	314 <protocol_in+0x2c>
+     464:	e59f3018 	ldr	r3, [pc, #24]	; 484 <STACK_SIZE+0x84>
+     468:	e5831014 	str	r1, [r3, #20]
+		}
+	}
+
+	log_string_debug("<< protocol_in\n");
+
+	VICVectAddr = 0;
+     46c:	e3a02000 	mov	r2, #0
+     470:	e3e03000 	mvn	r3, #0
+     474:	e5032fcf 	str	r2, [r3, #-4047]	; 0xfffff031
+}
+     478:	e28dd00c 	add	sp, sp, #12
+     47c:	e8bd10ff 	pop	{r0, r1, r2, r3, r4, r5, r6, r7, ip}
+     480:	e25ef004 	subs	pc, lr, #4
+     484:	4000009c 	.word	0x4000009c
+     488:	e0010000 	.word	0xe0010000
+     48c:	e0008000 	.word	0xe0008000
+     490:	e0004000 	.word	0xe0004000
+
+00000494 <logger_init>:
+ * ou UARTn_baudrate = PCLK / ( 16 * ( 256 * UnDLM + UnDLL))
+ * 115131 = 15MHz / ( 16 * ( 256*0 + 6) * ( 1 + 5/14) )
+ * 115200 = 14.7456MHz / ( 16 * ( 256*0 + 8) )
+ */
+void logger_init(void){ // using UART0
+	PINSEL0 |= 0x05; // Set the pins function
+     494:	e59f3054 	ldr	r3, [pc, #84]	; 4f0 <logger_init+0x5c>
+     498:	e5932000 	ldr	r2, [r3]
+     49c:	e3822005 	orr	r2, r2, #5
+     4a0:	e5832000 	str	r2, [r3]
+	U0FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable
+     4a4:	e59f3048 	ldr	r3, [pc, #72]	; 4f4 <logger_init+0x60>
+     4a8:	e3a02007 	mov	r2, #7
+     4ac:	e5c32008 	strb	r2, [r3, #8]
+	U0LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+     4b0:	e3e0207c 	mvn	r2, #124	; 0x7c
+     4b4:	e5c3200c 	strb	r2, [r3, #12]
+
+#ifdef CRYSTAL12MHz
+	U0DLL	 = 0x06; // DivisorLatchLow bit
+     4b8:	e3a02006 	mov	r2, #6
+     4bc:	e5c32000 	strb	r2, [r3]
+	U0DLM	 = 0x00; // DivisorLatchHigh bit
+     4c0:	e3a02000 	mov	r2, #0
+     4c4:	e5c32004 	strb	r2, [r3, #4]
+	U0FDR	|= 0x05; // DivAddVal
+     4c8:	e5d32028 	ldrb	r2, [r3, #40]	; 0x28
+     4cc:	e20220ff 	and	r2, r2, #255	; 0xff
+     4d0:	e3822005 	orr	r2, r2, #5
+     4d4:	e5c32028 	strb	r2, [r3, #40]	; 0x28
+	U0FDR	|= 0x0E << 4; // MulVal = 14
+     4d8:	e5d32028 	ldrb	r2, [r3, #40]	; 0x28
+     4dc:	e38220e0 	orr	r2, r2, #224	; 0xe0
+     4e0:	e5c32028 	strb	r2, [r3, #40]	; 0x28
+#ifdef CRYSTAL14745600Hz
+	U0DLL	 = 0x08; // DivisorLatchLow bit
+	U0DLM	 = 0x00; // DivisorLatchHigh bit
+#endif
+
+	U0LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+     4e4:	e3a02003 	mov	r2, #3
+     4e8:	e5c3200c 	strb	r2, [r3, #12]
+}
+     4ec:	e12fff1e 	bx	lr
+     4f0:	e002c000 	.word	0xe002c000
+     4f4:	e000c000 	.word	0xe000c000
+
+000004f8 <log_int>:
+static void log_char(char c){
+	U0THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
+	while(!(U0LSR & 0x40));
+}
+
+void log_int(int num){
+     4f8:	e92d4038 	push	{r3, r4, r5, lr}
+	if(num & 0x80000000){ // se for negativo
+     4fc:	e2504000 	subs	r4, r0, #0
+     500:	aa000003 	bge	514 <log_int+0x1c>
+		log_char('-');
+     504:	e3a0002d 	mov	r0, #45	; 0x2d
+     508:	ebfffeff 	bl	10c <log_char>
+		num = ~num;
+		num += 0x1;
+     50c:	e2644000 	rsb	r4, r4, #0
+     510:	ea000001 	b	51c <log_int+0x24>
+	}else
+		log_char(' ');
+     514:	e3a00020 	mov	r0, #32
+     518:	ebfffefb 	bl	10c <log_char>
+	log_char(ascii[num >> 28]);
+     51c:	e59f5078 	ldr	r5, [pc, #120]	; 59c <log_int+0xa4>
+     520:	e7d50e44 	ldrb	r0, [r5, r4, asr #28]
+     524:	ebfffef8 	bl	10c <log_char>
+	log_char(ascii[num >> 24 & 0x0000000f]);
+     528:	e1a03c44 	asr	r3, r4, #24
+     52c:	e203300f 	and	r3, r3, #15
+     530:	e7d50003 	ldrb	r0, [r5, r3]
+     534:	ebfffef4 	bl	10c <log_char>
+	log_char(ascii[num >> 20 & 0x0000000f]);
+     538:	e1a03a44 	asr	r3, r4, #20
+     53c:	e203300f 	and	r3, r3, #15
+     540:	e7d50003 	ldrb	r0, [r5, r3]
+     544:	ebfffef0 	bl	10c <log_char>
+	log_char(ascii[num >> 16 & 0x0000000f]);
+     548:	e1a03844 	asr	r3, r4, #16
+     54c:	e203300f 	and	r3, r3, #15
+     550:	e7d50003 	ldrb	r0, [r5, r3]
+     554:	ebfffeec 	bl	10c <log_char>
+	log_char(ascii[num >> 12 & 0x0000000f]);
+     558:	e1a03644 	asr	r3, r4, #12
+     55c:	e203300f 	and	r3, r3, #15
+     560:	e7d50003 	ldrb	r0, [r5, r3]
+     564:	ebfffee8 	bl	10c <log_char>
+	log_char(ascii[num >> 8 & 0x0000000f]);
+     568:	e1a03444 	asr	r3, r4, #8
+     56c:	e203300f 	and	r3, r3, #15
+     570:	e7d50003 	ldrb	r0, [r5, r3]
+     574:	ebfffee4 	bl	10c <log_char>
+	log_char(ascii[num >> 4 & 0x0000000f]);
+     578:	e1a03244 	asr	r3, r4, #4
+     57c:	e203300f 	and	r3, r3, #15
+     580:	e7d50003 	ldrb	r0, [r5, r3]
+     584:	ebfffee0 	bl	10c <log_char>
+	log_char(ascii[num & 0x0000000f]);
+     588:	e204400f 	and	r4, r4, #15
+     58c:	e7d50004 	ldrb	r0, [r5, r4]
+     590:	ebfffedd 	bl	10c <log_char>
+}
+     594:	e8bd4038 	pop	{r3, r4, r5, lr}
+     598:	e12fff1e 	bx	lr
+     59c:	00001854 	.word	0x00001854
+
+000005a0 <log_short>:
+
+void log_short(short num){
+     5a0:	e92d4038 	push	{r3, r4, r5, lr}
+	if(num & 0x8000){ // se for negativo
+     5a4:	e2504000 	subs	r4, r0, #0
+     5a8:	aa000005 	bge	5c4 <log_short+0x24>
+		log_char('-');
+     5ac:	e3a0002d 	mov	r0, #45	; 0x2d
+     5b0:	ebfffed5 	bl	10c <log_char>
+		num = ~num;
+		num++;
+     5b4:	e2644000 	rsb	r4, r4, #0
+     5b8:	e1a04804 	lsl	r4, r4, #16
+     5bc:	e1a04844 	asr	r4, r4, #16
+     5c0:	ea000001 	b	5cc <log_short+0x2c>
+	}else
+		log_char(' ');
+     5c4:	e3a00020 	mov	r0, #32
+     5c8:	ebfffecf 	bl	10c <log_char>
+	log_char(ascii[num >> 12]);
+     5cc:	e59f5038 	ldr	r5, [pc, #56]	; 60c <log_short+0x6c>
+     5d0:	e7d50644 	ldrb	r0, [r5, r4, asr #12]
+     5d4:	ebfffecc 	bl	10c <log_char>
+	log_char(ascii[num >> 8 & 0x000f]);
+     5d8:	e1a03424 	lsr	r3, r4, #8
+     5dc:	e203300f 	and	r3, r3, #15
+     5e0:	e7d50003 	ldrb	r0, [r5, r3]
+     5e4:	ebfffec8 	bl	10c <log_char>
+	log_char(ascii[num >> 4 & 0x000f]);
+     5e8:	e1a03224 	lsr	r3, r4, #4
+     5ec:	e203300f 	and	r3, r3, #15
+     5f0:	e7d50003 	ldrb	r0, [r5, r3]
+     5f4:	ebfffec4 	bl	10c <log_char>
+	log_char(ascii[num & 0x000f]);
+     5f8:	e204400f 	and	r4, r4, #15
+     5fc:	e7d50004 	ldrb	r0, [r5, r4]
+     600:	ebfffec1 	bl	10c <log_char>
+}
+     604:	e8bd4038 	pop	{r3, r4, r5, lr}
+     608:	e12fff1e 	bx	lr
+     60c:	00001854 	.word	0x00001854
+
+00000610 <log_string>:
+
+void log_string(const char *s){
+     610:	e92d4038 	push	{r3, r4, r5, lr}
+	while(*s){
+     614:	e5d03000 	ldrb	r3, [r0]
+     618:	e3530000 	cmp	r3, #0
+     61c:	0a000009 	beq	648 <log_string+0x38>
+     620:	e1a04000 	mov	r4, r0
+		if(*s == '\n')
+			log_char('\r'); // \n + \r = new line
+     624:	e3a0500d 	mov	r5, #13
+	log_char(ascii[num & 0x000f]);
+}
+
+void log_string(const char *s){
+	while(*s){
+		if(*s == '\n')
+     628:	e353000a 	cmp	r3, #10
+			log_char('\r'); // \n + \r = new line
+     62c:	01a00005 	moveq	r0, r5
+     630:	0bfffeb5 	bleq	10c <log_char>
+		log_char(*s);
+     634:	e5d40000 	ldrb	r0, [r4]
+     638:	ebfffeb3 	bl	10c <log_char>
+	log_char(ascii[num >> 4 & 0x000f]);
+	log_char(ascii[num & 0x000f]);
+}
+
+void log_string(const char *s){
+	while(*s){
+     63c:	e5f43001 	ldrb	r3, [r4, #1]!
+     640:	e3530000 	cmp	r3, #0
+     644:	1afffff7 	bne	628 <log_string+0x18>
+		if(*s == '\n')
+			log_char('\r'); // \n + \r = new line
+		log_char(*s);
+		s++;
+	}
+}
+     648:	e8bd4038 	pop	{r3, r4, r5, lr}
+     64c:	e12fff1e 	bx	lr
+
+00000650 <error>:
+}
+
+/**
+ *
+ */
+void error(void){
+     650:	e24ee004 	sub	lr, lr, #4
+     654:	e92d500f 	push	{r0, r1, r2, r3, ip, lr}
+	log_string_error("irq error");
+     658:	e59f0004 	ldr	r0, [pc, #4]	; 664 <error+0x14>
+     65c:	ebffffeb 	bl	610 <log_string>
+}
+     660:	e8fd900f 	ldm	sp!, {r0, r1, r2, r3, ip, pc}^
+     664:	00001868 	.word	0x00001868
+
+00000668 <i2c_read_bytes_isr>:
+}
+
+/**
+ * i2c interrupt handler
+ */
+void i2c_read_bytes_isr(void) {
+     668:	e24ee004 	sub	lr, lr, #4
+     66c:	e92d500f 	push	{r0, r1, r2, r3, ip, lr}
+     670:	e24dd008 	sub	sp, sp, #8
+	log_string_i2c(">> read_bytes_isr\n");
+	volatile int temp = 0;
+     674:	e3a03000 	mov	r3, #0
+     678:	e58d3004 	str	r3, [sp, #4]
+	temp = I2C1STAT;
+     67c:	e59f32b8 	ldr	r3, [pc, #696]	; 93c <i2c_read_bytes_isr+0x2d4>
+     680:	e5d33004 	ldrb	r3, [r3, #4]
+     684:	e20330ff 	and	r3, r3, #255	; 0xff
+     688:	e58d3004 	str	r3, [sp, #4]
+
+	switch (temp) {
+     68c:	e59d3004 	ldr	r3, [sp, #4]
+     690:	e2433008 	sub	r3, r3, #8
+     694:	e3530050 	cmp	r3, #80	; 0x50
+     698:	979ff103 	ldrls	pc, [pc, r3, lsl #2]
+     69c:	ea000098 	b	904 <i2c_read_bytes_isr+0x29c>
+     6a0:	000007e4 	.word	0x000007e4
+     6a4:	00000904 	.word	0x00000904
+     6a8:	00000904 	.word	0x00000904
+     6ac:	00000904 	.word	0x00000904
+     6b0:	00000904 	.word	0x00000904
+     6b4:	00000904 	.word	0x00000904
+     6b8:	00000904 	.word	0x00000904
+     6bc:	00000904 	.word	0x00000904
+     6c0:	000007fc 	.word	0x000007fc
+     6c4:	00000904 	.word	0x00000904
+     6c8:	00000904 	.word	0x00000904
+     6cc:	00000904 	.word	0x00000904
+     6d0:	00000904 	.word	0x00000904
+     6d4:	00000904 	.word	0x00000904
+     6d8:	00000904 	.word	0x00000904
+     6dc:	00000904 	.word	0x00000904
+     6e0:	00000814 	.word	0x00000814
+     6e4:	00000904 	.word	0x00000904
+     6e8:	00000904 	.word	0x00000904
+     6ec:	00000904 	.word	0x00000904
+     6f0:	00000904 	.word	0x00000904
+     6f4:	00000904 	.word	0x00000904
+     6f8:	00000904 	.word	0x00000904
+     6fc:	00000904 	.word	0x00000904
+     700:	00000928 	.word	0x00000928
+     704:	00000904 	.word	0x00000904
+     708:	00000904 	.word	0x00000904
+     70c:	00000904 	.word	0x00000904
+     710:	00000904 	.word	0x00000904
+     714:	00000904 	.word	0x00000904
+     718:	00000904 	.word	0x00000904
+     71c:	00000904 	.word	0x00000904
+     720:	00000830 	.word	0x00000830
+     724:	00000904 	.word	0x00000904
+     728:	00000904 	.word	0x00000904
+     72c:	00000904 	.word	0x00000904
+     730:	00000904 	.word	0x00000904
+     734:	00000904 	.word	0x00000904
+     738:	00000904 	.word	0x00000904
+     73c:	00000904 	.word	0x00000904
+     740:	00000928 	.word	0x00000928
+     744:	00000904 	.word	0x00000904
+     748:	00000904 	.word	0x00000904
+     74c:	00000904 	.word	0x00000904
+     750:	00000904 	.word	0x00000904
+     754:	00000904 	.word	0x00000904
+     758:	00000904 	.word	0x00000904
+     75c:	00000904 	.word	0x00000904
+     760:	00000928 	.word	0x00000928
+     764:	00000904 	.word	0x00000904
+     768:	00000904 	.word	0x00000904
+     76c:	00000904 	.word	0x00000904
+     770:	00000904 	.word	0x00000904
+     774:	00000904 	.word	0x00000904
+     778:	00000904 	.word	0x00000904
+     77c:	00000904 	.word	0x00000904
+     780:	00000848 	.word	0x00000848
+     784:	00000904 	.word	0x00000904
+     788:	00000904 	.word	0x00000904
+     78c:	00000904 	.word	0x00000904
+     790:	00000904 	.word	0x00000904
+     794:	00000904 	.word	0x00000904
+     798:	00000904 	.word	0x00000904
+     79c:	00000904 	.word	0x00000904
+     7a0:	00000928 	.word	0x00000928
+     7a4:	00000904 	.word	0x00000904
+     7a8:	00000904 	.word	0x00000904
+     7ac:	00000904 	.word	0x00000904
+     7b0:	00000904 	.word	0x00000904
+     7b4:	00000904 	.word	0x00000904
+     7b8:	00000904 	.word	0x00000904
+     7bc:	00000904 	.word	0x00000904
+     7c0:	00000870 	.word	0x00000870
+     7c4:	00000904 	.word	0x00000904
+     7c8:	00000904 	.word	0x00000904
+     7cc:	00000904 	.word	0x00000904
+     7d0:	00000904 	.word	0x00000904
+     7d4:	00000904 	.word	0x00000904
+     7d8:	00000904 	.word	0x00000904
+     7dc:	00000904 	.word	0x00000904
+     7e0:	000008b0 	.word	0x000008b0
+	case TW_START: // A START condition has been transmitted.
+		log_string_i2c("TW_START\n");
+		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+     7e4:	e59f3150 	ldr	r3, [pc, #336]	; 93c <i2c_read_bytes_isr+0x2d4>
+     7e8:	e3e0202f 	mvn	r2, #47	; 0x2f
+     7ec:	e5c32008 	strb	r2, [r3, #8]
+		I2C1CONCLR = 0x28; // Clear SI and STA flag
+     7f0:	e3a02028 	mov	r2, #40	; 0x28
+     7f4:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     7f8:	ea00004a 	b	928 <i2c_read_bytes_isr+0x2c0>
+	case TW_REP_START: // A repeated START	condition has been transmitted.
+		log_string_i2c("TW_REP_START\n");
+		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_READ; // Slave address + Read
+     7fc:	e59f3138 	ldr	r3, [pc, #312]	; 93c <i2c_read_bytes_isr+0x2d4>
+     800:	e3e0202e 	mvn	r2, #46	; 0x2e
+     804:	e5c32008 	strb	r2, [r3, #8]
+		I2C1CONCLR = 0x28; // Clear SI and STA flag
+     808:	e3a02028 	mov	r2, #40	; 0x28
+     80c:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     810:	ea000044 	b	928 <i2c_read_bytes_isr+0x2c0>
+	case TW_MT_SLA_ACK: // SLA+W has been transmitted; ACK has been received.
+		log_string_i2c("TW_MT_SLA_ACK\n");
+		I2C1DAT = ra_buff; // Register address to be written
+     814:	e59f3124 	ldr	r3, [pc, #292]	; 940 <i2c_read_bytes_isr+0x2d8>
+     818:	e5d32000 	ldrb	r2, [r3]
+     81c:	e59f3118 	ldr	r3, [pc, #280]	; 93c <i2c_read_bytes_isr+0x2d4>
+     820:	e5c32008 	strb	r2, [r3, #8]
+		I2C1CONCLR = 0x08; // Clear SI
+     824:	e3a02008 	mov	r2, #8
+     828:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     82c:	ea00003d 	b	928 <i2c_read_bytes_isr+0x2c0>
+	case TW_MT_SLA_NACK: // SLA+W has been transmitted; NOT ACK has been received.
+		log_string_i2c("TW_MT_SLA_NACK\n");
+		break;
+	case TW_MT_DATA_ACK: // Data byte in I2DAT has been transmitted; ACK has been received.
+		log_string_i2c("TW_MT_DATA_ACK\n");
+		I2C1CONSET = 0x20; // Transmit start condition
+     830:	e59f3104 	ldr	r3, [pc, #260]	; 93c <i2c_read_bytes_isr+0x2d4>
+     834:	e3a02020 	mov	r2, #32
+     838:	e5c32000 	strb	r2, [r3]
+		I2C1CONCLR = 0x08; // Clear SI
+     83c:	e3a02008 	mov	r2, #8
+     840:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     844:	ea000037 	b	928 <i2c_read_bytes_isr+0x2c0>
+		log_string_i2c("TW_MT_ARB_LOST\n");
+		break;
+
+	case TW_MR_SLA_ACK: // SLA+R has been transmitted; ACK has been received.
+		log_string_i2c("TW_MR_SLA_ACK\n");
+		if(buff_size > 1)
+     848:	e59f30f0 	ldr	r3, [pc, #240]	; 940 <i2c_read_bytes_isr+0x2d8>
+     84c:	e5933008 	ldr	r3, [r3, #8]
+     850:	e3530001 	cmp	r3, #1
+			I2C1CONSET = 0x04; // Transmit ACK on data receives
+     854:	c3a02004 	movgt	r2, #4
+     858:	c59f30dc 	ldrgt	r3, [pc, #220]	; 93c <i2c_read_bytes_isr+0x2d4>
+     85c:	c5c32000 	strbgt	r2, [r3]
+		I2C1CONCLR = 0x08; // Clear SI
+     860:	e3a02008 	mov	r2, #8
+     864:	e59f30d0 	ldr	r3, [pc, #208]	; 93c <i2c_read_bytes_isr+0x2d4>
+     868:	e5c32018 	strb	r2, [r3, #24]
+		break;
+     86c:	ea00002d 	b	928 <i2c_read_bytes_isr+0x2c0>
+	case TW_MR_DATA_ACK: // Data byte has been received; ACK has been returned.
+		log_string_i2c("TW_MR_DATA_ACK\n");
+		log_string_i2c("pos: ");
+		log_int_i2c(buff_pos);
+		log_string_i2c("\n");
+		if ((buff_pos + 2) < buff_size) {
+     870:	e59f20c8 	ldr	r2, [pc, #200]	; 940 <i2c_read_bytes_isr+0x2d8>
+     874:	e5923004 	ldr	r3, [r2, #4]
+     878:	e2831002 	add	r1, r3, #2
+     87c:	e5922008 	ldr	r2, [r2, #8]
+     880:	e1510002 	cmp	r1, r2
+			c_buff[buff_pos++] = I2C1DAT;
+     884:	e59f20b0 	ldr	r2, [pc, #176]	; 93c <i2c_read_bytes_isr+0x2d4>
+     888:	e5d2c008 	ldrb	ip, [r2, #8]
+     88c:	e59f10ac 	ldr	r1, [pc, #172]	; 940 <i2c_read_bytes_isr+0x2d8>
+     890:	e591000c 	ldr	r0, [r1, #12]
+     894:	e7c0c003 	strb	ip, [r0, r3]
+     898:	e2833001 	add	r3, r3, #1
+     89c:	e5813004 	str	r3, [r1, #4]
+			I2C1CONCLR = 0x08; // Clear SI
+     8a0:	b3a03008 	movlt	r3, #8
+		}
+		else {
+			c_buff[buff_pos++] = I2C1DAT;
+			I2C1CONCLR = 0x0C; // Transmit NACK on next data receive, Clear SI
+     8a4:	a3a0300c 	movge	r3, #12
+     8a8:	e5c23018 	strb	r3, [r2, #24]
+     8ac:	ea00001d 	b	928 <i2c_read_bytes_isr+0x2c0>
+	case TW_MR_DATA_NACK: // Data byte has been received; NOT ACK has been returned.
+		log_string_i2c("TW_MR_DATA_NACK\n");
+		log_string_i2c("pos: ");
+		log_int_i2c(buff_pos);
+		log_string_i2c("\n");
+		if (buff_pos < buff_size) {
+     8b0:	e59f2088 	ldr	r2, [pc, #136]	; 940 <i2c_read_bytes_isr+0x2d8>
+     8b4:	e5923004 	ldr	r3, [r2, #4]
+     8b8:	e5922008 	ldr	r2, [r2, #8]
+     8bc:	e1530002 	cmp	r3, r2
+     8c0:	aa000006 	bge	8e0 <i2c_read_bytes_isr+0x278>
+			c_buff[buff_pos++] = I2C1DAT;
+     8c4:	e59f2070 	ldr	r2, [pc, #112]	; 93c <i2c_read_bytes_isr+0x2d4>
+     8c8:	e5d20008 	ldrb	r0, [r2, #8]
+     8cc:	e59f206c 	ldr	r2, [pc, #108]	; 940 <i2c_read_bytes_isr+0x2d8>
+     8d0:	e592100c 	ldr	r1, [r2, #12]
+     8d4:	e7c10003 	strb	r0, [r1, r3]
+     8d8:	e2833001 	add	r3, r3, #1
+     8dc:	e5823004 	str	r3, [r2, #4]
+		}
+		I2C1CONSET = 0x10; // Transmit stop condition
+     8e0:	e59f3054 	ldr	r3, [pc, #84]	; 93c <i2c_read_bytes_isr+0x2d4>
+     8e4:	e3a02010 	mov	r2, #16
+     8e8:	e5c32000 	strb	r2, [r3]
+		I2C1CONCLR = 0x08; // Clear SI
+     8ec:	e3a02008 	mov	r2, #8
+     8f0:	e5c32018 	strb	r2, [r3, #24]
+		busy = 0; // data ready to be returned
+     8f4:	e3a02000 	mov	r2, #0
+     8f8:	e59f3040 	ldr	r3, [pc, #64]	; 940 <i2c_read_bytes_isr+0x2d8>
+     8fc:	e5832010 	str	r2, [r3, #16]
+		break;
+     900:	ea000008 	b	928 <i2c_read_bytes_isr+0x2c0>
+
+	default:
+		log_string_warning("[i2c] default: ");
+     904:	e59f0038 	ldr	r0, [pc, #56]	; 944 <i2c_read_bytes_isr+0x2dc>
+     908:	ebffff40 	bl	610 <log_string>
+		log_int_warning(temp);
+     90c:	e59d0004 	ldr	r0, [sp, #4]
+     910:	ebfffef8 	bl	4f8 <log_int>
+		log_string_warning("\n");
+     914:	e59f002c 	ldr	r0, [pc, #44]	; 948 <i2c_read_bytes_isr+0x2e0>
+     918:	ebffff3c 	bl	610 <log_string>
+		//I2C1CONSET = 0x10; // Transmit stop condition
+		I2C1CONCLR = 0x08; // Clear SI
+     91c:	e3a02008 	mov	r2, #8
+     920:	e59f3014 	ldr	r3, [pc, #20]	; 93c <i2c_read_bytes_isr+0x2d4>
+     924:	e5c32018 	strb	r2, [r3, #24]
+		//busy = 0; // data ready to be returned
+		break;
+	}
+
+	VICVectAddr = 0;
+     928:	e3a02000 	mov	r2, #0
+     92c:	e3e03000 	mvn	r3, #0
+     930:	e5032fcf 	str	r2, [r3, #-4047]	; 0xfffff031
+}
+     934:	e28dd008 	add	sp, sp, #8
+     938:	e8fd900f 	ldm	sp!, {r0, r1, r2, r3, ip, pc}^
+     93c:	e005c000 	.word	0xe005c000
+     940:	4000009c 	.word	0x4000009c
+     944:	00001874 	.word	0x00001874
+     948:	00001890 	.word	0x00001890
+
+0000094c <log_byte>:
+
+void log_byte(char c){
+     94c:	e92d4038 	push	{r3, r4, r5, lr}
+     950:	e1a04000 	mov	r4, r0
+	if(c & 0x80){ // se for negativo
+     954:	e3100080 	tst	r0, #128	; 0x80
+     958:	0a000004 	beq	970 <log_byte+0x24>
+		log_char('-');
+     95c:	e3a0002d 	mov	r0, #45	; 0x2d
+     960:	ebfffde9 	bl	10c <log_char>
+		c = ~c;
+		c++;
+     964:	e2644000 	rsb	r4, r4, #0
+     968:	e20440ff 	and	r4, r4, #255	; 0xff
+     96c:	ea000001 	b	978 <log_byte+0x2c>
+	}else
+		log_char(' ');
+     970:	e3a00020 	mov	r0, #32
+     974:	ebfffde4 	bl	10c <log_char>
+	log_char(ascii[c >> 4]);
+     978:	e59f5018 	ldr	r5, [pc, #24]	; 998 <log_byte+0x4c>
+     97c:	e7d50224 	ldrb	r0, [r5, r4, lsr #4]
+     980:	ebfffde1 	bl	10c <log_char>
+	log_char(ascii[c & 0x000f]);
+     984:	e204400f 	and	r4, r4, #15
+     988:	e7d50004 	ldrb	r0, [r5, r4]
+     98c:	ebfffdde 	bl	10c <log_char>
+}
+     990:	e8bd4038 	pop	{r3, r4, r5, lr}
+     994:	e12fff1e 	bx	lr
+     998:	00001854 	.word	0x00001854
+
+0000099c <log2bytes>:
+
+void log2bytes(short c){
+     99c:	e92d4038 	push	{r3, r4, r5, lr}
+	if(c & 0x8000){ // se for negativo
+     9a0:	e2504000 	subs	r4, r0, #0
+     9a4:	aa000005 	bge	9c0 <log2bytes+0x24>
+		log_char('-');
+     9a8:	e3a0002d 	mov	r0, #45	; 0x2d
+     9ac:	ebfffdd6 	bl	10c <log_char>
+		c = ~c;
+		c++;
+     9b0:	e2644000 	rsb	r4, r4, #0
+     9b4:	e1a04804 	lsl	r4, r4, #16
+     9b8:	e1a04844 	asr	r4, r4, #16
+     9bc:	ea000001 	b	9c8 <log2bytes+0x2c>
+	}else
+		log_char(' ');
+     9c0:	e3a00020 	mov	r0, #32
+     9c4:	ebfffdd0 	bl	10c <log_char>
+	log_char(ascii[c >> 12]);
+     9c8:	e59f5038 	ldr	r5, [pc, #56]	; a08 <log2bytes+0x6c>
+     9cc:	e7d50644 	ldrb	r0, [r5, r4, asr #12]
+     9d0:	ebfffdcd 	bl	10c <log_char>
+	log_char(ascii[c >> 8 & 0x000f]);
+     9d4:	e1a03424 	lsr	r3, r4, #8
+     9d8:	e203300f 	and	r3, r3, #15
+     9dc:	e7d50003 	ldrb	r0, [r5, r3]
+     9e0:	ebfffdc9 	bl	10c <log_char>
+	log_char(ascii[c >> 4 & 0x000f]);
+     9e4:	e1a03224 	lsr	r3, r4, #4
+     9e8:	e203300f 	and	r3, r3, #15
+     9ec:	e7d50003 	ldrb	r0, [r5, r3]
+     9f0:	ebfffdc5 	bl	10c <log_char>
+	log_char(ascii[c & 0x000f]);
+     9f4:	e204400f 	and	r4, r4, #15
+     9f8:	e7d50004 	ldrb	r0, [r5, r4]
+     9fc:	ebfffdc2 	bl	10c <log_char>
+}
+     a00:	e8bd4038 	pop	{r3, r4, r5, lr}
+     a04:	e12fff1e 	bx	lr
+     a08:	00001854 	.word	0x00001854
+
+00000a0c <log4bytes>:
+
+void log4bytes(int c){
+     a0c:	e92d4038 	push	{r3, r4, r5, lr}
+	if(c & 0x80000000){ // se for negativo
+     a10:	e2504000 	subs	r4, r0, #0
+     a14:	aa000003 	bge	a28 <log4bytes+0x1c>
+		log_char('-');
+     a18:	e3a0002d 	mov	r0, #45	; 0x2d
+     a1c:	ebfffdba 	bl	10c <log_char>
+		c = ~c;
+		c += 0x1;
+     a20:	e2644000 	rsb	r4, r4, #0
+     a24:	ea000001 	b	a30 <log4bytes+0x24>
+	}else
+		log_char(' ');
+     a28:	e3a00020 	mov	r0, #32
+     a2c:	ebfffdb6 	bl	10c <log_char>
+	log_char(ascii[c >> 28]);
+     a30:	e59f5078 	ldr	r5, [pc, #120]	; ab0 <log4bytes+0xa4>
+     a34:	e7d50e44 	ldrb	r0, [r5, r4, asr #28]
+     a38:	ebfffdb3 	bl	10c <log_char>
+	log_char(ascii[c >> 24 & 0x0000000f]);
+     a3c:	e1a03c44 	asr	r3, r4, #24
+     a40:	e203300f 	and	r3, r3, #15
+     a44:	e7d50003 	ldrb	r0, [r5, r3]
+     a48:	ebfffdaf 	bl	10c <log_char>
+	log_char(ascii[c >> 20 & 0x0000000f]);
+     a4c:	e1a03a44 	asr	r3, r4, #20
+     a50:	e203300f 	and	r3, r3, #15
+     a54:	e7d50003 	ldrb	r0, [r5, r3]
+     a58:	ebfffdab 	bl	10c <log_char>
+	log_char(ascii[c >> 16 & 0x0000000f]);
+     a5c:	e1a03844 	asr	r3, r4, #16
+     a60:	e203300f 	and	r3, r3, #15
+     a64:	e7d50003 	ldrb	r0, [r5, r3]
+     a68:	ebfffda7 	bl	10c <log_char>
+	log_char(ascii[c >> 12 & 0x0000000f]);
+     a6c:	e1a03644 	asr	r3, r4, #12
+     a70:	e203300f 	and	r3, r3, #15
+     a74:	e7d50003 	ldrb	r0, [r5, r3]
+     a78:	ebfffda3 	bl	10c <log_char>
+	log_char(ascii[c >> 8 & 0x0000000f]);
+     a7c:	e1a03444 	asr	r3, r4, #8
+     a80:	e203300f 	and	r3, r3, #15
+     a84:	e7d50003 	ldrb	r0, [r5, r3]
+     a88:	ebfffd9f 	bl	10c <log_char>
+	log_char(ascii[c >> 4 & 0x0000000f]);
+     a8c:	e1a03244 	asr	r3, r4, #4
+     a90:	e203300f 	and	r3, r3, #15
+     a94:	e7d50003 	ldrb	r0, [r5, r3]
+     a98:	ebfffd9b 	bl	10c <log_char>
+	log_char(ascii[c & 0x0000000f]);
+     a9c:	e204400f 	and	r4, r4, #15
+     aa0:	e7d50004 	ldrb	r0, [r5, r4]
+     aa4:	ebfffd98 	bl	10c <log_char>
+}
+     aa8:	e8bd4038 	pop	{r3, r4, r5, lr}
+     aac:	e12fff1e 	bx	lr
+     ab0:	00001854 	.word	0x00001854
+
+00000ab4 <i2c_init>:
+void i2c_init(void){
+
+	log_string_i2c(">> i2c_init\n");
+
+	// Set the pin function
+	PINSEL1 |= 0x1 << 2; // SCL1
+     ab4:	e59f3058 	ldr	r3, [pc, #88]	; b14 <i2c_init+0x60>
+     ab8:	e5932004 	ldr	r2, [r3, #4]
+     abc:	e3822004 	orr	r2, r2, #4
+     ac0:	e5832004 	str	r2, [r3, #4]
+	PINSEL1 |= 0x1 << 4; // SDA1
+     ac4:	e5932004 	ldr	r2, [r3, #4]
+     ac8:	e3822010 	orr	r2, r2, #16
+     acc:	e5832004 	str	r2, [r3, #4]
+
+	I2C1CONCLR = 0x6C; // clear all flags
+     ad0:	e2833803 	add	r3, r3, #196608	; 0x30000
+     ad4:	e3a0206c 	mov	r2, #108	; 0x6c
+     ad8:	e5c32018 	strb	r2, [r3, #24]
+	I2C1CONSET |= 0x1 << 6; // enable i2c1
+     adc:	e5d32000 	ldrb	r2, [r3]
+     ae0:	e20220ff 	and	r2, r2, #255	; 0xff
+     ae4:	e3822040 	orr	r2, r2, #64	; 0x40
+     ae8:	e5c32000 	strb	r2, [r3]
+	I2C1SCLH = 19; // Set the bit rate:
+     aec:	e3a02013 	mov	r2, #19
+     af0:	e1c321b0 	strh	r2, [r3, #16]
+	I2C1SCLL = 19; // 394.7kHz for pclk=15MHz | 388.0kHz for pclk=14.7456MHz
+     af4:	e1c321b4 	strh	r2, [r3, #20]
+
+	// Enable the interrupts
+	VICVectCntl0 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+     af8:	e3e03000 	mvn	r3, #0
+     afc:	e3a02033 	mov	r2, #51	; 0x33
+     b00:	e5032dff 	str	r2, [r3, #-3583]	; 0xfffff201
+	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
+     b04:	e5132fef 	ldr	r2, [r3, #-4079]	; 0xfffff011
+     b08:	e3822702 	orr	r2, r2, #524288	; 0x80000
+     b0c:	e5032fef 	str	r2, [r3, #-4079]	; 0xfffff011
+	// Enable i2c as FIQ
+	//VICIntSelect |= 0x1 << 19;// I2C1 as FIQ
+	//VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
+
+	log_string_i2c("<< i2c_init\n");
+}
+     b10:	e12fff1e 	bx	lr
+     b14:	e002c000 	.word	0xe002c000
+
+00000b18 <i2c_read_bytes>:
+}
+
+int i2c_read_bytes(char reg_addr, char length, char* data) {
+	log_string_i2c(">> read_bytes\n");
+
+	buff_size = length;
+     b18:	e59f3048 	ldr	r3, [pc, #72]	; b68 <i2c_read_bytes+0x50>
+     b1c:	e5831008 	str	r1, [r3, #8]
+	buff_pos = 0;
+     b20:	e3a01000 	mov	r1, #0
+     b24:	e5831004 	str	r1, [r3, #4]
+	ra_buff = reg_addr;
+     b28:	e5c30000 	strb	r0, [r3]
+	c_buff = data;
+     b2c:	e583200c 	str	r2, [r3, #12]
+
+	busy = 1;
+     b30:	e3a02001 	mov	r2, #1
+     b34:	e5832010 	str	r2, [r3, #16]
+
+	//Setting the interrupt handler location for write byte
+	VICVectAddr0 = (unsigned int) &i2c_read_bytes_isr;
+     b38:	e3e03000 	mvn	r3, #0
+     b3c:	e59f2028 	ldr	r2, [pc, #40]	; b6c <i2c_read_bytes+0x54>
+     b40:	e5032eff 	str	r2, [r3, #-3839]	; 0xfffff101
+	//current_isr = &i2c_read_bytes_isr;
+	// Send Start bit
+	I2C1CONSET = 0x20; // Transmit start condition
+     b44:	e3a02020 	mov	r2, #32
+     b48:	e59f3020 	ldr	r3, [pc, #32]	; b70 <i2c_read_bytes+0x58>
+     b4c:	e5c32000 	strb	r2, [r3]
+
+	log_string_i2c("waiting\n");
+
+	while (busy); // busy wait for read process
+     b50:	e59f2010 	ldr	r2, [pc, #16]	; b68 <i2c_read_bytes+0x50>
+     b54:	e5923010 	ldr	r3, [r2, #16]
+     b58:	e3530000 	cmp	r3, #0
+     b5c:	1afffffc 	bne	b54 <i2c_read_bytes+0x3c>
+
+	log_string_i2c("<< read_bytes\n");
+	return 1;
+}
+     b60:	e3a00001 	mov	r0, #1
+     b64:	e12fff1e 	bx	lr
+     b68:	4000009c 	.word	0x4000009c
+     b6c:	00000668 	.word	0x00000668
+     b70:	e005c000 	.word	0xe005c000
+
+00000b74 <i2c_read_byte>:
+
+//void i2c_isr(void) {
+//	(*current_isr)();
+//}
+
+int i2c_read_byte(char reg_addr, char* data) {
+     b74:	e92d4008 	push	{r3, lr}
+     b78:	e1a02001 	mov	r2, r1
+	log_string_i2c("read_byte\n");
+
+	int i = i2c_read_bytes(reg_addr,1,data);
+     b7c:	e3a01001 	mov	r1, #1
+     b80:	ebffffe4 	bl	b18 <i2c_read_bytes>
+
+	log_string_i2c("read_byte..returning\n");
+	return i;
+}
+     b84:	e8bd4008 	pop	{r3, lr}
+     b88:	e12fff1e 	bx	lr
+
+00000b8c <i2c_write_byte>:
+	c |= data; // combine data with existing byte
+
+	return i2c_write_byte(reg_addr, c);
+}
+
+int i2c_write_byte(char reg_addr, char data) {
+     b8c:	e24dd008 	sub	sp, sp, #8
+     b90:	e28d3008 	add	r3, sp, #8
+     b94:	e5631001 	strb	r1, [r3, #-1]!
+	log_string_i2c("write_byte\n");
+
+	buff_size = 1;
+     b98:	e59f204c 	ldr	r2, [pc, #76]	; bec <i2c_write_byte+0x60>
+     b9c:	e3a01001 	mov	r1, #1
+     ba0:	e5821008 	str	r1, [r2, #8]
+	buff_pos = 0;
+     ba4:	e3a0c000 	mov	ip, #0
+     ba8:	e582c004 	str	ip, [r2, #4]
+	ra_buff = reg_addr;
+     bac:	e5c20000 	strb	r0, [r2]
+	c_buff = &data;
+     bb0:	e582300c 	str	r3, [r2, #12]
+
+	busy = 1;
+     bb4:	e5821010 	str	r1, [r2, #16]
+
+	//Setting the interrupt handler location for write byte
+	VICVectAddr0 = (unsigned int) &i2c_write_byte_isr;
+     bb8:	e3e03000 	mvn	r3, #0
+     bbc:	e59f202c 	ldr	r2, [pc, #44]	; bf0 <i2c_write_byte+0x64>
+     bc0:	e5032eff 	str	r2, [r3, #-3839]	; 0xfffff101
+	//current_isr = &i2c_write_byte_isr;
+	// Send Start bit
+	I2C1CONSET = 0x20; // Transmit start condition
+     bc4:	e3a02020 	mov	r2, #32
+     bc8:	e59f3024 	ldr	r3, [pc, #36]	; bf4 <i2c_write_byte+0x68>
+     bcc:	e5c32000 	strb	r2, [r3]
+
+	while (busy); // busy wait for read process
+     bd0:	e59f2014 	ldr	r2, [pc, #20]	; bec <i2c_write_byte+0x60>
+     bd4:	e5923010 	ldr	r3, [r2, #16]
+     bd8:	e3530000 	cmp	r3, #0
+     bdc:	1afffffc 	bne	bd4 <i2c_write_byte+0x48>
+
+	log_string_i2c("write_byte..returning\n");
+	return 1;
+}
+     be0:	e3a00001 	mov	r0, #1
+     be4:	e28dd008 	add	sp, sp, #8
+     be8:	e12fff1e 	bx	lr
+     bec:	4000009c 	.word	0x4000009c
+     bf0:	0000012c 	.word	0x0000012c
+     bf4:	e005c000 	.word	0xe005c000
+
+00000bf8 <i2c_write_bits>:
+	}
+
+	VICVectAddr = 0;
+}
+
+int i2c_write_bits(char reg_addr, char bit, char length, char data){
+     bf8:	e92d40f0 	push	{r4, r5, r6, r7, lr}
+     bfc:	e24dd00c 	sub	sp, sp, #12
+     c00:	e1a07000 	mov	r7, r0
+     c04:	e1a05001 	mov	r5, r1
+     c08:	e1a04002 	mov	r4, r2
+     c0c:	e1a06003 	mov	r6, r3
+	// 10101111 original value (sample)
+	// 10100011 original & ~mask
+	// 10101011 masked | value
+
+	char c;
+	i2c_read_byte(reg_addr, &c);
+     c10:	e28d1007 	add	r1, sp, #7
+     c14:	ebffffd6 	bl	b74 <i2c_read_byte>
+	char mask = ((1 << length) - 1) << (bit - length + 1);
+     c18:	e2855001 	add	r5, r5, #1
+     c1c:	e0645005 	rsb	r5, r4, r5
+     c20:	e3e03000 	mvn	r3, #0
+     c24:	e1e04413 	mvn	r4, r3, lsl r4
+     c28:	e1a04514 	lsl	r4, r4, r5
+     c2c:	e20440ff 	and	r4, r4, #255	; 0xff
+	data <<= (bit - length + 1); // shift data into correct position
+	data &= mask; // zero all non-important bits in data
+	c &= ~(mask); // zero all important bits in existing byte
+     c30:	e5dd1007 	ldrb	r1, [sp, #7]
+     c34:	e1c11004 	bic	r1, r1, r4
+
+	char c;
+	i2c_read_byte(reg_addr, &c);
+	char mask = ((1 << length) - 1) << (bit - length + 1);
+	data <<= (bit - length + 1); // shift data into correct position
+	data &= mask; // zero all non-important bits in data
+     c38:	e0046516 	and	r6, r4, r6, lsl r5
+	c &= ~(mask); // zero all important bits in existing byte
+	c |= data; // combine data with existing byte
+     c3c:	e1811006 	orr	r1, r1, r6
+     c40:	e5cd1007 	strb	r1, [sp, #7]
+
+	return i2c_write_byte(reg_addr, c);
+     c44:	e1a00007 	mov	r0, r7
+     c48:	ebffffcf 	bl	b8c <i2c_write_byte>
+}
+     c4c:	e28dd00c 	add	sp, sp, #12
+     c50:	e8bd40f0 	pop	{r4, r5, r6, r7, lr}
+     c54:	e12fff1e 	bx	lr
+
+00000c58 <mpu_set_clock_source>:
+* @see getClockSource()
+* @see MPU6050_RA_PWR_MGMT_1
+* @see MPU6050_PWR1_CLKSEL_BIT
+* @see MPU6050_PWR1_CLKSEL_LENGTH
+*/
+void mpu_set_clock_source(char source) {
+     c58:	e92d4008 	push	{r3, lr}
+     c5c:	e1a03000 	mov	r3, r0
+    i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, source);
+     c60:	e3a0006b 	mov	r0, #107	; 0x6b
+     c64:	e3a01002 	mov	r1, #2
+     c68:	e3a02003 	mov	r2, #3
+     c6c:	ebffffe1 	bl	bf8 <i2c_write_bits>
+}
+     c70:	e8bd4008 	pop	{r3, lr}
+     c74:	e12fff1e 	bx	lr
+
+00000c78 <mpu_set_full_scale_gyro_range>:
+* @see MPU6050_GYRO_FS_250
+* @see MPU6050_RA_GYRO_CONFIG
+* @see MPU6050_GCONFIG_FS_SEL_BIT
+* @see MPU6050_GCONFIG_FS_SEL_LENGTH
+*/
+void mpu_set_full_scale_gyro_range(char range) {
+     c78:	e92d4008 	push	{r3, lr}
+     c7c:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
+     c80:	e3a0001b 	mov	r0, #27
+     c84:	e3a01004 	mov	r1, #4
+     c88:	e3a02002 	mov	r2, #2
+     c8c:	ebffffd9 	bl	bf8 <i2c_write_bits>
+}
+     c90:	e8bd4008 	pop	{r3, lr}
+     c94:	e12fff1e 	bx	lr
+
+00000c98 <mpu_set_full_scale_accel_range>:
+
+/** Set full-scale accelerometer range.
+* @param range New full-scale accelerometer range setting
+* @see getFullScaleAccelRange()
+*/
+void mpu_set_full_scale_accel_range(char range) {
+     c98:	e92d4008 	push	{r3, lr}
+     c9c:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGTH, range);
+     ca0:	e3a0001c 	mov	r0, #28
+     ca4:	e3a01004 	mov	r1, #4
+     ca8:	e3a02002 	mov	r2, #2
+     cac:	ebffffd1 	bl	bf8 <i2c_write_bits>
+}
+     cb0:	e8bd4008 	pop	{r3, lr}
+     cb4:	e12fff1e 	bx	lr
+
+00000cb8 <mpu_set_sleep_enable>:
+* @param enabled New sleep mode enabled status
+* @see getSleepEnabled()
+* @see MPU6050_RA_PWR_MGMT_1
+* @see MPU6050_PWR1_SLEEP_BIT
+*/
+void mpu_set_sleep_enable(int enable) {
+     cb8:	e92d4008 	push	{r3, lr}
+	i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1, enable);
+     cbc:	e20030ff 	and	r3, r0, #255	; 0xff
+     cc0:	e3a0006b 	mov	r0, #107	; 0x6b
+     cc4:	e3a01006 	mov	r1, #6
+     cc8:	e3a02001 	mov	r2, #1
+     ccc:	ebffffc9 	bl	bf8 <i2c_write_bits>
+}
+     cd0:	e8bd4008 	pop	{r3, lr}
+     cd4:	e12fff1e 	bx	lr
+
+00000cd8 <mpu_set_temperature_sensor_enabled>:
+ * values to indicate whether the sensor is enabled or disabled, respectively.
+ * This bit resets the FIFO buffer when set to 1 while FIFO_EN equals 0. This
+ * bit automatically clears to 0 after the reset has been triggered.
+ * @param enabled 1 enabled; 0 disabled
+ */
+void mpu_set_temperature_sensor_enabled(char enabled) {
+     cd8:	e92d4008 	push	{r3, lr}
+	i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_TEMP_DIS_BIT, 1, 1-enabled);
+     cdc:	e2603001 	rsb	r3, r0, #1
+     ce0:	e20330ff 	and	r3, r3, #255	; 0xff
+     ce4:	e3a0006b 	mov	r0, #107	; 0x6b
+     ce8:	e3a01003 	mov	r1, #3
+     cec:	e3a02001 	mov	r2, #1
+     cf0:	ebffffc0 	bl	bf8 <i2c_write_bits>
+}
+     cf4:	e8bd4008 	pop	{r3, lr}
+     cf8:	e12fff1e 	bx	lr
+
+00000cfc <mpu_set_gyro_rate>:
+*
+* @param rate New sample rate divider
+* @see getRate()
+* @see MPU6050_RA_SMPLRT_DIV
+*/
+void mpu_set_gyro_rate(char rate) {
+     cfc:	e92d4008 	push	{r3, lr}
+     d00:	e1a01000 	mov	r1, r0
+    i2c_write_byte(MPU6050_RA_SMPLRT_DIV, rate);
+     d04:	e3a00019 	mov	r0, #25
+     d08:	ebffff9f 	bl	b8c <i2c_write_byte>
+}
+     d0c:	e8bd4008 	pop	{r3, lr}
+     d10:	e12fff1e 	bx	lr
+
+00000d14 <mpu_set_DLPF_mode>:
+* @return DLFP configuration
+* @see MPU6050_RA_CONFIG
+* @see MPU6050_CFG_DLPF_CFG_BIT
+* @see MPU6050_CFG_DLPF_CFG_LENGTH
+*/
+void mpu_set_DLPF_mode(char mode) {
+     d14:	e92d4008 	push	{r3, lr}
+     d18:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode);
+     d1c:	e3a0001a 	mov	r0, #26
+     d20:	e3a01002 	mov	r1, #2
+     d24:	e3a02003 	mov	r2, #3
+     d28:	ebffffb2 	bl	bf8 <i2c_write_bits>
+}
+     d2c:	e8bd4008 	pop	{r3, lr}
+     d30:	e12fff1e 	bx	lr
+
+00000d34 <mpu_set_6axis_FIFO_enabled>:
+
+/**
+ * Configure FIFO to store data from accelerometer temp and gyro
+ * @param enabled 0 disabled; 1 enabled
+ */
+void mpu_set_6axis_FIFO_enabled(char enabled) {
+     d34:	e92d4008 	push	{r3, lr}
+	i2c_write_byte(MPU6050_RA_FIFO_EN, 0x78);
+     d38:	e3a00023 	mov	r0, #35	; 0x23
+     d3c:	e3a01078 	mov	r1, #120	; 0x78
+     d40:	ebffff91 	bl	b8c <i2c_write_byte>
+//	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_ACCEL_FIFO_EN_BIT, 1, enabled);
+//	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_TEMP_FIFO_EN_BIT, 1, 0);
+//	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_XG_FIFO_EN_BIT, 1, enabled);
+//	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_YG_FIFO_EN_BIT, 1, enabled);
+//	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_ZG_FIFO_EN_BIT, 1, enabled);
+}
+     d44:	e8bd4008 	pop	{r3, lr}
+     d48:	e12fff1e 	bx	lr
+
+00000d4c <mpu_set_interrupt_mode>:
+
+/**
+ * Configure interruption mode
+ * @param mode 0 active high; 1 active low
+ */
+void mpu_set_interrupt_mode(char mode) {
+     d4c:	e92d4008 	push	{r3, lr}
+     d50:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_INT_LEVEL_BIT, 1, mode);
+     d54:	e3a00037 	mov	r0, #55	; 0x37
+     d58:	e3a01007 	mov	r1, #7
+     d5c:	e3a02001 	mov	r2, #1
+     d60:	ebffffa4 	bl	bf8 <i2c_write_bits>
+}
+     d64:	e8bd4008 	pop	{r3, lr}
+     d68:	e12fff1e 	bx	lr
+
+00000d6c <mpu_set_interrupt_drive>:
+
+/**
+ * Set interrupt drive mode
+ * @param drive 0 push/pull; 1 open-drain
+ */
+void mpu_set_interrupt_drive(char drive) {
+     d6c:	e92d4008 	push	{r3, lr}
+     d70:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_INT_OPEN_BIT, 1, drive);
+     d74:	e3a00037 	mov	r0, #55	; 0x37
+     d78:	e3a01006 	mov	r1, #6
+     d7c:	e3a02001 	mov	r2, #1
+     d80:	ebffff9c 	bl	bf8 <i2c_write_bits>
+}
+     d84:	e8bd4008 	pop	{r3, lr}
+     d88:	e12fff1e 	bx	lr
+
+00000d8c <mpu_set_interrupt_latch>:
+
+/**
+ * Set interrupt latch mode
+ * @param latch 0 50us pulse; 1 high until interrupt is cleared
+ */
+void mpu_set_interrupt_latch(char latch) {
+     d8c:	e92d4008 	push	{r3, lr}
+     d90:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_LATCH_INT_EN_BIT, 1, latch);
+     d94:	e3a00037 	mov	r0, #55	; 0x37
+     d98:	e3a01005 	mov	r1, #5
+     d9c:	e3a02001 	mov	r2, #1
+     da0:	ebffff94 	bl	bf8 <i2c_write_bits>
+}
+     da4:	e8bd4008 	pop	{r3, lr}
+     da8:	e12fff1e 	bx	lr
+
+00000dac <mpu_set_FIFO_overflow_interrupt>:
+
+/**
+ * Set FIFO Buffer Overflow interrupt enabled status.
+ * @param enabled 1 enabled; 0 disabled
+ */
+void mpu_set_FIFO_overflow_interrupt(char enabled) {
+     dac:	e92d4008 	push	{r3, lr}
+     db0:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_INT_ENABLE, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, 1, enabled);
+     db4:	e3a00038 	mov	r0, #56	; 0x38
+     db8:	e3a01004 	mov	r1, #4
+     dbc:	e3a02001 	mov	r2, #1
+     dc0:	ebffff8c 	bl	bf8 <i2c_write_bits>
+}
+     dc4:	e8bd4008 	pop	{r3, lr}
+     dc8:	e12fff1e 	bx	lr
+
+00000dcc <mpu_set_data_ready_interrupt>:
+
+/**
+ * Set Data Ready interrupt enabled status.
+ * @param enabled 1 enabled; 0 disabled
+ */
+void mpu_set_data_ready_interrupt(char enabled) {
+     dcc:	e92d4008 	push	{r3, lr}
+     dd0:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_INT_ENABLE, MPU6050_INTERRUPT_DATA_RDY_BIT, 1, enabled);
+     dd4:	e3a00038 	mov	r0, #56	; 0x38
+     dd8:	e3a01000 	mov	r1, #0
+     ddc:	e3a02001 	mov	r2, #1
+     de0:	ebffff84 	bl	bf8 <i2c_write_bits>
+}
+     de4:	e8bd4008 	pop	{r3, lr}
+     de8:	e12fff1e 	bx	lr
+
+00000dec <mpu_clear_interrupt>:
+* These bits clear to 0 after the register has been read. Very useful
+* for getting multiple INT statuses, since each single bit read clears
+* all of them because it has to read the whole byte.
+* @see MPU6050_RA_INT_STATUS
+*/
+int mpu_clear_interrupt(char* data) {
+     dec:	e92d4008 	push	{r3, lr}
+     df0:	e1a01000 	mov	r1, r0
+	return i2c_read_byte(MPU6050_RA_INT_STATUS, data);
+     df4:	e3a0003a 	mov	r0, #58	; 0x3a
+     df8:	ebffff5d 	bl	b74 <i2c_read_byte>
+}
+     dfc:	e8bd4008 	pop	{r3, lr}
+     e00:	e12fff1e 	bx	lr
+
+00000e04 <mpu_set_FIFO_enabled>:
+
+/** Enable FIFO usage.
+ * @param enabled 1 enabled; 0 disabled
+ */
+void mpu_set_FIFO_enabled(char enabled) {
+     e04:	e92d4008 	push	{r3, lr}
+     e08:	e1a03000 	mov	r3, r0
+	i2c_write_bits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, 1, enabled);
+     e0c:	e3a0006a 	mov	r0, #106	; 0x6a
+     e10:	e3a01006 	mov	r1, #6
+     e14:	e3a02001 	mov	r2, #1
+     e18:	ebffff76 	bl	bf8 <i2c_write_bits>
+}
+     e1c:	e8bd4008 	pop	{r3, lr}
+     e20:	e12fff1e 	bx	lr
+
+00000e24 <mpu_reset_FIFO>:
+ * Reset the FIFO.
+ * This bit resets the FIFO buffer when set to 1 while FIFO_EN equals 0. This
+ * bit automatically clears to 0 after the reset has been triggered.
+ * @param enabled 1 enabled; 0 disabled
+ */
+void mpu_reset_FIFO(void) {
+     e24:	e92d4008 	push	{r3, lr}
+	i2c_write_bits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1, 1);
+     e28:	e3a0006a 	mov	r0, #106	; 0x6a
+     e2c:	e3a01002 	mov	r1, #2
+     e30:	e3a02001 	mov	r2, #1
+     e34:	e1a03002 	mov	r3, r2
+     e38:	ebffff6e 	bl	bf8 <i2c_write_bits>
+}
+     e3c:	e8bd4008 	pop	{r3, lr}
+     e40:	e12fff1e 	bx	lr
+
+00000e44 <mpu_init>:
+* after start-up). This function also sets both the accelerometer and the gyroscope
+* to their most sensitive settings, namely +/- 2g and +/- 250 degrees/sec, and sets
+* the clock source to use the X Gyro for reference, which is slightly better than
+* the default internal clock source.
+*/
+void mpu_init(void) {
+     e44:	e92d4008 	push	{r3, lr}
+	log_string_mpu(">> mpu_init\n");
+
+    // configure clock source
+	mpu_set_clock_source(MPU6050_CLOCK_PLL_XGYRO);
+     e48:	e3a00001 	mov	r0, #1
+     e4c:	ebffff81 	bl	c58 <mpu_set_clock_source>
+	// disable temperature sensor
+	mpu_set_temperature_sensor_enabled(0);
+     e50:	e3a00000 	mov	r0, #0
+     e54:	ebffff9f 	bl	cd8 <mpu_set_temperature_sensor_enabled>
+	// set scale to
+	// acc ±2g 16384 LSB/g
+	// gyro ± 250 °/s 131 LSB/°/s
+    mpu_set_full_scale_gyro_range(MPU6050_GYRO_FS_250);
+     e58:	e3a00000 	mov	r0, #0
+     e5c:	ebffff85 	bl	c78 <mpu_set_full_scale_gyro_range>
+    mpu_set_full_scale_accel_range(MPU6050_ACCEL_FS_2);
+     e60:	e3a00000 	mov	r0, #0
+     e64:	ebffff8b 	bl	c98 <mpu_set_full_scale_accel_range>
+
+    // divide gyro output rate by 7+1, if DLPF>0 set back to 0 to keep output rate 1kHz
+    mpu_set_gyro_rate(7);
+     e68:	e3a00007 	mov	r0, #7
+     e6c:	ebffffa2 	bl	cfc <mpu_set_gyro_rate>
+    // set digital low pass filter cut off frequency (disabled)
+    mpu_set_DLPF_mode(0);
+     e70:	e3a00000 	mov	r0, #0
+     e74:	ebffffa6 	bl	d14 <mpu_set_DLPF_mode>
+
+    // FIFO WAS NOT USED
+    // enable FIFO
+    mpu_set_6axis_FIFO_enabled(1);
+     e78:	e3a00001 	mov	r0, #1
+     e7c:	ebffffac 	bl	d34 <mpu_set_6axis_FIFO_enabled>
+
+    // clear interrupts
+	//char source;
+	//mpu_clear_interrupt(&source);
+    // reset FIFO
+    mpu_reset_FIFO();
+     e80:	ebffffe7 	bl	e24 <mpu_reset_FIFO>
+    // enable fifo
+    mpu_set_FIFO_enabled(1);
+     e84:	e3a00001 	mov	r0, #1
+     e88:	ebffffdd 	bl	e04 <mpu_set_FIFO_enabled>
+
+    // stop sleeping
+    mpu_set_sleep_enable(0);
+     e8c:	e3a00000 	mov	r0, #0
+     e90:	ebffff88 	bl	cb8 <mpu_set_sleep_enable>
+
+	log_string_mpu("<< mpu_init\n");
+}
+     e94:	e8bd4008 	pop	{r3, lr}
+     e98:	e12fff1e 	bx	lr
+
+00000e9c <mpu_get_FIFO_size>:
+* This value indicates the number of bytes stored in the FIFO buffer. This
+* number is in turn the number of bytes that can be read from the FIFO buffer
+* and it is directly proportional to the number of samples available given the
+* set of sensor data bound to be stored in the FIFO (register 35 and 36).
+*/
+void mpu_get_FIFO_size(int* size) {
+     e9c:	e92d4010 	push	{r4, lr}
+     ea0:	e24dd008 	sub	sp, sp, #8
+     ea4:	e1a04000 	mov	r4, r0
+	char count[2];
+	i2c_read_bytes(MPU6050_RA_FIFO_COUNTH, 2, count);
+     ea8:	e3a00072 	mov	r0, #114	; 0x72
+     eac:	e3a01002 	mov	r1, #2
+     eb0:	e28d2004 	add	r2, sp, #4
+     eb4:	ebffff17 	bl	b18 <i2c_read_bytes>
+	*size = (((int)count[0]) << 8) | count[1];
+     eb8:	e5dd2004 	ldrb	r2, [sp, #4]
+     ebc:	e5dd3005 	ldrb	r3, [sp, #5]
+     ec0:	e1833402 	orr	r3, r3, r2, lsl #8
+     ec4:	e5843000 	str	r3, [r4]
+}
+     ec8:	e28dd008 	add	sp, sp, #8
+     ecc:	e8bd4010 	pop	{r4, lr}
+     ed0:	e12fff1e 	bx	lr
+
+00000ed4 <mpu_get_motion6>:
+*
+* @see getAcceleration()
+* @see getRotation()
+* @see MPU6050_RA_ACCEL_XOUT_H
+*/
+void mpu_get_motion6(char* buff) {
+     ed4:	e92d4010 	push	{r4, lr}
+     ed8:	e24dd010 	sub	sp, sp, #16
+     edc:	e1a04000 	mov	r4, r0
+
+	log_string_mpu(">> mpu_get_motion6\n");
+
+	char c[14];
+	i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, 14, c);
+     ee0:	e3a0003b 	mov	r0, #59	; 0x3b
+     ee4:	e3a0100e 	mov	r1, #14
+     ee8:	e1a0200d 	mov	r2, sp
+     eec:	ebffff09 	bl	b18 <i2c_read_bytes>
+	*buff = c[0];
+     ef0:	e5dd3000 	ldrb	r3, [sp]
+     ef4:	e5c43000 	strb	r3, [r4]
+	*(buff+1) = c[1];
+     ef8:	e5dd3001 	ldrb	r3, [sp, #1]
+     efc:	e5c43001 	strb	r3, [r4, #1]
+	*(buff+2) = c[2];
+     f00:	e5dd3002 	ldrb	r3, [sp, #2]
+     f04:	e5c43002 	strb	r3, [r4, #2]
+	*(buff+3) = c[3];
+     f08:	e5dd3003 	ldrb	r3, [sp, #3]
+     f0c:	e5c43003 	strb	r3, [r4, #3]
+	*(buff+4) = c[4];
+     f10:	e5dd3004 	ldrb	r3, [sp, #4]
+     f14:	e5c43004 	strb	r3, [r4, #4]
+	*(buff+5) = c[5];
+     f18:	e5dd3005 	ldrb	r3, [sp, #5]
+     f1c:	e5c43005 	strb	r3, [r4, #5]
+	*(buff+6) = c[8];
+     f20:	e5dd3008 	ldrb	r3, [sp, #8]
+     f24:	e5c43006 	strb	r3, [r4, #6]
+	*(buff+7) = c[9];
+     f28:	e5dd3009 	ldrb	r3, [sp, #9]
+     f2c:	e5c43007 	strb	r3, [r4, #7]
+	*(buff+8) = c[10];
+     f30:	e5dd300a 	ldrb	r3, [sp, #10]
+     f34:	e5c43008 	strb	r3, [r4, #8]
+	*(buff+9) = c[11];
+     f38:	e5dd300b 	ldrb	r3, [sp, #11]
+     f3c:	e5c43009 	strb	r3, [r4, #9]
+	*(buff+10) = c[12];
+     f40:	e5dd300c 	ldrb	r3, [sp, #12]
+     f44:	e5c4300a 	strb	r3, [r4, #10]
+	*(buff+11) = c[13];
+     f48:	e5dd300d 	ldrb	r3, [sp, #13]
+     f4c:	e5c4300b 	strb	r3, [r4, #11]
+
+	log_string_mpu("<< mpu_get_motion6\n");
+}
+     f50:	e28dd010 	add	sp, sp, #16
+     f54:	e8bd4010 	pop	{r4, lr}
+     f58:	e12fff1e 	bx	lr
+
+00000f5c <mpu_get_FIFO_motion6>:
+*
+* buff:
+* ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l,
+*
+*/
+void mpu_get_FIFO_motion6(char* buff) {
+     f5c:	e92d4010 	push	{r4, lr}
+     f60:	e24dd010 	sub	sp, sp, #16
+     f64:	e1a04000 	mov	r4, r0
+
+	char c[12];
+	i2c_read_bytes(MPU6050_RA_FIFO_R_W, 12, c);
+     f68:	e3a00074 	mov	r0, #116	; 0x74
+     f6c:	e3a0100c 	mov	r1, #12
+     f70:	e28d2004 	add	r2, sp, #4
+     f74:	ebfffee7 	bl	b18 <i2c_read_bytes>
+
+	*buff = c[0];
+     f78:	e5dd3004 	ldrb	r3, [sp, #4]
+     f7c:	e5c43000 	strb	r3, [r4]
+	*(buff+1) = c[1];
+     f80:	e5dd3005 	ldrb	r3, [sp, #5]
+     f84:	e5c43001 	strb	r3, [r4, #1]
+	*(buff+2) = c[2];
+     f88:	e5dd3006 	ldrb	r3, [sp, #6]
+     f8c:	e5c43002 	strb	r3, [r4, #2]
+	*(buff+3) = c[3];
+     f90:	e5dd3007 	ldrb	r3, [sp, #7]
+     f94:	e5c43003 	strb	r3, [r4, #3]
+	*(buff+4) = c[4];
+     f98:	e5dd3008 	ldrb	r3, [sp, #8]
+     f9c:	e5c43004 	strb	r3, [r4, #4]
+	*(buff+5) = c[5];
+     fa0:	e5dd3009 	ldrb	r3, [sp, #9]
+     fa4:	e5c43005 	strb	r3, [r4, #5]
+	*(buff+6) = c[6];
+     fa8:	e5dd300a 	ldrb	r3, [sp, #10]
+     fac:	e5c43006 	strb	r3, [r4, #6]
+	*(buff+7) = c[7];
+     fb0:	e5dd300b 	ldrb	r3, [sp, #11]
+     fb4:	e5c43007 	strb	r3, [r4, #7]
+	*(buff+8) = c[8];
+     fb8:	e5dd300c 	ldrb	r3, [sp, #12]
+     fbc:	e5c43008 	strb	r3, [r4, #8]
+	*(buff+9) = c[9];
+     fc0:	e5dd300d 	ldrb	r3, [sp, #13]
+     fc4:	e5c43009 	strb	r3, [r4, #9]
+	*(buff+10) = c[10];
+     fc8:	e5dd300e 	ldrb	r3, [sp, #14]
+     fcc:	e5c4300a 	strb	r3, [r4, #10]
+	*(buff+11) = c[11];
+     fd0:	e5dd300f 	ldrb	r3, [sp, #15]
+     fd4:	e5c4300b 	strb	r3, [r4, #11]
+//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gy_h);
+//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gy_l);
+//
+//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gz_h);
+//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gz_l);
+}
+     fd8:	e28dd010 	add	sp, sp, #16
+     fdc:	e8bd4010 	pop	{r4, lr}
+     fe0:	e12fff1e 	bx	lr
+
+00000fe4 <main>:
+static unsigned short timestamp = 0;
+
+/**
+ * Entry point
+ */
+int main(void){
+     fe4:	e92d41f0 	push	{r4, r5, r6, r7, r8, lr}
+     fe8:	e24dd008 	sub	sp, sp, #8
+ * 													(P=1 -> PSEL=00, P=2 -> PSEL=01, P=4 -> PSEL=10, P=8 -> PSEL=11)
+ */
+inline void PLL_Init(void){
+
+#ifdef CRYSTAL12MHz
+	PLLCFG=0x24;                // 12MHz crystal      -> 60MHz
+     fec:	e59f34cc 	ldr	r3, [pc, #1228]	; 14c0 <main+0x4dc>
+     ff0:	e3a02024 	mov	r2, #36	; 0x24
+     ff4:	e5c32084 	strb	r2, [r3, #132]	; 0x84
+#endif
+#ifdef CRYSTAL14745600Hz
+	PLLCFG=0x23;                // 14.7456MHz crystal -> 58.9824MHz
+#endif
+
+	PLLCON=0x1;                 //PLLE = 1, PLLEnable
+     ff8:	e3a02001 	mov	r2, #1
+     ffc:	e5c32080 	strb	r2, [r3, #128]	; 0x80
+	PLLFEED=0xAA;               // Validation sequence
+    1000:	e3e02055 	mvn	r2, #85	; 0x55
+    1004:	e5c3208c 	strb	r2, [r3, #140]	; 0x8c
+	PLLFEED=0x55;               // Validation sequence
+    1008:	e28220ab 	add	r2, r2, #171	; 0xab
+    100c:	e5c3208c 	strb	r2, [r3, #140]	; 0x8c
+	while(!(PLLSTAT & 0x400)); // Wait PLL to lock
+    1010:	e1d328b8 	ldrh	r2, [r3, #136]	; 0x88
+    1014:	e3120b01 	tst	r2, #1024	; 0x400
+    1018:	0afffffc 	beq	1010 <main+0x2c>
+	PLLCON=0x3;                 // PLLC = 1, PLLConnect, Assert the PLL to be the cclk
+    101c:	e59f349c 	ldr	r3, [pc, #1180]	; 14c0 <main+0x4dc>
+    1020:	e3a02003 	mov	r2, #3
+    1024:	e5c32080 	strb	r2, [r3, #128]	; 0x80
+	PLLFEED=0xAA;               // Validation sequence
+    1028:	e3e02055 	mvn	r2, #85	; 0x55
+    102c:	e5c3208c 	strb	r2, [r3, #140]	; 0x8c
+	PLLFEED=0x55;               // Validation sequence
+    1030:	e28220ab 	add	r2, r2, #171	; 0xab
+    1034:	e5c3208c 	strb	r2, [r3, #140]	; 0x8c
+ * > 60MHz         -> MAMTIM = 4 CCLK
+ */
+inline void MAM_Init(void){
+
+#ifdef CRYSTAL12MHz
+	MAMTIM = 4; // 4 clock fetches
+    1038:	e3a02004 	mov	r2, #4
+    103c:	e5c32004 	strb	r2, [r3, #4]
+#endif
+#ifdef CRYSTAL14745600Hz
+	MAMTIM = 3; // 3 clock fetches
+#endif
+	MAMCR = 2;	// MAM functions fully enabled
+    1040:	e3a02002 	mov	r2, #2
+    1044:	e5c32000 	strb	r2, [r3]
+ * for PCLK = CCLK/4
+ */
+inline void APB_Init(void){
+	// peripheral clock = PCLK = CCLK/4
+	//APBDIV |= 0x02;
+	APBDIV &= ~0x03;
+    1048:	e2833c01 	add	r3, r3, #256	; 0x100
+    104c:	e5d32000 	ldrb	r2, [r3]
+    1050:	e20220fc 	and	r2, r2, #252	; 0xfc
+    1054:	e5c32000 	strb	r2, [r3]
+
+	PLL_Init(); // Turn on PLL clock
+	MAM_Init(); // Turn on MAM pre-fetcher
+	APB_Init(); // Turn on the peripheral devices clock divider
+
+	logger_init(); // uart0
+    1058:	ebfffd0d 	bl	494 <logger_init>
+#include "irq.h"
+
+static inline unsigned asm_get_cpsr(void)
+{
+  unsigned long retval;
+  asm volatile (" mrs  %0, cpsr" : "=r" (retval) : /* no inputs */  );
+    105c:	e10f3000 	mrs	r3, CPSR
+static inline unsigned enableIRQ(void)
+{
+  unsigned _cpsr;
+
+  _cpsr = asm_get_cpsr();
+  asm_set_cpsr(_cpsr & ~IRQ_MASK);
+    1060:	e3c33080 	bic	r3, r3, #128	; 0x80
+  return retval;
+}
+
+static inline void asm_set_cpsr(unsigned val)
+{
+  asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
+    1064:	e129f003 	msr	CPSR_fc, r3
+#include "irq.h"
+
+static inline unsigned asm_get_cpsr(void)
+{
+  unsigned long retval;
+  asm volatile (" mrs  %0, cpsr" : "=r" (retval) : /* no inputs */  );
+    1068:	e10f3000 	mrs	r3, CPSR
+static inline unsigned enableFIQ(void)
+{
+  unsigned _cpsr;
+
+  _cpsr = asm_get_cpsr();
+  asm_set_cpsr(_cpsr & ~FIQ_MASK);
+    106c:	e3c33040 	bic	r3, r3, #64	; 0x40
+  return retval;
+}
+
+static inline void asm_set_cpsr(unsigned val)
+{
+  asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
+    1070:	e129f003 	msr	CPSR_fc, r3
+inline void pulses_in_init(void){
+
+	log_string_debug(">> pulses_in_init\n");
+
+	// Set the pin function
+	PINSEL1 |= 0x1 << 0;  // EINT0
+    1074:	e59f4448 	ldr	r4, [pc, #1096]	; 14c4 <main+0x4e0>
+    1078:	e5943004 	ldr	r3, [r4, #4]
+    107c:	e3833001 	orr	r3, r3, #1
+    1080:	e5843004 	str	r3, [r4, #4]
+	PINSEL1 |= 0x2 << 22; // CAP2.0
+    1084:	e5943004 	ldr	r3, [r4, #4]
+    1088:	e3833502 	orr	r3, r3, #8388608	; 0x800000
+    108c:	e5843004 	str	r3, [r4, #4]
+	PINSEL1 |= 0x2 << 24; // CAP2.1
+    1090:	e5943004 	ldr	r3, [r4, #4]
+    1094:	e3833402 	orr	r3, r3, #33554432	; 0x2000000
+    1098:	e5843004 	str	r3, [r4, #4]
+	PINSEL1 |= 0x2 << 26; // CAP2.2
+    109c:	e5943004 	ldr	r3, [r4, #4]
+    10a0:	e3833302 	orr	r3, r3, #134217728	; 0x8000000
+    10a4:	e5843004 	str	r3, [r4, #4]
+
+	// EINT setup
+	EXTMODE |= 0x1 << 0; // EINT is edge sensitive
+    10a8:	e59f3418 	ldr	r3, [pc, #1048]	; 14c8 <main+0x4e4>
+    10ac:	e5d32048 	ldrb	r2, [r3, #72]	; 0x48
+    10b0:	e20220ff 	and	r2, r2, #255	; 0xff
+    10b4:	e3822001 	orr	r2, r2, #1
+    10b8:	e5c32048 	strb	r2, [r3, #72]	; 0x48
+	EXTPOLAR |= 0x1 << 0; // EINT is rising edge sensitive
+    10bc:	e5d3204c 	ldrb	r2, [r3, #76]	; 0x4c
+    10c0:	e20220ff 	and	r2, r2, #255	; 0xff
+    10c4:	e3822001 	orr	r2, r2, #1
+    10c8:	e5c3204c 	strb	r2, [r3, #76]	; 0x4c
+	EXTINT |= 0x1 << 0; // reset EINT0
+    10cc:	e5d32040 	ldrb	r2, [r3, #64]	; 0x40
+    10d0:	e20220ff 	and	r2, r2, #255	; 0xff
+    10d4:	e3822001 	orr	r2, r2, #1
+    10d8:	e5c32040 	strb	r2, [r3, #64]	; 0x40
+
+	// Timer Setup
+	T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
+    10dc:	e59f33e8 	ldr	r3, [pc, #1000]	; 14cc <main+0x4e8>
+    10e0:	e1d322b8 	ldrh	r2, [r3, #40]	; 0x28
+    10e4:	e3822005 	orr	r2, r2, #5
+    10e8:	e1c322b8 	strh	r2, [r3, #40]	; 0x28
+	T2CCR |= 0x5 << 3; // capture and interrupt on CAP2.1 rising edge
+    10ec:	e1d322b8 	ldrh	r2, [r3, #40]	; 0x28
+    10f0:	e3822028 	orr	r2, r2, #40	; 0x28
+    10f4:	e1c322b8 	strh	r2, [r3, #40]	; 0x28
+	T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
+    10f8:	e1d322b8 	ldrh	r2, [r3, #40]	; 0x28
+    10fc:	e3822d05 	orr	r2, r2, #320	; 0x140
+    1100:	e1c322b8 	strh	r2, [r3, #40]	; 0x28
+	T2TCR = 1; //enable T2
+    1104:	e3a06001 	mov	r6, #1
+    1108:	e5c36004 	strb	r6, [r3, #4]
+
+	// Enable the interrupts
+	VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
+    110c:	e3e05000 	mvn	r5, #0
+    1110:	e5153ff3 	ldr	r3, [r5, #-4083]	; 0xfffff00d
+    1114:	e3833901 	orr	r3, r3, #16384	; 0x4000
+    1118:	e5053ff3 	str	r3, [r5, #-4083]	; 0xfffff00d
+	VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
+    111c:	e5153fef 	ldr	r3, [r5, #-4079]	; 0xfffff011
+    1120:	e3833901 	orr	r3, r3, #16384	; 0x4000
+    1124:	e5053fef 	str	r3, [r5, #-4079]	; 0xfffff011
+	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
+    1128:	e5153ff3 	ldr	r3, [r5, #-4083]	; 0xfffff00d
+    112c:	e3833301 	orr	r3, r3, #67108864	; 0x4000000
+    1130:	e5053ff3 	str	r3, [r5, #-4083]	; 0xfffff00d
+	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
+    1134:	e5153fef 	ldr	r3, [r5, #-4079]	; 0xfffff011
+    1138:	e3833301 	orr	r3, r3, #67108864	; 0x4000000
+    113c:	e5053fef 	str	r3, [r5, #-4079]	; 0xfffff011
+inline void imu_init(void){
+
+	log_string_debug(">> imu_init\n");
+
+	// start the communication with the IMU
+	i2c_init();
+    1140:	ebfffe5b 	bl	ab4 <i2c_init>
+
+	// configure mpu and start taking samples
+	mpu_init();
+    1144:	ebffff3e 	bl	e44 <mpu_init>
+inline void adc_init(void){
+
+	log_string_debug(">> adc_init\n");
+
+	// Set the pin function
+	PINSEL1 |= 0x3 << 12; // AD0.0
+    1148:	e5943004 	ldr	r3, [r4, #4]
+    114c:	e3833a03 	orr	r3, r3, #12288	; 0x3000
+    1150:	e5843004 	str	r3, [r4, #4]
+	PINSEL1 |= 0x3 << 14; // AD0.1
+    1154:	e5943004 	ldr	r3, [r4, #4]
+    1158:	e3833903 	orr	r3, r3, #49152	; 0xc000
+    115c:	e5843004 	str	r3, [r4, #4]
+	PINSEL1 |= 0x3 << 16; // AD0.2
+    1160:	e5943004 	ldr	r3, [r4, #4]
+    1164:	e3833803 	orr	r3, r3, #196608	; 0x30000
+    1168:	e5843004 	str	r3, [r4, #4]
+	PINSEL0 |= 0x3 << 20; // AD0.3
+    116c:	e5943000 	ldr	r3, [r4]
+    1170:	e3833603 	orr	r3, r3, #3145728	; 0x300000
+    1174:	e5843000 	str	r3, [r4]
+	PINSEL0 |= 0x3 << 22; // AD0.4
+    1178:	e5943000 	ldr	r3, [r4]
+    117c:	e3833503 	orr	r3, r3, #12582912	; 0xc00000
+    1180:	e5843000 	str	r3, [r4]
+
+	// ADC setup
+	ADCR |= 0x01 << 16; // Start A/D Conversion in burst mode
+    1184:	e59f3344 	ldr	r3, [pc, #836]	; 14d0 <main+0x4ec>
+    1188:	e5932000 	ldr	r2, [r3]
+    118c:	e3822801 	orr	r2, r2, #65536	; 0x10000
+    1190:	e5832000 	str	r2, [r3]
+	ADCR |= 0x03 << 8; // 3,75MHz for adc if pclk=15MHz; 3,6864MHz if pclk=14.7456MHz
+    1194:	e5932000 	ldr	r2, [r3]
+    1198:	e3822c03 	orr	r2, r2, #768	; 0x300
+    119c:	e5832000 	str	r2, [r3]
+	ADCR |= 0x1F; // Read AD0.0 - AD0.4
+    11a0:	e5932000 	ldr	r2, [r3]
+    11a4:	e382201f 	orr	r2, r2, #31
+    11a8:	e5832000 	str	r2, [r3]
+	ADCR |= 0x01 << 21; // The ADC is operational
+    11ac:	e5932000 	ldr	r2, [r3]
+    11b0:	e3822602 	orr	r2, r2, #2097152	; 0x200000
+    11b4:	e5832000 	str	r2, [r3]
+inline void pwm_out_init(void){
+
+	log_string_debug(">> pwm_out_init\n");
+
+	// Set the pin function
+	PINSEL0 |= 0x2 << 6;  // MAT0.0
+    11b8:	e5943000 	ldr	r3, [r4]
+    11bc:	e3833080 	orr	r3, r3, #128	; 0x80
+    11c0:	e5843000 	str	r3, [r4]
+	PINSEL0 |= 0x2 << 10; // MAT0.1
+    11c4:	e5943000 	ldr	r3, [r4]
+    11c8:	e3833b02 	orr	r3, r3, #2048	; 0x800
+    11cc:	e5843000 	str	r3, [r4]
+	PINSEL0 |= 0x2 << 24; // MAT1.0
+    11d0:	e5943000 	ldr	r3, [r4]
+    11d4:	e3833402 	orr	r3, r3, #33554432	; 0x2000000
+    11d8:	e5843000 	str	r3, [r4]
+	PINSEL0 |= 0x2 << 26; // MAT1.1
+    11dc:	e5943000 	ldr	r3, [r4]
+    11e0:	e3833302 	orr	r3, r3, #134217728	; 0x8000000
+    11e4:	e5843000 	str	r3, [r4]
+
+#ifdef CRYSTAL12MHz
+	T0PR = 293; // 255 levels for T2TC in 5ms
+    11e8:	e59f22e4 	ldr	r2, [pc, #740]	; 14d4 <main+0x4f0>
+    11ec:	e59f12e4 	ldr	r1, [pc, #740]	; 14d8 <main+0x4f4>
+    11f0:	e582100c 	str	r1, [r2, #12]
+	T1PR = 293; // TC increments every PR + 1 PCLKs
+    11f4:	e59f32e0 	ldr	r3, [pc, #736]	; 14dc <main+0x4f8>
+    11f8:	e583100c 	str	r1, [r3, #12]
+#ifdef CRYSTAL14745600Hz
+	T0PR = 288; // 255 levels for T2TC in 5ms
+	T1PR = 288;
+#endif
+
+	T0PC = 0; // Prescale = 0
+    11fc:	e3a01000 	mov	r1, #0
+    1200:	e5821010 	str	r1, [r2, #16]
+	T1PC = 0;
+    1204:	e5831010 	str	r1, [r3, #16]
+	T0TC = 0; // Counter = 0
+    1208:	e5821008 	str	r1, [r2, #8]
+	T1TC = 0;
+    120c:	e5831008 	str	r1, [r3, #8]
+
+	T0MCR |= (0x1 << 10); // Reset the counter on MAT0.3
+    1210:	e1d201b4 	ldrh	r0, [r2, #20]
+    1214:	e3800b01 	orr	r0, r0, #1024	; 0x400
+    1218:	e1c201b4 	strh	r0, [r2, #20]
+	T1MCR |= (0x1 << 10); // Reset the counter on MAT1.3
+    121c:	e1d301b4 	ldrh	r0, [r3, #20]
+    1220:	e3800b01 	orr	r0, r0, #1024	; 0x400
+    1224:	e1c301b4 	strh	r0, [r3, #20]
+	T0MR3 = 255; // MAT0.3 every 255 counts (5ms)
+    1228:	e3a000ff 	mov	r0, #255	; 0xff
+    122c:	e5820024 	str	r0, [r2, #36]	; 0x24
+	T1MR3 = 255; // MAT1.3 every 255 counts (5ms)
+    1230:	e5830024 	str	r0, [r3, #36]	; 0x24
+
+	T0PWMCON |= (0x1 << 0); // MAT0.0 configured as PWM output
+    1234:	e5920074 	ldr	r0, [r2, #116]	; 0x74
+    1238:	e1800006 	orr	r0, r0, r6
+    123c:	e5820074 	str	r0, [r2, #116]	; 0x74
+	T0PWMCON |= (0x1 << 1); // MAT0.1 configured as PWM output
+    1240:	e5920074 	ldr	r0, [r2, #116]	; 0x74
+    1244:	e3800002 	orr	r0, r0, #2
+    1248:	e5820074 	str	r0, [r2, #116]	; 0x74
+	T1PWMCON |= (0x1 << 0); // MAT1.0 configured as PWM output
+    124c:	e5930074 	ldr	r0, [r3, #116]	; 0x74
+    1250:	e1800006 	orr	r0, r0, r6
+    1254:	e5830074 	str	r0, [r3, #116]	; 0x74
+	T1PWMCON |= (0x1 << 1); // MAT1.1 configured as PWM output
+    1258:	e5930074 	ldr	r0, [r3, #116]	; 0x74
+    125c:	e3800002 	orr	r0, r0, #2
+    1260:	e5830074 	str	r0, [r3, #116]	; 0x74
+
+	T0MR0 = 256; // initially LOW
+    1264:	e3a00c01 	mov	r0, #256	; 0x100
+    1268:	e5820018 	str	r0, [r2, #24]
+	T0MR1 = 256; // initially LOW
+    126c:	e582001c 	str	r0, [r2, #28]
+	T1MR0 = 256; // initially LOW
+    1270:	e5830018 	str	r0, [r3, #24]
+	T1MR1 = 256; // initially LOW
+    1274:	e583001c 	str	r0, [r3, #28]
+
+	T0TCR = 1; // enable T0
+    1278:	e5c26004 	strb	r6, [r2, #4]
+	T1TCR = 1; // enable T1
+    127c:	e5c36004 	strb	r6, [r3, #4]
+
+	log_string_debug(">> protocol_init\n");
+
+	volatile char dummy;
+
+	PINSEL0 |= 0x05 << 16; // Set the pins function
+    1280:	e5943000 	ldr	r3, [r4]
+    1284:	e3833805 	orr	r3, r3, #327680	; 0x50000
+    1288:	e5843000 	str	r3, [r4]
+	U1FCR    = 0x07; // FIFOControlRegister, Tx, Rx FIFO Reset and FIFO enable, Rx trigger = 1
+    128c:	e59f324c 	ldr	r3, [pc, #588]	; 14e0 <main+0x4fc>
+    1290:	e3a02007 	mov	r2, #7
+    1294:	e5c32008 	strb	r2, [r3, #8]
+	U1LCR 	 = 0x83; // DivisorLatchAccessBit = 1,  UART 8N1, allow access to divider-latches
+    1298:	e3e0207c 	mvn	r2, #124	; 0x7c
+    129c:	e5c3200c 	strb	r2, [r3, #12]
+
+#ifdef CRYSTAL12MHz
+	U1DLL	 = 0x06; // DivisorLatchLow bit
+    12a0:	e2822083 	add	r2, r2, #131	; 0x83
+    12a4:	e5c32000 	strb	r2, [r3]
+	U1DLM	 = 0x00; // DivisorLatchHigh bit
+    12a8:	e5c31004 	strb	r1, [r3, #4]
+	U1FDR	|= 0x05; // DivAddVal
+    12ac:	e5d32028 	ldrb	r2, [r3, #40]	; 0x28
+    12b0:	e20220ff 	and	r2, r2, #255	; 0xff
+    12b4:	e3822005 	orr	r2, r2, #5
+    12b8:	e5c32028 	strb	r2, [r3, #40]	; 0x28
+	U1FDR	|= 0x0E << 4; // MulVal = 14
+    12bc:	e5d32028 	ldrb	r2, [r3, #40]	; 0x28
+    12c0:	e38220e0 	orr	r2, r2, #224	; 0xe0
+    12c4:	e5c32028 	strb	r2, [r3, #40]	; 0x28
+#ifdef CRYSTAL14745600Hz
+	U1DLL	 = 0x08; // DivisorLatchLow bit
+	U1DLM	 = 0x00; // DivisorLatchHigh bit
+#endif
+
+	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
+    12c8:	e3a02003 	mov	r2, #3
+    12cc:	e5c3200c 	strb	r2, [r3, #12]
+
+	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the 2th vectored interruption slot
+    12d0:	e59f220c 	ldr	r2, [pc, #524]	; 14e4 <main+0x500>
+    12d4:	e5052ef7 	str	r2, [r5, #-3831]	; 0xfffff109
+	VICVectCntl2 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
+    12d8:	e3a02027 	mov	r2, #39	; 0x27
+    12dc:	e5052df7 	str	r2, [r5, #-3575]	; 0xfffff209
+	VICIntEnable |= 0x00000080; //source #7 enabled as FIQ or IRQ
+    12e0:	e5152fef 	ldr	r2, [r5, #-4079]	; 0xfffff011
+    12e4:	e3822080 	orr	r2, r2, #128	; 0x80
+    12e8:	e5052fef 	str	r2, [r5, #-4079]	; 0xfffff011
+
+	cmd_out.i = 0;
+    12ec:	e59f21f4 	ldr	r2, [pc, #500]	; 14e8 <main+0x504>
+    12f0:	e582103c 	str	r1, [r2, #60]	; 0x3c
+	cmd_in.i = 0;
+    12f4:	e5821014 	str	r1, [r2, #20]
+
+	dummy = U1IIR;   // Read IrqID - Required to Get Interrupts Started
+    12f8:	e5d32008 	ldrb	r2, [r3, #8]
+    12fc:	e20220ff 	and	r2, r2, #255	; 0xff
+    1300:	e5cd2007 	strb	r2, [sp, #7]
+	U1IER = 1;       // Enable UART1 RX (and THRE Interrupts)
+    1304:	e5c36004 	strb	r6, [r3, #4]
+ */
+inline void sampler_init(void){
+	log_string_debug(">> sampler_init\n");
+
+	// set pre scale for sample rate
+	T3PR = SAMPLE_RATE; // Increment the timer every PCLK
+    1308:	e2833919 	add	r3, r3, #409600	; 0x64000
+    130c:	e3a02a01 	mov	r2, #4096	; 0x1000
+    1310:	e1c320bc 	strh	r2, [r3, #12]
+
+	T3PC = 0;
+    1314:	e1c311b0 	strh	r1, [r3, #16]
+	T3TC = 0; // Counter = 0
+    1318:	e1c310b8 	strh	r1, [r3, #8]
+
+	T3MCR |= (0x1 << 0); // Interrupt on MAT3.0
+    131c:	e1d321b4 	ldrh	r2, [r3, #20]
+    1320:	e1822006 	orr	r2, r2, r6
+    1324:	e1c321b4 	strh	r2, [r3, #20]
+	T3MCR |= (0x1 << 1); // Reset the counter on MAT3.0
+    1328:	e1d321b4 	ldrh	r2, [r3, #20]
+    132c:	e3822002 	orr	r2, r2, #2
+    1330:	e1c321b4 	strh	r2, [r3, #20]
+
+#ifdef CRYSTAL12MHz
+	T3MR0 = 15000; // MAT3.0 every 15000/(SAMPLE_RATE + 1) counts (1ms/(SAMPLE_RATE + 1))
+    1334:	e59f21b0 	ldr	r2, [pc, #432]	; 14ec <main+0x508>
+    1338:	e1c321b8 	strh	r2, [r3, #24]
+#endif
+#ifdef CRYSTAL14745600Hz
+	T3MR0 = 14746; // MAT3.0 every 14746/(SAMPLE_RATE + 1) counts (1.000027127ms/(SAMPLE_RATE + 1))
+#endif
+
+	VICVectAddr1 = (unsigned int) &sample; //Setting the interrupt handler location
+    133c:	e59f21ac 	ldr	r2, [pc, #428]	; 14f0 <main+0x50c>
+    1340:	e5052efb 	str	r2, [r5, #-3835]	; 0xfffff105
+	VICVectCntl1 = 0x3B; //Vectored Interrupt slot enabled and with source #27 (TIMER3)
+    1344:	e3a0203b 	mov	r2, #59	; 0x3b
+    1348:	e5052dfb 	str	r2, [r5, #-3579]	; 0xfffff205
+	VICIntEnable |= 0x1 << 27; //source #27 enabled as FIQ or IRQ
+    134c:	e5152fef 	ldr	r2, [r5, #-4079]	; 0xfffff011
+    1350:	e3822302 	orr	r2, r2, #134217728	; 0x8000000
+    1354:	e5052fef 	str	r2, [r5, #-4079]	; 0xfffff011
+
+	T3TCR = 1; // enable T3
+    1358:	e5c36004 	strb	r6, [r3, #4]
+	adc_init(); // start reading the IR sensor signals			| Burst mode, no interruption
+	pwm_out_init(); // start pwm for the H bridges				| Timer 0 and Timer 1 operating in PWM mode, no interruption
+	protocol_init(); // start the communication protocol		| uart1, Priority 2
+	sampler_init(); // start taking samples at 1kHz				| Timer 3, 1kH, Priority 1
+
+	VICDefVectAddr = (unsigned int) &error;
+    135c:	e59f3190 	ldr	r3, [pc, #400]	; 14f4 <main+0x510>
+    1360:	e5053fcb 	str	r3, [r5, #-4043]	; 0xfffff035
+
+	//set_wheel_pwm(RIGHT_WHEEL,0x7F);
+	//set_wheel_pwm(LEFT_WHEEL,0x7F);
+
+	while (1) {
+		if (send_data) {
+    1364:	e59f317c 	ldr	r3, [pc, #380]	; 14e8 <main+0x504>
+			// while data available
+			while(data_out_pos != data_in_pos) {
+    1368:	e59f6188 	ldr	r6, [pc, #392]	; 14f8 <main+0x514>
+static unsigned short timestamp = 0;
+
+/**
+ * Entry point
+ */
+int main(void){
+    136c:	e2837058 	add	r7, r3, #88	; 0x58
+
+/**
+ *
+ */
+static inline void protocol_out_char(char c){
+	U1THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
+    1370:	e59f5168 	ldr	r5, [pc, #360]	; 14e0 <main+0x4fc>
+
+	//set_wheel_pwm(RIGHT_WHEEL,0x7F);
+	//set_wheel_pwm(LEFT_WHEEL,0x7F);
+
+	while (1) {
+		if (send_data) {
+    1374:	e5d32038 	ldrb	r2, [r3, #56]	; 0x38
+    1378:	e3520000 	cmp	r2, #0
+    137c:	0afffffc 	beq	1374 <main+0x390>
+    1380:	ea000044 	b	1498 <main+0x4b4>
+			// while data available
+			while(data_out_pos != data_in_pos) {
+				// send next data
+				data_out_pos = ++data_out_pos % DATA_BUFF_SIZE;
+    1384:	e1d326b0 	ldrh	r2, [r3, #96]	; 0x60
+    1388:	e2822001 	add	r2, r2, #1
+    138c:	e1a02802 	lsl	r2, r2, #16
+    1390:	e1a02822 	lsr	r2, r2, #16
+    1394:	e1c326b0 	strh	r2, [r3, #96]	; 0x60
+    1398:	e1d326b0 	ldrh	r2, [r3, #96]	; 0x60
+    139c:	e20220ff 	and	r2, r2, #255	; 0xff
+    13a0:	e1c326b0 	strh	r2, [r3, #96]	; 0x60
+
+				struct sensors_data* data;
+				data = &(sensors_data_buff[data_out_pos]);
+    13a4:	e1d316b0 	ldrh	r1, [r3, #96]	; 0x60
+
+				// encoders
+				cmd_out.buff[0] = (data->encoder_left >> 0x8) & 0xFF;
+    13a8:	e0811081 	add	r1, r1, r1, lsl #1
+    13ac:	e0831181 	add	r1, r3, r1, lsl #3
+    13b0:	e1d126b4 	ldrh	r2, [r1, #100]	; 0x64
+    13b4:	e1a08422 	lsr	r8, r2, #8
+    13b8:	e5c38040 	strb	r8, [r3, #64]	; 0x40
+				cmd_out.buff[1] = data->encoder_left & 0xFF;
+    13bc:	e5c32041 	strb	r2, [r3, #65]	; 0x41
+				cmd_out.buff[2] = (data->encoder_right >> 0x8) & 0xFF;
+    13c0:	e1d126b6 	ldrh	r2, [r1, #102]	; 0x66
+    13c4:	e1a08422 	lsr	r8, r2, #8
+    13c8:	e5c38042 	strb	r8, [r3, #66]	; 0x42
+				cmd_out.buff[3] = data->encoder_right & 0xFF;
+    13cc:	e5c32043 	strb	r2, [r3, #67]	; 0x43
+
+				// Infra Red
+				cmd_out.buff[4] = data->ir_l;
+    13d0:	e5d1806c 	ldrb	r8, [r1, #108]	; 0x6c
+    13d4:	e5c38044 	strb	r8, [r3, #68]	; 0x44
+				cmd_out.buff[5] = data->ir_ml;
+    13d8:	e5d1806b 	ldrb	r8, [r1, #107]	; 0x6b
+    13dc:	e5c38045 	strb	r8, [r3, #69]	; 0x45
+				cmd_out.buff[6] = data->ir_m;
+    13e0:	e5d1806a 	ldrb	r8, [r1, #106]	; 0x6a
+    13e4:	e5c38046 	strb	r8, [r3, #70]	; 0x46
+				cmd_out.buff[7] = data->ir_mr;
+    13e8:	e5d18069 	ldrb	r8, [r1, #105]	; 0x69
+    13ec:	e5c38047 	strb	r8, [r3, #71]	; 0x47
+				cmd_out.buff[8] = data->ir_r;
+    13f0:	e5d10068 	ldrb	r0, [r1, #104]	; 0x68
+    13f4:	e5c30048 	strb	r0, [r3, #72]	; 0x48
+
+				// IMU data
+				cmd_out.buff[9] = data->ax_h;
+    13f8:	e5d1006d 	ldrb	r0, [r1, #109]	; 0x6d
+    13fc:	e5c30049 	strb	r0, [r3, #73]	; 0x49
+				cmd_out.buff[10] = data->ax_l;
+    1400:	e5d1006e 	ldrb	r0, [r1, #110]	; 0x6e
+    1404:	e5c3004a 	strb	r0, [r3, #74]	; 0x4a
+				cmd_out.buff[11] = data->ay_h;
+    1408:	e5d1006f 	ldrb	r0, [r1, #111]	; 0x6f
+    140c:	e5c3004b 	strb	r0, [r3, #75]	; 0x4b
+				cmd_out.buff[12] = data->ay_l;
+    1410:	e5d10070 	ldrb	r0, [r1, #112]	; 0x70
+    1414:	e5c3004c 	strb	r0, [r3, #76]	; 0x4c
+				cmd_out.buff[13] = data->az_h;
+    1418:	e5d10071 	ldrb	r0, [r1, #113]	; 0x71
+    141c:	e5c3004d 	strb	r0, [r3, #77]	; 0x4d
+				cmd_out.buff[14] = data->az_l;
+    1420:	e5d10072 	ldrb	r0, [r1, #114]	; 0x72
+    1424:	e5c3004e 	strb	r0, [r3, #78]	; 0x4e
+				cmd_out.buff[15] = data->gx_h;
+    1428:	e5d12073 	ldrb	r2, [r1, #115]	; 0x73
+    142c:	e5c3204f 	strb	r2, [r3, #79]	; 0x4f
+				cmd_out.buff[16] = data->gx_l;
+    1430:	e2812074 	add	r2, r1, #116	; 0x74
+    1434:	e5d11074 	ldrb	r1, [r1, #116]	; 0x74
+    1438:	e5c31050 	strb	r1, [r3, #80]	; 0x50
+				cmd_out.buff[17] = data->gy_h;
+    143c:	e5d21001 	ldrb	r1, [r2, #1]
+    1440:	e5c31051 	strb	r1, [r3, #81]	; 0x51
+				cmd_out.buff[18] = data->gy_l;
+    1444:	e5d21002 	ldrb	r1, [r2, #2]
+    1448:	e5c31052 	strb	r1, [r3, #82]	; 0x52
+				cmd_out.buff[19] = data->gz_h;
+    144c:	e5d21003 	ldrb	r1, [r2, #3]
+    1450:	e5c31053 	strb	r1, [r3, #83]	; 0x53
+				cmd_out.buff[20] = data->gz_l;
+    1454:	e5d21004 	ldrb	r1, [r2, #4]
+    1458:	e5c31054 	strb	r1, [r3, #84]	; 0x54
+
+				// Timestamp
+				cmd_out.buff[21] = (data->timestamp >> 8) & 0xFF;
+    145c:	e1d220b6 	ldrh	r2, [r2, #6]
+    1460:	e1a01422 	lsr	r1, r2, #8
+    1464:	e5c31055 	strb	r1, [r3, #85]	; 0x55
+				cmd_out.buff[22] = data->timestamp & 0xFF;
+    1468:	e5c32056 	strb	r2, [r3, #86]	; 0x56
+
+				// end cmd
+				cmd_out.buff[23] = END_CMD;
+    146c:	e5c34057 	strb	r4, [r3, #87]	; 0x57
+				cmd_out.buff[24] = '\n';
+    1470:	e5c3e058 	strb	lr, [r3, #88]	; 0x58
+    1474:	e283103f 	add	r1, r3, #63	; 0x3f
+/**
+ *
+ */
+static inline void protocol_out_cmd(){
+	for (unsigned short i = 0; i < cmd_out.i; i++)
+		protocol_out_char(cmd_out.buff[i]);
+    1478:	e5f12001 	ldrb	r2, [r1, #1]!
+
+/**
+ *
+ */
+static inline void protocol_out_char(char c){
+	U1THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
+    147c:	e5c52000 	strb	r2, [r5]
+	while(!(U1LSR & 0x40));
+    1480:	e5d52014 	ldrb	r2, [r5, #20]
+    1484:	e3120040 	tst	r2, #64	; 0x40
+    1488:	0afffffc 	beq	1480 <main+0x49c>
+
+/**
+ *
+ */
+static inline void protocol_out_cmd(){
+	for (unsigned short i = 0; i < cmd_out.i; i++)
+    148c:	e1510007 	cmp	r1, r7
+    1490:	0a000003 	beq	14a4 <main+0x4c0>
+    1494:	eafffff7 	b	1478 <main+0x494>
+	//set_wheel_pwm(LEFT_WHEEL,0x7F);
+
+	while (1) {
+		if (send_data) {
+			// while data available
+			while(data_out_pos != data_in_pos) {
+    1498:	e59fc05c 	ldr	ip, [pc, #92]	; 14fc <main+0x518>
+				// Timestamp
+				cmd_out.buff[21] = (data->timestamp >> 8) & 0xFF;
+				cmd_out.buff[22] = data->timestamp & 0xFF;
+
+				// end cmd
+				cmd_out.buff[23] = END_CMD;
+    149c:	e3e04001 	mvn	r4, #1
+				cmd_out.buff[24] = '\n';
+    14a0:	e3a0e00a 	mov	lr, #10
+	//set_wheel_pwm(LEFT_WHEEL,0x7F);
+
+	while (1) {
+		if (send_data) {
+			// while data available
+			while(data_out_pos != data_in_pos) {
+    14a4:	e1d316b0 	ldrh	r1, [r3, #96]	; 0x60
+    14a8:	e19620bc 	ldrh	r2, [r6, ip]
+    14ac:	e1510002 	cmp	r1, r2
+    14b0:	1affffb3 	bne	1384 <main+0x3a0>
+				cmd_out.i = 25;
+
+				protocol_out_cmd();
+			}
+
+			send_data = 0;
+    14b4:	e3a02000 	mov	r2, #0
+    14b8:	e5c32038 	strb	r2, [r3, #56]	; 0x38
+    14bc:	eaffffac 	b	1374 <main+0x390>
+    14c0:	e01fc000 	.word	0xe01fc000
+    14c4:	e002c000 	.word	0xe002c000
+    14c8:	e01fc100 	.word	0xe01fc100
+    14cc:	e0070000 	.word	0xe0070000
+    14d0:	e0034000 	.word	0xe0034000
+    14d4:	e0004000 	.word	0xe0004000
+    14d8:	00000125 	.word	0x00000125
+    14dc:	e0008000 	.word	0xe0008000
+    14e0:	e0010000 	.word	0xe0010000
+    14e4:	000002e8 	.word	0x000002e8
+    14e8:	4000009c 	.word	0x4000009c
+    14ec:	00003a98 	.word	0x00003a98
+    14f0:	00001714 	.word	0x00001714
+    14f4:	00000650 	.word	0x00000650
+    14f8:	40002094 	.word	0x40002094
+    14fc:	fffff86c 	.word	0xfffff86c
+
+00001500 <pulse_in>:
+ *
+ * Count the encoder pulses using CAP2.0-2 and EINT0 as interrupt sources
+ *
+ * Handle i2c requests
+ */
+void pulse_in(void) {
+    1500:	e92d000c 	push	{r2, r3}
+
+	log_string_debug(">> pulse_in\n");
+
+	const unsigned short ir = T2IR;
+    1504:	e59f311c 	ldr	r3, [pc, #284]	; 1628 <pulse_in+0x128>
+    1508:	e5d33000 	ldrb	r3, [r3]
+    150c:	e20320ff 	and	r2, r3, #255	; 0xff
+
+	// pulses in int
+	if (ir & (0x1 << 4)) { //CAP2.0 left encoder
+    1510:	e3130010 	tst	r3, #16
+    1514:	0a000009 	beq	1540 <pulse_in+0x40>
+		//log_string_debug("FIQ2\n");
+		forward_l--;
+    1518:	e59f310c 	ldr	r3, [pc, #268]	; 162c <pulse_in+0x12c>
+    151c:	e5132790 	ldr	r2, [r3, #-1936]	; 0xfffff870
+    1520:	e2422001 	sub	r2, r2, #1
+    1524:	e5032790 	str	r2, [r3, #-1936]	; 0xfffff870
+		T2IR |= 0x1 << 4; // reset CAP2.0
+    1528:	e59f30f8 	ldr	r3, [pc, #248]	; 1628 <pulse_in+0x128>
+    152c:	e5d32000 	ldrb	r2, [r3]
+    1530:	e20220ff 	and	r2, r2, #255	; 0xff
+    1534:	e3822010 	orr	r2, r2, #16
+    1538:	e5c32000 	strb	r2, [r3]
+    153c:	ea000034 	b	1614 <pulse_in+0x114>
+	}
+	else if (ir & (0x1 << 5)) { //CAP2.1 right encoder
+    1540:	e3120020 	tst	r2, #32
+    1544:	0a000011 	beq	1590 <pulse_in+0x90>
+		//log_string_debug("FIQ3\n");
+		forward_r++;
+    1548:	e59f20dc 	ldr	r2, [pc, #220]	; 162c <pulse_in+0x12c>
+    154c:	e512378c 	ldr	r3, [r2, #-1932]	; 0xfffff874
+    1550:	e2833001 	add	r3, r3, #1
+    1554:	e502378c 	str	r3, [r2, #-1932]	; 0xfffff874
+		if (forward_r > 0)
+    1558:	e3530000 	cmp	r3, #0
+			encoder_count[1]++;
+    155c:	c1a03002 	movgt	r3, r2
+    1560:	c5122784 	ldrgt	r2, [r2, #-1924]	; 0xfffff87c
+    1564:	c2822001 	addgt	r2, r2, #1
+		else
+			encoder_count[1]--;
+    1568:	d59f30bc 	ldrle	r3, [pc, #188]	; 162c <pulse_in+0x12c>
+    156c:	d5132784 	ldrle	r2, [r3, #-1924]	; 0xfffff87c
+    1570:	d2422001 	suble	r2, r2, #1
+    1574:	e5032784 	str	r2, [r3, #-1924]	; 0xfffff87c
+		T2IR |= 0x1 << 5; // reset CAP2.1
+    1578:	e59f30a8 	ldr	r3, [pc, #168]	; 1628 <pulse_in+0x128>
+    157c:	e5d32000 	ldrb	r2, [r3]
+    1580:	e20220ff 	and	r2, r2, #255	; 0xff
+    1584:	e3822020 	orr	r2, r2, #32
+    1588:	e5c32000 	strb	r2, [r3]
+    158c:	ea000020 	b	1614 <pulse_in+0x114>
+	}
+	else if (ir & (0x1 << 6)) { //CAP2.2 right encoder
+    1590:	e3120040 	tst	r2, #64	; 0x40
+    1594:	0a000009 	beq	15c0 <pulse_in+0xc0>
+		//log_string_debug("FIQ4\n");
+		forward_r--;
+    1598:	e59f308c 	ldr	r3, [pc, #140]	; 162c <pulse_in+0x12c>
+    159c:	e513278c 	ldr	r2, [r3, #-1932]	; 0xfffff874
+    15a0:	e2422001 	sub	r2, r2, #1
+    15a4:	e503278c 	str	r2, [r3, #-1932]	; 0xfffff874
+		T2IR |= 0x1 << 6; // reset CAP2.2
+    15a8:	e59f3078 	ldr	r3, [pc, #120]	; 1628 <pulse_in+0x128>
+    15ac:	e5d32000 	ldrb	r2, [r3]
+    15b0:	e20220ff 	and	r2, r2, #255	; 0xff
+    15b4:	e3822040 	orr	r2, r2, #64	; 0x40
+    15b8:	e5c32000 	strb	r2, [r3]
+    15bc:	ea000014 	b	1614 <pulse_in+0x114>
+	}
+	else if (EXTINT & 0x1 << 0) { // EINT0 left encoder
+    15c0:	e59f3068 	ldr	r3, [pc, #104]	; 1630 <pulse_in+0x130>
+    15c4:	e5d33040 	ldrb	r3, [r3, #64]	; 0x40
+    15c8:	e3130001 	tst	r3, #1
+    15cc:	0a000010 	beq	1614 <pulse_in+0x114>
+		//log_string_debug("FIQ1\n");
+		forward_l++;
+    15d0:	e59f2054 	ldr	r2, [pc, #84]	; 162c <pulse_in+0x12c>
+    15d4:	e5123790 	ldr	r3, [r2, #-1936]	; 0xfffff870
+    15d8:	e2833001 	add	r3, r3, #1
+    15dc:	e5023790 	str	r3, [r2, #-1936]	; 0xfffff870
+		if (forward_l > 0)
+    15e0:	e3530000 	cmp	r3, #0
+			encoder_count[0]++;
+    15e4:	c1a03002 	movgt	r3, r2
+    15e8:	c5122788 	ldrgt	r2, [r2, #-1928]	; 0xfffff878
+    15ec:	c2822001 	addgt	r2, r2, #1
+		else
+			encoder_count[0]--;
+    15f0:	d59f3034 	ldrle	r3, [pc, #52]	; 162c <pulse_in+0x12c>
+    15f4:	d5132788 	ldrle	r2, [r3, #-1928]	; 0xfffff878
+    15f8:	d2422001 	suble	r2, r2, #1
+    15fc:	e5032788 	str	r2, [r3, #-1928]	; 0xfffff878
+		EXTINT |= 0x1 << 0; // reset EINT0
+    1600:	e59f3028 	ldr	r3, [pc, #40]	; 1630 <pulse_in+0x130>
+    1604:	e5d32040 	ldrb	r2, [r3, #64]	; 0x40
+    1608:	e20220ff 	and	r2, r2, #255	; 0xff
+    160c:	e3822001 	orr	r2, r2, #1
+    1610:	e5c32040 	strb	r2, [r3, #64]	; 0x40
+	}
+
+	log_string_debug("<< pulse_in\n");
+
+	VICVectAddr = 0;
+    1614:	e3a02000 	mov	r2, #0
+    1618:	e3e03000 	mvn	r3, #0
+    161c:	e5032fcf 	str	r2, [r3, #-4047]	; 0xfffff031
+}
+    1620:	e8bd000c 	pop	{r2, r3}
+    1624:	e25ef004 	subs	pc, lr, #4
+    1628:	e0070000 	.word	0xe0070000
+    162c:	40002094 	.word	0x40002094
+    1630:	e01fc100 	.word	0xe01fc100
+
+00001634 <get_ir_sensor_data>:
+ */
+void get_ir_sensor_data(char * buff) {
+
+	unsigned short val;
+
+	while(ADDR0 & ((0x1 << 31) == 0));
+    1634:	e59f30a0 	ldr	r3, [pc, #160]	; 16dc <get_ir_sensor_data+0xa8>
+    1638:	e5932010 	ldr	r2, [r3, #16]
+	val = (ADDR0 >> 6) & 0x3FF;
+    163c:	e5932010 	ldr	r2, [r3, #16]
+	val >>= 0x2; // they want a value from 1 to 255
+    1640:	e1a02422 	lsr	r2, r2, #8
+	val += (val == 0);
+    1644:	e21220ff 	ands	r2, r2, #255	; 0xff
+    1648:	13a01000 	movne	r1, #0
+    164c:	03a01001 	moveq	r1, #1
+    1650:	e0812002 	add	r2, r1, r2
+	*buff = (char) val;
+    1654:	e5c02000 	strb	r2, [r0]
+
+	while(ADDR1 & ((0x1 << 31) == 0));
+    1658:	e5932014 	ldr	r2, [r3, #20]
+	val = (ADDR1 >> 6) & 0x3FF;
+    165c:	e5932014 	ldr	r2, [r3, #20]
+	val >>= 0x2; // they want a value from 1 to 255
+    1660:	e1a02422 	lsr	r2, r2, #8
+	val += (val == 0);
+    1664:	e21220ff 	ands	r2, r2, #255	; 0xff
+    1668:	13a01000 	movne	r1, #0
+    166c:	03a01001 	moveq	r1, #1
+    1670:	e0812002 	add	r2, r1, r2
+	*(buff+1) = (char) val;
+    1674:	e5c02001 	strb	r2, [r0, #1]
+
+	while(ADDR2 & ((0x1 << 31) == 0));
+    1678:	e5932018 	ldr	r2, [r3, #24]
+	val = (ADDR2 >> 6) & 0x3FF;
+    167c:	e5932018 	ldr	r2, [r3, #24]
+	val >>= 0x2; // they want a value from 1 to 255
+    1680:	e1a02422 	lsr	r2, r2, #8
+	val += (val == 0);
+    1684:	e21220ff 	ands	r2, r2, #255	; 0xff
+    1688:	13a01000 	movne	r1, #0
+    168c:	03a01001 	moveq	r1, #1
+    1690:	e0812002 	add	r2, r1, r2
+	*(buff+2) = (char) val;
+    1694:	e5c02002 	strb	r2, [r0, #2]
+
+	while(ADDR3 & ((0x1 << 31) == 0));
+    1698:	e593201c 	ldr	r2, [r3, #28]
+	val = (ADDR3 >> 6) & 0x3FF;
+    169c:	e593201c 	ldr	r2, [r3, #28]
+	val >>= 0x2; // they want a value from 1 to 255
+    16a0:	e1a02422 	lsr	r2, r2, #8
+	val += (val == 0);
+    16a4:	e21220ff 	ands	r2, r2, #255	; 0xff
+    16a8:	13a01000 	movne	r1, #0
+    16ac:	03a01001 	moveq	r1, #1
+    16b0:	e0812002 	add	r2, r1, r2
+	*(buff+3) = (char) val;
+    16b4:	e5c02003 	strb	r2, [r0, #3]
+
+	while(ADDR4 & ((0x1 << 31) == 0));
+    16b8:	e5932020 	ldr	r2, [r3, #32]
+	val = (ADDR4 >> 6) & 0x3FF;
+    16bc:	e5933020 	ldr	r3, [r3, #32]
+	val >>= 0x2; // they want a value from 1 to 255
+    16c0:	e1a03423 	lsr	r3, r3, #8
+	val += (val == 0);
+    16c4:	e21330ff 	ands	r3, r3, #255	; 0xff
+    16c8:	13a02000 	movne	r2, #0
+    16cc:	03a02001 	moveq	r2, #1
+    16d0:	e0823003 	add	r3, r2, r3
+	*(buff+4) = (char) val;
+    16d4:	e5c03004 	strb	r3, [r0, #4]
+}
+    16d8:	e12fff1e 	bx	lr
+    16dc:	e0034000 	.word	0xe0034000
+
+000016e0 <get_encoders_count>:
+ * Return the count value read from the i'th sensor
+ */
+void get_encoders_count(short * left_encoder, short * right_encoder) {
+
+	int val;
+	val = encoder_count[ENCODER_L - ENCODER_L];
+    16e0:	e59f3028 	ldr	r3, [pc, #40]	; 1710 <get_encoders_count+0x30>
+    16e4:	e5132788 	ldr	r2, [r3, #-1928]	; 0xfffff878
+	*left_encoder = val - sent_encoder_count[ENCODER_L - ENCODER_L];
+    16e8:	e513c780 	ldr	ip, [r3, #-1920]	; 0xfffff880
+    16ec:	e06cc002 	rsb	ip, ip, r2
+    16f0:	e1c0c0b0 	strh	ip, [r0]
+	sent_encoder_count[ENCODER_L - ENCODER_L] = val;
+    16f4:	e5032780 	str	r2, [r3, #-1920]	; 0xfffff880
+
+	val = encoder_count[ENCODER_R - ENCODER_L];
+    16f8:	e5132784 	ldr	r2, [r3, #-1924]	; 0xfffff87c
+	*right_encoder = val - sent_encoder_count[ENCODER_R - ENCODER_L];
+    16fc:	e513077c 	ldr	r0, [r3, #-1916]	; 0xfffff884
+    1700:	e0600002 	rsb	r0, r0, r2
+    1704:	e1c100b0 	strh	r0, [r1]
+	sent_encoder_count[ENCODER_R - ENCODER_L] = val;
+    1708:	e503277c 	str	r2, [r3, #-1916]	; 0xfffff884
+}
+    170c:	e12fff1e 	bx	lr
+    1710:	40002094 	.word	0x40002094
+
+00001714 <sample>:
+
+/**
+ * Sample sensors every 1ms (1kHz)
+ * data_in_pos -
+ */
+void sample(void) {
+    1714:	e24ee004 	sub	lr, lr, #4
+    1718:	e92d53ff 	push	{r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, ip, lr}
+	const unsigned short ir = T3IR;
+    171c:	e59f3118 	ldr	r3, [pc, #280]	; 183c <sample+0x128>
+    1720:	e5d33000 	ldrb	r3, [r3]
+	if(ir & 0x1) { // MAT3.0
+    1724:	e3130001 	tst	r3, #1
+    1728:	0a00003f 	beq	182c <sample+0x118>
+		log_string_debug(">> sample\n");
+
+		log_string_debug("IENABLE\n");
+		// enable nested interrupts for i2c and FIQ
+		T3IR |= 0x1 << 0; // clear MAT3.0 interrupt
+    172c:	e59f3108 	ldr	r3, [pc, #264]	; 183c <sample+0x128>
+    1730:	e5d32000 	ldrb	r2, [r3]
+    1734:	e20220ff 	and	r2, r2, #255	; 0xff
+    1738:	e3822001 	orr	r2, r2, #1
+    173c:	e5c32000 	strb	r2, [r3]
+		IENABLE
+    1740:	e14fe000 	mrs	lr, SPSR
+    1744:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
+    1748:	e321f01f 	msr	CPSR_c, #31
+    174c:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
+
+		// next position in buffer
+		data_in_pos = ++data_in_pos % DATA_BUFF_SIZE;
+    1750:	e59f20e8 	ldr	r2, [pc, #232]	; 1840 <sample+0x12c>
+    1754:	e59f30e8 	ldr	r3, [pc, #232]	; 1844 <sample+0x130>
+    1758:	e19210b3 	ldrh	r1, [r2, r3]
+    175c:	e2811001 	add	r1, r1, #1
+    1760:	e1a01801 	lsl	r1, r1, #16
+    1764:	e1a01821 	lsr	r1, r1, #16
+    1768:	e18210b3 	strh	r1, [r2, r3]
+    176c:	e19210b3 	ldrh	r1, [r2, r3]
+    1770:	e20110ff 	and	r1, r1, #255	; 0xff
+    1774:	e18210b3 	strh	r1, [r2, r3]
+
+		// check for overflow
+		if (data_in_pos == data_out_pos) {
+    1778:	e19220b3 	ldrh	r2, [r2, r3]
+    177c:	e59f30c4 	ldr	r3, [pc, #196]	; 1848 <sample+0x134>
+    1780:	e1d336b0 	ldrh	r3, [r3, #96]	; 0x60
+    1784:	e1520003 	cmp	r2, r3
+    1788:	1a00000a 	bne	17b8 <sample+0xa4>
+			log_string_warning("LPC overflow\n");
+    178c:	e59f00b8 	ldr	r0, [pc, #184]	; 184c <sample+0x138>
+    1790:	ebfffb9e 	bl	610 <log_string>
+			// the oldest data will be overwritten
+			data_out_pos = ++data_out_pos % DATA_BUFF_SIZE;
+    1794:	e59f30ac 	ldr	r3, [pc, #172]	; 1848 <sample+0x134>
+    1798:	e1d326b0 	ldrh	r2, [r3, #96]	; 0x60
+    179c:	e2822001 	add	r2, r2, #1
+    17a0:	e1a02802 	lsl	r2, r2, #16
+    17a4:	e1a02822 	lsr	r2, r2, #16
+    17a8:	e1c326b0 	strh	r2, [r3, #96]	; 0x60
+    17ac:	e1d326b0 	ldrh	r2, [r3, #96]	; 0x60
+    17b0:	e20220ff 	and	r2, r2, #255	; 0xff
+    17b4:	e1c326b0 	strh	r2, [r3, #96]	; 0x60
+		}
+
+		// read data and put on local circular buffer
+		struct sensors_data* data;
+		data = &(sensors_data_buff[data_in_pos]);
+    17b8:	e59f7080 	ldr	r7, [pc, #128]	; 1840 <sample+0x12c>
+    17bc:	e59f3080 	ldr	r3, [pc, #128]	; 1844 <sample+0x130>
+    17c0:	e19740b3 	ldrh	r4, [r7, r3]
+
+		// read encoder counts
+		get_encoders_count(&(data->encoder_left), &(data->encoder_right));
+    17c4:	e59f807c 	ldr	r8, [pc, #124]	; 1848 <sample+0x134>
+    17c8:	e2885064 	add	r5, r8, #100	; 0x64
+    17cc:	e1a06084 	lsl	r6, r4, #1
+    17d0:	e0861004 	add	r1, r6, r4
+    17d4:	e0851181 	add	r1, r5, r1, lsl #3
+    17d8:	e1a00001 	mov	r0, r1
+    17dc:	e2811002 	add	r1, r1, #2
+    17e0:	ebffffbe 	bl	16e0 <get_encoders_count>
+
+		// read the last IMU data
+		mpu_get_motion6(&(data->ax_h));
+    17e4:	e0863004 	add	r3, r6, r4
+    17e8:	e0855183 	add	r5, r5, r3, lsl #3
+    17ec:	e2850009 	add	r0, r5, #9
+    17f0:	e2855008 	add	r5, r5, #8
+    17f4:	ebfffdb6 	bl	ed4 <mpu_get_motion6>
+
+		// read IR data
+		get_ir_sensor_data(&(data->ir_l));
+    17f8:	e1a00005 	mov	r0, r5
+    17fc:	ebffff8c 	bl	1634 <get_ir_sensor_data>
+
+		data->timestamp = timestamp++;
+    1800:	e59f3048 	ldr	r3, [pc, #72]	; 1850 <sample+0x13c>
+    1804:	e19720b3 	ldrh	r2, [r7, r3]
+    1808:	e0864004 	add	r4, r6, r4
+    180c:	e0888184 	add	r8, r8, r4, lsl #3
+    1810:	e1c827ba 	strh	r2, [r8, #122]	; 0x7a
+    1814:	e2822001 	add	r2, r2, #1
+    1818:	e18720b3 	strh	r2, [r7, r3]
+
+		log_string_debug("IDISABLE\n");
+		IDISABLE
+    181c:	e49de004 	pop	{lr}		; (ldr lr, [sp], #4)
+    1820:	e321f092 	msr	CPSR_c, #146	; 0x92
+    1824:	e49de004 	pop	{lr}		; (ldr lr, [sp], #4)
+    1828:	e16ff00e 	msr	SPSR_fsxc, lr
+
+		log_string_debug("<< sample\n");
+	}
+
+	VICVectAddr = 0;
+    182c:	e3a02000 	mov	r2, #0
+    1830:	e3e03000 	mvn	r3, #0
+    1834:	e5032fcf 	str	r2, [r3, #-4047]	; 0xfffff031
+}
+    1838:	e8fd93ff 	ldm	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, ip, pc}^
+    183c:	e0074000 	.word	0xe0074000
+    1840:	40002094 	.word	0x40002094
+    1844:	fffff86c 	.word	0xfffff86c
+    1848:	4000009c 	.word	0x4000009c
+    184c:	00001884 	.word	0x00001884
+    1850:	fffff888 	.word	0xfffff888
+
+00001854 <ascii>:
+    1854:	33323130 37363534 42413938 46454443     0123456789ABCDEF
+    1864:	00000000 20717269 6f727265 00000072     ....irq error...
+    1874:	6332695b 6564205d 6c756166 00203a74     [i2c] default: .
+    1884:	2043504c 7265766f 776f6c66 0000000a     LPC overflow....

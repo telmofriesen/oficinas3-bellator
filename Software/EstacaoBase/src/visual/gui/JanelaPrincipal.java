@@ -12,7 +12,7 @@ import dados.Mapa;
 import dados.MovementKeyboardListener;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
-import comunicacao.ClientMessageInterpreter;
+import comunicacao.ClientMessageProcessor;
 import comunicacao.ClientConnector;
 import events.MyChangeEvent;
 import events.MyChangeListener;
@@ -76,7 +76,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 //    private Player webcamPlayer;
 //    private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 //    Canvas canvas;
-    private final EmbeddedMediaPlayerComponent mediaPlayerComponent;
+//    private final EmbeddedMediaPlayerComponent mediaPlayerComponent;
     private VideoInfoListener videoInfoListener;
 
     /**
@@ -92,7 +92,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         connector = new ClientConnector();
         controleCamera = new ControleCamera();
         controleMotores = new ControleMotores();
-        ClientMessageInterpreter interpreter = new ClientMessageInterpreter(connector, controleSensores, controleCamera);
+        ClientMessageProcessor interpreter = new ClientMessageProcessor(connector, controleSensores, controleCamera);
         connector.setInterpreter(interpreter);
         //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
@@ -101,9 +101,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         interpreter.start();
         connector.start();
 
-        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-        webcamImagePanel.add(mediaPlayerComponent, BorderLayout.CENTER);
-        mediaPlayerComponent.setSize(webcamImagePanel.getSize());
+//        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+//        webcamImagePanel.add(mediaPlayerComponent, BorderLayout.CENTER);
+//        mediaPlayerComponent.setSize(webcamImagePanel.getSize());
         webcamImagePanel.addComponentListener(new webcamImagePanelListener());
 //        mediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener();
 
@@ -716,14 +716,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             final String url = String.format("http://%s:%d", ip, port);
 //            final String url = String.format("rtp://@%s:%d", ip, port);
             System.out.println("---- INICIANDO STREAM: " + url);
-            mediaPlayerComponent.getMediaPlayer().playMedia(url);
+//            mediaPlayerComponent.getMediaPlayer().playMedia(url);
 //            mediaPlayer.getVi
         }
 
         private void stopStreamPlayer() {
 //            webcamPlayer.stop();
 //            webcamPlayer.close();
-            mediaPlayerComponent.getMediaPlayer().stop();
+//            mediaPlayerComponent.getMediaPlayer().stop();
         }
 
         @Override
@@ -819,7 +819,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            mediaPlayerComponent.setSize(e.getComponent().getSize());
+//            mediaPlayerComponent.setSize(e.getComponent().getSize());
         }
 
         @Override
@@ -844,58 +844,58 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         public void run() {
 //            boolean sampling_enabled;
 //            boolean webcam_available;
-//            Dimension dim;
-            long play_start_time = System.currentTimeMillis();
-            final MediaPlayer m = mediaPlayerComponent.getMediaPlayer();
-            while (true) {
-                final boolean sampling_enabled = controleCamera.isSampling_enabled();
-                final boolean webcam_available = controleCamera.isWebcam_available();
-                final Dimension dim = mediaPlayerComponent.getMediaPlayer().getVideoDimension();
-                final float fps = m.isPlaying()
-                        ? m.getFps()
-                        : 0f;
-                final long time = (System.currentTimeMillis() - play_start_time) / 1000;
-                final float kbps = m.isPlaying() && time > 0
-                        ? (float) m.getMediaStatistics().i_read_bytes / (float) time / (float) 1024
-                        : 0f;
-                final float scale = m.isPlaying() && dim != null
-                        ? Math.min((float) webcamImagePanel.getSize().width / (float) dim.width, (float) webcamImagePanel.getSize().height / (float) dim.height)
-                        : 0f;
-                java.awt.EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        if (sampling_enabled && webcam_available && dim != null) {
-                            webcamTopLabel.setText(String.format("WEBCAM [ON] (%dx%d)", dim.width, dim.height));
-                        } else {
-                            webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
-                        }
-                        webcamBottomLabel.setText(String.format("Framerate: %.1f fps (%.1f kb/s).  Escala: %.2f",
-                                                                fps, kbps, scale));
-                    }
-                });
-                try {
-                    sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                //Indica se entrou no loop 
-                boolean a = false;
-                while (!m.isPlaying()) {
-                    try {
-                        sleep(2000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    if (a = false) {
-                        java.awt.EventQueue.invokeLater(new Runnable() {
-                            public void run() {
-                                webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
-                            }
-                        });
-                    }
-                    a = true;
-                }
-                if (a) play_start_time = System.currentTimeMillis();
-            }
+////            Dimension dim;
+//            long play_start_time = System.currentTimeMillis();
+////            final MediaPlayer m = mediaPlayerComponent.getMediaPlayer();
+//            while (true) {
+//                final boolean sampling_enabled = controleCamera.isSampling_enabled();
+//                final boolean webcam_available = controleCamera.isWebcam_available();
+//                final Dimension dim = mediaPlayerComponent.getMediaPlayer().getVideoDimension();
+//                final float fps = m.isPlaying()
+//                        ? m.getFps()
+//                        : 0f;
+//                final long time = (System.currentTimeMillis() - play_start_time) / 1000;
+//                final float kbps = m.isPlaying() && time > 0
+//                        ? (float) m.getMediaStatistics().i_read_bytes / (float) time / (float) 1024
+//                        : 0f;
+//                final float scale = m.isPlaying() && dim != null
+//                        ? Math.min((float) webcamImagePanel.getSize().width / (float) dim.width, (float) webcamImagePanel.getSize().height / (float) dim.height)
+//                        : 0f;
+//                java.awt.EventQueue.invokeLater(new Runnable() {
+//                    public void run() {
+//                        if (sampling_enabled && webcam_available && dim != null) {
+//                            webcamTopLabel.setText(String.format("WEBCAM [ON] (%dx%d)", dim.width, dim.height));
+//                        } else {
+//                            webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
+//                        }
+//                        webcamBottomLabel.setText(String.format("Framerate: %.1f fps (%.1f kb/s).  Escala: %.2f",
+//                                                                fps, kbps, scale));
+//                    }
+//                });
+//                try {
+//                    sleep(1000);
+//                } catch (InterruptedException ex) {
+//                    Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                //Indica se entrou no loop 
+//                boolean a = false;
+//                while (!m.isPlaying()) {
+//                    try {
+//                        sleep(2000);
+//                    } catch (InterruptedException ex) {
+//                        Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                    if (a = false) {
+//                        java.awt.EventQueue.invokeLater(new Runnable() {
+//                            public void run() {
+//                                webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
+//                            }
+//                        });
+//                    }
+//                    a = true;
+//                }
+//                if (a) play_start_time = System.currentTimeMillis();
+//            }
         }
     }
 

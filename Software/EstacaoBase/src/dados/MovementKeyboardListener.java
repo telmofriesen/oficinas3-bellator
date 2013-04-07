@@ -19,7 +19,7 @@ import visual.KeyboardListener;
 public class MovementKeyboardListener implements KeyboardListener {
     //Listeners de eventos da classe
 
-    private final long TIMER_DELAY = 5;
+    private final long TIMER_DELAY = 50;
     private final CopyOnWriteArrayList<MyChangeListener> listeners = new CopyOnWriteArrayList<MyChangeListener>();
     private int lastMovementType = -1;
     private final Object lock;

@@ -1,11 +1,15 @@
+<<<<<<< HEAD
 This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  28 MAR 2013 22:48
+=======
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.5.24)  29 MAR 2013 14:41
+>>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
 entering extended mode
  %&-line parsing enabled.
-**entregavel2
+**entregavel2.tex
 (./entregavel2.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
-yphenation, portuguese, loaded.
+yphenation, latin, portuguese, loaded.
 (./normas-utf-tex.cls (/usr/share/texmf/tex/latex/abntex/cvs-id.def)
 Document Class: normas-utf-tex 2011/06/19 v2.0
 (/usr/share/texmf-texlive/tex/latex/base/ifthen.sty
@@ -671,11 +675,7 @@ Package: booktabs 2005/04/14 v1.61803 publication quality tables
 )
 (/usr/share/texmf-texlive/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen147
-) (./entregavel2.aux
-
-LaTeX Warning: Label `tab:pacote_comunicacao' multiply defined.
-
-)
+) (./entregavel2.aux)
 \openout1 = `entregavel2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
@@ -691,7 +691,8 @@ LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
 LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 49.
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
@@ -805,75 +806,82 @@ aso_uso_estacao_base.png> <./figuras/diagrama_caso_uso_linux_embarcado.png>]
 t>
 File: ./figuras/diagrama_classes_estacao_base.png Graphic file (type png)
  <use ./figuras/diagrama_classes_estacao_base.png> [7 <./figuras/diagrama_caso_
-uso_placa_embarcada.png>]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
+uso_placa_embarcada.png>] [8 <./figuras/diagrama_classes_estacao_base.png>]
 Underfull \hbox (badness 4328) in paragraph at lines 118--118
 []\OT1/ptm/m/n/12 Respons[]avel por re-pre-sen-tar o rob[]o, este
  []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[8 <./figuras/diagrama_classes_estacao_base.png>] [9]
+[9] [10]
 Underfull \hbox (badness 2790) in paragraph at lines 145--145
 []\OT1/ptm/m/n/12 Thread res-pons[]avel pelo pro-ces-sa-mento de
  []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<./figuras/diagrama_fluxo_dados.png, id=45, 2202.72937pt x 1135.99406pt>
+[11] <./figuras/diagrama_fluxo_dados.png, id=51, 2202.72937pt x 1135.99406pt>
 File: ./figuras/diagrama_fluxo_dados.png Graphic file (type png)
 
-<use ./figuras/diagrama_fluxo_dados.png> [10]
-<./figuras/diagrama_classes_sist_embarcado.png, id=49, 1141.26375pt x 566.86781
+<use ./figuras/diagrama_fluxo_dados.png>
+<./figuras/diagrama_classes_sist_embarcado.png, id=52, 1141.26375pt x 566.86781
 pt>
 File: ./figuras/diagrama_classes_sist_embarcado.png Graphic file (type png)
+<<<<<<< HEAD
  <use ./figuras/diagrama_classes_sist_embarcado.png> [11 <./figuras/diagrama_fl
 uxo_dados.png>]) (./protocolo_estacao_robo.tex [12 <./figuras/diagrama_classes_
 sist_embarcado.png>] [13]
 <./figuras/diagrama_estados_estacao_base.png, id=62, 939.51pt x 993.7125pt>
+=======
+ <use ./figuras/diagrama_classes_sist_embarcado.png> [12 <./figuras/diagrama_fl
+uxo_dados.png>]) (./protocolo_estacao_robo.tex [13 <./figuras/diagrama_classes_
+sist_embarcado.png>]
+Overfull \hbox (7.36357pt too wide) in paragraph at lines 14--15
+\OT1/ptm/m/n/12 ocorre o re-ce-bi-mento de al-guma men-sa-gem, ela a en-ca-mi-n
+ha para a quarta \OT1/ptm/m/it/12 th-read \OT1/ptm/m/n/12 (cuja explica[][]ao
+ []
+
+
+Overfull \hbox (12.61407pt too wide) in paragraph at lines 16--17
+[]\OT1/ptm/m/n/12 A quarta \OT1/ptm/m/it/12 th-read []\OT1/ptm/m/n/12 e a res-p
+ons[]avel por pro-ces-sar men-sa-gens re-ce-bi-das e re-a-li-zar as opera[][]oe
+s
+ []
+
+[14]
+<./figuras/diagrama_estados_estacao_base.png, id=65, 939.51pt x 993.7125pt>
+>>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
 File: ./figuras/diagrama_estados_estacao_base.png Graphic file (type png)
 
-<use ./figuras/diagrama_estados_estacao_base.png> [14]
-<./figuras/diagrama_estados_sist_embarcado.png, id=66, 942.52126pt x 928.21782p
+<use ./figuras/diagrama_estados_estacao_base.png> [15]
+<./figuras/diagrama_estados_sist_embarcado.png, id=69, 942.52126pt x 928.21782p
 t>
 File: ./figuras/diagrama_estados_sist_embarcado.png Graphic file (type png)
- <use ./figuras/diagrama_estados_sist_embarcado.png> [15 <./figuras/diagrama_es
+ <use ./figuras/diagrama_estados_sist_embarcado.png> [16 <./figuras/diagrama_es
 tados_estacao_base.png>]
-<./figuras/diagrama_estados_sender.png, id=71, 856.70062pt x 660.21657pt>
+<./figuras/diagrama_estados_sender.png, id=74, 856.70062pt x 660.21657pt>
 File: ./figuras/diagrama_estados_sender.png Graphic file (type png)
 
-<use ./figuras/diagrama_estados_sender.png> [16 <./figuras/diagrama_estados_sis
+<use ./figuras/diagrama_estados_sender.png> [17 <./figuras/diagrama_estados_sis
 t_embarcado.png>]
-<./figuras/diagrama_estados_receiver.png, id=76, 750.55406pt x 497.60907pt>
+<./figuras/diagrama_estados_receiver.png, id=79, 750.55406pt x 497.60907pt>
 File: ./figuras/diagrama_estados_receiver.png Graphic file (type png)
 
-<use ./figuras/diagrama_estados_receiver.png> [17 <./figuras/diagrama_estados_s
+<use ./figuras/diagrama_estados_receiver.png> [18 <./figuras/diagrama_estados_s
 ender.png>]
-<./figuras/diagrama_estados_processor.png, id=81, 713.66624pt x 566.115pt>
+<./figuras/diagrama_estados_processor.png, id=85, 713.66624pt x 566.115pt>
 File: ./figuras/diagrama_estados_processor.png Graphic file (type png)
 
-<use ./figuras/diagrama_estados_processor.png> [18 <./figuras/diagrama_estados_
+<use ./figuras/diagrama_estados_processor.png> [19 <./figuras/diagrama_estados_
 receiver.png>]
-<./figuras/diagrama_estados_amostragem_sensores.png, id=87, 784.43062pt x 566.1
+<./figuras/diagrama_estados_amostragem_sensores.png, id=90, 784.43062pt x 566.1
 15pt>
 File: ./figuras/diagrama_estados_amostragem_sensores.png Graphic file (type png
 )
- <use ./figuras/diagrama_estados_amostragem_sensores.png> [19 <./figuras/diagra
+ <use ./figuras/diagrama_estados_amostragem_sensores.png> [20 <./figuras/diagra
 ma_estados_processor.png>]
-<./figuras/diagrama_sequencia_motores.png, id=92, 1461.96187pt x 521.69907pt>
+<./figuras/diagrama_sequencia_motores.png, id=95, 1461.96187pt x 521.69907pt>
 File: ./figuras/diagrama_sequencia_motores.png Graphic file (type png)
 
-<use ./figuras/diagrama_sequencia_motores.png> [20 <./figuras/diagrama_estados_
+<use ./figuras/diagrama_sequencia_motores.png> [21 <./figuras/diagrama_estados_
 amostragem_sensores.png>]
-<./figuras/diagrama_sequencia_sensores.png, id=97, 1758.57pt x 548.80031pt>
+<./figuras/diagrama_sequencia_sensores.png, id=100, 1758.57pt x 548.80031pt>
 File: ./figuras/diagrama_sequencia_sensores.png Graphic file (type png)
 
 <use ./figuras/diagrama_sequencia_sensores.png>
@@ -884,11 +892,11 @@ File: omsptm.fd
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 97.
- [21 <./figuras/diagrama_sequencia_motores.png> <./figuras/diagrama_sequencia_s
-ensores.png>] [22]
-[23] [24]) (./diagrama_hardware.tex [25]
+ [22 <./figuras/diagrama_sequencia_motores.png> <./figuras/diagrama_sequencia_s
+ensores.png>] [23]
+[24] [25]) (./diagrama_hardware.tex [26]
 Cap\'{\i }tulo 3.
-<./figuras/diagrama_blocos_hardware.png, id=117, 712.91344pt x 595.47469pt>
+<./figuras/diagrama_blocos_hardware.png, id=120, 712.91344pt x 595.47469pt>
 File: ./figuras/diagrama_blocos_hardware.png Graphic file (type png)
 
 <use ./figuras/diagrama_blocos_hardware.png>
@@ -897,40 +905,46 @@ Overfull \hbox (4.01436pt too wide) in paragraph at lines 17--18
 [][]ao do pro-to-colo de comunica[][]ao
  []
 
-[26
+[27
 
  <./figuras/diagrama_blocos_hardware.png (PNG copy)>]
-<./figuras/hardware2_1.pdf, id=121, 1690.315pt x 2392.94pt>
+<./figuras/hardware2_1.pdf, id=124, 1690.315pt x 2392.94pt>
 File: ./figuras/hardware2_1.pdf Graphic file (type pdf)
 
-<use ./figuras/hardware2_1.pdf>) (./entregavel2.bbl [27] [28 <./figuras/hardwar
-e2_1.pdf>]) AED: lastpage setting LastPage [29
+<use ./figuras/hardware2_1.pdf>) (./entregavel2.bbl [28] [29 <./figuras/hardwar
+e2_1.pdf>]) AED: lastpage setting LastPage [30
 
 ]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./entregavel2.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+(./entregavel2.aux) ) 
 Here is how much of TeX's memory you used:
- 5941 strings out of 495041
- 88953 string characters out of 1181897
- 167215 words of memory out of 3000000
- 8904 multiletter control sequences out of 15000+50000
+ 5943 strings out of 495028
+ 88995 string characters out of 1181228
+ 165186 words of memory out of 3000000
+ 8907 multiletter control sequences out of 15000+50000
  20949 words of font info for 44 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
+<<<<<<< HEAD
  61i,14n,96p,1107b,385s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
 ve/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/ty
 pe1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a
 .pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
 Output written on entregavel2.pdf (30 pages, 1950139 bytes).
+=======
+ 61i,14n,96p,1112b,385s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</us
+r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
+mf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/typ
+e1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a
+.pfb>
+Output written on entregavel2.pdf (31 pages, 1949756 bytes).
+>>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
 PDF statistics:
- 150 PDF objects out of 1000 (max. 8388607)
+ 154 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

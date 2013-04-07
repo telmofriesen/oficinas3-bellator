@@ -1,0 +1,35 @@
+saidas medidas do IR
+140mV - 3.82V
+TODO: 
+Botar pra funcionar com o 8051
+implementar logica para detectar sentido do encoder
+
+Impedancia de saida do IR + voltage limiter
+CLKDIV The APB clock (PCLK) is divided by (this value plus one) to produce the clock for the
+A/D converter, which should be less than or equal to 4.5 MHz. Typically, software should
+program the smallest value in this field that yields a clock of 4.5 MHz or slightly less, but
+in certain cases (such as a high-impedance analog source) a slower clock may be
+desirable.
+
+
+
+
+Conector:
+
+verde		Esq	F	T1MT1
+amarelo		Esq	B	T1MT0
+azul		Dir	F	T0MT1
+cinza		Dir	B	T0MT2
+
+
+1. Criar esquematico com gschem.
+2. Achar footprints 
+	colocar na pasta footprints
+	configurar nos atributos dos componentes
+3. Rodar refdesrenum
+4. Rodar gschem2pcb
+
+Para gerar pdf do esquematico:
+- imprimir para arquivo.ps no gschem
+- ps2pdf -sPAPERSIZE=a1 ./bellator2.1.ps
+

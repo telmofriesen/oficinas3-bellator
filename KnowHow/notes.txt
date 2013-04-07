@@ -57,8 +57,14 @@ colocar o diretorio do hex, setar a porta serial
 colocar o clock e o baud rate pra serial
 (funcionou com 19200 e clock de 12000)
 
+----------------------------------------------------------------------------------
 Ambiente para desenvolvimento do hardware
 
 instalar geda (gschem) e pcb pelo synaptic
 copiar a biblioteca de comoponentes para /usr/share/gEDA/sym e dar permicoes adequadas
 
+Para gerar pdf:
+- imprimir para arquivo.ps
+- ps2pdf -sPAPERSIZE=a1 ./bellator2.1.ps
+
+rodar refdesrenum na placa para renomear componentes

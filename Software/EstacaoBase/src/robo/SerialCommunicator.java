@@ -27,7 +27,7 @@ public class SerialCommunicator implements SerialNetwork_iface {
 
     public SerialCommunicator(Main server) {
         this.server = server;
-        network = new SerialNetwork(0, this, 255);
+        network = new SerialNetwork(0, this, (byte) 0xFE);
 
         // initializing reader from command line
         int i, inp_num = 0;
@@ -57,23 +57,25 @@ public class SerialCommunicator implements SerialNetwork_iface {
             System.out
                     .println("enter the id (1,2,...) of the connection to connect to: ");
             try {
-                input = in_stream.readLine();
-                inp_num = Integer.parseInt(input);
+//                input = in_stream.readLine();
+//                inp_num = Integer.parseInt(input);
+                inp_num = 1;
                 if ((inp_num < 1) || (inp_num >= ports.size() + 1))
                     System.out.println("your input is not valid");
                 else
                     valid_answer = true;
             } catch (NumberFormatException ex) {
                 System.out.println("please enter a correct number");
-            } catch (IOException e) {
-                System.out.println("there was an input error\n");
-                System.exit(1);
             }
+//            catch (IOException e) {
+//                System.out.println("there was an input error\n");
+//                System.exit(1);
+//            }
         }
 
         // connecting to the selected port
         if (network.connect(ports.elementAt(inp_num - 1), speed)) {
-            System.out.println();
+            System.out.println("Conectado na porta " + ports.elementAt(inp_num - 1));
         } else {
             System.out.println("sorry, there was an error connecting\n");
             System.exit(1);
@@ -146,19 +148,20 @@ public class SerialCommunicator implements SerialNetwork_iface {
 
     /**
      * Envia uma mensagem via serial até a placa de baixo nível
-     * @param message 
+     *
+     * @param message
      */
     //TODO:
     //- Usar bytes ao invés de inteiros
-    public void sendMessage(int[] message) {
-        network.writeSerial(1, message);
+    public void sendMessage(byte[] message) {
+        network.writeSerial(message.length, message);
 
     }
 
     /**
      * Interpreta mensagens recebidas da porta serial (mensagens vindas da placa de baixo nível)
-     * 
-     * 
+     *
+     *
      * Implementing {@link net.Network_iface#parseInput(int, int, int[])} to
      * handle messages received over the serial port.
      *
@@ -169,7 +172,7 @@ public class SerialCommunicator implements SerialNetwork_iface {
     //TODO:
     //- Usar bytes ao invés de inteiros
     //- Implementar a interpretação de mensagens das leituras dos sensores: recebe leituras e manda elas para a estação base
-    public void parseInput(int id, int numBytes, int[] message) {
+    public void parseInput(int id, int numBytes, byte[] message) {
         if (resend_active) {
             network.writeSerial(numBytes, message);
             System.out.print("received and sent back the following message: ");

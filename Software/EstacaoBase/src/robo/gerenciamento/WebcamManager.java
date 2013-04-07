@@ -83,7 +83,7 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
         if (webcam_available) {
             String[] split = webcam.getDevice().getName().split(" ");
             String device = split[split.length - 1];
-            String mrl = String.format("v4l2://%s:%s:%s:%.2f", device, resolution.width, resolution.height, fps);
+            String mrl = String.format("v4l2://%s:width=%s:height=%s:fps=%.2f:chroma=mjpg", device, resolution.width, resolution.height, fps);
             String options = formatStream(resolution, bitrate, fps, "127.0.0.1", host_port);
             System.out.println("---- INICIANDO STREAM: " + mrl + " -- " + options);
 
@@ -127,7 +127,7 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
 //        StringBuilder sb = new StringBuilder(60);
 //        return String.format(":sout=#transcode{vcodec=mp4v,bitrate=%d,fps=%f,width=%d,height=%d}:rtp{dst=%s,port=%d,mux=ts}",
 //                             bitrate, fps, resolution.width, resolution.height, host_ip, host_port);
-        return String.format(":sout=#standard{access=http,width=%d,height=%d,fps=%.2f,mux=ogg,dst=%s:host_port}",
+        return String.format(":sout=#standard{access=http,width=%d,height=%d,fps=%.2f,mux=mpjpeg,dst=%s:host_port}",
                              resolution.width, resolution.height, fps, "0.0.0.0", host_port);
         
     }

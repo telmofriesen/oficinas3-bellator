@@ -49,7 +49,7 @@ public class ServerConnection extends Thread {
     //Listener do servidor
     private ServerListener listener;
     //Interpretador de comandos
-    private ServerMessageInterpreter interpreter;
+    private ServerMessageProcessor interpreter;
     //O socket da conexão aceita
     private Socket sock;
     //Estado atual de handshake
@@ -77,7 +77,7 @@ public class ServerConnection extends Thread {
         this.sock = sock;
         this.receiver = new ServerReceiver(this);
         this.sender = new ServerSender(this);
-        this.interpreter = new ServerMessageInterpreter(this);
+        this.interpreter = new ServerMessageProcessor(this);
         lastHandshakeActivity = System.currentTimeMillis();
         handshakeStatus = HANDSHAKE_NO;
         this.setName(this.getClass().getName());
@@ -349,7 +349,7 @@ public class ServerConnection extends Thread {
         return sock;
     }
 
-    public synchronized ServerMessageInterpreter getInterpreter() {
+    public synchronized ServerMessageProcessor getInterpreter() {
         return interpreter;
     }
 

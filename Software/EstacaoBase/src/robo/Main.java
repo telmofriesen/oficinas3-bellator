@@ -35,7 +35,7 @@ public class Main extends Thread {
     private SensorsManager sensorsManager;
     private SensorsInfoListnener sensorsInfoListener;
     //Amostragem da webcam
-    private WebcamManager webcamManager;
+    private WebcamManagerNew2 webcamManager;
     private WebcamInfoListener webcamInfoListener;
     private EnginesManager enginesManager;
     private SerialCommunicator serialCommunicator;
@@ -59,7 +59,7 @@ public class Main extends Thread {
         sensorsInfoListener = new SensorsInfoListnener();
         sensorsManager.addMyChangeListener(sensorsInfoListener);
         //[176x144] [320x240] [352x288] [480x400] [640x480] [1024x768] 
-        webcamManager = new WebcamManager(1, new Dimension(320, 240));
+        webcamManager = new WebcamManagerNew2(new Dimension(320, 240));
 //        webcamManager = new WebcamManager(new Dimension(640, 480));
 
         webcamInfoListener = new WebcamInfoListener();
@@ -158,13 +158,19 @@ public class Main extends Thread {
         return sensorsManager;
     }
 
-    public WebcamManager getWebcamManager() {
+    public WebcamManagerNew2 getWebcamManager() {
         return webcamManager;
     }
 
     public EnginesManager getEnginesManager() {
         return enginesManager;
     }
+
+    public SerialCommunicator getSerialCommunicator() {
+        return serialCommunicator;
+    }
+    
+    
 
     class SensorsInfoListnener implements MyChangeListener {
 
@@ -265,7 +271,7 @@ public class Main extends Thread {
     public static void main(String args[]) {
         boolean enable_serial = false;
 //        if (args[0].equals("serial")) {
-            //enable_serial = true;
+            enable_serial = true;
 //        }
         Main s = new Main(enable_serial);
         s.startThreads();

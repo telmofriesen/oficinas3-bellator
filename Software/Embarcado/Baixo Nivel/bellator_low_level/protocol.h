@@ -7,29 +7,21 @@
 #define ON					0x01
 #define OFF					0x00
 
-// Encoder (encoder indice 0 -> 0x20, encoder 1 -> 0x21)
-#define ENCODER_L				0x20
-#define ENCODER_R				0x21
+// Comando para requisição dos dados dos sensores
+#define SYNC				0xA0
 
-// Sensores de distancia
-#define OPTICAL_SENSOR_0		0x22
-#define OPTICAL_SENSOR_1		0x23
-#define OPTICAL_SENSOR_2		0x24
-#define OPTICAL_SENSOR_3		0x25
-#define OPTICAL_SENSOR_4		0x26
-#define OPTICAL_SENSOR_5		0x27
+// Comandos para controlar os motores
+#define ENGINES				0xB0
 
-// Comandos para controlar PWM
-#define LEFT_WHEEL			0xA1 // Nivel das PWMS de Movimentacao ou passos
-#define RIGHT_WHEEL			0xA0 // Nivel das PWMS de Movimentacao ou passos
-
-// Comando para sincronizacao
-#define SYNC				0xB0
-
-// Comando para fazer o robo parar imediatamente
-#define STOP				0xFF // Parada De Emergencia !!!!
-
-#define RESET				0xF0 // Ordem para RESET GLOBAL
+// Comandos para envio dos dados dos sensores
+#define SENSORS				0xC0
+#define ENCODER_L			0xC1
+#define ENCODER_R			0xC2
+#define IR_L				0xC3
+#define IR_ML				0xC4
+#define IR_M				0xC5
+#define IR_MR				0xC6
+#define IR_R				0xC7
 
 // Byte que sinaliza fim do comando
 #define	END_CMD 			0xFE
