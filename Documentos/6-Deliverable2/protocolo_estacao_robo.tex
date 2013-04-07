@@ -9,19 +9,11 @@ Essa escolha foi feita tendo em vista que, em uma comunicação totalmente sínc
 
 A solução desenvolvida para possibilitar a comunicação assíncrona foi o uso de 4 \textit{threads} (tanto na estação base quanto no sistema embarcado) para gerenciar os diversos aspectos envolvidos nela. A primeira \textit{thread} (a gerenciadora principal de conexão) é a responsável por estabelecer e manter a conexão, além de gerenciar os potenciais erros que possam ocorrer (tempo excessivo sem comunicação e fechamento de \textit{socket}). Para a estação base, o diagrama de estados dessa \textit{thread} está representado na Figura \ref{fig:diagrama_estados_estacao_base}, e para o sistema embarcado na Figura \ref{fig:diagrama_estados_sist_embarcado}.
 
-<<<<<<< HEAD
 A segunda \textit{thread} tem a função de gerenciar o envio de mensagens. O programa principal, ao necessitar enviar uma mensagem, faz uma requisição a essa \textit{thread} que insere a mensagem em uma fila de envio. O programa principal não fica bloqueado, dessa forma, pois não necessita aguardar a mensagem ser completamente enviada, podendo efetuar outras tarefas. O diagrama de estados dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_sender}.
-=======
-A segunda \textit{thread} tem a função de gerenciar o envio de mensagens. O programa, quando necessita enviar uma mensagem, faz uma requisição a essa \textit{thread} que insere a mensagem em uma fila de envio. O programa principal não fica bloqueado, dessa forma, pois não necessita aguardar a mensagem ser completamente enviada, podendo efetuar outras tarefas. O diagrama de estados dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_sender}.
->>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
 
 A terceira \textit{thread} gerencia o recebimento de mensagens. Seu funcionamento é relativamente simples: ela possui um loop, no qual aguarda até alguma mensagem ser recebida. Quando ocorre o recebimento de alguma mensagem, ela é encaminhada para a quarta \textit{thread} (cuja explicação está a seguir) que processa o conteúdo dela e executa as operações que são necessárias para cada tipo de mensagem. Dessa forma, novas mensagens podem ser recebidas rapidamente, pois o receptor não fica bloqueado realizando o processamento das informações recebidas. O diagrama de estados dessa terceira \textit{thread} está presente na Figura \ref{fig:diagrama_estados_receiver}.
 
-<<<<<<< HEAD
 A quarta \textit{thread}, como já exposto, é a responsável por processar mensagens recebidas e realizar as operações que são necessárias para cada tipo de mensagem, o que depende da codificação exposta na seção \ref{sec:codificacao_mensagens}. Ela possui uma fila, na qual são inseridas as mensagens a serem processadas. Dessa forma a \textit{thread} receptora não necessita ficar bloqueada aguardando o término do processamento. O diagrama de estados dessa quarta \textit{thread} está presente na Figura \ref{fig:diagrama_estados_processor}.
-=======
-A quarta \textit{thread} é a responsável por processar mensagens recebidas e realizar as operações que são necessárias para cada tipo de mensagem (o que depende da codificação exposta na seção \ref{sec:codificacao_mensagens}). Ela possui uma fila, na qual são inseridas as mensagens a serem processadas. Dessa forma o receptor não necessita ficar bloqueado aguardando o término do processamento. O diagrama de estados dessa \textit{thread} está presente na Figura \ref{fig:diagrama_estados_processor}.
->>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
 
 \subsection{Diagramas de estados}
 

@@ -1,15 +1,11 @@
-<<<<<<< HEAD
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  28 MAR 2013 22:48
-=======
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.5.24)  29 MAR 2013 14:41
->>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  7 APR 2013 14:29
 entering extended mode
  %&-line parsing enabled.
-**entregavel2.tex
+**entregavel2
 (./entregavel2.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
-yphenation, latin, portuguese, loaded.
+yphenation, portuguese, loaded.
 (./normas-utf-tex.cls (/usr/share/texmf/tex/latex/abntex/cvs-id.def)
 Document Class: normas-utf-tex 2011/06/19 v2.0
 (/usr/share/texmf-texlive/tex/latex/base/ifthen.sty
@@ -823,30 +819,10 @@ File: ./figuras/diagrama_fluxo_dados.png Graphic file (type png)
 <./figuras/diagrama_classes_sist_embarcado.png, id=52, 1141.26375pt x 566.86781
 pt>
 File: ./figuras/diagrama_classes_sist_embarcado.png Graphic file (type png)
-<<<<<<< HEAD
- <use ./figuras/diagrama_classes_sist_embarcado.png> [11 <./figuras/diagrama_fl
-uxo_dados.png>]) (./protocolo_estacao_robo.tex [12 <./figuras/diagrama_classes_
-sist_embarcado.png>] [13]
-<./figuras/diagrama_estados_estacao_base.png, id=62, 939.51pt x 993.7125pt>
-=======
  <use ./figuras/diagrama_classes_sist_embarcado.png> [12 <./figuras/diagrama_fl
 uxo_dados.png>]) (./protocolo_estacao_robo.tex [13 <./figuras/diagrama_classes_
-sist_embarcado.png>]
-Overfull \hbox (7.36357pt too wide) in paragraph at lines 14--15
-\OT1/ptm/m/n/12 ocorre o re-ce-bi-mento de al-guma men-sa-gem, ela a en-ca-mi-n
-ha para a quarta \OT1/ptm/m/it/12 th-read \OT1/ptm/m/n/12 (cuja explica[][]ao
- []
-
-
-Overfull \hbox (12.61407pt too wide) in paragraph at lines 16--17
-[]\OT1/ptm/m/n/12 A quarta \OT1/ptm/m/it/12 th-read []\OT1/ptm/m/n/12 e a res-p
-ons[]avel por pro-ces-sar men-sa-gens re-ce-bi-das e re-a-li-zar as opera[][]oe
-s
- []
-
-[14]
+sist_embarcado.png>] [14]
 <./figuras/diagrama_estados_estacao_base.png, id=65, 939.51pt x 993.7125pt>
->>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
 File: ./figuras/diagrama_estados_estacao_base.png Graphic file (type png)
 
 <use ./figuras/diagrama_estados_estacao_base.png> [15]
@@ -921,28 +897,19 @@ e2_1.pdf>]) AED: lastpage setting LastPage [30
 +-------------------------------------------------------------------+
 (./entregavel2.aux) ) 
 Here is how much of TeX's memory you used:
- 5943 strings out of 495028
- 88995 string characters out of 1181228
+ 5943 strings out of 495041
+ 88995 string characters out of 1181897
  165186 words of memory out of 3000000
- 8907 multiletter control sequences out of 15000+50000
+ 8906 multiletter control sequences out of 15000+50000
  20949 words of font info for 44 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
-<<<<<<< HEAD
- 61i,14n,96p,1107b,385s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a
-.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on entregavel2.pdf (30 pages, 1950139 bytes).
-=======
- 61i,14n,96p,1112b,385s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 61i,14n,96p,1108b,385s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</us
 r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
 mf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/typ
 e1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a
 .pfb>
-Output written on entregavel2.pdf (31 pages, 1949756 bytes).
->>>>>>> 48c5c237de828d9bc1b9fe6ae62cd06298c725e5
+Output written on entregavel2.pdf (31 pages, 1951162 bytes).
 PDF statistics:
  154 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
