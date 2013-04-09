@@ -37,7 +37,7 @@ void i2c_init(void){
 	I2C1SCLL = 19; // 394.7kHz for pclk=15MHz | 388.0kHz for pclk=14.7456MHz
 
 	// Enable the interrupts
-	VICVectCntl0 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+	VICVectCntl2 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
 	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
 
 	// Enable i2c as FIQ
@@ -71,7 +71,7 @@ int i2c_read_bytes(char reg_addr, char length, char* data) {
 	busy = 1;
 
 	//Setting the interrupt handler location for write byte
-	VICVectAddr0 = (unsigned int) &i2c_read_bytes_isr;
+	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
 	//current_isr = &i2c_read_bytes_isr;
 	// Send Start bit
 	I2C1CONSET = 0x20; // Transmit start condition
@@ -203,7 +203,7 @@ int i2c_write_byte(char reg_addr, char data) {
 	busy = 1;
 
 	//Setting the interrupt handler location for write byte
-	VICVectAddr0 = (unsigned int) &i2c_write_byte_isr;
+	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
 	//current_isr = &i2c_write_byte_isr;
 	// Send Start bit
 	I2C1CONSET = 0x20; // Transmit start condition

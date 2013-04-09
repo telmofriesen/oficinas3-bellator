@@ -7,7 +7,7 @@
 #define CRYSTAL12MHz
 //#define CRYSTAL14745600Hz
 #define CMD_BUFF_SIZE 32 // has to be a power of two
-#define DATA_BUFF_SIZE 256 // has to be a power of two
+#define DATA_BUFF_SIZE 16 // has to be a power of two
 
 #define SAMPLE_RATE_1kHZ 0;
 #define SAMPLE_RATE_500HZ 1;
@@ -15,10 +15,10 @@
 #define SAMPLE_RATE_125HZ 4;
 #define SAMPLE_RATE_012HZ 4096;
 
-#define SAMPLE_RATE SAMPLE_RATE_012HZ
+#define SAMPLE_RATE SAMPLE_RATE_125HZ
 
-#define ERROR
-#define WARNING
+//#define ERROR
+//#define WARNING
 //#define DEBUG
 //#define DEBUG_I2C
 //#define DEBUG_MPU
@@ -49,7 +49,7 @@
 #include "mpu6050.c"
 
 /* interruptions */
-void __attribute__ ((interrupt("FIQ"))) pulse_in(void);
+void __attribute__ ((interrupt("IRQ"))) pulse_in(void);
 void __attribute__ ((interrupt("IRQ"))) protocol_in(void);
 void __attribute__ ((interrupt("IRQ"))) sample(void);
 void __attribute__ ((interrupt("IRQ"))) error(void);
@@ -114,7 +114,7 @@ int main(void){
 	log_string_debug("iniciando\n");
 
 	enableIRQ(); // Enable interruptions
-	enableFIQ();
+	//enableFIQ();
 
 	pulses_in_init(); // start counting pulses from the encoder	| Timer 2, FIQ, eint0, FIQ
 	imu_init(); // start the IMU								| i2c1 FIQ
@@ -132,6 +132,8 @@ int main(void){
 		if (send_data) {
 			// while data available
 			while(data_out_pos != data_in_pos) {
+
+				log_string_debug("sending data");
 				// send next data
 				data_out_pos = ++data_out_pos % DATA_BUFF_SIZE;
 
@@ -271,9 +273,14 @@ inline void pulses_in_init(void){
 	T2TCR = 1; //enable T2
 
 	// Enable the interrupts
-	VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
+	//VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
+	VICVectAddr6 = (unsigned int) &pulse_in;
+	VICVectCntl6 = 0x2E; // source 14 and enabled
 	VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
-	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
+
+	//VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
+	VICVectAddr7 = (unsigned int) &pulse_in;
+	VICVectCntl7 = 0x3A; // source 26 and enabled
 	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
 
 	log_string_debug("<< pulses_in_init\n");
@@ -421,8 +428,8 @@ static inline void protocol_init(void){
 
 	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
 
-	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the 2th vectored interruption slot
-	VICVectCntl2 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
+	VICVectAddr4 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the 2th vectored interruption slot
+	VICVectCntl4 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
 	VICIntEnable |= 0x00000080; //source #7 enabled as FIQ or IRQ
 
 	cmd_out.i = 0;
@@ -456,8 +463,8 @@ inline void sampler_init(void){
 	T3MR0 = 14746; // MAT3.0 every 14746/(SAMPLE_RATE + 1) counts (1.000027127ms/(SAMPLE_RATE + 1))
 #endif
 
-	VICVectAddr1 = (unsigned int) &sample; //Setting the interrupt handler location
-	VICVectCntl1 = 0x3B; //Vectored Interrupt slot enabled and with source #27 (TIMER3)
+	VICVectAddr3 = (unsigned int) &sample; //Setting the interrupt handler location
+	VICVectCntl3 = 0x3B; //Vectored Interrupt slot enabled and with source #27 (TIMER3)
 	VICIntEnable |= 0x1 << 27; //source #27 enabled as FIQ or IRQ
 
 	T3TCR = 1; // enable T3
@@ -491,13 +498,25 @@ void protocol_in(void){
 
 			if (cmd_in.buff[cmd_in.i] == END_CMD) {
 				// ENGINES
-				if (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == ENGINES) {
-					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]),
-								(unsigned short) (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)]));
+				if (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)] == ENGINES) {
+					log_string_debug("ENGINES\n");
+
+					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]),
+								(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));
+
+					cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
 				}
 				// SYNC
 				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == SYNC) {
+					log_string_debug("SYNC\n");
+
 					send_data = 1;
+
+					cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
 				}
 			}
 
@@ -531,9 +550,9 @@ void protocol_in(void){
  */
 void pulse_in(void) {
 
-	log_string_debug(">> pulse_in\n");
+	//log_string_debug(">> pulse_in\n");
 
-	const unsigned short ir = T2IR;
+	volatile unsigned short ir = T2IR;
 
 	// pulses in int
 	if (ir & (0x1 << 4)) { //CAP2.0 left encoder
@@ -565,7 +584,7 @@ void pulse_in(void) {
 		EXTINT |= 0x1 << 0; // reset EINT0
 	}
 
-	log_string_debug("<< pulse_in\n");
+	//log_string_debug("<< pulse_in\n");
 
 	VICVectAddr = 0;
 }
@@ -593,7 +612,7 @@ void pulse_in(void) {
  * data_in_pos -
  */
 void sample(void) {
-	const unsigned short ir = T3IR;
+	volatile unsigned short ir = T3IR;
 	if(ir & 0x1) { // MAT3.0
 		log_string_debug(">> sample\n");
 
@@ -705,6 +724,11 @@ void get_encoders_count(short * left_encoder, short * right_encoder) {
  * Set the output pwm value
  */
 inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel) {
+
+	if (left_wheel > 8)
+		left_wheel -= 8;
+	else
+		left_wheel = 0;
 
 	if (right_wheel & PWM_DIR) { // Forward
 		T0MR2 = 256;
