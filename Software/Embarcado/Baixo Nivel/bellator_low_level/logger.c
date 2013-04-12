@@ -7,6 +7,8 @@
 #include "lpc2103.h"
 #include "logger.h"
 
+static const char ascii[] = "0123456789ABCDEF";
+
 /**
  * Start logger using UART0
  * 8N1 (8 data, Non parity, 1 stop)
@@ -36,7 +38,7 @@ void logger_init(void){ // using UART0
 	U0LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
 }
 
-static void log_char(char c){
+void log_char(char c){
 	U0THR = c;     // TransmitHoldingRegister , DivisorLatchAccessBit must be 0 to transmit
 	while(!(U0LSR & 0x40));
 }

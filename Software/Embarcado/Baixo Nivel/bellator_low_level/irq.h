@@ -11,12 +11,9 @@
 #define IRQ_MASK 0x00000080
 #define FIQ_MASK 0x00000040
 
-static inline unsigned asm_get_cpsr(void);
-static inline void asm_set_cpsr(unsigned val);
-static inline unsigned enableIRQ(void);
-static inline unsigned disableIRQ(void);
-static inline unsigned restoreIRQ(unsigned oldCPSR);
-static inline unsigned enableFIQ(void);
-static inline unsigned disableFIQ(void);
+unsigned enableIRQ(void);
+unsigned disableIRQ(void);
+unsigned enableFIQ(void);
+unsigned disableFIQ(void);
 
 #endif /* IRQ_H_ */

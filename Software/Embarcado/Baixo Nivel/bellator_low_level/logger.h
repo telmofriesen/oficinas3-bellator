@@ -14,6 +14,14 @@
 //#	define logger_init(str)
 //#endif
 
+#define CRYSTAL12MHz
+
+#define ERROR
+#define WARNING
+#define DEBUG
+#define DEBUG_I2C
+#define DEBUG_MPU
+
 #ifdef ERROR
 #   define log_char_error(str) log_char(str)
 #   define log_int_error(str) log_int(str)
@@ -104,10 +112,8 @@
 #   define log4bytes_mpu(str)
 #endif
 
-const char ascii[] = "0123456789ABCDEF";
-
 void logger_init(void);
-static void log_char(char c);
+void log_char(char c);
 void log_int(int num);
 void log_short(short num);
 void log_string(const char *c);

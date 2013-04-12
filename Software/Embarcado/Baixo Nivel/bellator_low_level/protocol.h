@@ -23,6 +23,8 @@
 #define IR_MR				0xC6
 #define IR_R				0xC7
 
+#define TEST				0xD0
+
 // Byte que sinaliza fim do comando
 #define	END_CMD 			0xFE
 

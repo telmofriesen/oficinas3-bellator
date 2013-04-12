@@ -1,0 +1,1075 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 2
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 18, 4
+  11              		.file	"mpu6050.c"
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.align	2
+  22              		.global	mpu_init
+  24              	mpu_init:
+  25              		.fnstart
+  26              	.LFB0:
+  27              		.file 1 "mpu6050.c"
+   1:mpu6050.c     **** /*
+   2:mpu6050.c     ****  * mpu6050.c
+   3:mpu6050.c     ****  *
+   4:mpu6050.c     ****  *  Created on: Mar 21, 2013
+   5:mpu6050.c     ****  *      Author: telmo
+   6:mpu6050.c     ****  *
+   7:mpu6050.c     ****  *  This code was based on Jeff Rowberg code for arduino https://github.com/jrowberg/i2cdevlib/tree
+   8:mpu6050.c     ****  */
+   9:mpu6050.c     **** #include "lpc2103.h"
+  10:mpu6050.c     **** #include "i2c.h"
+  11:mpu6050.c     **** #include "logger.h"
+  12:mpu6050.c     **** #include "mpu6050.h"
+  13:mpu6050.c     **** 
+  14:mpu6050.c     **** inline void mpu_set_clock_source(char source);
+  15:mpu6050.c     **** inline void mpu_set_full_scale_gyro_range(char range);
+  16:mpu6050.c     **** inline void mpu_set_full_scale_accel_range(char range);
+  17:mpu6050.c     **** inline void mpu_set_sleep_enable(int enable);
+  18:mpu6050.c     **** inline void mpu_set_temperature_sensor_enabled(char enabled);
+  19:mpu6050.c     **** inline void mpu_set_gyro_rate(char rate);
+  20:mpu6050.c     **** inline void mpu_set_DLPF_mode(char mode);
+  21:mpu6050.c     **** 
+  22:mpu6050.c     **** /** Power on and prepare for general usage.
+  23:mpu6050.c     **** * This will activate the device and take it out of sleep mode (which must be done
+  24:mpu6050.c     **** * after start-up). This function also sets both the accelerometer and the gyroscope
+  25:mpu6050.c     **** * to their most sensitive settings, namely +/- 2g and +/- 250 degrees/sec, and sets
+  26:mpu6050.c     **** * the clock source to use the X Gyro for reference, which is slightly better than
+  27:mpu6050.c     **** * the default internal clock source.
+  28:mpu6050.c     **** */
+  29:mpu6050.c     **** void mpu_init(void) {
+  28              		.loc 1 29 0
+  29              		.cfi_startproc
+  30              		@ Function supports interworking.
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              	.LVL0:
+  34 0000 08402DE9 		stmfd	sp!, {r3, lr}
+  35              		.save {r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              	.LBB16:
+  39              	.LBB17:
+  30:mpu6050.c     **** 	log_string_mpu(">> mpu_init\n");
+  31:mpu6050.c     **** 
+  32:mpu6050.c     ****     // configure clock source
+  33:mpu6050.c     **** 	mpu_set_clock_source(MPU6050_CLOCK_PLL_XGYRO);
+  34:mpu6050.c     **** 	// disable temperature sensor
+  35:mpu6050.c     **** 	mpu_set_temperature_sensor_enabled(0);
+  36:mpu6050.c     **** 	// set scale to
+  37:mpu6050.c     **** 	// acc ±2g 16384 LSB/g
+  38:mpu6050.c     **** 	// gyro ± 250 °/s 131 LSB/°/s
+  39:mpu6050.c     ****     mpu_set_full_scale_gyro_range(MPU6050_GYRO_FS_250);
+  40:mpu6050.c     ****     mpu_set_full_scale_accel_range(MPU6050_ACCEL_FS_2);
+  41:mpu6050.c     **** 
+  42:mpu6050.c     ****     // divide gyro output rate by 7+1, if DLPF>0 set back to 0 to keep output rate 1kHz
+  43:mpu6050.c     ****     mpu_set_gyro_rate(7);
+  44:mpu6050.c     ****     // set digital low pass filter cut off frequency (disabled)
+  45:mpu6050.c     ****     mpu_set_DLPF_mode(0);
+  46:mpu6050.c     **** 
+  47:mpu6050.c     ****     // FIFO WAS NOT USED
+  48:mpu6050.c     ****     // enable FIFO
+  49:mpu6050.c     ****     //mpu_set_6axis_FIFO_enabled(1);
+  50:mpu6050.c     **** 
+  51:mpu6050.c     ****     // DATAREADY INTERRUPT WAS NOT USED
+  52:mpu6050.c     ****     // configure interruption
+  53:mpu6050.c     ****     //mpu_set_interrupt_mode(0); // active high
+  54:mpu6050.c     ****     //mpu_set_interrupt_drive(0); // push/pull
+  55:mpu6050.c     ****     //mpu_set_interrupt_latch(0); // 50us pulse on interrupt
+  56:mpu6050.c     ****     //mpu_set_FIFO_overflow_interrupt(1); // generate interrupt on FIFO overflow
+  57:mpu6050.c     ****     //mpu_set_data_ready_interrupt(1); // data ready interrupt
+  58:mpu6050.c     **** 
+  59:mpu6050.c     ****     // clear interrupts
+  60:mpu6050.c     **** 	//char source;
+  61:mpu6050.c     **** 	//mpu_clear_interrupt(&source);
+  62:mpu6050.c     ****     // reset FIFO
+  63:mpu6050.c     ****     //mpu_reset_FIFO();
+  64:mpu6050.c     ****     // enable fifo
+  65:mpu6050.c     ****     //mpu_set_FIFO_enabled(1);
+  66:mpu6050.c     **** 
+  67:mpu6050.c     ****     // stop sleeping
+  68:mpu6050.c     ****     mpu_set_sleep_enable(0);
+  69:mpu6050.c     **** 
+  70:mpu6050.c     **** 	log_string_mpu("<< mpu_init\n");
+  71:mpu6050.c     **** }
+  72:mpu6050.c     **** 
+  73:mpu6050.c     **** /** Set clock source setting.
+  74:mpu6050.c     **** * An internal 8MHz oscillator, gyroscope based clock, or external sources can
+  75:mpu6050.c     **** * be selected as the MPU-60X0 clock source. When the internal 8 MHz oscillator
+  76:mpu6050.c     **** * or an external source is chosen as the clock source, the MPU-60X0 can operate
+  77:mpu6050.c     **** * in low power modes with the gyroscopes disabled.
+  78:mpu6050.c     **** *
+  79:mpu6050.c     **** * Upon power up, the MPU-60X0 clock source defaults to the internal oscillator.
+  80:mpu6050.c     **** * However, it is highly recommended that the device be configured to use one of
+  81:mpu6050.c     **** * the gyroscopes (or an external clock source) as the clock reference for
+  82:mpu6050.c     **** * improved stability. The clock source can be selected according to the following table:
+  83:mpu6050.c     **** *
+  84:mpu6050.c     **** * <pre>
+  85:mpu6050.c     **** * CLK_SEL | Clock Source
+  86:mpu6050.c     **** * --------+--------------------------------------
+  87:mpu6050.c     **** * 0 | Internal oscillator
+  88:mpu6050.c     **** * 1 | PLL with X Gyro reference
+  89:mpu6050.c     **** * 2 | PLL with Y Gyro reference
+  90:mpu6050.c     **** * 3 | PLL with Z Gyro reference
+  91:mpu6050.c     **** * 4 | PLL with external 32.768kHz reference
+  92:mpu6050.c     **** * 5 | PLL with external 19.2MHz reference
+  93:mpu6050.c     **** * 6 | Reserved
+  94:mpu6050.c     **** * 7 | Stops the clock and keeps the timing generator in reset
+  95:mpu6050.c     **** * </pre>
+  96:mpu6050.c     **** *
+  97:mpu6050.c     **** * @param source New clock source setting
+  98:mpu6050.c     **** * @see getClockSource()
+  99:mpu6050.c     **** * @see MPU6050_RA_PWR_MGMT_1
+ 100:mpu6050.c     **** * @see MPU6050_PWR1_CLKSEL_BIT
+ 101:mpu6050.c     **** * @see MPU6050_PWR1_CLKSEL_LENGTH
+ 102:mpu6050.c     **** */
+ 103:mpu6050.c     **** inline void mpu_set_clock_source(char source) {
+ 104:mpu6050.c     ****     i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, sour
+  40              		.loc 1 104 0
+  41 0004 0210A0E3 		mov	r1, #2
+  42 0008 0320A0E3 		mov	r2, #3
+  43 000c 0130A0E3 		mov	r3, #1
+  44              		.cfi_offset 14, -4
+  45              		.cfi_offset 3, -8
+  46 0010 6B00A0E3 		mov	r0, #107
+  47 0014 FEFFFFEB 		bl	i2c_write_bits
+  48              	.LVL1:
+  49              	.LBE17:
+  50              	.LBE16:
+  51              	.LBB18:
+  52              	.LBB19:
+ 105:mpu6050.c     **** }
+ 106:mpu6050.c     **** 
+ 107:mpu6050.c     **** /** Set full-scale gyroscope range.
+ 108:mpu6050.c     **** * @param range New full-scale gyroscope range value
+ 109:mpu6050.c     **** * @see getFullScaleRange()
+ 110:mpu6050.c     **** * @see MPU6050_GYRO_FS_250
+ 111:mpu6050.c     **** * @see MPU6050_RA_GYRO_CONFIG
+ 112:mpu6050.c     **** * @see MPU6050_GCONFIG_FS_SEL_BIT
+ 113:mpu6050.c     **** * @see MPU6050_GCONFIG_FS_SEL_LENGTH
+ 114:mpu6050.c     **** */
+ 115:mpu6050.c     **** inline void mpu_set_full_scale_gyro_range(char range) {
+ 116:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, 
+ 117:mpu6050.c     **** }
+ 118:mpu6050.c     **** 
+ 119:mpu6050.c     **** /** Set full-scale accelerometer range.
+ 120:mpu6050.c     **** * @param range New full-scale accelerometer range setting
+ 121:mpu6050.c     **** * @see getFullScaleAccelRange()
+ 122:mpu6050.c     **** */
+ 123:mpu6050.c     **** inline void mpu_set_full_scale_accel_range(char range) {
+ 124:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGT
+ 125:mpu6050.c     **** }
+ 126:mpu6050.c     **** 
+ 127:mpu6050.c     **** /** Set sleep mode status.
+ 128:mpu6050.c     **** * @param enabled New sleep mode enabled status
+ 129:mpu6050.c     **** * @see getSleepEnabled()
+ 130:mpu6050.c     **** * @see MPU6050_RA_PWR_MGMT_1
+ 131:mpu6050.c     **** * @see MPU6050_PWR1_SLEEP_BIT
+ 132:mpu6050.c     **** */
+ 133:mpu6050.c     **** inline void mpu_set_sleep_enable(int enable) {
+ 134:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1, enable);
+ 135:mpu6050.c     **** }
+ 136:mpu6050.c     **** 
+ 137:mpu6050.c     **** /**
+ 138:mpu6050.c     ****  * Set temperature sensor enabled status.
+ 139:mpu6050.c     ****  * Note: this register stores the *disabled* value, but for consistency with the
+ 140:mpu6050.c     ****  * rest of the code, the function is named and used with standard true/false
+ 141:mpu6050.c     ****  * values to indicate whether the sensor is enabled or disabled, respectively.
+ 142:mpu6050.c     ****  * This bit resets the FIFO buffer when set to 1 while FIFO_EN equals 0. This
+ 143:mpu6050.c     ****  * bit automatically clears to 0 after the reset has been triggered.
+ 144:mpu6050.c     ****  * @param enabled 1 enabled; 0 disabled
+ 145:mpu6050.c     ****  */
+ 146:mpu6050.c     **** inline void mpu_set_temperature_sensor_enabled(char enabled) {
+ 147:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_TEMP_DIS_BIT, 1, 1-enabled);
+  53              		.loc 1 147 0
+  54 0018 0120A0E3 		mov	r2, #1
+  55 001c 0230A0E1 		mov	r3, r2
+  56 0020 0310A0E3 		mov	r1, #3
+  57 0024 6B00A0E3 		mov	r0, #107
+  58 0028 FEFFFFEB 		bl	i2c_write_bits
+  59              	.LVL2:
+  60              	.LBE19:
+  61              	.LBE18:
+  62              	.LBB20:
+  63              	.LBB21:
+ 116:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, 
+  64              		.loc 1 116 0
+  65 002c 0410A0E3 		mov	r1, #4
+  66 0030 0220A0E3 		mov	r2, #2
+  67 0034 0030A0E3 		mov	r3, #0
+  68 0038 1B00A0E3 		mov	r0, #27
+  69 003c FEFFFFEB 		bl	i2c_write_bits
+  70              	.LVL3:
+  71              	.LBE21:
+  72              	.LBE20:
+  73              	.LBB22:
+  74              	.LBB23:
+ 124:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGT
+  75              		.loc 1 124 0
+  76 0040 0220A0E3 		mov	r2, #2
+  77 0044 0030A0E3 		mov	r3, #0
+  78 0048 0410A0E3 		mov	r1, #4
+  79 004c 1C00A0E3 		mov	r0, #28
+  80 0050 FEFFFFEB 		bl	i2c_write_bits
+  81              	.LVL4:
+  82              	.LBE23:
+  83              	.LBE22:
+  84              	.LBB24:
+  85              	.LBB25:
+ 148:mpu6050.c     **** }
+ 149:mpu6050.c     **** 
+ 150:mpu6050.c     **** /** Set gyroscope output rate divider.
+ 151:mpu6050.c     **** * The sensor register output, FIFO output, DMP sampling, Motion detection, Zero
+ 152:mpu6050.c     **** * Motion detection, and Free Fall detection are all based on the Sample Rate.
+ 153:mpu6050.c     **** * The Sample Rate is generated by dividing the gyroscope output rate by
+ 154:mpu6050.c     **** * SMPLRT_DIV:
+ 155:mpu6050.c     **** *
+ 156:mpu6050.c     **** * Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV)
+ 157:mpu6050.c     **** *
+ 158:mpu6050.c     **** * where Gyroscope Output Rate = 8kHz when the DLPF is disabled (DLPF_CFG = 0 or
+ 159:mpu6050.c     **** * 7), and 1kHz when the DLPF is enabled (see Register 26).
+ 160:mpu6050.c     **** *
+ 161:mpu6050.c     **** * Note: The accelerometer output rate is 1kHz. This means that for a Sample
+ 162:mpu6050.c     **** * Rate greater than 1kHz, the same accelerometer sample may be output to the
+ 163:mpu6050.c     **** * FIFO, DMP, and sensor registers more than once.
+ 164:mpu6050.c     **** *
+ 165:mpu6050.c     **** * For a diagram of the gyroscope and accelerometer signal paths, see Section 8
+ 166:mpu6050.c     **** * of the MPU-6000/MPU-6050 Product Specification document.
+ 167:mpu6050.c     **** *
+ 168:mpu6050.c     **** * @param rate New sample rate divider
+ 169:mpu6050.c     **** * @see getRate()
+ 170:mpu6050.c     **** * @see MPU6050_RA_SMPLRT_DIV
+ 171:mpu6050.c     **** */
+ 172:mpu6050.c     **** inline void mpu_set_gyro_rate(char rate) {
+ 173:mpu6050.c     ****     i2c_write_byte(MPU6050_RA_SMPLRT_DIV, rate);
+  86              		.loc 1 173 0
+  87 0054 0710A0E3 		mov	r1, #7
+  88 0058 1900A0E3 		mov	r0, #25
+  89 005c FEFFFFEB 		bl	i2c_write_byte
+  90              	.LVL5:
+  91              	.LBE25:
+  92              	.LBE24:
+  93              	.LBB26:
+  94              	.LBB27:
+ 174:mpu6050.c     **** }
+ 175:mpu6050.c     **** 
+ 176:mpu6050.c     **** /** Get digital low-pass filter configuration.
+ 177:mpu6050.c     **** * The DLPF_CFG parameter sets the digital low pass filter configuration. It
+ 178:mpu6050.c     **** * also determines the internal sampling rate used by the device as shown in
+ 179:mpu6050.c     **** * the table below.
+ 180:mpu6050.c     **** *
+ 181:mpu6050.c     **** * Note: The accelerometer output rate is 1kHz. This means that for a Sample
+ 182:mpu6050.c     **** * Rate greater than 1kHz, the same accelerometer sample may be output to the
+ 183:mpu6050.c     **** * FIFO, DMP, and sensor registers more than once.
+ 184:mpu6050.c     **** *
+ 185:mpu6050.c     **** * <pre>
+ 186:mpu6050.c     **** * | ACCELEROMETER | GYROSCOPE
+ 187:mpu6050.c     **** * DLPF_CFG | Bandwidth | Delay | Bandwidth | Delay | Sample Rate
+ 188:mpu6050.c     **** * ---------+-----------+--------+-----------+--------+-------------
+ 189:mpu6050.c     **** * 0 | 260Hz | 0ms | 256Hz | 0.98ms | 8kHz
+ 190:mpu6050.c     **** * 1 | 184Hz | 2.0ms | 188Hz | 1.9ms | 1kHz
+ 191:mpu6050.c     **** * 2 | 94Hz | 3.0ms | 98Hz | 2.8ms | 1kHz
+ 192:mpu6050.c     **** * 3 | 44Hz | 4.9ms | 42Hz | 4.8ms | 1kHz
+ 193:mpu6050.c     **** * 4 | 21Hz | 8.5ms | 20Hz | 8.3ms | 1kHz
+ 194:mpu6050.c     **** * 5 | 10Hz | 13.8ms | 10Hz | 13.4ms | 1kHz
+ 195:mpu6050.c     **** * 6 | 5Hz | 19.0ms | 5Hz | 18.6ms | 1kHz
+ 196:mpu6050.c     **** * 7 | -- Reserved -- | -- Reserved -- | Reserved
+ 197:mpu6050.c     **** * </pre>
+ 198:mpu6050.c     **** *
+ 199:mpu6050.c     **** * @return DLFP configuration
+ 200:mpu6050.c     **** * @see MPU6050_RA_CONFIG
+ 201:mpu6050.c     **** * @see MPU6050_CFG_DLPF_CFG_BIT
+ 202:mpu6050.c     **** * @see MPU6050_CFG_DLPF_CFG_LENGTH
+ 203:mpu6050.c     **** */
+ 204:mpu6050.c     **** inline void mpu_set_DLPF_mode(char mode) {
+ 205:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode);
+  95              		.loc 1 205 0
+  96 0060 0210A0E3 		mov	r1, #2
+  97 0064 0320A0E3 		mov	r2, #3
+  98 0068 0030A0E3 		mov	r3, #0
+  99 006c 1A00A0E3 		mov	r0, #26
+ 100 0070 FEFFFFEB 		bl	i2c_write_bits
+ 101              	.LVL6:
+ 102              	.LBE27:
+ 103              	.LBE26:
+ 104              	.LBB28:
+ 105              	.LBB29:
+ 134:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1, enable);
+ 106              		.loc 1 134 0
+ 107 0074 0610A0E3 		mov	r1, #6
+ 108 0078 0120A0E3 		mov	r2, #1
+ 109 007c 0030A0E3 		mov	r3, #0
+ 110 0080 6B00A0E3 		mov	r0, #107
+ 111 0084 FEFFFFEB 		bl	i2c_write_bits
+ 112              	.LBE29:
+ 113              	.LBE28:
+  71:mpu6050.c     **** }
+ 114              		.loc 1 71 0
+ 115 0088 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 116 008c 1EFF2FE1 		bx	lr
+ 117              		.cfi_endproc
+ 118              	.LFE0:
+ 119              		.fnend
+ 121              		.align	2
+ 122              		.global	mpu_set_6axis_FIFO_enabled
+ 124              	mpu_set_6axis_FIFO_enabled:
+ 125              		.fnstart
+ 126              	.LFB8:
+ 206:mpu6050.c     **** }
+ 207:mpu6050.c     **** 
+ 208:mpu6050.c     **** /**
+ 209:mpu6050.c     ****  * Configure FIFO to store data from accelerometer temp and gyro
+ 210:mpu6050.c     ****  * @param enabled 0 disabled; 1 enabled
+ 211:mpu6050.c     ****  */
+ 212:mpu6050.c     **** void mpu_set_6axis_FIFO_enabled(char enabled) {
+ 127              		.loc 1 212 0
+ 128              		.cfi_startproc
+ 129              		@ Function supports interworking.
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132              	.LVL7:
+ 133 0090 08402DE9 		stmfd	sp!, {r3, lr}
+ 134              		.save {r3, lr}
+ 135              	.LCFI1:
+ 136              		.cfi_def_cfa_offset 8
+ 213:mpu6050.c     **** 	i2c_write_byte(MPU6050_RA_FIFO_EN, 0x78);
+ 137              		.loc 1 213 0
+ 138 0094 7810A0E3 		mov	r1, #120
+ 139 0098 2300A0E3 		mov	r0, #35
+ 140              	.LVL8:
+ 141              		.cfi_offset 14, -4
+ 142              		.cfi_offset 3, -8
+ 143 009c FEFFFFEB 		bl	i2c_write_byte
+ 214:mpu6050.c     **** //	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_ACCEL_FIFO_EN_BIT, 1, enabled);
+ 215:mpu6050.c     **** //	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_TEMP_FIFO_EN_BIT, 1, 0);
+ 216:mpu6050.c     **** //	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_XG_FIFO_EN_BIT, 1, enabled);
+ 217:mpu6050.c     **** //	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_YG_FIFO_EN_BIT, 1, enabled);
+ 218:mpu6050.c     **** //	i2c_write_bits(MPU6050_RA_FIFO_EN, MPU6050_ZG_FIFO_EN_BIT, 1, enabled);
+ 219:mpu6050.c     **** }
+ 144              		.loc 1 219 0
+ 145 00a0 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 146 00a4 1EFF2FE1 		bx	lr
+ 147              		.cfi_endproc
+ 148              	.LFE8:
+ 149              		.fnend
+ 151              		.align	2
+ 152              		.global	mpu_set_interrupt_mode
+ 154              	mpu_set_interrupt_mode:
+ 155              		.fnstart
+ 156              	.LFB9:
+ 220:mpu6050.c     **** 
+ 221:mpu6050.c     **** /**
+ 222:mpu6050.c     ****  * Configure interruption mode
+ 223:mpu6050.c     ****  * @param mode 0 active high; 1 active low
+ 224:mpu6050.c     ****  */
+ 225:mpu6050.c     **** void mpu_set_interrupt_mode(char mode) {
+ 157              		.loc 1 225 0
+ 158              		.cfi_startproc
+ 159              		@ Function supports interworking.
+ 160              		@ args = 0, pretend = 0, frame = 0
+ 161              		@ frame_needed = 0, uses_anonymous_args = 0
+ 162              	.LVL9:
+ 163 00a8 08402DE9 		stmfd	sp!, {r3, lr}
+ 164              		.save {r3, lr}
+ 165              	.LCFI2:
+ 166              		.cfi_def_cfa_offset 8
+ 226:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_INT_LEVEL_BIT, 1, mode);
+ 167              		.loc 1 226 0
+ 168 00ac 0710A0E3 		mov	r1, #7
+ 225:mpu6050.c     **** void mpu_set_interrupt_mode(char mode) {
+ 169              		.loc 1 225 0
+ 170 00b0 0030A0E1 		mov	r3, r0
+ 171              		.cfi_offset 14, -4
+ 172              		.cfi_offset 3, -8
+ 173              		.loc 1 226 0
+ 174 00b4 0120A0E3 		mov	r2, #1
+ 175 00b8 3700A0E3 		mov	r0, #55
+ 176              	.LVL10:
+ 177 00bc FEFFFFEB 		bl	i2c_write_bits
+ 227:mpu6050.c     **** }
+ 178              		.loc 1 227 0
+ 179 00c0 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 180 00c4 1EFF2FE1 		bx	lr
+ 181              		.cfi_endproc
+ 182              	.LFE9:
+ 183              		.fnend
+ 185              		.align	2
+ 186              		.global	mpu_set_interrupt_drive
+ 188              	mpu_set_interrupt_drive:
+ 189              		.fnstart
+ 190              	.LFB10:
+ 228:mpu6050.c     **** 
+ 229:mpu6050.c     **** /**
+ 230:mpu6050.c     ****  * Set interrupt drive mode
+ 231:mpu6050.c     ****  * @param drive 0 push/pull; 1 open-drain
+ 232:mpu6050.c     ****  */
+ 233:mpu6050.c     **** void mpu_set_interrupt_drive(char drive) {
+ 191              		.loc 1 233 0
+ 192              		.cfi_startproc
+ 193              		@ Function supports interworking.
+ 194              		@ args = 0, pretend = 0, frame = 0
+ 195              		@ frame_needed = 0, uses_anonymous_args = 0
+ 196              	.LVL11:
+ 197 00c8 08402DE9 		stmfd	sp!, {r3, lr}
+ 198              		.save {r3, lr}
+ 199              	.LCFI3:
+ 200              		.cfi_def_cfa_offset 8
+ 234:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_INT_OPEN_BIT, 1, drive);
+ 201              		.loc 1 234 0
+ 202 00cc 0610A0E3 		mov	r1, #6
+ 233:mpu6050.c     **** void mpu_set_interrupt_drive(char drive) {
+ 203              		.loc 1 233 0
+ 204 00d0 0030A0E1 		mov	r3, r0
+ 205              		.cfi_offset 14, -4
+ 206              		.cfi_offset 3, -8
+ 207              		.loc 1 234 0
+ 208 00d4 0120A0E3 		mov	r2, #1
+ 209 00d8 3700A0E3 		mov	r0, #55
+ 210              	.LVL12:
+ 211 00dc FEFFFFEB 		bl	i2c_write_bits
+ 235:mpu6050.c     **** }
+ 212              		.loc 1 235 0
+ 213 00e0 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 214 00e4 1EFF2FE1 		bx	lr
+ 215              		.cfi_endproc
+ 216              	.LFE10:
+ 217              		.fnend
+ 219              		.align	2
+ 220              		.global	mpu_set_interrupt_latch
+ 222              	mpu_set_interrupt_latch:
+ 223              		.fnstart
+ 224              	.LFB11:
+ 236:mpu6050.c     **** 
+ 237:mpu6050.c     **** /**
+ 238:mpu6050.c     ****  * Set interrupt latch mode
+ 239:mpu6050.c     ****  * @param latch 0 50us pulse; 1 high until interrupt is cleared
+ 240:mpu6050.c     ****  */
+ 241:mpu6050.c     **** void mpu_set_interrupt_latch(char latch) {
+ 225              		.loc 1 241 0
+ 226              		.cfi_startproc
+ 227              		@ Function supports interworking.
+ 228              		@ args = 0, pretend = 0, frame = 0
+ 229              		@ frame_needed = 0, uses_anonymous_args = 0
+ 230              	.LVL13:
+ 231 00e8 08402DE9 		stmfd	sp!, {r3, lr}
+ 232              		.save {r3, lr}
+ 233              	.LCFI4:
+ 234              		.cfi_def_cfa_offset 8
+ 242:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_LATCH_INT_EN_BIT, 1, latch);
+ 235              		.loc 1 242 0
+ 236 00ec 0510A0E3 		mov	r1, #5
+ 241:mpu6050.c     **** void mpu_set_interrupt_latch(char latch) {
+ 237              		.loc 1 241 0
+ 238 00f0 0030A0E1 		mov	r3, r0
+ 239              		.cfi_offset 14, -4
+ 240              		.cfi_offset 3, -8
+ 241              		.loc 1 242 0
+ 242 00f4 0120A0E3 		mov	r2, #1
+ 243 00f8 3700A0E3 		mov	r0, #55
+ 244              	.LVL14:
+ 245 00fc FEFFFFEB 		bl	i2c_write_bits
+ 243:mpu6050.c     **** }
+ 246              		.loc 1 243 0
+ 247 0100 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 248 0104 1EFF2FE1 		bx	lr
+ 249              		.cfi_endproc
+ 250              	.LFE11:
+ 251              		.fnend
+ 253              		.align	2
+ 254              		.global	mpu_set_FIFO_overflow_interrupt
+ 256              	mpu_set_FIFO_overflow_interrupt:
+ 257              		.fnstart
+ 258              	.LFB12:
+ 244:mpu6050.c     **** 
+ 245:mpu6050.c     **** /**
+ 246:mpu6050.c     ****  * Set FIFO Buffer Overflow interrupt enabled status.
+ 247:mpu6050.c     ****  * @param enabled 1 enabled; 0 disabled
+ 248:mpu6050.c     ****  */
+ 249:mpu6050.c     **** void mpu_set_FIFO_overflow_interrupt(char enabled) {
+ 259              		.loc 1 249 0
+ 260              		.cfi_startproc
+ 261              		@ Function supports interworking.
+ 262              		@ args = 0, pretend = 0, frame = 0
+ 263              		@ frame_needed = 0, uses_anonymous_args = 0
+ 264              	.LVL15:
+ 265 0108 08402DE9 		stmfd	sp!, {r3, lr}
+ 266              		.save {r3, lr}
+ 267              	.LCFI5:
+ 268              		.cfi_def_cfa_offset 8
+ 250:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_INT_ENABLE, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, 1, enabled);
+ 269              		.loc 1 250 0
+ 270 010c 0410A0E3 		mov	r1, #4
+ 249:mpu6050.c     **** void mpu_set_FIFO_overflow_interrupt(char enabled) {
+ 271              		.loc 1 249 0
+ 272 0110 0030A0E1 		mov	r3, r0
+ 273              		.cfi_offset 14, -4
+ 274              		.cfi_offset 3, -8
+ 275              		.loc 1 250 0
+ 276 0114 0120A0E3 		mov	r2, #1
+ 277 0118 3800A0E3 		mov	r0, #56
+ 278              	.LVL16:
+ 279 011c FEFFFFEB 		bl	i2c_write_bits
+ 251:mpu6050.c     **** }
+ 280              		.loc 1 251 0
+ 281 0120 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 282 0124 1EFF2FE1 		bx	lr
+ 283              		.cfi_endproc
+ 284              	.LFE12:
+ 285              		.fnend
+ 287              		.align	2
+ 288              		.global	mpu_set_data_ready_interrupt
+ 290              	mpu_set_data_ready_interrupt:
+ 291              		.fnstart
+ 292              	.LFB13:
+ 252:mpu6050.c     **** 
+ 253:mpu6050.c     **** /**
+ 254:mpu6050.c     ****  * Set Data Ready interrupt enabled status.
+ 255:mpu6050.c     ****  * @param enabled 1 enabled; 0 disabled
+ 256:mpu6050.c     ****  */
+ 257:mpu6050.c     **** void mpu_set_data_ready_interrupt(char enabled) {
+ 293              		.loc 1 257 0
+ 294              		.cfi_startproc
+ 295              		@ Function supports interworking.
+ 296              		@ args = 0, pretend = 0, frame = 0
+ 297              		@ frame_needed = 0, uses_anonymous_args = 0
+ 298              	.LVL17:
+ 299 0128 08402DE9 		stmfd	sp!, {r3, lr}
+ 300              		.save {r3, lr}
+ 301              	.LCFI6:
+ 302              		.cfi_def_cfa_offset 8
+ 258:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_INT_ENABLE, MPU6050_INTERRUPT_DATA_RDY_BIT, 1, enabled);
+ 303              		.loc 1 258 0
+ 304 012c 0010A0E3 		mov	r1, #0
+ 257:mpu6050.c     **** void mpu_set_data_ready_interrupt(char enabled) {
+ 305              		.loc 1 257 0
+ 306 0130 0030A0E1 		mov	r3, r0
+ 307              		.cfi_offset 14, -4
+ 308              		.cfi_offset 3, -8
+ 309              		.loc 1 258 0
+ 310 0134 0120A0E3 		mov	r2, #1
+ 311 0138 3800A0E3 		mov	r0, #56
+ 312              	.LVL18:
+ 313 013c FEFFFFEB 		bl	i2c_write_bits
+ 259:mpu6050.c     **** }
+ 314              		.loc 1 259 0
+ 315 0140 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 316 0144 1EFF2FE1 		bx	lr
+ 317              		.cfi_endproc
+ 318              	.LFE13:
+ 319              		.fnend
+ 321              		.align	2
+ 322              		.global	mpu_clear_interrupt
+ 324              	mpu_clear_interrupt:
+ 325              		.fnstart
+ 326              	.LFB14:
+ 260:mpu6050.c     **** 
+ 261:mpu6050.c     **** /** Get full set of interrupt status bits.
+ 262:mpu6050.c     **** * These bits clear to 0 after the register has been read. Very useful
+ 263:mpu6050.c     **** * for getting multiple INT statuses, since each single bit read clears
+ 264:mpu6050.c     **** * all of them because it has to read the whole byte.
+ 265:mpu6050.c     **** * @see MPU6050_RA_INT_STATUS
+ 266:mpu6050.c     **** */
+ 267:mpu6050.c     **** int mpu_clear_interrupt(char* data) {
+ 327              		.loc 1 267 0
+ 328              		.cfi_startproc
+ 329              		@ Function supports interworking.
+ 330              		@ args = 0, pretend = 0, frame = 0
+ 331              		@ frame_needed = 0, uses_anonymous_args = 0
+ 332              	.LVL19:
+ 333 0148 0010A0E1 		mov	r1, r0
+ 334 014c 08402DE9 		stmfd	sp!, {r3, lr}
+ 335              		.save {r3, lr}
+ 336              	.LCFI7:
+ 337              		.cfi_def_cfa_offset 8
+ 268:mpu6050.c     **** 	return i2c_read_byte(MPU6050_RA_INT_STATUS, data);
+ 338              		.loc 1 268 0
+ 339 0150 3A00A0E3 		mov	r0, #58
+ 340              	.LVL20:
+ 341              		.cfi_offset 14, -4
+ 342              		.cfi_offset 3, -8
+ 343 0154 FEFFFFEB 		bl	i2c_read_byte
+ 344              	.LVL21:
+ 269:mpu6050.c     **** }
+ 345              		.loc 1 269 0
+ 346 0158 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 347 015c 1EFF2FE1 		bx	lr
+ 348              		.cfi_endproc
+ 349              	.LFE14:
+ 350              		.fnend
+ 352              		.align	2
+ 353              		.global	mpu_set_FIFO_enabled
+ 355              	mpu_set_FIFO_enabled:
+ 356              		.fnstart
+ 357              	.LFB15:
+ 270:mpu6050.c     **** 
+ 271:mpu6050.c     **** /** Enable FIFO usage.
+ 272:mpu6050.c     ****  * @param enabled 1 enabled; 0 disabled
+ 273:mpu6050.c     ****  */
+ 274:mpu6050.c     **** void mpu_set_FIFO_enabled(char enabled) {
+ 358              		.loc 1 274 0
+ 359              		.cfi_startproc
+ 360              		@ Function supports interworking.
+ 361              		@ args = 0, pretend = 0, frame = 0
+ 362              		@ frame_needed = 0, uses_anonymous_args = 0
+ 363              	.LVL22:
+ 364 0160 08402DE9 		stmfd	sp!, {r3, lr}
+ 365              		.save {r3, lr}
+ 366              	.LCFI8:
+ 367              		.cfi_def_cfa_offset 8
+ 275:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, 1, enabled);
+ 368              		.loc 1 275 0
+ 369 0164 0610A0E3 		mov	r1, #6
+ 274:mpu6050.c     **** void mpu_set_FIFO_enabled(char enabled) {
+ 370              		.loc 1 274 0
+ 371 0168 0030A0E1 		mov	r3, r0
+ 372              		.cfi_offset 14, -4
+ 373              		.cfi_offset 3, -8
+ 374              		.loc 1 275 0
+ 375 016c 0120A0E3 		mov	r2, #1
+ 376 0170 6A00A0E3 		mov	r0, #106
+ 377              	.LVL23:
+ 378 0174 FEFFFFEB 		bl	i2c_write_bits
+ 276:mpu6050.c     **** }
+ 379              		.loc 1 276 0
+ 380 0178 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 381 017c 1EFF2FE1 		bx	lr
+ 382              		.cfi_endproc
+ 383              	.LFE15:
+ 384              		.fnend
+ 386              		.align	2
+ 387              		.global	mpu_reset_FIFO
+ 389              	mpu_reset_FIFO:
+ 390              		.fnstart
+ 391              	.LFB16:
+ 277:mpu6050.c     **** 
+ 278:mpu6050.c     **** /**
+ 279:mpu6050.c     ****  * Reset the FIFO.
+ 280:mpu6050.c     ****  * This bit resets the FIFO buffer when set to 1 while FIFO_EN equals 0. This
+ 281:mpu6050.c     ****  * bit automatically clears to 0 after the reset has been triggered.
+ 282:mpu6050.c     ****  * @param enabled 1 enabled; 0 disabled
+ 283:mpu6050.c     ****  */
+ 284:mpu6050.c     **** void mpu_reset_FIFO(void) {
+ 392              		.loc 1 284 0
+ 393              		.cfi_startproc
+ 394              		@ Function supports interworking.
+ 395              		@ args = 0, pretend = 0, frame = 0
+ 396              		@ frame_needed = 0, uses_anonymous_args = 0
+ 285:mpu6050.c     **** 	i2c_write_bits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1, 1);
+ 397              		.loc 1 285 0
+ 398 0180 0120A0E3 		mov	r2, #1
+ 284:mpu6050.c     **** void mpu_reset_FIFO(void) {
+ 399              		.loc 1 284 0
+ 400 0184 08402DE9 		stmfd	sp!, {r3, lr}
+ 401              		.save {r3, lr}
+ 402              	.LCFI9:
+ 403              		.cfi_def_cfa_offset 8
+ 404              		.loc 1 285 0
+ 405 0188 0210A0E3 		mov	r1, #2
+ 406 018c 0230A0E1 		mov	r3, r2
+ 407              		.cfi_offset 14, -4
+ 408              		.cfi_offset 3, -8
+ 409 0190 6A00A0E3 		mov	r0, #106
+ 410 0194 FEFFFFEB 		bl	i2c_write_bits
+ 286:mpu6050.c     **** }
+ 411              		.loc 1 286 0
+ 412 0198 0840BDE8 		ldmfd	sp!, {r3, lr}
+ 413 019c 1EFF2FE1 		bx	lr
+ 414              		.cfi_endproc
+ 415              	.LFE16:
+ 416              		.fnend
+ 418              		.align	2
+ 419              		.global	mpu_get_FIFO_size
+ 421              	mpu_get_FIFO_size:
+ 422              		.fnstart
+ 423              	.LFB17:
+ 287:mpu6050.c     **** 
+ 288:mpu6050.c     **** 
+ 289:mpu6050.c     **** /** Get current FIFO buffer size.
+ 290:mpu6050.c     **** * This value indicates the number of bytes stored in the FIFO buffer. This
+ 291:mpu6050.c     **** * number is in turn the number of bytes that can be read from the FIFO buffer
+ 292:mpu6050.c     **** * and it is directly proportional to the number of samples available given the
+ 293:mpu6050.c     **** * set of sensor data bound to be stored in the FIFO (register 35 and 36).
+ 294:mpu6050.c     **** */
+ 295:mpu6050.c     **** void mpu_get_FIFO_size(int* size) {
+ 424              		.loc 1 295 0
+ 425              		.cfi_startproc
+ 426              		@ Function supports interworking.
+ 427              		@ args = 0, pretend = 0, frame = 8
+ 428              		@ frame_needed = 0, uses_anonymous_args = 0
+ 429              	.LVL24:
+ 430 01a0 10402DE9 		stmfd	sp!, {r4, lr}
+ 431              		.save {r4, lr}
+ 432              	.LCFI10:
+ 433              		.cfi_def_cfa_offset 8
+ 434              		.pad #8
+ 435 01a4 08D04DE2 		sub	sp, sp, #8
+ 436              	.LCFI11:
+ 437              		.cfi_def_cfa_offset 16
+ 438              		.loc 1 295 0
+ 439 01a8 0040A0E1 		mov	r4, r0
+ 440              		.cfi_offset 14, -4
+ 441              		.cfi_offset 4, -8
+ 296:mpu6050.c     **** 	char count[2];
+ 297:mpu6050.c     **** 	i2c_read_bytes(MPU6050_RA_FIFO_COUNTH, 2, count);
+ 442              		.loc 1 297 0
+ 443 01ac 04208DE2 		add	r2, sp, #4
+ 444 01b0 0210A0E3 		mov	r1, #2
+ 445 01b4 7200A0E3 		mov	r0, #114
+ 446              	.LVL25:
+ 447 01b8 FEFFFFEB 		bl	i2c_read_bytes
+ 298:mpu6050.c     **** 	*size = (((int)count[0]) << 8) | count[1];
+ 448              		.loc 1 298 0
+ 449 01bc 0420DDE5 		ldrb	r2, [sp, #4]	@ zero_extendqisi2
+ 450 01c0 0500DDE5 		ldrb	r0, [sp, #5]	@ zero_extendqisi2
+ 451 01c4 023480E1 		orr	r3, r0, r2, asl #8
+ 452 01c8 003084E5 		str	r3, [r4, #0]
+ 299:mpu6050.c     **** }
+ 453              		.loc 1 299 0
+ 454 01cc 08D08DE2 		add	sp, sp, #8
+ 455 01d0 1040BDE8 		ldmfd	sp!, {r4, lr}
+ 456 01d4 1EFF2FE1 		bx	lr
+ 457              		.cfi_endproc
+ 458              	.LFE17:
+ 459              		.fnend
+ 461              		.align	2
+ 462              		.global	mpu_get_motion6
+ 464              	mpu_get_motion6:
+ 465              		.fnstart
+ 466              	.LFB18:
+ 300:mpu6050.c     **** 
+ 301:mpu6050.c     **** /** Get raw 6-axis motion sensor readings (accel/gyro).
+ 302:mpu6050.c     **** * Retrieves all currently available motion sensor values.
+ 303:mpu6050.c     **** * @param ax 16-bit signed integer container for accelerometer X-axis value
+ 304:mpu6050.c     **** * @param ay 16-bit signed integer container for accelerometer Y-axis value
+ 305:mpu6050.c     **** * @param az 16-bit signed integer container for accelerometer Z-axis value
+ 306:mpu6050.c     **** * @param gx 16-bit signed integer container for gyroscope X-axis value
+ 307:mpu6050.c     **** * @param gy 16-bit signed integer container for gyroscope Y-axis value
+ 308:mpu6050.c     **** * @param gz 16-bit signed integer container for gyroscope Z-axis value
+ 309:mpu6050.c     **** *
+ 310:mpu6050.c     **** * buff:
+ 311:mpu6050.c     **** * ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l,
+ 312:mpu6050.c     **** *
+ 313:mpu6050.c     **** * @see getAcceleration()
+ 314:mpu6050.c     **** * @see getRotation()
+ 315:mpu6050.c     **** * @see MPU6050_RA_ACCEL_XOUT_H
+ 316:mpu6050.c     **** */
+ 317:mpu6050.c     **** void mpu_get_motion6(char* buff) {
+ 467              		.loc 1 317 0
+ 468              		.cfi_startproc
+ 469              		@ Function supports interworking.
+ 470              		@ args = 0, pretend = 0, frame = 16
+ 471              		@ frame_needed = 0, uses_anonymous_args = 0
+ 472              	.LVL26:
+ 473 01d8 F04F2DE9 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 474              		.save {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 475              	.LCFI12:
+ 476              		.cfi_def_cfa_offset 36
+ 477              		.pad #20
+ 478 01dc 14D04DE2 		sub	sp, sp, #20
+ 479              	.LCFI13:
+ 480              		.cfi_def_cfa_offset 56
+ 481              		.loc 1 317 0
+ 482 01e0 0040A0E1 		mov	r4, r0
+ 483              		.cfi_offset 14, -4
+ 484              		.cfi_offset 11, -8
+ 485              		.cfi_offset 10, -12
+ 486              		.cfi_offset 9, -16
+ 487              		.cfi_offset 8, -20
+ 488              		.cfi_offset 7, -24
+ 489              		.cfi_offset 6, -28
+ 490              		.cfi_offset 5, -32
+ 491              		.cfi_offset 4, -36
+ 318:mpu6050.c     **** 
+ 319:mpu6050.c     **** 	log_string_mpu(">> mpu_get_motion6\n");
+ 320:mpu6050.c     **** 
+ 321:mpu6050.c     **** 	char c[14];
+ 322:mpu6050.c     **** 	i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, 14, c);
+ 492              		.loc 1 322 0
+ 493 01e4 0E10A0E3 		mov	r1, #14
+ 494 01e8 0D20A0E1 		mov	r2, sp
+ 495 01ec 3B00A0E3 		mov	r0, #59
+ 496              	.LVL27:
+ 497 01f0 FEFFFFEB 		bl	i2c_read_bytes
+ 323:mpu6050.c     **** 	*buff = c[0];
+ 498              		.loc 1 323 0
+ 499 01f4 0090DDE5 		ldrb	r9, [sp, #0]	@ zero_extendqisi2
+ 324:mpu6050.c     **** 	*(buff+1) = c[1];
+ 500              		.loc 1 324 0
+ 501 01f8 01A0DDE5 		ldrb	sl, [sp, #1]	@ zero_extendqisi2
+ 325:mpu6050.c     **** 	*(buff+2) = c[2];
+ 502              		.loc 1 325 0
+ 503 01fc 0280DDE5 		ldrb	r8, [sp, #2]	@ zero_extendqisi2
+ 326:mpu6050.c     **** 	*(buff+3) = c[3];
+ 504              		.loc 1 326 0
+ 505 0200 0370DDE5 		ldrb	r7, [sp, #3]	@ zero_extendqisi2
+ 327:mpu6050.c     **** 	*(buff+4) = c[4];
+ 506              		.loc 1 327 0
+ 507 0204 0460DDE5 		ldrb	r6, [sp, #4]	@ zero_extendqisi2
+ 328:mpu6050.c     **** 	*(buff+5) = c[5];
+ 508              		.loc 1 328 0
+ 509 0208 0550DDE5 		ldrb	r5, [sp, #5]	@ zero_extendqisi2
+ 329:mpu6050.c     **** 	*(buff+6) = c[8];
+ 510              		.loc 1 329 0
+ 511 020c 08C0DDE5 		ldrb	ip, [sp, #8]	@ zero_extendqisi2
+ 330:mpu6050.c     **** 	*(buff+7) = c[9];
+ 512              		.loc 1 330 0
+ 513 0210 0900DDE5 		ldrb	r0, [sp, #9]	@ zero_extendqisi2
+ 331:mpu6050.c     **** 	*(buff+8) = c[10];
+ 514              		.loc 1 331 0
+ 515 0214 0A10DDE5 		ldrb	r1, [sp, #10]	@ zero_extendqisi2
+ 332:mpu6050.c     **** 	*(buff+9) = c[11];
+ 516              		.loc 1 332 0
+ 517 0218 0B20DDE5 		ldrb	r2, [sp, #11]	@ zero_extendqisi2
+ 333:mpu6050.c     **** 	*(buff+10) = c[12];
+ 518              		.loc 1 333 0
+ 519 021c 0CB0DDE5 		ldrb	fp, [sp, #12]	@ zero_extendqisi2
+ 334:mpu6050.c     **** 	*(buff+11) = c[13];
+ 520              		.loc 1 334 0
+ 521 0220 0D30DDE5 		ldrb	r3, [sp, #13]	@ zero_extendqisi2
+ 323:mpu6050.c     **** 	*buff = c[0];
+ 522              		.loc 1 323 0
+ 523 0224 0090C4E5 		strb	r9, [r4, #0]
+ 324:mpu6050.c     **** 	*(buff+1) = c[1];
+ 524              		.loc 1 324 0
+ 525 0228 01A0C4E5 		strb	sl, [r4, #1]
+ 325:mpu6050.c     **** 	*(buff+2) = c[2];
+ 526              		.loc 1 325 0
+ 527 022c 0280C4E5 		strb	r8, [r4, #2]
+ 326:mpu6050.c     **** 	*(buff+3) = c[3];
+ 528              		.loc 1 326 0
+ 529 0230 0370C4E5 		strb	r7, [r4, #3]
+ 327:mpu6050.c     **** 	*(buff+4) = c[4];
+ 530              		.loc 1 327 0
+ 531 0234 0460C4E5 		strb	r6, [r4, #4]
+ 328:mpu6050.c     **** 	*(buff+5) = c[5];
+ 532              		.loc 1 328 0
+ 533 0238 0550C4E5 		strb	r5, [r4, #5]
+ 329:mpu6050.c     **** 	*(buff+6) = c[8];
+ 534              		.loc 1 329 0
+ 535 023c 06C0C4E5 		strb	ip, [r4, #6]
+ 330:mpu6050.c     **** 	*(buff+7) = c[9];
+ 536              		.loc 1 330 0
+ 537 0240 0700C4E5 		strb	r0, [r4, #7]
+ 331:mpu6050.c     **** 	*(buff+8) = c[10];
+ 538              		.loc 1 331 0
+ 539 0244 0810C4E5 		strb	r1, [r4, #8]
+ 332:mpu6050.c     **** 	*(buff+9) = c[11];
+ 540              		.loc 1 332 0
+ 541 0248 0920C4E5 		strb	r2, [r4, #9]
+ 333:mpu6050.c     **** 	*(buff+10) = c[12];
+ 542              		.loc 1 333 0
+ 543 024c 0AB0C4E5 		strb	fp, [r4, #10]
+ 544              		.loc 1 334 0
+ 545 0250 0B30C4E5 		strb	r3, [r4, #11]
+ 335:mpu6050.c     **** 
+ 336:mpu6050.c     **** 	log_string_mpu("<< mpu_get_motion6\n");
+ 337:mpu6050.c     **** }
+ 546              		.loc 1 337 0
+ 547 0254 14D08DE2 		add	sp, sp, #20
+ 548 0258 F04FBDE8 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 549 025c 1EFF2FE1 		bx	lr
+ 550              		.cfi_endproc
+ 551              	.LFE18:
+ 552              		.fnend
+ 554              		.align	2
+ 555              		.global	mpu_get_FIFO_motion6
+ 557              	mpu_get_FIFO_motion6:
+ 558              		.fnstart
+ 559              	.LFB19:
+ 338:mpu6050.c     **** 
+ 339:mpu6050.c     **** /** Get byte from FIFO buffer.
+ 340:mpu6050.c     **** * This register is used to read and write data from the FIFO buffer. Data is
+ 341:mpu6050.c     **** * written to the FIFO in order of register number (from lowest to highest). If
+ 342:mpu6050.c     **** * all the FIFO enable flags (see below) are enabled and all External Sensor
+ 343:mpu6050.c     **** * Data registers (Registers 73 to 96) are associated with a Slave device, the
+ 344:mpu6050.c     **** * contents of registers 59 through 96 will be written in order at the Sample
+ 345:mpu6050.c     **** * Rate.
+ 346:mpu6050.c     **** *
+ 347:mpu6050.c     **** * The contents of the sensor data registers (Registers 59 to 96) are written
+ 348:mpu6050.c     **** * into the FIFO buffer when their corresponding FIFO enable flags are set to 1
+ 349:mpu6050.c     **** * in FIFO_EN (Register 35). An additional flag for the sensor data registers
+ 350:mpu6050.c     **** * associated with I2C Slave 3 can be found in I2C_MST_CTRL (Register 36).
+ 351:mpu6050.c     **** *
+ 352:mpu6050.c     **** * If the FIFO buffer has overflowed, the status bit FIFO_OFLOW_INT is
+ 353:mpu6050.c     **** * automatically set to 1. This bit is located in INT_STATUS (Register 58).
+ 354:mpu6050.c     **** * When the FIFO buffer has overflowed, the oldest data will be lost and new
+ 355:mpu6050.c     **** * data will be written to the FIFO.
+ 356:mpu6050.c     **** *
+ 357:mpu6050.c     **** * If the FIFO buffer is empty, reading this register will return the last byte
+ 358:mpu6050.c     **** * that was previously read from the FIFO until new data is available. The user
+ 359:mpu6050.c     **** * should check FIFO_COUNT to ensure that the FIFO buffer is not read when
+ 360:mpu6050.c     **** * empty.
+ 361:mpu6050.c     **** *
+ 362:mpu6050.c     **** * buff:
+ 363:mpu6050.c     **** * ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l,
+ 364:mpu6050.c     **** *
+ 365:mpu6050.c     **** */
+ 366:mpu6050.c     **** void mpu_get_FIFO_motion6(char* buff) {
+ 560              		.loc 1 366 0
+ 561              		.cfi_startproc
+ 562              		@ Function supports interworking.
+ 563              		@ args = 0, pretend = 0, frame = 16
+ 564              		@ frame_needed = 0, uses_anonymous_args = 0
+ 565              	.LVL28:
+ 566 0260 F04F2DE9 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 567              		.save {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 568              	.LCFI14:
+ 569              		.cfi_def_cfa_offset 36
+ 570              		.pad #20
+ 571 0264 14D04DE2 		sub	sp, sp, #20
+ 572              	.LCFI15:
+ 573              		.cfi_def_cfa_offset 56
+ 574              		.loc 1 366 0
+ 575 0268 0040A0E1 		mov	r4, r0
+ 576              		.cfi_offset 14, -4
+ 577              		.cfi_offset 11, -8
+ 578              		.cfi_offset 10, -12
+ 579              		.cfi_offset 9, -16
+ 580              		.cfi_offset 8, -20
+ 581              		.cfi_offset 7, -24
+ 582              		.cfi_offset 6, -28
+ 583              		.cfi_offset 5, -32
+ 584              		.cfi_offset 4, -36
+ 367:mpu6050.c     **** 
+ 368:mpu6050.c     **** 	char c[12];
+ 369:mpu6050.c     **** 	i2c_read_bytes(MPU6050_RA_FIFO_R_W, 12, c);
+ 585              		.loc 1 369 0
+ 586 026c 0C10A0E3 		mov	r1, #12
+ 587 0270 04208DE2 		add	r2, sp, #4
+ 588 0274 7400A0E3 		mov	r0, #116
+ 589              	.LVL29:
+ 590 0278 FEFFFFEB 		bl	i2c_read_bytes
+ 370:mpu6050.c     **** 
+ 371:mpu6050.c     **** 	*buff = c[0];
+ 591              		.loc 1 371 0
+ 592 027c 0490DDE5 		ldrb	r9, [sp, #4]	@ zero_extendqisi2
+ 372:mpu6050.c     **** 	*(buff+1) = c[1];
+ 593              		.loc 1 372 0
+ 594 0280 05A0DDE5 		ldrb	sl, [sp, #5]	@ zero_extendqisi2
+ 373:mpu6050.c     **** 	*(buff+2) = c[2];
+ 595              		.loc 1 373 0
+ 596 0284 0680DDE5 		ldrb	r8, [sp, #6]	@ zero_extendqisi2
+ 374:mpu6050.c     **** 	*(buff+3) = c[3];
+ 597              		.loc 1 374 0
+ 598 0288 0770DDE5 		ldrb	r7, [sp, #7]	@ zero_extendqisi2
+ 375:mpu6050.c     **** 	*(buff+4) = c[4];
+ 599              		.loc 1 375 0
+ 600 028c 0860DDE5 		ldrb	r6, [sp, #8]	@ zero_extendqisi2
+ 376:mpu6050.c     **** 	*(buff+5) = c[5];
+ 601              		.loc 1 376 0
+ 602 0290 0950DDE5 		ldrb	r5, [sp, #9]	@ zero_extendqisi2
+ 377:mpu6050.c     **** 	*(buff+6) = c[6];
+ 603              		.loc 1 377 0
+ 604 0294 0AC0DDE5 		ldrb	ip, [sp, #10]	@ zero_extendqisi2
+ 378:mpu6050.c     **** 	*(buff+7) = c[7];
+ 605              		.loc 1 378 0
+ 606 0298 0B00DDE5 		ldrb	r0, [sp, #11]	@ zero_extendqisi2
+ 379:mpu6050.c     **** 	*(buff+8) = c[8];
+ 607              		.loc 1 379 0
+ 608 029c 0C10DDE5 		ldrb	r1, [sp, #12]	@ zero_extendqisi2
+ 380:mpu6050.c     **** 	*(buff+9) = c[9];
+ 609              		.loc 1 380 0
+ 610 02a0 0D20DDE5 		ldrb	r2, [sp, #13]	@ zero_extendqisi2
+ 381:mpu6050.c     **** 	*(buff+10) = c[10];
+ 611              		.loc 1 381 0
+ 612 02a4 0EB0DDE5 		ldrb	fp, [sp, #14]	@ zero_extendqisi2
+ 382:mpu6050.c     **** 	*(buff+11) = c[11];
+ 613              		.loc 1 382 0
+ 614 02a8 0F30DDE5 		ldrb	r3, [sp, #15]	@ zero_extendqisi2
+ 371:mpu6050.c     **** 	*buff = c[0];
+ 615              		.loc 1 371 0
+ 616 02ac 0090C4E5 		strb	r9, [r4, #0]
+ 372:mpu6050.c     **** 	*(buff+1) = c[1];
+ 617              		.loc 1 372 0
+ 618 02b0 01A0C4E5 		strb	sl, [r4, #1]
+ 373:mpu6050.c     **** 	*(buff+2) = c[2];
+ 619              		.loc 1 373 0
+ 620 02b4 0280C4E5 		strb	r8, [r4, #2]
+ 374:mpu6050.c     **** 	*(buff+3) = c[3];
+ 621              		.loc 1 374 0
+ 622 02b8 0370C4E5 		strb	r7, [r4, #3]
+ 375:mpu6050.c     **** 	*(buff+4) = c[4];
+ 623              		.loc 1 375 0
+ 624 02bc 0460C4E5 		strb	r6, [r4, #4]
+ 376:mpu6050.c     **** 	*(buff+5) = c[5];
+ 625              		.loc 1 376 0
+ 626 02c0 0550C4E5 		strb	r5, [r4, #5]
+ 377:mpu6050.c     **** 	*(buff+6) = c[6];
+ 627              		.loc 1 377 0
+ 628 02c4 06C0C4E5 		strb	ip, [r4, #6]
+ 378:mpu6050.c     **** 	*(buff+7) = c[7];
+ 629              		.loc 1 378 0
+ 630 02c8 0700C4E5 		strb	r0, [r4, #7]
+ 379:mpu6050.c     **** 	*(buff+8) = c[8];
+ 631              		.loc 1 379 0
+ 632 02cc 0810C4E5 		strb	r1, [r4, #8]
+ 380:mpu6050.c     **** 	*(buff+9) = c[9];
+ 633              		.loc 1 380 0
+ 634 02d0 0920C4E5 		strb	r2, [r4, #9]
+ 381:mpu6050.c     **** 	*(buff+10) = c[10];
+ 635              		.loc 1 381 0
+ 636 02d4 0AB0C4E5 		strb	fp, [r4, #10]
+ 637              		.loc 1 382 0
+ 638 02d8 0B30C4E5 		strb	r3, [r4, #11]
+ 383:mpu6050.c     **** 
+ 384:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, ax_h);
+ 385:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, ax_l);
+ 386:mpu6050.c     **** //
+ 387:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, ay_h);
+ 388:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, ay_l);
+ 389:mpu6050.c     **** //
+ 390:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, az_h);
+ 391:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, az_l);
+ 392:mpu6050.c     **** //
+ 393:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, gx_h);
+ 394:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, gx_l);
+ 395:mpu6050.c     **** //
+ 396:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, gy_h);
+ 397:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, gy_l);
+ 398:mpu6050.c     **** //
+ 399:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, gz_h);
+ 400:mpu6050.c     **** //	i2c_read_byte(MPU6050_RA_FIFO_R_W, gz_l);
+ 401:mpu6050.c     **** }
+ 639              		.loc 1 401 0
+ 640 02dc 14D08DE2 		add	sp, sp, #20
+ 641 02e0 F04FBDE8 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 642 02e4 1EFF2FE1 		bx	lr
+ 643              		.cfi_endproc
+ 644              	.LFE19:
+ 645              		.fnend
+ 647              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 mpu6050.c
+     /tmp/ccCjieQa.s:21     .text:00000000 $a
+     /tmp/ccCjieQa.s:24     .text:00000000 mpu_init
+                       .ARM.extab:00000000 $d
+                       .ARM.exidx:00000000 $d
+     /tmp/ccCjieQa.s:124    .text:00000090 mpu_set_6axis_FIFO_enabled
+     /tmp/ccCjieQa.s:154    .text:000000a8 mpu_set_interrupt_mode
+     /tmp/ccCjieQa.s:188    .text:000000c8 mpu_set_interrupt_drive
+     /tmp/ccCjieQa.s:222    .text:000000e8 mpu_set_interrupt_latch
+     /tmp/ccCjieQa.s:256    .text:00000108 mpu_set_FIFO_overflow_interrupt
+     /tmp/ccCjieQa.s:290    .text:00000128 mpu_set_data_ready_interrupt
+     /tmp/ccCjieQa.s:324    .text:00000148 mpu_clear_interrupt
+     /tmp/ccCjieQa.s:355    .text:00000160 mpu_set_FIFO_enabled
+     /tmp/ccCjieQa.s:389    .text:00000180 mpu_reset_FIFO
+     /tmp/ccCjieQa.s:421    .text:000001a0 mpu_get_FIFO_size
+     /tmp/ccCjieQa.s:464    .text:000001d8 mpu_get_motion6
+     /tmp/ccCjieQa.s:557    .text:00000260 mpu_get_FIFO_motion6
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+i2c_write_bits
+i2c_write_byte
+__aeabi_unwind_cpp_pr1
+i2c_read_byte
+i2c_read_bytes
+__aeabi_unwind_cpp_pr0

@@ -1,0 +1,1327 @@
+   1              		.cpu arm7tdmi
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 2
+   9              		.eabi_attribute 30, 2
+  10              		.eabi_attribute 18, 4
+  11              		.file	"i2c.c"
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.align	2
+  22              		.global	i2c_read_bytes_isr
+  24              	i2c_read_bytes_isr:
+  25              		.fnstart
+  26              	.LFB3:
+  27              		.file 1 "i2c.c"
+   1:i2c.c         **** /*
+   2:i2c.c         ****  * i2c.c
+   3:i2c.c         ****  *
+   4:i2c.c         ****  *  Created on: Mar 21, 2013
+   5:i2c.c         ****  *      Author: telmo
+   6:i2c.c         ****  */
+   7:i2c.c         **** #include "lpc2103.h"
+   8:i2c.c         **** #include "i2c.h"
+   9:i2c.c         **** #include "logger.h"
+  10:i2c.c         **** #include "mpu6050.h"
+  11:i2c.c         **** 
+  12:i2c.c         **** void __attribute__ ((interrupt("IRQ"))) i2c_read_bytes_isr(void);
+  13:i2c.c         **** void __attribute__ ((interrupt("IRQ"))) i2c_write_byte_isr(void);
+  14:i2c.c         **** 
+  15:i2c.c         **** volatile int busy = 0;
+  16:i2c.c         **** 
+  17:i2c.c         **** static int buff_size = 0;
+  18:i2c.c         **** static int buff_pos = 0;
+  19:i2c.c         **** static char* c_buff = 0;
+  20:i2c.c         **** static char ra_buff = 0;
+  21:i2c.c         **** 
+  22:i2c.c         **** /**
+  23:i2c.c         ****  * I2C 1
+  24:i2c.c         ****  *
+  25:i2c.c         ****  * I2Cbitfrequency = PCLK / ( I2C1SCLH + I2C1SCLL )
+  26:i2c.c         ****  * 0 < I2Cbitfrequency < 400kHz
+  27:i2c.c         ****  * I2C1SCLL >= 4, I2C1SCLH >=4
+  28:i2c.c         ****  * pclk=15MHz or pclk=14.7456MHz, depending on previous configuration
+  29:i2c.c         ****  *
+  30:i2c.c         ****  * MPU Address: b1101000W
+  31:i2c.c         ****  * W bit 0 => write on the mpu registers
+  32:i2c.c         ****  * I2C Addr + Reg Addr + Data
+  33:i2c.c         ****  * I2C Addr + Reg Addr + Data + Data for Addr+1, etc
+  34:i2c.c         ****  * W bit 1 => read
+  35:i2c.c         ****  */
+  36:i2c.c         **** void i2c_init(void){
+  37:i2c.c         **** 
+  38:i2c.c         **** 	log_string_i2c(">> i2c_init\n");
+  39:i2c.c         **** 
+  40:i2c.c         **** 	// Set the pin function
+  41:i2c.c         **** 	PINSEL1 |= 0x1 << 2; // SCL1
+  42:i2c.c         **** 	PINSEL1 |= 0x1 << 4; // SDA1
+  43:i2c.c         **** 
+  44:i2c.c         **** 	I2C1CONCLR = 0x6C; // clear all flags
+  45:i2c.c         **** 	I2C1CONSET |= 0x1 << 6; // enable i2c1
+  46:i2c.c         **** 	I2C1SCLH = 19; // Set the bit rate:
+  47:i2c.c         **** 	I2C1SCLL = 19; // 394.7kHz for pclk=15MHz | 388.0kHz for pclk=14.7456MHz
+  48:i2c.c         **** 
+  49:i2c.c         **** 	// Enable the interrupts
+  50:i2c.c         **** 	VICVectCntl2 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+  51:i2c.c         **** 	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
+  52:i2c.c         **** 
+  53:i2c.c         **** 	// Enable i2c as FIQ
+  54:i2c.c         **** 	//VICIntSelect |= 0x1 << 19;// I2C1 as FIQ
+  55:i2c.c         **** 	//VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
+  56:i2c.c         **** 
+  57:i2c.c         **** 	log_string_i2c("<< i2c_init\n");
+  58:i2c.c         **** }
+  59:i2c.c         **** 
+  60:i2c.c         **** //void i2c_isr(void) {
+  61:i2c.c         **** //	(*current_isr)();
+  62:i2c.c         **** //}
+  63:i2c.c         **** 
+  64:i2c.c         **** int i2c_read_byte(char reg_addr, char* data) {
+  65:i2c.c         **** 	log_string_i2c(">> read_byte\n");
+  66:i2c.c         **** 
+  67:i2c.c         **** 	int i = i2c_read_bytes(reg_addr,1,data);
+  68:i2c.c         **** 
+  69:i2c.c         **** 	log_string_i2c("<< read_byte\n");
+  70:i2c.c         **** 	return i;
+  71:i2c.c         **** }
+  72:i2c.c         **** 
+  73:i2c.c         **** int i2c_read_bytes(char reg_addr, char length, char* data) {
+  74:i2c.c         **** 	log_string_i2c(">> read_bytes\n");
+  75:i2c.c         **** 
+  76:i2c.c         **** 	buff_size = length;
+  77:i2c.c         **** 	buff_pos = 0;
+  78:i2c.c         **** 	ra_buff = reg_addr;
+  79:i2c.c         **** 	c_buff = data;
+  80:i2c.c         **** 
+  81:i2c.c         **** 	busy = 1;
+  82:i2c.c         **** 
+  83:i2c.c         **** 	//Setting the interrupt handler location for write byte
+  84:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+  85:i2c.c         **** 	// Send Start bit
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+  87:i2c.c         **** 
+  88:i2c.c         **** 	log_string_i2c("waiting\n");
+  89:i2c.c         **** 
+  90:i2c.c         **** 	while (busy); // busy wait for read process
+  91:i2c.c         **** 
+  92:i2c.c         **** 	log_string_i2c("<< read_bytes\n");
+  93:i2c.c         **** 	return 1;
+  94:i2c.c         **** }
+  95:i2c.c         **** 
+  96:i2c.c         **** /**
+  97:i2c.c         ****  * i2c interrupt handler
+  98:i2c.c         ****  */
+  99:i2c.c         **** void i2c_read_bytes_isr(void) {
+  28              		.loc 1 99 0
+  29              		.cfi_startproc
+  30              		@ Interrupt Service Routine.
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34 0000 1F102DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, ip}
+  35              		.save {r0, r1, r2, r3, r4, ip}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 24
+ 100:i2c.c         **** 	log_string_i2c(">> read_bytes_isr\n");
+ 101:i2c.c         **** 	volatile int temp = 0;
+  38              		.loc 1 101 0
+  39 0004 0030A0E3 		mov	r3, #0
+  40              		.cfi_offset 12, -4
+  41              		.cfi_offset 4, -8
+  42              		.cfi_offset 3, -12
+  43              		.cfi_offset 2, -16
+  44              		.cfi_offset 1, -20
+  45              		.cfi_offset 0, -24
+  99:i2c.c         **** void i2c_read_bytes_isr(void) {
+  46              		.loc 1 99 0
+  47              		.pad #8
+  48 0008 08D04DE2 		sub	sp, sp, #8
+  49              	.LCFI1:
+  50              		.cfi_def_cfa_offset 32
+  51              		.loc 1 101 0
+  52 000c 04308DE5 		str	r3, [sp, #4]
+  53              	.LVL0:
+ 102:i2c.c         **** 	temp = I2C1STAT;
+  54              		.loc 1 102 0
+  55 0010 80C29FE5 		ldr	ip, .L16
+  56 0014 0420DCE5 		ldrb	r2, [ip, #4]	@ zero_extendqisi2
+  57 0018 FF1002E2 		and	r1, r2, #255
+  58 001c 04108DE5 		str	r1, [sp, #4]
+ 103:i2c.c         **** 
+ 104:i2c.c         **** 	switch (temp) {
+  59              		.loc 1 104 0
+  60 0020 04009DE5 		ldr	r0, [sp, #4]
+  61 0024 083040E2 		sub	r3, r0, #8
+  62 0028 500053E3 		cmp	r3, #80
+  63 002c 03F19F97 		ldrls	pc, [pc, r3, asl #2]
+  64 0030 6D0000EA 		b	.L2
+  65              	.L11:
+  66 0034 FC010000 		.word	.L3
+  67 0038 EC010000 		.word	.L2
+  68 003c EC010000 		.word	.L2
+  69 0040 EC010000 		.word	.L2
+  70 0044 EC010000 		.word	.L2
+  71 0048 EC010000 		.word	.L2
+  72 004c EC010000 		.word	.L2
+  73 0050 EC010000 		.word	.L2
+  74 0054 14020000 		.word	.L4
+  75 0058 EC010000 		.word	.L2
+  76 005c EC010000 		.word	.L2
+  77 0060 EC010000 		.word	.L2
+  78 0064 EC010000 		.word	.L2
+  79 0068 EC010000 		.word	.L2
+  80 006c EC010000 		.word	.L2
+  81 0070 EC010000 		.word	.L2
+  82 0074 2C020000 		.word	.L5
+  83 0078 EC010000 		.word	.L2
+  84 007c EC010000 		.word	.L2
+  85 0080 EC010000 		.word	.L2
+  86 0084 EC010000 		.word	.L2
+  87 0088 EC010000 		.word	.L2
+  88 008c EC010000 		.word	.L2
+  89 0090 EC010000 		.word	.L2
+  90 0094 BC010000 		.word	.L6
+  91 0098 EC010000 		.word	.L2
+  92 009c EC010000 		.word	.L2
+  93 00a0 EC010000 		.word	.L2
+  94 00a4 EC010000 		.word	.L2
+  95 00a8 EC010000 		.word	.L2
+  96 00ac EC010000 		.word	.L2
+  97 00b0 EC010000 		.word	.L2
+  98 00b4 48020000 		.word	.L7
+  99 00b8 EC010000 		.word	.L2
+ 100 00bc EC010000 		.word	.L2
+ 101 00c0 EC010000 		.word	.L2
+ 102 00c4 EC010000 		.word	.L2
+ 103 00c8 EC010000 		.word	.L2
+ 104 00cc EC010000 		.word	.L2
+ 105 00d0 EC010000 		.word	.L2
+ 106 00d4 BC010000 		.word	.L6
+ 107 00d8 EC010000 		.word	.L2
+ 108 00dc EC010000 		.word	.L2
+ 109 00e0 EC010000 		.word	.L2
+ 110 00e4 EC010000 		.word	.L2
+ 111 00e8 EC010000 		.word	.L2
+ 112 00ec EC010000 		.word	.L2
+ 113 00f0 EC010000 		.word	.L2
+ 114 00f4 BC010000 		.word	.L6
+ 115 00f8 EC010000 		.word	.L2
+ 116 00fc EC010000 		.word	.L2
+ 117 0100 EC010000 		.word	.L2
+ 118 0104 EC010000 		.word	.L2
+ 119 0108 EC010000 		.word	.L2
+ 120 010c EC010000 		.word	.L2
+ 121 0110 EC010000 		.word	.L2
+ 122 0114 D4010000 		.word	.L8
+ 123 0118 EC010000 		.word	.L2
+ 124 011c EC010000 		.word	.L2
+ 125 0120 EC010000 		.word	.L2
+ 126 0124 EC010000 		.word	.L2
+ 127 0128 EC010000 		.word	.L2
+ 128 012c EC010000 		.word	.L2
+ 129 0130 EC010000 		.word	.L2
+ 130 0134 BC010000 		.word	.L6
+ 131 0138 EC010000 		.word	.L2
+ 132 013c EC010000 		.word	.L2
+ 133 0140 EC010000 		.word	.L2
+ 134 0144 EC010000 		.word	.L2
+ 135 0148 EC010000 		.word	.L2
+ 136 014c EC010000 		.word	.L2
+ 137 0150 EC010000 		.word	.L2
+ 138 0154 60020000 		.word	.L9
+ 139 0158 EC010000 		.word	.L2
+ 140 015c EC010000 		.word	.L2
+ 141 0160 EC010000 		.word	.L2
+ 142 0164 EC010000 		.word	.L2
+ 143 0168 EC010000 		.word	.L2
+ 144 016c EC010000 		.word	.L2
+ 145 0170 EC010000 		.word	.L2
+ 146 0174 78010000 		.word	.L10
+ 147              	.L10:
+ 105:i2c.c         **** 	case TW_START: // A START condition has been transmitted.
+ 106:i2c.c         **** 		log_string_i2c("TW_START\n");
+ 107:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+ 108:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 109:i2c.c         **** 		break;
+ 110:i2c.c         **** 	case TW_REP_START: // A repeated START	condition has been transmitted.
+ 111:i2c.c         **** 		log_string_i2c("TW_REP_START\n");
+ 112:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_READ; // Slave address + Read
+ 113:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 114:i2c.c         **** 		break;
+ 115:i2c.c         **** 	case TW_MT_SLA_ACK: // SLA+W has been transmitted; ACK has been received.
+ 116:i2c.c         **** 		log_string_i2c("TW_MT_SLA_ACK\n");
+ 117:i2c.c         **** 		I2C1DAT = ra_buff; // Register address to be written
+ 118:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 119:i2c.c         **** 		break;
+ 120:i2c.c         **** 	case TW_MT_SLA_NACK: // SLA+W has been transmitted; NOT ACK has been received.
+ 121:i2c.c         **** 		log_string_i2c("TW_MT_SLA_NACK\n");
+ 122:i2c.c         **** 		break;
+ 123:i2c.c         **** 	case TW_MT_DATA_ACK: // Data byte in I2DAT has been transmitted; ACK has been received.
+ 124:i2c.c         **** 		log_string_i2c("TW_MT_DATA_ACK\n");
+ 125:i2c.c         **** 		I2C1CONSET = 0x20; // Transmit start condition
+ 126:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 127:i2c.c         **** 		break;
+ 128:i2c.c         **** 	case TW_MT_DATA_NACK: // Data byte in I2DAT has been transmitted; NOT ACK has been received.
+ 129:i2c.c         **** 		log_string_i2c("TW_MT_DATA_NACK\n");
+ 130:i2c.c         **** 		break;
+ 131:i2c.c         **** 	case TW_MT_ARB_LOST: // Arbitration lost in SLA+R/W or Data bytes.
+ 132:i2c.c         **** 		log_string_i2c("TW_MT_ARB_LOST\n");
+ 133:i2c.c         **** 		break;
+ 134:i2c.c         **** 
+ 135:i2c.c         **** 	case TW_MR_SLA_ACK: // SLA+R has been transmitted; ACK has been received.
+ 136:i2c.c         **** 		log_string_i2c("TW_MR_SLA_ACK\n");
+ 137:i2c.c         **** 		if(buff_size > 1)
+ 138:i2c.c         **** 			I2C1CONSET = 0x04; // Transmit ACK on data receives
+ 139:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 140:i2c.c         **** 		break;
+ 141:i2c.c         **** 	case TW_MR_SLA_NACK: // SLA+R has been transmitted; NOT ACK or has been received.
+ 142:i2c.c         **** 		log_string_i2c("TW_MR_SLA_NACK\n");
+ 143:i2c.c         **** 		break;
+ 144:i2c.c         **** 	case TW_MR_DATA_ACK: // Data byte has been received; ACK has been returned.
+ 145:i2c.c         **** 		log_string_i2c("TW_MR_DATA_ACK\n");
+ 146:i2c.c         **** 		log_string_i2c("pos: ");
+ 147:i2c.c         **** 		log_int_i2c(buff_pos);
+ 148:i2c.c         **** 		log_string_i2c("\n");
+ 149:i2c.c         **** 		if ((buff_pos + 2) < buff_size) {
+ 150:i2c.c         **** 			c_buff[buff_pos++] = I2C1DAT;
+ 151:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 152:i2c.c         **** 		}
+ 153:i2c.c         **** 		else {
+ 154:i2c.c         **** 			c_buff[buff_pos++] = I2C1DAT;
+ 155:i2c.c         **** 			I2C1CONCLR = 0x0C; // Transmit NACK on next data receive, Clear SI
+ 156:i2c.c         **** 		}
+ 157:i2c.c         **** 		break;
+ 158:i2c.c         **** 	case TW_MR_DATA_NACK: // Data byte has been received; NOT ACK has been returned.
+ 159:i2c.c         **** 		log_string_i2c("TW_MR_DATA_NACK\n");
+ 160:i2c.c         **** 		log_string_i2c("pos: ");
+ 161:i2c.c         **** 		log_int_i2c(buff_pos);
+ 162:i2c.c         **** 		log_string_i2c("\n");
+ 163:i2c.c         **** 		if (buff_pos < buff_size) {
+ 148              		.loc 1 163 0
+ 149 0178 1C319FE5 		ldr	r3, .L16+4
+ 150 017c 050093E9 		ldmib	r3, {r0, r2}	@ phole ldm
+ 151 0180 000052E1 		cmp	r2, r0
+ 152 0184 050000AA 		bge	.L14
+ 164:i2c.c         **** 			c_buff[buff_pos++] = I2C1DAT;
+ 153              		.loc 1 164 0
+ 154 0188 08119FE5 		ldr	r1, .L16
+ 155 018c 0C0093E5 		ldr	r0, [r3, #12]
+ 156 0190 08C0D1E5 		ldrb	ip, [r1, #8]	@ zero_extendqisi2
+ 157 0194 011082E2 		add	r1, r2, #1
+ 158 0198 02C0C0E7 		strb	ip, [r0, r2]
+ 159 019c 081083E5 		str	r1, [r3, #8]
+ 160              	.L14:
+ 165:i2c.c         **** 		}
+ 166:i2c.c         **** 		I2C1CONSET = 0x10; // Transmit stop condition
+ 161              		.loc 1 166 0
+ 162 01a0 F0C09FE5 		ldr	ip, .L16
+ 163 01a4 1010A0E3 		mov	r1, #16
+ 167:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 164              		.loc 1 167 0
+ 165 01a8 0800A0E3 		mov	r0, #8
+ 168:i2c.c         **** 		busy = 0; // data ready to be returned
+ 166              		.loc 1 168 0
+ 167 01ac 0020A0E3 		mov	r2, #0
+ 166:i2c.c         **** 		I2C1CONSET = 0x10; // Transmit stop condition
+ 168              		.loc 1 166 0
+ 169 01b0 0010CCE5 		strb	r1, [ip, #0]
+ 167:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 170              		.loc 1 167 0
+ 171 01b4 1800CCE5 		strb	r0, [ip, #24]
+ 172              		.loc 1 168 0
+ 173 01b8 102083E5 		str	r2, [r3, #16]
+ 174              	.L6:
+ 169:i2c.c         **** 		break;
+ 170:i2c.c         **** 
+ 171:i2c.c         **** 	default:
+ 172:i2c.c         **** 		log_string_warning("[i2c] default: ");
+ 173:i2c.c         **** 		log_int_warning(temp);
+ 174:i2c.c         **** 		log_string_warning("\n");
+ 175:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 176:i2c.c         **** 		break;
+ 177:i2c.c         **** 	}
+ 178:i2c.c         **** 
+ 179:i2c.c         **** 	VICVectAddr = 0;
+ 175              		.loc 1 179 0
+ 176 01bc 0000A0E3 		mov	r0, #0
+ 177 01c0 00C0E0E3 		mvn	ip, #0
+ 178 01c4 CF0F0CE5 		str	r0, [ip, #-4047]
+ 180:i2c.c         **** }
+ 179              		.loc 1 180 0
+ 180 01c8 08D08DE2 		add	sp, sp, #8
+ 181 01cc 1F10BDE8 		ldmfd	sp!, {r0, r1, r2, r3, r4, ip}
+ 182 01d0 04F05EE2 		subs	pc, lr, #4
+ 183              	.L8:
+ 137:i2c.c         **** 		if(buff_size > 1)
+ 184              		.loc 1 137 0
+ 185 01d4 C0309FE5 		ldr	r3, .L16+4
+ 186 01d8 042093E5 		ldr	r2, [r3, #4]
+ 187 01dc 010052E3 		cmp	r2, #1
+ 138:i2c.c         **** 			I2C1CONSET = 0x04; // Transmit ACK on data receives
+ 188              		.loc 1 138 0
+ 189 01e0 B0109FC5 		ldrgt	r1, .L16
+ 190 01e4 0400A0C3 		movgt	r0, #4
+ 191 01e8 0000C1C5 		strgtb	r0, [r1, #0]
+ 192              	.L2:
+ 175:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 193              		.loc 1 175 0
+ 194 01ec A4309FE5 		ldr	r3, .L16
+ 195 01f0 0820A0E3 		mov	r2, #8
+ 196 01f4 1820C3E5 		strb	r2, [r3, #24]
+ 176:i2c.c         **** 		break;
+ 197              		.loc 1 176 0
+ 198 01f8 EFFFFFEA 		b	.L6
+ 199              	.L3:
+ 107:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+ 200              		.loc 1 107 0
+ 201 01fc 94109FE5 		ldr	r1, .L16
+ 202 0200 2F20E0E3 		mvn	r2, #47
+ 108:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 203              		.loc 1 108 0
+ 204 0204 2800A0E3 		mov	r0, #40
+ 107:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+ 205              		.loc 1 107 0
+ 206 0208 0820C1E5 		strb	r2, [r1, #8]
+ 108:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 207              		.loc 1 108 0
+ 208 020c 1800C1E5 		strb	r0, [r1, #24]
+ 109:i2c.c         **** 		break;
+ 209              		.loc 1 109 0
+ 210 0210 E9FFFFEA 		b	.L6
+ 211              	.L4:
+ 112:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_READ; // Slave address + Read
+ 212              		.loc 1 112 0
+ 213 0214 7C309FE5 		ldr	r3, .L16
+ 214 0218 2E00E0E3 		mvn	r0, #46
+ 113:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 215              		.loc 1 113 0
+ 216 021c 28C0A0E3 		mov	ip, #40
+ 112:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_READ; // Slave address + Read
+ 217              		.loc 1 112 0
+ 218 0220 0800C3E5 		strb	r0, [r3, #8]
+ 113:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 219              		.loc 1 113 0
+ 220 0224 18C0C3E5 		strb	ip, [r3, #24]
+ 114:i2c.c         **** 		break;
+ 221              		.loc 1 114 0
+ 222 0228 E3FFFFEA 		b	.L6
+ 223              	.L5:
+ 117:i2c.c         **** 		I2C1DAT = ra_buff; // Register address to be written
+ 224              		.loc 1 117 0
+ 225 022c 68309FE5 		ldr	r3, .L16+4
+ 226 0230 60C09FE5 		ldr	ip, .L16
+ 227 0234 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 118:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 228              		.loc 1 118 0
+ 229 0238 0810A0E3 		mov	r1, #8
+ 117:i2c.c         **** 		I2C1DAT = ra_buff; // Register address to be written
+ 230              		.loc 1 117 0
+ 231 023c 0820CCE5 		strb	r2, [ip, #8]
+ 118:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 232              		.loc 1 118 0
+ 233 0240 1810CCE5 		strb	r1, [ip, #24]
+ 119:i2c.c         **** 		break;
+ 234              		.loc 1 119 0
+ 235 0244 DCFFFFEA 		b	.L6
+ 236              	.L7:
+ 125:i2c.c         **** 		I2C1CONSET = 0x20; // Transmit start condition
+ 237              		.loc 1 125 0
+ 238 0248 48109FE5 		ldr	r1, .L16
+ 239 024c 20C0A0E3 		mov	ip, #32
+ 126:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 240              		.loc 1 126 0
+ 241 0250 0800A0E3 		mov	r0, #8
+ 125:i2c.c         **** 		I2C1CONSET = 0x20; // Transmit start condition
+ 242              		.loc 1 125 0
+ 243 0254 00C0C1E5 		strb	ip, [r1, #0]
+ 126:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 244              		.loc 1 126 0
+ 245 0258 1800C1E5 		strb	r0, [r1, #24]
+ 127:i2c.c         **** 		break;
+ 246              		.loc 1 127 0
+ 247 025c D6FFFFEA 		b	.L6
+ 248              	.L9:
+ 149:i2c.c         **** 		if ((buff_pos + 2) < buff_size) {
+ 249              		.loc 1 149 0
+ 250 0260 34309FE5 		ldr	r3, .L16+4
+ 251 0264 060093E9 		ldmib	r3, {r1, r2}	@ phole ldm
+ 252 0268 024082E2 		add	r4, r2, #2
+ 253 026c 010054E1 		cmp	r4, r1
+ 150:i2c.c         **** 			c_buff[buff_pos++] = I2C1DAT;
+ 254              		.loc 1 150 0
+ 255 0270 20109FE5 		ldr	r1, .L16
+ 256 0274 0CC093E5 		ldr	ip, [r3, #12]
+ 257 0278 0840D1E5 		ldrb	r4, [r1, #8]	@ zero_extendqisi2
+ 258 027c 010082E2 		add	r0, r2, #1
+ 259 0280 0240CCE7 		strb	r4, [ip, r2]
+ 260 0284 080083E5 		str	r0, [r3, #8]
+ 151:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 261              		.loc 1 151 0
+ 262 0288 0830A0B3 		movlt	r3, #8
+ 155:i2c.c         **** 			I2C1CONCLR = 0x0C; // Transmit NACK on next data receive, Clear SI
+ 263              		.loc 1 155 0
+ 264 028c 0C30A0A3 		movge	r3, #12
+ 265 0290 1830C1E5 		strb	r3, [r1, #24]
+ 266 0294 C8FFFFEA 		b	.L6
+ 267              	.L17:
+ 268              		.align	2
+ 269              	.L16:
+ 270 0298 00C005E0 		.word	-536494080
+ 271 029c 00000000 		.word	.LANCHOR0
+ 272              		.cfi_endproc
+ 273              	.LFE3:
+ 274              		.fnend
+ 276              		.align	2
+ 277              		.global	i2c_write_byte_isr
+ 279              	i2c_write_byte_isr:
+ 280              		.fnstart
+ 281              	.LFB6:
+ 181:i2c.c         **** 
+ 182:i2c.c         **** int i2c_write_bits(char reg_addr, char bit, char length, char data){
+ 183:i2c.c         **** 	log_string_i2c(">> write_bits\n");
+ 184:i2c.c         **** 	//      010 value to write
+ 185:i2c.c         **** 	// 76543210 bit numbers
+ 186:i2c.c         **** 	//    xxx   args: bitStart=4, length=3
+ 187:i2c.c         **** 	// 00011100 mask byte
+ 188:i2c.c         **** 	// 10101111 original value (sample)
+ 189:i2c.c         **** 	// 10100011 original & ~mask
+ 190:i2c.c         **** 	// 10101011 masked | value
+ 191:i2c.c         **** 
+ 192:i2c.c         **** 	char c = 0;
+ 193:i2c.c         **** 	i2c_read_bytes(reg_addr,1,&c);
+ 194:i2c.c         **** 	char mask = ((1 << length) - 1) << (bit - length + 1);
+ 195:i2c.c         **** 	data <<= (bit - length + 1); // shift data into correct position
+ 196:i2c.c         **** 	data &= mask; // zero all non-important bits in data
+ 197:i2c.c         **** 	c &= ~(mask); // zero all important bits in existing byte
+ 198:i2c.c         **** 	c |= data; // combine data with existing byte
+ 199:i2c.c         **** 
+ 200:i2c.c         **** 	int i = i2c_write_byte(reg_addr, c);
+ 201:i2c.c         **** 
+ 202:i2c.c         **** 	log_string_i2c("<< write_bits\n");
+ 203:i2c.c         **** 
+ 204:i2c.c         **** 	return i;
+ 205:i2c.c         **** }
+ 206:i2c.c         **** 
+ 207:i2c.c         **** int i2c_write_byte(char reg_addr, char data) {
+ 208:i2c.c         **** 	log_string_i2c(">> write_byte\n");
+ 209:i2c.c         **** 
+ 210:i2c.c         **** 	buff_size = 1;
+ 211:i2c.c         **** 	buff_pos = 0;
+ 212:i2c.c         **** 	ra_buff = reg_addr;
+ 213:i2c.c         **** 	c_buff = &data;
+ 214:i2c.c         **** 
+ 215:i2c.c         **** 	busy = 1;
+ 216:i2c.c         **** 
+ 217:i2c.c         **** 	//Setting the interrupt handler location for write byte
+ 218:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+ 219:i2c.c         **** 
+ 220:i2c.c         **** 	// Send Start bit
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 222:i2c.c         **** 
+ 223:i2c.c         **** 	while (busy); // busy wait for read process
+ 224:i2c.c         **** 
+ 225:i2c.c         **** 	log_string_i2c("<< write_byte\n");
+ 226:i2c.c         **** 	return 1;
+ 227:i2c.c         **** }
+ 228:i2c.c         **** 
+ 229:i2c.c         **** /**
+ 230:i2c.c         ****  * i2c interrupt handler
+ 231:i2c.c         ****  */
+ 232:i2c.c         **** void i2c_write_byte_isr(void) {
+ 282              		.loc 1 232 0
+ 283              		.cfi_startproc
+ 284              		@ Interrupt Service Routine.
+ 285              		@ args = 0, pretend = 0, frame = 8
+ 286              		@ frame_needed = 0, uses_anonymous_args = 0
+ 287              		@ link register save eliminated.
+ 288 02a0 0F002DE9 		stmfd	sp!, {r0, r1, r2, r3}
+ 289              		.save {r0, r1, r2, r3}
+ 290              	.LCFI2:
+ 291              		.cfi_def_cfa_offset 16
+ 233:i2c.c         **** 	log_string_i2c(">> i2c_write_byte_isr\n");
+ 234:i2c.c         **** 	volatile int temp = 0;
+ 292              		.loc 1 234 0
+ 293 02a4 0000A0E3 		mov	r0, #0
+ 294              		.cfi_offset 3, -4
+ 295              		.cfi_offset 2, -8
+ 296              		.cfi_offset 1, -12
+ 297              		.cfi_offset 0, -16
+ 232:i2c.c         **** void i2c_write_byte_isr(void) {
+ 298              		.loc 1 232 0
+ 299              		.pad #8
+ 300 02a8 08D04DE2 		sub	sp, sp, #8
+ 301              	.LCFI3:
+ 302              		.cfi_def_cfa_offset 24
+ 303              		.loc 1 234 0
+ 304 02ac 04008DE5 		str	r0, [sp, #4]
+ 305              	.LVL1:
+ 235:i2c.c         **** 	temp = I2C1STAT;
+ 306              		.loc 1 235 0
+ 307 02b0 B8319FE5 		ldr	r3, .L30
+ 308 02b4 0420D3E5 		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 309 02b8 FF1002E2 		and	r1, r2, #255
+ 310 02bc 04108DE5 		str	r1, [sp, #4]
+ 236:i2c.c         **** 
+ 237:i2c.c         **** 	switch (temp) {
+ 311              		.loc 1 237 0
+ 312 02c0 04009DE5 		ldr	r0, [sp, #4]
+ 313 02c4 083040E2 		sub	r3, r0, #8
+ 314 02c8 300053E3 		cmp	r3, #48
+ 315 02cc 03F19F97 		ldrls	pc, [pc, r3, asl #2]
+ 316 02d0 300000EA 		b	.L19
+ 317              	.L27:
+ 318 02d4 F0030000 		.word	.L20
+ 319 02d8 98030000 		.word	.L19
+ 320 02dc 98030000 		.word	.L19
+ 321 02e0 98030000 		.word	.L19
+ 322 02e4 98030000 		.word	.L19
+ 323 02e8 98030000 		.word	.L19
+ 324 02ec 98030000 		.word	.L19
+ 325 02f0 98030000 		.word	.L19
+ 326 02f4 98030000 		.word	.L19
+ 327 02f8 98030000 		.word	.L19
+ 328 02fc 98030000 		.word	.L19
+ 329 0300 98030000 		.word	.L19
+ 330 0304 98030000 		.word	.L19
+ 331 0308 98030000 		.word	.L19
+ 332 030c 98030000 		.word	.L19
+ 333 0310 98030000 		.word	.L19
+ 334 0314 30040000 		.word	.L22
+ 335 0318 98030000 		.word	.L19
+ 336 031c 98030000 		.word	.L19
+ 337 0320 98030000 		.word	.L19
+ 338 0324 98030000 		.word	.L19
+ 339 0328 98030000 		.word	.L19
+ 340 032c 98030000 		.word	.L19
+ 341 0330 98030000 		.word	.L19
+ 342 0334 98030000 		.word	.L19
+ 343 0338 98030000 		.word	.L19
+ 344 033c 98030000 		.word	.L19
+ 345 0340 98030000 		.word	.L19
+ 346 0344 98030000 		.word	.L19
+ 347 0348 98030000 		.word	.L19
+ 348 034c 98030000 		.word	.L19
+ 349 0350 98030000 		.word	.L19
+ 350 0354 BC030000 		.word	.L24
+ 351 0358 98030000 		.word	.L19
+ 352 035c 98030000 		.word	.L19
+ 353 0360 98030000 		.word	.L19
+ 354 0364 98030000 		.word	.L19
+ 355 0368 98030000 		.word	.L19
+ 356 036c 98030000 		.word	.L19
+ 357 0370 98030000 		.word	.L19
+ 358 0374 08040000 		.word	.L25
+ 359 0378 98030000 		.word	.L19
+ 360 037c 98030000 		.word	.L19
+ 361 0380 98030000 		.word	.L19
+ 362 0384 98030000 		.word	.L19
+ 363 0388 98030000 		.word	.L19
+ 364 038c 98030000 		.word	.L19
+ 365 0390 98030000 		.word	.L19
+ 366 0394 98030000 		.word	.L19
+ 367              	.L19:
+ 238:i2c.c         **** 	case TW_START: // A START condition has been transmitted.
+ 239:i2c.c         **** 		log_string_i2c("TW_START\n");
+ 240:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+ 241:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 242:i2c.c         **** 		break;
+ 243:i2c.c         **** 	case TW_REP_START: // A repeated START	condition has been transmitted.
+ 244:i2c.c         **** 		log_string_i2c("TW_REP_START\n");
+ 245:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 246:i2c.c         **** 		break;
+ 247:i2c.c         **** 	case TW_MT_SLA_ACK: // SLA+W has been transmitted; ACK has been received.
+ 248:i2c.c         **** 		log_string_i2c("TW_MT_SLA_ACK\n");
+ 249:i2c.c         **** 		I2C1DAT = ra_buff; // Register address to be written
+ 250:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 251:i2c.c         **** 		break;
+ 252:i2c.c         **** 	case TW_MT_SLA_NACK: // SLA+W has been transmitted; NOT ACK has been received.
+ 253:i2c.c         **** 		log_string_i2c("TW_MT_SLA_NACK\n");
+ 254:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 255:i2c.c         **** 		break;
+ 256:i2c.c         **** 	case TW_MT_DATA_ACK: // Data byte in I2DAT has been transmitted; ACK has been received.
+ 257:i2c.c         **** 		log_string_i2c("TW_MT_DATA_ACK\n");
+ 258:i2c.c         **** 		if (buff_pos < buff_size) {
+ 259:i2c.c         **** 			I2C1DAT = c_buff[buff_pos++]; // Send data
+ 260:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 261:i2c.c         **** 		} else {
+ 262:i2c.c         **** 			I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+ 263:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 264:i2c.c         **** 			busy = 0; // done
+ 265:i2c.c         **** 		}
+ 266:i2c.c         **** 		break;
+ 267:i2c.c         **** 	case TW_MT_DATA_NACK: // Data byte in I2DAT has been transmitted; NOT ACK has been received.
+ 268:i2c.c         **** 		log_string_i2c("TW_MT_DATA_NACK\n");
+ 269:i2c.c         **** 		I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+ 270:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 271:i2c.c         **** 		busy = 0; // done
+ 272:i2c.c         **** 		break;
+ 273:i2c.c         **** 	case TW_MT_ARB_LOST: // Arbitration lost in SLA+R/W or Data bytes.
+ 274:i2c.c         **** 		log_string_i2c("TW_MT_ARB_LOST\n");
+ 275:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 276:i2c.c         **** 		break;
+ 277:i2c.c         **** 
+ 278:i2c.c         **** 	default:
+ 279:i2c.c         **** 		log_string_warning("[i2c] default: ");
+ 280:i2c.c         **** 		log_int_warning(temp);
+ 281:i2c.c         **** 		log_string_warning("\n");
+ 282:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 368              		.loc 1 282 0
+ 369 0398 D0009FE5 		ldr	r0, .L30
+ 370 039c 0810A0E3 		mov	r1, #8
+ 371 03a0 1810C0E5 		strb	r1, [r0, #24]
+ 372              	.L28:
+ 283:i2c.c         **** 		log_string_i2c("default\n");
+ 284:i2c.c         **** 		break;
+ 285:i2c.c         **** 	}
+ 286:i2c.c         **** 
+ 287:i2c.c         **** 	VICVectAddr = 0;
+ 373              		.loc 1 287 0
+ 374 03a4 0020A0E3 		mov	r2, #0
+ 375 03a8 0030E0E3 		mvn	r3, #0
+ 376 03ac CF2F03E5 		str	r2, [r3, #-4047]
+ 288:i2c.c         **** }
+ 377              		.loc 1 288 0
+ 378 03b0 08D08DE2 		add	sp, sp, #8
+ 379 03b4 0F00BDE8 		ldmfd	sp!, {r0, r1, r2, r3}
+ 380 03b8 04F05EE2 		subs	pc, lr, #4
+ 381              	.L24:
+ 258:i2c.c         **** 		if (buff_pos < buff_size) {
+ 382              		.loc 1 258 0
+ 383 03bc B0309FE5 		ldr	r3, .L30+4
+ 384 03c0 050093E9 		ldmib	r3, {r0, r2}	@ phole ldm
+ 385 03c4 000052E1 		cmp	r2, r0
+ 386 03c8 1F0000AA 		bge	.L29
+ 259:i2c.c         **** 			I2C1DAT = c_buff[buff_pos++]; // Send data
+ 387              		.loc 1 259 0
+ 388 03cc 0C0093E5 		ldr	r0, [r3, #12]
+ 389 03d0 98109FE5 		ldr	r1, .L30
+ 390 03d4 0200D0E7 		ldrb	r0, [r0, r2]	@ zero_extendqisi2
+ 391 03d8 012082E2 		add	r2, r2, #1
+ 392 03dc 0800C1E5 		strb	r0, [r1, #8]
+ 393 03e0 082083E5 		str	r2, [r3, #8]
+ 260:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 394              		.loc 1 260 0
+ 395 03e4 0830A0E3 		mov	r3, #8
+ 396 03e8 1830C1E5 		strb	r3, [r1, #24]
+ 397 03ec ECFFFFEA 		b	.L28
+ 398              	.L20:
+ 240:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+ 399              		.loc 1 240 0
+ 400 03f0 78309FE5 		ldr	r3, .L30
+ 401 03f4 2F20E0E3 		mvn	r2, #47
+ 241:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 402              		.loc 1 241 0
+ 403 03f8 2810A0E3 		mov	r1, #40
+ 240:i2c.c         **** 		I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
+ 404              		.loc 1 240 0
+ 405 03fc 0820C3E5 		strb	r2, [r3, #8]
+ 241:i2c.c         **** 		I2C1CONCLR = 0x28; // Clear SI and STA flag
+ 406              		.loc 1 241 0
+ 407 0400 1810C3E5 		strb	r1, [r3, #24]
+ 242:i2c.c         **** 		break;
+ 408              		.loc 1 242 0
+ 409 0404 E6FFFFEA 		b	.L28
+ 410              	.L25:
+ 269:i2c.c         **** 		I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+ 411              		.loc 1 269 0
+ 412 0408 60009FE5 		ldr	r0, .L30
+ 413 040c 0030D0E5 		ldrb	r3, [r0, #0]	@ zero_extendqisi2
+ 414 0410 102083E3 		orr	r2, r3, #16
+ 271:i2c.c         **** 		busy = 0; // done
+ 415              		.loc 1 271 0
+ 416 0414 58309FE5 		ldr	r3, .L30+4
+ 269:i2c.c         **** 		I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+ 417              		.loc 1 269 0
+ 418 0418 0020C0E5 		strb	r2, [r0, #0]
+ 270:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 419              		.loc 1 270 0
+ 420 041c 0810A0E3 		mov	r1, #8
+ 271:i2c.c         **** 		busy = 0; // done
+ 421              		.loc 1 271 0
+ 422 0420 0020A0E3 		mov	r2, #0
+ 270:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 423              		.loc 1 270 0
+ 424 0424 1810C0E5 		strb	r1, [r0, #24]
+ 271:i2c.c         **** 		busy = 0; // done
+ 425              		.loc 1 271 0
+ 426 0428 102083E5 		str	r2, [r3, #16]
+ 272:i2c.c         **** 		break;
+ 427              		.loc 1 272 0
+ 428 042c DCFFFFEA 		b	.L28
+ 429              	.L22:
+ 249:i2c.c         **** 		I2C1DAT = ra_buff; // Register address to be written
+ 430              		.loc 1 249 0
+ 431 0430 3C209FE5 		ldr	r2, .L30+4
+ 432 0434 34109FE5 		ldr	r1, .L30
+ 433 0438 0030D2E5 		ldrb	r3, [r2, #0]	@ zero_extendqisi2
+ 250:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 434              		.loc 1 250 0
+ 435 043c 0800A0E3 		mov	r0, #8
+ 249:i2c.c         **** 		I2C1DAT = ra_buff; // Register address to be written
+ 436              		.loc 1 249 0
+ 437 0440 0830C1E5 		strb	r3, [r1, #8]
+ 250:i2c.c         **** 		I2C1CONCLR = 0x08; // Clear SI
+ 438              		.loc 1 250 0
+ 439 0444 1800C1E5 		strb	r0, [r1, #24]
+ 251:i2c.c         **** 		break;
+ 440              		.loc 1 251 0
+ 441 0448 D5FFFFEA 		b	.L28
+ 442              	.L29:
+ 262:i2c.c         **** 			I2C1CONSET |= 0x01 << 4; // Transmit stop condition
+ 443              		.loc 1 262 0
+ 444 044c 1C209FE5 		ldr	r2, .L30
+ 445 0450 0000D2E5 		ldrb	r0, [r2, #0]	@ zero_extendqisi2
+ 446 0454 101080E3 		orr	r1, r0, #16
+ 447 0458 0010C2E5 		strb	r1, [r2, #0]
+ 263:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 448              		.loc 1 263 0
+ 449 045c 0800A0E3 		mov	r0, #8
+ 264:i2c.c         **** 			busy = 0; // done
+ 450              		.loc 1 264 0
+ 451 0460 0010A0E3 		mov	r1, #0
+ 263:i2c.c         **** 			I2C1CONCLR = 0x08; // Clear SI
+ 452              		.loc 1 263 0
+ 453 0464 1800C2E5 		strb	r0, [r2, #24]
+ 264:i2c.c         **** 			busy = 0; // done
+ 454              		.loc 1 264 0
+ 455 0468 101083E5 		str	r1, [r3, #16]
+ 456 046c CCFFFFEA 		b	.L28
+ 457              	.L31:
+ 458              		.align	2
+ 459              	.L30:
+ 460 0470 00C005E0 		.word	-536494080
+ 461 0474 00000000 		.word	.LANCHOR0
+ 462              		.cfi_endproc
+ 463              	.LFE6:
+ 464              		.fnend
+ 466              		.align	2
+ 467              		.global	i2c_init
+ 469              	i2c_init:
+ 470              		.fnstart
+ 471              	.LFB0:
+  36:i2c.c         **** void i2c_init(void){
+ 472              		.loc 1 36 0
+ 473              		.cfi_startproc
+ 474              		@ Function supports interworking.
+ 475              		@ args = 0, pretend = 0, frame = 0
+ 476              		@ frame_needed = 0, uses_anonymous_args = 0
+ 477              		@ link register save eliminated.
+  41:i2c.c         **** 	PINSEL1 |= 0x1 << 2; // SCL1
+ 478              		.loc 1 41 0
+ 479 0478 54009FE5 		ldr	r0, .L33
+ 480 047c 042090E5 		ldr	r2, [r0, #4]
+ 481 0480 043082E3 		orr	r3, r2, #4
+ 482 0484 043080E5 		str	r3, [r0, #4]
+  42:i2c.c         **** 	PINSEL1 |= 0x1 << 4; // SDA1
+ 483              		.loc 1 42 0
+ 484 0488 041090E5 		ldr	r1, [r0, #4]
+  44:i2c.c         **** 	I2C1CONCLR = 0x6C; // clear all flags
+ 485              		.loc 1 44 0
+ 486 048c 44309FE5 		ldr	r3, .L33+4
+  42:i2c.c         **** 	PINSEL1 |= 0x1 << 4; // SDA1
+ 487              		.loc 1 42 0
+ 488 0490 10C081E3 		orr	ip, r1, #16
+  44:i2c.c         **** 	I2C1CONCLR = 0x6C; // clear all flags
+ 489              		.loc 1 44 0
+ 490 0494 6C20A0E3 		mov	r2, #108
+  42:i2c.c         **** 	PINSEL1 |= 0x1 << 4; // SDA1
+ 491              		.loc 1 42 0
+ 492 0498 04C080E5 		str	ip, [r0, #4]
+  44:i2c.c         **** 	I2C1CONCLR = 0x6C; // clear all flags
+ 493              		.loc 1 44 0
+ 494 049c 1820C3E5 		strb	r2, [r3, #24]
+  45:i2c.c         **** 	I2C1CONSET |= 0x1 << 6; // enable i2c1
+ 495              		.loc 1 45 0
+ 496 04a0 0010D3E5 		ldrb	r1, [r3, #0]	@ zero_extendqisi2
+  50:i2c.c         **** 	VICVectCntl2 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+ 497              		.loc 1 50 0
+ 498 04a4 0020E0E3 		mvn	r2, #0
+  45:i2c.c         **** 	I2C1CONSET |= 0x1 << 6; // enable i2c1
+ 499              		.loc 1 45 0
+ 500 04a8 400081E3 		orr	r0, r1, #64
+  46:i2c.c         **** 	I2C1SCLH = 19; // Set the bit rate:
+ 501              		.loc 1 46 0
+ 502 04ac 13C0A0E3 		mov	ip, #19
+  50:i2c.c         **** 	VICVectCntl2 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+ 503              		.loc 1 50 0
+ 504 04b0 3310A0E3 		mov	r1, #51
+  45:i2c.c         **** 	I2C1CONSET |= 0x1 << 6; // enable i2c1
+ 505              		.loc 1 45 0
+ 506 04b4 0000C3E5 		strb	r0, [r3, #0]
+  46:i2c.c         **** 	I2C1SCLH = 19; // Set the bit rate:
+ 507              		.loc 1 46 0
+ 508 04b8 B0C1C3E1 		strh	ip, [r3, #16]	@ movhi
+  47:i2c.c         **** 	I2C1SCLL = 19; // 394.7kHz for pclk=15MHz | 388.0kHz for pclk=14.7456MHz
+ 509              		.loc 1 47 0
+ 510 04bc B4C1C3E1 		strh	ip, [r3, #20]	@ movhi
+  50:i2c.c         **** 	VICVectCntl2 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+ 511              		.loc 1 50 0
+ 512 04c0 F71D02E5 		str	r1, [r2, #-3575]
+  51:i2c.c         **** 	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
+ 513              		.loc 1 51 0
+ 514 04c4 EF0F12E5 		ldr	r0, [r2, #-4079]
+ 515 04c8 023780E3 		orr	r3, r0, #524288
+ 516 04cc EF3F02E5 		str	r3, [r2, #-4079]
+  58:i2c.c         **** }
+ 517              		.loc 1 58 0
+ 518 04d0 1EFF2FE1 		bx	lr
+ 519              	.L34:
+ 520              		.align	2
+ 521              	.L33:
+ 522 04d4 00C002E0 		.word	-536690688
+ 523 04d8 00C005E0 		.word	-536494080
+ 524              		.cfi_endproc
+ 525              	.LFE0:
+ 526              		.fnend
+ 528              		.align	2
+ 529              		.global	i2c_read_byte
+ 531              	i2c_read_byte:
+ 532              		.fnstart
+ 533              	.LFB1:
+  64:i2c.c         **** int i2c_read_byte(char reg_addr, char* data) {
+ 534              		.loc 1 64 0
+ 535              		.cfi_startproc
+ 536              		@ Function supports interworking.
+ 537              		@ args = 0, pretend = 0, frame = 0
+ 538              		@ frame_needed = 0, uses_anonymous_args = 0
+ 539              		@ link register save eliminated.
+ 540              	.LVL2:
+ 541              	.LBB8:
+ 542              	.LBB9:
+  76:i2c.c         **** 	buff_size = length;
+ 543              		.loc 1 76 0
+ 544 04dc 44309FE5 		ldr	r3, .L38
+ 545 04e0 0120A0E3 		mov	r2, #1
+  84:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+ 546              		.loc 1 84 0
+ 547 04e4 40C09FE5 		ldr	ip, .L38+4
+  81:i2c.c         **** 	busy = 1;
+ 548              		.loc 1 81 0
+ 549 04e8 102083E5 		str	r2, [r3, #16]
+  76:i2c.c         **** 	buff_size = length;
+ 550              		.loc 1 76 0
+ 551 04ec 042083E5 		str	r2, [r3, #4]
+  84:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+ 552              		.loc 1 84 0
+ 553 04f0 0020E0E3 		mvn	r2, #0
+ 554 04f4 F7CE02E5 		str	ip, [r2, #-3831]
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 555              		.loc 1 86 0
+ 556 04f8 30209FE5 		ldr	r2, .L38+8
+  79:i2c.c         **** 	c_buff = data;
+ 557              		.loc 1 79 0
+ 558 04fc 0C1083E5 		str	r1, [r3, #12]
+  77:i2c.c         **** 	buff_pos = 0;
+ 559              		.loc 1 77 0
+ 560 0500 00C0A0E3 		mov	ip, #0
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 561              		.loc 1 86 0
+ 562 0504 2010A0E3 		mov	r1, #32
+ 563              	.LVL3:
+  77:i2c.c         **** 	buff_pos = 0;
+ 564              		.loc 1 77 0
+ 565 0508 08C083E5 		str	ip, [r3, #8]
+  78:i2c.c         **** 	ra_buff = reg_addr;
+ 566              		.loc 1 78 0
+ 567 050c 0000C3E5 		strb	r0, [r3, #0]
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 568              		.loc 1 86 0
+ 569 0510 0010C2E5 		strb	r1, [r2, #0]
+ 570              	.LVL4:
+ 571              	.L36:
+  90:i2c.c         **** 	while (busy); // busy wait for read process
+ 572              		.loc 1 90 0
+ 573 0514 100093E5 		ldr	r0, [r3, #16]
+ 574 0518 000050E3 		cmp	r0, #0
+ 575 051c FCFFFF1A 		bne	.L36
+ 576              	.LBE9:
+ 577              	.LBE8:
+  71:i2c.c         **** }
+ 578              		.loc 1 71 0
+ 579 0520 0100A0E3 		mov	r0, #1
+ 580 0524 1EFF2FE1 		bx	lr
+ 581              	.L39:
+ 582              		.align	2
+ 583              	.L38:
+ 584 0528 00000000 		.word	.LANCHOR0
+ 585 052c 00000000 		.word	i2c_read_bytes_isr
+ 586 0530 00C005E0 		.word	-536494080
+ 587              		.cfi_endproc
+ 588              	.LFE1:
+ 589              		.fnend
+ 591              		.align	2
+ 592              		.global	i2c_read_bytes
+ 594              	i2c_read_bytes:
+ 595              		.fnstart
+ 596              	.LFB2:
+  73:i2c.c         **** int i2c_read_bytes(char reg_addr, char length, char* data) {
+ 597              		.loc 1 73 0
+ 598              		.cfi_startproc
+ 599              		@ Function supports interworking.
+ 600              		@ args = 0, pretend = 0, frame = 0
+ 601              		@ frame_needed = 0, uses_anonymous_args = 0
+ 602              		@ link register save eliminated.
+ 603              	.LVL5:
+  76:i2c.c         **** 	buff_size = length;
+ 604              		.loc 1 76 0
+ 605 0534 44309FE5 		ldr	r3, .L43
+  81:i2c.c         **** 	busy = 1;
+ 606              		.loc 1 81 0
+ 607 0538 01C0A0E3 		mov	ip, #1
+ 608 053c 10C083E5 		str	ip, [r3, #16]
+  84:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+ 609              		.loc 1 84 0
+ 610 0540 3CC09FE5 		ldr	ip, .L43+4
+  76:i2c.c         **** 	buff_size = length;
+ 611              		.loc 1 76 0
+ 612 0544 041083E5 		str	r1, [r3, #4]
+  84:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+ 613              		.loc 1 84 0
+ 614 0548 0010E0E3 		mvn	r1, #0
+ 615              	.LVL6:
+ 616 054c F7CE01E5 		str	ip, [r1, #-3831]
+  79:i2c.c         **** 	c_buff = data;
+ 617              		.loc 1 79 0
+ 618 0550 0C2083E5 		str	r2, [r3, #12]
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 619              		.loc 1 86 0
+ 620 0554 2C209FE5 		ldr	r2, .L43+8
+ 621              	.LVL7:
+  77:i2c.c         **** 	buff_pos = 0;
+ 622              		.loc 1 77 0
+ 623 0558 00C0A0E3 		mov	ip, #0
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 624              		.loc 1 86 0
+ 625 055c 2010A0E3 		mov	r1, #32
+  77:i2c.c         **** 	buff_pos = 0;
+ 626              		.loc 1 77 0
+ 627 0560 08C083E5 		str	ip, [r3, #8]
+  78:i2c.c         **** 	ra_buff = reg_addr;
+ 628              		.loc 1 78 0
+ 629 0564 0000C3E5 		strb	r0, [r3, #0]
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 630              		.loc 1 86 0
+ 631 0568 0010C2E5 		strb	r1, [r2, #0]
+ 632              	.LVL8:
+ 633              	.L41:
+  90:i2c.c         **** 	while (busy); // busy wait for read process
+ 634              		.loc 1 90 0 discriminator 1
+ 635 056c 100093E5 		ldr	r0, [r3, #16]
+ 636 0570 000050E3 		cmp	r0, #0
+ 637 0574 FCFFFF1A 		bne	.L41
+  94:i2c.c         **** }
+ 638              		.loc 1 94 0
+ 639 0578 0100A0E3 		mov	r0, #1
+ 640 057c 1EFF2FE1 		bx	lr
+ 641              	.L44:
+ 642              		.align	2
+ 643              	.L43:
+ 644 0580 00000000 		.word	.LANCHOR0
+ 645 0584 00000000 		.word	i2c_read_bytes_isr
+ 646 0588 00C005E0 		.word	-536494080
+ 647              		.cfi_endproc
+ 648              	.LFE2:
+ 649              		.fnend
+ 651              		.align	2
+ 652              		.global	i2c_write_bits
+ 654              	i2c_write_bits:
+ 655              		.fnstart
+ 656              	.LFB4:
+ 182:i2c.c         **** int i2c_write_bits(char reg_addr, char bit, char length, char data){
+ 657              		.loc 1 182 0
+ 658              		.cfi_startproc
+ 659              		@ Function supports interworking.
+ 660              		@ args = 0, pretend = 0, frame = 8
+ 661              		@ frame_needed = 0, uses_anonymous_args = 0
+ 662              		@ link register save eliminated.
+ 663              	.LVL9:
+ 664              	.LBB10:
+ 665              	.LBB12:
+  76:i2c.c         **** 	buff_size = length;
+ 666              		.loc 1 76 0
+ 667 058c A8C09FE5 		ldr	ip, .L50
+ 668              	.LBE12:
+ 669              	.LBE10:
+ 182:i2c.c         **** int i2c_write_bits(char reg_addr, char bit, char length, char data){
+ 670              		.loc 1 182 0
+ 671 0590 30002DE9 		stmfd	sp!, {r4, r5}
+ 672              		.save {r4, r5}
+ 673              	.LCFI4:
+ 674              		.cfi_def_cfa_offset 8
+ 675              	.LBB14:
+ 676              	.LBB11:
+  76:i2c.c         **** 	buff_size = length;
+ 677              		.loc 1 76 0
+ 678 0594 0150A0E3 		mov	r5, #1
+ 679              		.cfi_offset 5, -4
+ 680              		.cfi_offset 4, -8
+  81:i2c.c         **** 	busy = 1;
+ 681              		.loc 1 81 0
+ 682 0598 10508CE5 		str	r5, [ip, #16]
+  76:i2c.c         **** 	buff_size = length;
+ 683              		.loc 1 76 0
+ 684 059c 04508CE5 		str	r5, [ip, #4]
+  84:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+ 685              		.loc 1 84 0
+ 686 05a0 98509FE5 		ldr	r5, .L50+4
+ 687 05a4 0040E0E3 		mvn	r4, #0
+ 688 05a8 F75E04E5 		str	r5, [r4, #-3831]
+  77:i2c.c         **** 	buff_pos = 0;
+ 689              		.loc 1 77 0
+ 690 05ac 0040A0E3 		mov	r4, #0
+  78:i2c.c         **** 	ra_buff = reg_addr;
+ 691              		.loc 1 78 0
+ 692 05b0 0000CCE5 		strb	r0, [ip, #0]
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 693              		.loc 1 86 0
+ 694 05b4 88009FE5 		ldr	r0, .L50+8
+ 695              	.LVL10:
+  77:i2c.c         **** 	buff_pos = 0;
+ 696              		.loc 1 77 0
+ 697 05b8 08408CE5 		str	r4, [ip, #8]
+  86:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 698              		.loc 1 86 0
+ 699 05bc 2040A0E3 		mov	r4, #32
+ 700 05c0 0040C0E5 		strb	r4, [r0, #0]
+ 701              	.LBE11:
+ 702              	.LBE14:
+ 182:i2c.c         **** int i2c_write_bits(char reg_addr, char bit, char length, char data){
+ 703              		.loc 1 182 0
+ 704              		.pad #8
+ 705 05c4 08D04DE2 		sub	sp, sp, #8
+ 706              	.LCFI5:
+ 707              		.cfi_def_cfa_offset 16
+ 708              	.L46:
+ 709              	.LBB15:
+ 710              	.LBB13:
+  90:i2c.c         **** 	while (busy); // busy wait for read process
+ 711              		.loc 1 90 0
+ 712 05c8 10009CE5 		ldr	r0, [ip, #16]
+ 713 05cc 000050E3 		cmp	r0, #0
+ 714 05d0 64009FE5 		ldr	r0, .L50
+ 715 05d4 FBFFFF1A 		bne	.L46
+ 716              	.LBE13:
+ 717              	.LBE15:
+ 194:i2c.c         **** 	char mask = ((1 << length) - 1) << (bit - length + 1);
+ 718              		.loc 1 194 0
+ 719 05d8 014081E2 		add	r4, r1, #1
+ 720 05dc 041062E0 		rsb	r1, r2, r4
+ 721              	.LVL11:
+ 722 05e0 0140A0E3 		mov	r4, #1
+ 195:i2c.c         **** 	data <<= (bit - length + 1); // shift data into correct position
+ 723              		.loc 1 195 0
+ 724 05e4 1331A0E1 		mov	r3, r3, asl r1
+ 725              	.LVL12:
+ 194:i2c.c         **** 	char mask = ((1 << length) - 1) << (bit - length + 1);
+ 726              		.loc 1 194 0
+ 727 05e8 1422A0E1 		mov	r2, r4, asl r2
+ 728              	.LVL13:
+ 195:i2c.c         **** 	data <<= (bit - length + 1); // shift data into correct position
+ 729              		.loc 1 195 0
+ 730 05ec FF3003E2 		and	r3, r3, #255
+ 731              	.LVL14:
+ 194:i2c.c         **** 	char mask = ((1 << length) - 1) << (bit - length + 1);
+ 732              		.loc 1 194 0
+ 733 05f0 012042E2 		sub	r2, r2, #1
+ 196:i2c.c         **** 	data &= mask; // zero all non-important bits in data
+ 734              		.loc 1 196 0
+ 735 05f4 123103E0 		and	r3, r3, r2, asl r1
+ 195:i2c.c         **** 	data <<= (bit - length + 1); // shift data into correct position
+ 736              		.loc 1 195 0
+ 737 05f8 08208DE2 		add	r2, sp, #8
+ 738 05fc 013062E5 		strb	r3, [r2, #-1]!
+ 739              	.LVL15:
+ 740              	.LBB16:
+ 741              	.LBB17:
+ 218:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+ 742              		.loc 1 218 0
+ 743 0600 40109FE5 		ldr	r1, .L50+12
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 744              		.loc 1 221 0
+ 745 0604 38309FE5 		ldr	r3, .L50+8
+ 215:i2c.c         **** 	busy = 1;
+ 746              		.loc 1 215 0
+ 747 0608 104080E5 		str	r4, [r0, #16]
+ 213:i2c.c         **** 	c_buff = &data;
+ 748              		.loc 1 213 0
+ 749 060c 0C2080E5 		str	r2, [r0, #12]
+ 218:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+ 750              		.loc 1 218 0
+ 751 0610 0000E0E3 		mvn	r0, #0
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 752              		.loc 1 221 0
+ 753 0614 2020A0E3 		mov	r2, #32
+ 218:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+ 754              		.loc 1 218 0
+ 755 0618 F71E00E5 		str	r1, [r0, #-3831]
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 756              		.loc 1 221 0
+ 757 061c 0020C3E5 		strb	r2, [r3, #0]
+ 758              	.L47:
+ 223:i2c.c         **** 	while (busy); // busy wait for read process
+ 759              		.loc 1 223 0
+ 760 0620 10009CE5 		ldr	r0, [ip, #16]
+ 761 0624 000050E3 		cmp	r0, #0
+ 762 0628 FCFFFF1A 		bne	.L47
+ 763              	.LBE17:
+ 764              	.LBE16:
+ 205:i2c.c         **** }
+ 765              		.loc 1 205 0
+ 766 062c 0100A0E3 		mov	r0, #1
+ 767 0630 08D08DE2 		add	sp, sp, #8
+ 768 0634 3000BDE8 		ldmfd	sp!, {r4, r5}
+ 769 0638 1EFF2FE1 		bx	lr
+ 770              	.L51:
+ 771              		.align	2
+ 772              	.L50:
+ 773 063c 00000000 		.word	.LANCHOR0
+ 774 0640 00000000 		.word	i2c_read_bytes_isr
+ 775 0644 00C005E0 		.word	-536494080
+ 776 0648 00000000 		.word	i2c_write_byte_isr
+ 777              		.cfi_endproc
+ 778              	.LFE4:
+ 779              		.fnend
+ 781              		.align	2
+ 782              		.global	i2c_write_byte
+ 784              	i2c_write_byte:
+ 785              		.fnstart
+ 786              	.LFB5:
+ 207:i2c.c         **** int i2c_write_byte(char reg_addr, char data) {
+ 787              		.loc 1 207 0
+ 788              		.cfi_startproc
+ 789              		@ Function supports interworking.
+ 790              		@ args = 0, pretend = 0, frame = 8
+ 791              		@ frame_needed = 0, uses_anonymous_args = 0
+ 792              		@ link register save eliminated.
+ 793              	.LVL16:
+ 794              		.pad #8
+ 795 064c 08D04DE2 		sub	sp, sp, #8
+ 796              	.LCFI6:
+ 797              		.cfi_def_cfa_offset 8
+ 210:i2c.c         **** 	buff_size = 1;
+ 798              		.loc 1 210 0
+ 799 0650 50309FE5 		ldr	r3, .L55
+ 207:i2c.c         **** int i2c_write_byte(char reg_addr, char data) {
+ 800              		.loc 1 207 0
+ 801 0654 08208DE2 		add	r2, sp, #8
+ 802 0658 011062E5 		strb	r1, [r2, #-1]!
+ 218:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+ 803              		.loc 1 218 0
+ 804 065c 48C09FE5 		ldr	ip, .L55+4
+ 210:i2c.c         **** 	buff_size = 1;
+ 805              		.loc 1 210 0
+ 806 0660 0110A0E3 		mov	r1, #1
+ 807              	.LVL17:
+ 215:i2c.c         **** 	busy = 1;
+ 808              		.loc 1 215 0
+ 809 0664 101083E5 		str	r1, [r3, #16]
+ 210:i2c.c         **** 	buff_size = 1;
+ 810              		.loc 1 210 0
+ 811 0668 041083E5 		str	r1, [r3, #4]
+ 218:i2c.c         **** 	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+ 812              		.loc 1 218 0
+ 813 066c 0010E0E3 		mvn	r1, #0
+ 814 0670 F7CE01E5 		str	ip, [r1, #-3831]
+ 213:i2c.c         **** 	c_buff = &data;
+ 815              		.loc 1 213 0
+ 816 0674 0C2083E5 		str	r2, [r3, #12]
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 817              		.loc 1 221 0
+ 818 0678 30209FE5 		ldr	r2, .L55+8
+ 211:i2c.c         **** 	buff_pos = 0;
+ 819              		.loc 1 211 0
+ 820 067c 00C0A0E3 		mov	ip, #0
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 821              		.loc 1 221 0
+ 822 0680 2010A0E3 		mov	r1, #32
+ 211:i2c.c         **** 	buff_pos = 0;
+ 823              		.loc 1 211 0
+ 824 0684 08C083E5 		str	ip, [r3, #8]
+ 212:i2c.c         **** 	ra_buff = reg_addr;
+ 825              		.loc 1 212 0
+ 826 0688 0000C3E5 		strb	r0, [r3, #0]
+ 221:i2c.c         **** 	I2C1CONSET = 0x20; // Transmit start condition
+ 827              		.loc 1 221 0
+ 828 068c 0010C2E5 		strb	r1, [r2, #0]
+ 829              	.LVL18:
+ 830              	.L53:
+ 223:i2c.c         **** 	while (busy); // busy wait for read process
+ 831              		.loc 1 223 0 discriminator 1
+ 832 0690 100093E5 		ldr	r0, [r3, #16]
+ 833 0694 000050E3 		cmp	r0, #0
+ 834 0698 FCFFFF1A 		bne	.L53
+ 227:i2c.c         **** }
+ 835              		.loc 1 227 0
+ 836 069c 0100A0E3 		mov	r0, #1
+ 837 06a0 08D08DE2 		add	sp, sp, #8
+ 838 06a4 1EFF2FE1 		bx	lr
+ 839              	.L56:
+ 840              		.align	2
+ 841              	.L55:
+ 842 06a8 00000000 		.word	.LANCHOR0
+ 843 06ac 00000000 		.word	i2c_write_byte_isr
+ 844 06b0 00C005E0 		.word	-536494080
+ 845              		.cfi_endproc
+ 846              	.LFE5:
+ 847              		.fnend
+ 849              		.global	busy
+ 850              		.bss
+ 851              		.align	2
+ 852              	.LANCHOR0 = . + 0
+ 855              	ra_buff:
+ 856 0000 00       		.space	1
+ 857 0001 000000   		.space	3
+ 860              	buff_size:
+ 861 0004 00000000 		.space	4
+ 864              	buff_pos:
+ 865 0008 00000000 		.space	4
+ 868              	c_buff:
+ 869 000c 00000000 		.space	4
+ 872              	busy:
+ 873 0010 00000000 		.space	4
+ 874              		.text
+ 875              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 i2c.c
+     /tmp/ccheUqaV.s:21     .text:00000000 $a
+     /tmp/ccheUqaV.s:24     .text:00000000 i2c_read_bytes_isr
+     /tmp/ccheUqaV.s:66     .text:00000034 $d
+     /tmp/ccheUqaV.s:149    .text:00000178 $a
+     /tmp/ccheUqaV.s:270    .text:00000298 $d
+                       .ARM.extab:00000000 $d
+                       .ARM.exidx:00000000 $d
+     /tmp/ccheUqaV.s:276    .text:000002a0 $a
+     /tmp/ccheUqaV.s:279    .text:000002a0 i2c_write_byte_isr
+     /tmp/ccheUqaV.s:318    .text:000002d4 $d
+     /tmp/ccheUqaV.s:369    .text:00000398 $a
+     /tmp/ccheUqaV.s:460    .text:00000470 $d
+     /tmp/ccheUqaV.s:466    .text:00000478 $a
+     /tmp/ccheUqaV.s:469    .text:00000478 i2c_init
+     /tmp/ccheUqaV.s:522    .text:000004d4 $d
+     /tmp/ccheUqaV.s:528    .text:000004dc $a
+     /tmp/ccheUqaV.s:531    .text:000004dc i2c_read_byte
+     /tmp/ccheUqaV.s:584    .text:00000528 $d
+     /tmp/ccheUqaV.s:591    .text:00000534 $a
+     /tmp/ccheUqaV.s:594    .text:00000534 i2c_read_bytes
+     /tmp/ccheUqaV.s:644    .text:00000580 $d
+     /tmp/ccheUqaV.s:651    .text:0000058c $a
+     /tmp/ccheUqaV.s:654    .text:0000058c i2c_write_bits
+     /tmp/ccheUqaV.s:773    .text:0000063c $d
+     /tmp/ccheUqaV.s:781    .text:0000064c $a
+     /tmp/ccheUqaV.s:784    .text:0000064c i2c_write_byte
+     /tmp/ccheUqaV.s:842    .text:000006a8 $d
+     /tmp/ccheUqaV.s:872    .bss:00000010 busy
+     /tmp/ccheUqaV.s:851    .bss:00000000 $d
+     /tmp/ccheUqaV.s:855    .bss:00000000 ra_buff
+     /tmp/ccheUqaV.s:860    .bss:00000004 buff_size
+     /tmp/ccheUqaV.s:864    .bss:00000008 buff_pos
+     /tmp/ccheUqaV.s:868    .bss:0000000c c_buff
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_unwind_cpp_pr1
+__aeabi_unwind_cpp_pr0
