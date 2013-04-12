@@ -7,7 +7,7 @@
 #define CRYSTAL12MHz
 //#define CRYSTAL14745600Hz
 #define CMD_BUFF_SIZE 32 // has to be a power of two
-#define DATA_BUFF_SIZE 4 // has to be a power of two
+#define DATA_BUFF_SIZE 256 // has to be a power of two
 
 #define SAMPLE_RATE_1kHZ 0;
 #define SAMPLE_RATE_500HZ 1;
@@ -16,7 +16,7 @@
 #define SAMPLE_RATE_062HZ 8;
 #define SAMPLE_RATE_012HZ 4096;
 
-#define SAMPLE_RATE SAMPLE_RATE_012HZ
+#define SAMPLE_RATE SAMPLE_RATE_125HZ
 
 #define IENABLE \
 		asm volatile ( "MRS		LR, SPSR" 		); /* copy SPSR_irq to LR */ \
@@ -36,16 +36,13 @@
 #include "logger.h"
 #include "irq.h"
 #include "imu.h"
-//#include "i2c.h"
 #include "protocol.h"
-//#include "mpu6050.h"
 
 /* interruptions */
 void __attribute__ ((interrupt("FIQ"))) pulse_in(void);
 static void __attribute__ ((interrupt("IRQ"))) protocol_in(void);
 static void __attribute__ ((interrupt("IRQ"))) sample(void);
 static void __attribute__ ((interrupt("IRQ"))) error(void);
-
 
 /* init functions */
 static inline void PLL_Init(void);
@@ -120,9 +117,6 @@ int main(void){
 	sampler_init(); // start taking samples at 1kHz				| Timer 3, 1kH, Priority 1
 
 	VICDefVectAddr = (unsigned int) &error;
-
-	//set_wheel_pwm(RIGHT_WHEEL,0x7F);
-	//set_wheel_pwm(LEFT_WHEEL,0x7F);
 
 	while (1) {
 		if (send_data) {
@@ -269,13 +263,9 @@ static inline void pulses_in_init(void){
 
 	// Enable the interrupts
 	VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
-	//VICVectAddr0 = (unsigned int) &pulse_in;
-	//VICVectCntl0 = 0x2E; // source 14 and enabled
 	VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
 
 	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
-	//VICVectAddr1 = (unsigned int) &pulse_in;
-	//VICVectCntl1 = 0x3A; // source 26 and enabled
 	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
 
 	log_string_debug("<< pulses_in_init\n");
@@ -421,8 +411,8 @@ static inline void protocol_init(void){
 
 	U1LCR	 = 0x03; // DivisorLatchAccessBit = 0,  UART 8N1, forbid access to divider-latches
 
-	VICVectAddr4 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the 2th vectored interruption slot
-	VICVectCntl4 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
+	VICVectAddr2 = (unsigned int) &protocol_in; //Setting the interrupt handler location to the 2th vectored interruption slot
+	VICVectCntl2 = 0x27; //Vectored Interrupt slot 2 enabled with source #7 (UART1)
 	VICIntEnable |= 0x00000080; //source #7 enabled as FIQ or IRQ
 
 	cmd_out.i = 0;
@@ -456,8 +446,8 @@ static inline void sampler_init(void){
 	T3MR0 = 14746; // MAT3.0 every 14746/(SAMPLE_RATE + 1) counts (1.000027127ms/(SAMPLE_RATE + 1))
 #endif
 
-	VICVectAddr3 = (unsigned int) &sample; //Setting the interrupt handler location
-	VICVectCntl3 = 0x3B; //Vectored Interrupt slot enabled and with source #27 (TIMER3)
+	VICVectAddr1 = (unsigned int) &sample; //Setting the interrupt handler location
+	VICVectCntl1 = 0x3B; //Vectored Interrupt slot enabled and with source #27 (TIMER3)
 	VICIntEnable |= 0x1 << 27; //source #27 enabled as FIQ or IRQ
 
 	T3TCR = 1; // enable T3
@@ -551,7 +541,7 @@ static void protocol_in(void){
 }
 
 /**
- * Hall the FIQ interrupts shoul be handled as fast as possible.
+ * Hall the FIQ interrupts should be handled as fast as possible.
  *
  * Count the encoder pulses using CAP2.0-2 and EINT0 as interrupt sources
  *
@@ -717,7 +707,7 @@ static inline void get_ir_sensor_data(char * buff) {
 
 
 /**
- * Return the count value read from the i'th sensor
+ * Return the count value read from sensors
  */
 static inline void get_encoders_count(short * left_encoder, short * right_encoder) {
 
@@ -736,10 +726,10 @@ static inline void get_encoders_count(short * left_encoder, short * right_encode
  */
 static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel) {
 
-	if (left_wheel > 8)
-		left_wheel -= 8;
-	else
-		left_wheel = 0;
+//	if (left_wheel > 8)
+//		left_wheel -= 8;
+//	else
+//		left_wheel = 0;
 
 	if (right_wheel & PWM_DIR) { // Forward
 		T0MR2 = 256;

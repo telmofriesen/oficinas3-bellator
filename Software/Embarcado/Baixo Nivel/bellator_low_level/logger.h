@@ -16,11 +16,11 @@
 
 #define CRYSTAL12MHz
 
-#define ERROR
-#define WARNING
-#define DEBUG
-#define DEBUG_I2C
-#define DEBUG_MPU
+//#define ERROR
+//#define WARNING
+//#define DEBUG
+//#define DEBUG_I2C
+//#define DEBUG_MPU
 
 #ifdef ERROR
 #   define log_char_error(str) log_char(str)

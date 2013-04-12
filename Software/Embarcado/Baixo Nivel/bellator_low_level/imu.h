@@ -445,6 +445,6 @@ void mpu_set_FIFO_enabled(char enabled);
 void mpu_reset_FIFO(void);
 void mpu_get_FIFO_size(int* size);
 void mpu_get_motion6(char* buff);
-void mpu_get_FIFO_motion6(char* buff);
+//void mpu_get_FIFO_motion6(char* buff);
 
 #endif /* IMU_H_ */

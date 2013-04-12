@@ -13,12 +13,9 @@ void __attribute__ ((interrupt("IRQ"))) i2c_write_byte_isr(void);
 
 static inline int i2c_read_byte(char reg_addr, char* data);
 static inline int i2c_read_bytes(char reg_addr, char length, char* data);
-static inline int i2c_read_bytes_no_int(char reg_addr, char length, char* data);
-//void i2c_read_bytes_isr(void);
 
 static inline int i2c_write_bits(char reg_addr, char bit, char length, char data);
 static inline int i2c_write_byte(char reg_addr, char data);
-//void i2c_write_byte_isr(void);
 
 static inline void mpu_set_clock_source(char source);
 static inline void mpu_set_full_scale_gyro_range(char range);
@@ -66,7 +63,7 @@ void i2c_init(void){
 	I2C1SCLL = 19; // 394.7kHz for pclk=15MHz | 388.0kHz for pclk=14.7456MHz
 
 	// Enable the interrupts
-	VICVectCntl2 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
+	VICVectCntl0 = 0x33; //Vectored Interrupt slot enabled with source #19 (I2C1)
 	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
 
 	// Enable i2c as FIQ
@@ -100,7 +97,7 @@ static inline int i2c_read_bytes(char reg_addr, char length, char* data) {
 	busy = 1;
 
 	//Setting the interrupt handler location for write byte
-	VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
+	VICVectAddr0 = (unsigned int) &i2c_read_bytes_isr;
 	// Send Start bit
 	I2C1CONSET = 0x20; // Transmit start condition
 
@@ -108,105 +105,8 @@ static inline int i2c_read_bytes(char reg_addr, char length, char* data) {
 
 	while (busy); // busy wait for read process
 
-	log_string_i2c("<< read_bytes\n");
-	return 1;
-}
-
-static inline int i2c_read_bytes_no_int(char reg_addr, char length, char* data) {
-	log_string_i2c(">> read_bytes_no_int\n");
-
-	buff_size = length;
-	buff_pos = 0;
-	ra_buff = reg_addr;
-	c_buff = data;
-
-	//Setting the interrupt handler location for write byte
-	//VICVectAddr2 = (unsigned int) &i2c_read_bytes_isr;
-	// Disable IRQ
-	VICIntEnable &= ~(0x1 << 19); //source #19 enabled as FIQ or IRQ
-
-	// Send Start bit
-	I2C1CONSET = 0x20; // Transmit start condition
-
-	log_string_i2c("waiting\n");
-
-	temp = I2C1STAT;
-
-	while (temp != TW_START); // A START condition has been transmitted.
-	log_string_i2c("TW_START\n");
-	I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_WRITE; // Slave address + Write
-	I2C1CONCLR = 0x28; // Clear SI and STA flag
-
-	while (temp != TW_MT_SLA_ACK || temp != TW_MT_SLA_NACK);
-	if (temp == TW_MT_SLA_ACK) { // SLA+W has been transmitted; ACK has been received.
-		log_string_i2c("TW_MT_SLA_ACK\n");
-		I2C1DAT = ra_buff; // Register address to be written
-		I2C1CONCLR = 0x08; // Clear SI
-	} else { // SLA+W has been transmitted; NOT ACK has been received.
-		log_string_i2c("TW_MT_SLA_NACK\n");
-		I2C1CONCLR = 0x08; // Clear SI
-	}
-
-	while (temp != TW_MT_DATA_ACK || temp != TW_MT_DATA_NACK);
-	if (temp == TW_MT_DATA_ACK) { // Data byte in I2DAT has been transmitted; ACK has been received.
-		log_string_i2c("TW_MT_DATA_ACK\n");
-		I2C1CONSET = 0x20; // Transmit start condition
-		I2C1CONCLR = 0x08; // Clear SI
-	} else {
-		log_string_i2c("TW_MT_DATA_NACK\n");
-		I2C1CONCLR = 0x08; // Clear SI
-	}
-
-	while (temp != TW_REP_START); // A repeated START	condition has been transmitted.
-	log_string_i2c("TW_REP_START\n");
-	I2C1DAT = (MPU6050_ADDRESS_AD0_LOW << 0x1) | I2C_READ; // Slave address + Read
-	I2C1CONCLR = 0x28; // Clear SI and STA flag
-
-	while (temp != TW_MR_SLA_ACK || temp != TW_MR_SLA_NACK);
-	if (temp == TW_MR_SLA_ACK) {
-		log_string_i2c("TW_MR_SLA_ACK\n");
-		if(buff_size > 1)
-			I2C1CONSET = 0x04; // Transmit ACK on data receives
-		I2C1CONCLR = 0x08; // Clear SI
-	} else {
-		log_string_i2c("TW_MR_SLA_NACK\n");
-		I2C1CONCLR = 0x08; // Clear SI
-	}
-
-	busy = 1;
-	while (busy) {
-		while (temp != TW_MR_DATA_ACK || temp != TW_MR_DATA_NACK);
-		if (temp == TW_MR_DATA_ACK) { // Data byte has been received; ACK has been returned.
-			log_string_i2c("TW_MR_DATA_ACK\n");
-			log_string_i2c("pos: ");
-			log_int_i2c(buff_pos);
-			log_string_i2c("\n");
-			if ((buff_pos + 2) < buff_size) {
-				c_buff[buff_pos++] = I2C1DAT;
-				I2C1CONCLR = 0x08; // Clear SI
-			}
-			else {
-				c_buff[buff_pos++] = I2C1DAT;
-				I2C1CONCLR = 0x0C; // Transmit NACK on next data receive, Clear SI
-			}
-		} else { // Data byte has been received; NOT ACK has been returned.
-			log_string_i2c("TW_MR_DATA_NACK\n");
-			log_string_i2c("pos: ");
-			log_int_i2c(buff_pos);
-			log_string_i2c("\n");
-			if (buff_pos < buff_size) {
-				c_buff[buff_pos++] = I2C1DAT;
-			}
-			I2C1CONSET = 0x10; // Transmit stop condition
-			I2C1CONCLR = 0x08; // Clear SI
-			busy = 0;
-		}
-	}
-
-	// Enable IRQ again
-	VICIntEnable |= 0x1 << 19; //source #19 enabled as FIQ or IRQ
-
-	log_string_i2c("<< read_bytes_no_int\n");
+	// nao apagar, gambi master
+	log_string("<< read_bytes\n");
 	return 1;
 }
 
@@ -335,14 +235,15 @@ static inline int i2c_write_byte(char reg_addr, char data) {
 	busy = 1;
 
 	//Setting the interrupt handler location for write byte
-	VICVectAddr2 = (unsigned int) &i2c_write_byte_isr;
+	VICVectAddr0 = (unsigned int) &i2c_write_byte_isr;
 
 	// Send Start bit
 	I2C1CONSET = 0x20; // Transmit start condition
 
 	while (busy); // busy wait for read process
 
-	log_string_i2c("<< write_byte\n");
+	// nao apagar, gambi master
+	log_string("<< write_byte\n");
 	return 1;
 }
 
@@ -706,7 +607,6 @@ void mpu_get_motion6(char* data) {
 
 	log_string_mpu(">> mpu_get_motion6\n");
 
-	//i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, 14, buff);
 	i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, 14, buff);
 
 	*data = buff[0];
@@ -752,38 +652,20 @@ void mpu_get_motion6(char* data) {
 * ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l,
 *
 */
-void mpu_get_FIFO_motion6(char* data) {
-
-	//i2c_read_bytes(MPU6050_RA_FIFO_R_W, 12, c);
-
-	*data = buff[0];
-	*(data+1) = buff[1];
-	*(data+2) = buff[2];
-	*(data+3) = buff[3];
-	*(data+4) = buff[4];
-	*(data+5) = buff[5];
-	*(data+6) = buff[6];
-	*(data+7) = buff[7];
-	*(data+8) = buff[8];
-	*(data+9) = buff[9];
-	*(data+10) = buff[10];
-	*(data+11) = buff[11];
-
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, ax_h);
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, ax_l);
+//void mpu_get_FIFO_motion6(char* data) {
 //
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, ay_h);
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, ay_l);
+//	i2c_read_bytes(MPU6050_RA_FIFO_R_W, 12, buff);
 //
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, az_h);
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, az_l);
-//
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gx_h);
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gx_l);
-//
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gy_h);
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gy_l);
-//
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gz_h);
-//	i2c_read_byte(MPU6050_RA_FIFO_R_W, gz_l);
-}
+//	*data = buff[0];
+//	*(data+1) = buff[1];
+//	*(data+2) = buff[2];
+//	*(data+3) = buff[3];
+//	*(data+4) = buff[4];
+//	*(data+5) = buff[5];
+//	*(data+6) = buff[6];
+//	*(data+7) = buff[7];
+//	*(data+8) = buff[8];
+//	*(data+9) = buff[9];
+//	*(data+10) = buff[10];
+//	*(data+11) = buff[11];
+//}
