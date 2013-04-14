@@ -15,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GerenciadorMotores implements MyChangeListener {
 
     private EnginesSpeed currentEngineSpeed = new EnginesSpeed(0, 0);
+    private float currentMultiplier = 1;
     private int movementType = 1;
     public static final int STOP = 1,
             FORWARD = 2,
@@ -84,7 +85,7 @@ public class GerenciadorMotores implements MyChangeListener {
     }
 
     public synchronized EnginesSpeed getNewEngineSpeed() {
-        return getNewEngineSpeed(movementType);
+        return getNewEngineSpeed(movementType, currentMultiplier);
     }
 
     public EnginesSpeed getNewEngineSpeed(int movementType) {
@@ -112,6 +113,11 @@ public class GerenciadorMotores implements MyChangeListener {
         }
     }
 
+    public EnginesSpeed getNewEngineSpeed(int movementType, float multiplier) {
+        EnginesSpeed speed = getNewEngineSpeed(movementType);
+        return new EnginesSpeed(speed.leftSpeed * multiplier, speed.rightSpeed * multiplier);
+    }
+
     public synchronized EnginesSpeed getCurrentEngineSpeed() {
         return currentEngineSpeed;
     }
@@ -119,5 +125,13 @@ public class GerenciadorMotores implements MyChangeListener {
     public synchronized void setCurrentEngineSpeed(EnginesSpeed currentEngineSpeed) {
         this.currentEngineSpeed = currentEngineSpeed;
         fireChangeEvent();
+    }
+
+    public float getCurrentMultiplier() {
+        return currentMultiplier;
+    }
+
+    public void setCurrentMultiplier(float currentMultiplier) {
+        this.currentMultiplier = currentMultiplier;
     }
 }

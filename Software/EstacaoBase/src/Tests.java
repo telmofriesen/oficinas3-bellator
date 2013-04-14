@@ -3,6 +3,7 @@
  * and open the template in the editor.
  */
 
+import dados.AmostraSensores;
 import dados.Robo;
 import dados.SensorIR;
 import dados.Obstaculos;
@@ -22,7 +23,7 @@ import visual.*;
  *
  * @author stefan
  */
-public class Main {
+public class Tests {
 
     /**
      * @param args the command line arguments
@@ -53,7 +54,7 @@ public class Main {
         robo.addSensorIR(new SensorIR(new Ponto(200, 0), PApplet.radians(0), 200, 1500));
 //        robo.addSensorIR(new SensorIR(new Ponto(20, 10), PApplet.radians(30), 20, 150));
         robo.addSensorIR(new SensorIR(new Ponto(200, 200), PApplet.radians(60), 200, 1500));
-        
+
         Mapa mapa = new Mapa(robo, obstaculos);
 
         RoboDrawable roboDrawable = new RoboDrawable(robo);
@@ -104,21 +105,34 @@ public class Main {
         //
         // Inicializa o controle dos sensores
         //
-        GerenciadorSensores controleSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        GerenciadorSensores gerenciadorSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        gerenciadorSensores.start();
+        gerenciadorSensores.startRecording();
 //        ControleSensoresKalman controleSensores = new ControleSensoresKalman(robo, obstaculos, 0.1f, 0.05f, 5f); //Com filtragem por filtro de Kalman
         //
         // Insere leituras de teste
         //
         try {
+            //Novos testes com encoders
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 1000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 2000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 3000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 4000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 5000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 6000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 7000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 8000));
+
+
 //Outros testes
-            controleSensores.novaLeituraSensores(0, PApplet.radians(0), new float[]{300, 0, 300}, 1000);
-            controleSensores.novaLeituraSensores(1, PApplet.radians(10), new float[]{300, 0, 300}, 2000);
-            controleSensores.novaLeituraSensores(0, PApplet.radians(10), new float[]{300, 0, 300}, 3000);
-            controleSensores.novaLeituraSensores(0, PApplet.radians(-10), new float[]{300, 0, 300}, 4000);
-            controleSensores.novaLeituraSensores(-0.5f, PApplet.radians(-20), new float[]{300, 0, 300}, 5000);
-            controleSensores.novaLeituraSensores(0, PApplet.radians(-25), new float[]{300, 0, 300}, 6000);
-            controleSensores.novaLeituraSensores(0, PApplet.radians(0), new float[]{300, 0, 300}, 7000);
-            
+//            gerenciadorSensores.novaLeituraSensores(0, PApplet.radians(0), new float[]{300, 0, 300}, 1000);
+//            gerenciadorSensores.novaLeituraSensores(1, PApplet.radians(10), new float[]{300, 0, 300}, 2000);
+//            gerenciadorSensores.novaLeituraSensores(0, PApplet.radians(10), new float[]{300, 0, 300}, 3000);
+//            gerenciadorSensores.novaLeituraSensores(0, PApplet.radians(-10), new float[]{300, 0, 300}, 4000);
+//            gerenciadorSensores.novaLeituraSensores(-0.5f, PApplet.radians(-20), new float[]{300, 0, 300}, 5000);
+//            gerenciadorSensores.novaLeituraSensores(0, PApplet.radians(-25), new float[]{300, 0, 300}, 6000);
+//            gerenciadorSensores.novaLeituraSensores(0, PApplet.radians(0), new float[]{300, 0, 300}, 7000);
+
 //            controleSensores.novaLeituraSensores(1, PApplet.radians(45), new float[]{30, 0, 30}, 2500);
 //            controleSensores.novaLeituraSensores(1, PApplet.radians(45), new float[]{30, 0, 30}, 2600);
 //            controleSensores.novaLeituraSensores(1, PApplet.radians(45), new float[]{30, 0, 30}, 2700);
@@ -148,12 +162,12 @@ public class Main {
 //            }
 //            System.out.println(robo.pontosToString());
 //            System.out.println(obstaculos.pontosToString());
-            
+
 //            mapa.save("save3.txt");
 //            mapa.load("save3.txt");
 
         } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Tests.class.getName()).log(Level.SEVERE, null, ex);
         }
         viewer2D.redraw();
     }

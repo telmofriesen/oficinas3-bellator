@@ -8,13 +8,44 @@ import java.awt.Color;
 
 /**
  * Propriedades visuais do robô
+ *
  * @author stefan
  */
 public class RoboDrawableProp {
 
-    int tamanhoRobo = 80;
+    int tamanhoSensores = 80;
     private Color corRobo = new Color(0, 0, 0, 100);
     private Color corSensoresIR = new Color(0, 0, 200, 240);
+    private Color corOrigem = new Color(0, 0, 200, 200);
+    private boolean roboEnabled = true;
+    private boolean coordenadasEnabled = true;
+    private int larguraRodas = 50;
+    private int comprimentoRodas = 150;
+    private Color corRodas = new Color(0, 0, 0, 200);
+
+    public Color getCorRodas() {
+        return corRodas;
+    }
+
+    public void setCorRodas(Color corRodas) {
+        this.corRodas = corRodas;
+    }
+
+    public int getLarguraRodas() {
+        return larguraRodas;
+    }
+
+    public void setLarguraRodas(int larguraRodas) {
+        this.larguraRodas = larguraRodas;
+    }
+
+    public int getComprimentoRodas() {
+        return comprimentoRodas;
+    }
+
+    public void setComprimentoRodas(int comprimentoRodas) {
+        this.comprimentoRodas = comprimentoRodas;
+    }
 
     public Color getCorSensoresIR() {
         return corSensoresIR;
@@ -23,16 +54,13 @@ public class RoboDrawableProp {
     public void setCorSensoresIR(Color corSensoresIR) {
         this.corSensoresIR = corSensoresIR;
     }
-    private Color corOrigem = new Color(0, 0, 200, 200);
-    private boolean roboEnabled = true;
-    private boolean coordenadasEnabled = true;
 
-    public int getTamanhoRobo() {
-        return tamanhoRobo;
+    public int getTamanhoSensores() {
+        return tamanhoSensores;
     }
 
-    public void setTamanhoRobo(int tamanhoRobo) {
-        this.tamanhoRobo = tamanhoRobo;
+    public void setTamanhoSensores(int tamanhoRobo) {
+        this.tamanhoSensores = tamanhoRobo;
     }
 
     public Color getCorRobo() {

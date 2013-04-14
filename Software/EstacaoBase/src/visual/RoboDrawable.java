@@ -47,7 +47,8 @@ public class RoboDrawable implements Drawable2D {
         a.fill(0);
         a.textAlign(PApplet.RIGHT);
         a.text(String.format("robo.pos: (%d, %d) cm @ %.2f deg", pontoLastPos.x / 10, pontoLastPos.y / 10, PApplet.degrees(lastPos.getAngulo())), a.width - 5, 15);
-        a.text(String.format("robo.velocidade=%.2f m/s", robo.getVelocidade()), a.width - 5, 30);
+        a.text(String.format("robo.velocidade=%.3f m/s", robo.getVelocidadeAtual()), a.width - 5, 30);
+        a.text(String.format("robo.velocidade_angular=%.3f rad/s", robo.getVelocidadeAngularAtual()), a.width - 5, 45);
 //        a.text(String.format("robo.y=%d cm", pontoLastPos.y), a.width - 5, 30);
 //        a.text(String.format("robo.angulo=%.2f deg", PApplet.degrees(lastPos.getAngulo())), a.width - 5, 45);
 
@@ -65,15 +66,31 @@ public class RoboDrawable implements Drawable2D {
         a.stroke(corRobo.getRGB());
         a.rotate(anguloRobo);
         a.ellipseMode(PApplet.CENTER);
-        a.ellipse(0, 0, propriedades.getTamanhoRobo() * escala, propriedades.getTamanhoRobo() * escala);
-        a.line(0, 0, propriedades.getTamanhoRobo() * escala, 0);
+        //Desenha o circulo do centro de movimento
+        a.ellipse(0, 0, propriedades.getTamanhoSensores() * escala, propriedades.getTamanhoSensores() * escala);
+        a.line(0, 0, propriedades.getTamanhoSensores() * escala, 0);
 
+        //Desenha o retangulo principal
         a.rectMode(PApplet.CORNER);
         a.rect(-robo.getComprimento() * escala - robo.getCentroMovimento().x() * escala,
                -robo.getCentroMovimento().y() * escala,
                robo.getComprimento() * escala,
                robo.getLargura() * escala);
+
+        //Desenha as rodas
+        a.fill(propriedades.getCorRodas().getRGB());
+        //Roda esquerda
+        a.rect(-propriedades.getComprimentoRodas() * escala / 2,
+               -robo.getCentroMovimento().y() * escala - propriedades.getLarguraRodas() * escala,
+               propriedades.getComprimentoRodas() * escala,
+               propriedades.getLarguraRodas() * escala);
+        //Roda direita
+        a.rect(-propriedades.getComprimentoRodas() * escala / 2,
+               robo.getCentroMovimento().y() * escala + propriedades.getLarguraRodas() * escala,
+               propriedades.getComprimentoRodas() * escala,
+               -propriedades.getLarguraRodas() * escala);
         a.popMatrix();
+
 
 
         //
@@ -87,8 +104,8 @@ public class RoboDrawable implements Drawable2D {
             a.rotate(anguloRobo);
             a.translate(posSensor.x() * escala, posSensor.y() * escala);
             a.rotate(robo.getSensor(i).getAngulo());
-            a.ellipse(0, 0, propriedades.getTamanhoRobo() * escala, propriedades.getTamanhoRobo() * escala);
-            a.line(0, 0, propriedades.getTamanhoRobo() * escala, 0);
+            a.ellipse(0, 0, propriedades.getTamanhoSensores() * escala, propriedades.getTamanhoSensores() * escala);
+            a.line(0, 0, propriedades.getTamanhoSensores() * escala, 0);
             a.popMatrix();
         }
 

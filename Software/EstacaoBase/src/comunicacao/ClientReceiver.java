@@ -69,7 +69,7 @@ public class ClientReceiver extends Thread {
      */
     public void kill() {
         try {
-            input.close();
+            if(input != null) input.close();
         } catch (IOException ex) {
             Logger.getLogger(ClientSender.class.getName()).log(Level.SEVERE, null, ex);
         }

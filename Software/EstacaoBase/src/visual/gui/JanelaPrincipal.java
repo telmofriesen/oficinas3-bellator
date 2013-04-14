@@ -63,13 +63,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private Mapa mapa;
     private Viewer2D viewer2D;
     private boolean saved = true;
-    private GerenciadorSensores controleSensores;
-    private GerenciadorCamera controleCamera;
-    private GerenciadorMotores controleMotores;
+    private GerenciadorSensores gerenciadorSensores;
+    private GerenciadorCamera gerenciadorCamera;
+    private GerenciadorMotores gerenciadorMotores;
     private JanelaConexao janelaConexao;
     private ClientConnector connector;
     private JanelaSensores janelaSensores;
-    private ControleSensoresListener infoListenerControleSensores;
+    private GerenciadorSensoresListener infoListenerControleSensores;
     private CameraInfoListener cameraInfoListener;
     private MovementKeyboardListener movementKeyboardListener;
     private MotoresListener motoresListener;
@@ -90,22 +90,29 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         fc = new CustomFileChooser(new File(".").getAbsolutePath(), "bellator");
         //Inicializa conector e interpretador de comandos.
         connector = new ClientConnector();
-        controleCamera = new GerenciadorCamera();
-        controleMotores = new GerenciadorMotores();
-        ClientMessageProcessor interpreter = new ClientMessageProcessor(connector, controleSensores, controleCamera);
+        gerenciadorCamera = new GerenciadorCamera();
+
+        gerenciadorMotores = new GerenciadorMotores();
+        maxSpeedSlider.setF_min(0.2f);
+        maxSpeedSlider.setF_max(1f);
+        maxSpeedSlider.setFloatValue(1);
+        maxSpeedTextField.setText(String.format("%.1f", maxSpeedSlider.getFloatValue()));
+
+        ClientMessageProcessor interpreter = new ClientMessageProcessor(connector, gerenciadorSensores, gerenciadorCamera);
         connector.setInterpreter(interpreter);
         //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
-        janelaSensores = new JanelaSensores(controleSensores, controleCamera, connector);
+        janelaSensores = new JanelaSensores(gerenciadorSensores, gerenciadorCamera, connector);
         //Inicia as threads.
         interpreter.start();
         connector.start();
+        gerenciadorSensores.start();
 
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         webcamImagePanel.add(mediaPlayerComponent, BorderLayout.CENTER);
         mediaPlayerComponent.setSize(webcamImagePanel.getSize());
         webcamImagePanel.addComponentListener(new webcamImagePanelListener());
-        
+
 //        mediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener();
 
 //        MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory("--no-video-title-show");
@@ -256,9 +263,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //
         Robo robo = new Robo(400, 500, new Ponto(-200, 200));
         robo.addSensorIR(new SensorIR(new Ponto(200, -200), PApplet.radians(-60), 200, 1500));
-//        robo.addSensorIR(new SensorIR(new Ponto(20, -10), PApplet.radians(-30), 20, 150));
+        robo.addSensorIR(new SensorIR(new Ponto(200, -100), PApplet.radians(-30), 20, 150));
         robo.addSensorIR(new SensorIR(new Ponto(200, 0), PApplet.radians(0), 200, 1500));
-//        robo.addSensorIR(new SensorIR(new Ponto(20, 10), PApplet.radians(30), 20, 150));
+        robo.addSensorIR(new SensorIR(new Ponto(200, 100), PApplet.radians(30), 20, 150));
         robo.addSensorIR(new SensorIR(new Ponto(200, 200), PApplet.radians(60), 200, 1500));
 
         RoboDrawable roboDrawable = new RoboDrawable(robo);
@@ -281,29 +288,29 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //
         // Inicializa o controle dos sensores
         //
-        controleSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        gerenciadorSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
     }
 
     /**
      * Inicializa os listeners.
      */
     private void initListeners() {
-        infoListenerControleSensores = new ControleSensoresListener();
+        infoListenerControleSensores = new GerenciadorSensoresListener();
         cameraInfoListener = new CameraInfoListener();
         videoInfoListener = new VideoInfoListener();
         videoInfoListener.start();
         movementKeyboardListener = new MovementKeyboardListener();
         motoresListener = new MotoresListener();
         //Adiciona os listeners aos objetos.
-        controleSensores.addMyChangeListener(infoListenerControleSensores);
-        controleSensores.getAmostragemEstacaoBase().addMyChangeListener(infoListenerControleSensores);
-        controleSensores.addMyChangeListener(janelaSensores);
-        controleSensores.addMyChangeListener(recordButton);
-        controleSensores.addMyChangeListener(sensoresButtonListener);
-        controleCamera.addMyChangeListener(cameraInfoListener);
-        controleCamera.addMyChangeListener(janelaSensores);
-        controleCamera.getContadorByterate().addMyChangeListener(cameraInfoListener);
-        controleCamera.getContadorFramerate().addMyChangeListener(cameraInfoListener);
+        gerenciadorSensores.addMyChangeListener(infoListenerControleSensores);
+        gerenciadorSensores.getAmostragemEstacaoBase().addMyChangeListener(infoListenerControleSensores);
+        gerenciadorSensores.addMyChangeListener(janelaSensores);
+        gerenciadorSensores.addMyChangeListener(recordButton);
+        gerenciadorSensores.addMyChangeListener(sensoresButtonListener);
+        gerenciadorCamera.addMyChangeListener(cameraInfoListener);
+        gerenciadorCamera.addMyChangeListener(janelaSensores);
+        gerenciadorCamera.getContadorByterate().addMyChangeListener(cameraInfoListener);
+        gerenciadorCamera.getContadorFramerate().addMyChangeListener(cameraInfoListener);
 //        imagePanelListener1.addMyChangeListener(cameraInfoListener);
 //        controleCamera.addMyChangeListener(imagePanelListener1);
         connector.addMyChangeListener(sensoresButtonListener);
@@ -312,8 +319,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         connector.addMyChangeListener(recordButton);
 
         viewer2D.addKeyboardListener(movementKeyboardListener);
-        movementKeyboardListener.addMyChangeListener(controleMotores);
-        controleMotores.addMyChangeListener(motoresListener);
+        movementKeyboardListener.addMyChangeListener(gerenciadorMotores);
+        gerenciadorMotores.addMyChangeListener(motoresListener);
 
     }
 
@@ -352,6 +359,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         bottomRightPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         movementImagePanel = new visual.gui.ImagePanel();
+        maxSpeedSlider = new visual.gui.FloatJSlider();
+        jLabel2 = new javax.swing.JLabel();
+        maxSpeedTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Bellator");
@@ -452,6 +462,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         bottomLabel4.setText("Descartadas: ");
         bottomToolBar.add(bottomLabel4);
 
+        jSplitPane1.setResizeWeight(1.0);
+
+        mapLeftPanel.setFocusable(false);
         mapLeftPanel.setMinimumSize(new java.awt.Dimension(500, 200));
         mapLeftPanel.setName(""); // NOI18N
         mapLeftPanel.setPreferredSize(new java.awt.Dimension(500, 300));
@@ -459,17 +472,24 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jSplitPane1.setLeftComponent(mapLeftPanel);
 
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.setResizeWeight(1.0);
 
         topRightPanel.setPreferredSize(new java.awt.Dimension(535, 200));
 
         webcamTopLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         webcamTopLabel.setText("WEBCAM [OFF] - ---X--- <- resolução");
         webcamTopLabel.setToolTipText("");
+        webcamTopLabel.setFocusable(false);
         webcamTopLabel.setMinimumSize(new java.awt.Dimension(0, 0));
 
         webcamBottomLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         webcamBottomLabel.setText("Framerate: ---- fps (--- kb/s).  Escala: -----");
+        webcamBottomLabel.setFocusable(false);
         webcamBottomLabel.setMinimumSize(new java.awt.Dimension(0, 0));
+
+        webcamImagePanel.setFocusable(false);
+        webcamImagePanel.setRequestFocusEnabled(false);
+        webcamImagePanel.setVerifyInputWhenFocusTarget(false);
 
         javax.swing.GroupLayout topRightPanelLayout = new javax.swing.GroupLayout(topRightPanel);
         topRightPanel.setLayout(topRightPanelLayout);
@@ -479,8 +499,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(topRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(webcamImagePanel)
-                    .addComponent(webcamTopLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
-                    .addComponent(webcamBottomLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE))
+                    .addComponent(webcamTopLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addComponent(webcamBottomLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
                 .addContainerGap())
         );
         topRightPanelLayout.setVerticalGroup(
@@ -498,7 +518,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         bottomRightPanel.setPreferredSize(new java.awt.Dimension(200, 200));
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("MOVIMENTAÇÃO");
+        jLabel1.setText("- MOVIMENTAÇÃO -");
+
+        movementImagePanel.setFocusable(false);
+        movementImagePanel.setMinimumSize(new java.awt.Dimension(160, 150));
 
         javax.swing.GroupLayout movementImagePanelLayout = new javax.swing.GroupLayout(movementImagePanel);
         movementImagePanel.setLayout(movementImagePanelLayout);
@@ -508,27 +531,59 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         );
         movementImagePanelLayout.setVerticalGroup(
             movementImagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 166, Short.MAX_VALUE)
+            .addGap(0, 165, Short.MAX_VALUE)
         );
+
+        maxSpeedSlider.setFocusable(false);
+        maxSpeedSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                maxSpeedSliderStateChanged(evt);
+            }
+        });
+
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Velocidade máxima:");
+
+        maxSpeedTextField.setEditable(false);
+        maxSpeedTextField.setText("1");
+        maxSpeedTextField.setFocusable(false);
+        maxSpeedTextField.setMinimumSize(new java.awt.Dimension(20, 26));
+        maxSpeedTextField.setPreferredSize(new java.awt.Dimension(40, 26));
+        maxSpeedTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                maxSpeedTextFieldActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout bottomRightPanelLayout = new javax.swing.GroupLayout(bottomRightPanel);
         bottomRightPanel.setLayout(bottomRightPanelLayout);
         bottomRightPanelLayout.setHorizontalGroup(
             bottomRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bottomRightPanelLayout.createSequentialGroup()
+            .addGroup(bottomRightPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(bottomRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(movementImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(bottomRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(bottomRightPanelLayout.createSequentialGroup()
+                        .addComponent(movementImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+                    .addGroup(bottomRightPanelLayout.createSequentialGroup()
+                        .addComponent(maxSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(maxSpeedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         bottomRightPanelLayout.setVerticalGroup(
             bottomRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bottomRightPanelLayout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(movementImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(bottomRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(maxSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxSpeedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(movementImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(bottomRightPanel);
@@ -542,7 +597,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 741, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 756, Short.MAX_VALUE)
                     .addComponent(bottomToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(topToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -552,7 +607,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(topToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bottomToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -642,12 +697,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
         boolean selected = recordButton.isSelected();
         if (selected) {
-            controleSensores.startRecord();
+            gerenciadorSensores.startRecording();
             recordButton.setText("Gravando");
             recordButton.setToolTipText("O programa está gravando movimentos do robô.");
             saved = false;
         } else {
-            controleSensores.stopRecord();
+            gerenciadorSensores.stopRecording();
             recordButton.setText("Não Gravando");
             recordButton.setToolTipText("O programa não está gravando movimentos do robô.");
         }
@@ -663,10 +718,22 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         janelaSensores.setVisible(true);
     }//GEN-LAST:event_sensoresButtonListenerActionPerformed
 
+    private void maxSpeedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxSpeedTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_maxSpeedTextFieldActionPerformed
+
+    private void maxSpeedSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_maxSpeedSliderStateChanged
+        // TODO add your handling code here:
+        maxSpeedTextField.setText(String.format("%.2f", maxSpeedSlider.getFloatValue()));
+        if(!maxSpeedSlider.getValueIsAdjusting()){
+            gerenciadorMotores.setCurrentMultiplier(maxSpeedSlider.getFloatValue());
+        }
+    }//GEN-LAST:event_maxSpeedSliderStateChanged
+
     /**
-     * Classe responsável por escutar mudanças importantes em ControleSensores e atualizar o display de informações caso necessário.
+     * Classe responsável por escutar mudanças importantes em GerenciadorSensores e atualizar o display de informações caso necessário.
      */
-    class ControleSensoresListener implements MyChangeListener {
+    class GerenciadorSensoresListener implements MyChangeListener {
 
         @Override
         public void changeEventReceived(MyChangeEvent evt) {
@@ -688,6 +755,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                         bottomLabel4.setText(String.format("Descartadas: %d ", leiturasDescartadas));
                     }
                 });
+                viewer2D.redraw();
             }
             if (evt.getSource() instanceof ContadorAmostragemTempoReal) {
                 final ContadorAmostragemTempoReal c = (ContadorAmostragemTempoReal) evt.getSource();
@@ -820,7 +888,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-//            mediaPlayerComponent.setSize(e.getComponent().getSize());
+            mediaPlayerComponent.setSize(e.getComponent().getSize());
         }
 
         @Override
@@ -845,58 +913,63 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         public void run() {
 //            boolean sampling_enabled;
 //            boolean webcam_available;
-////            Dimension dim;
-//            long play_start_time = System.currentTimeMillis();
-////            final MediaPlayer m = mediaPlayerComponent.getMediaPlayer();
-//            while (true) {
-//                final boolean sampling_enabled = controleCamera.isSampling_enabled();
-//                final boolean webcam_available = controleCamera.isWebcam_available();
-//                final Dimension dim = mediaPlayerComponent.getMediaPlayer().getVideoDimension();
-//                final float fps = m.isPlaying()
-//                        ? m.getFps()
-//                        : 0f;
-//                final long time = (System.currentTimeMillis() - play_start_time) / 1000;
-//                final float kbps = m.isPlaying() && time > 0
-//                        ? (float) m.getMediaStatistics().i_read_bytes / (float) time / (float) 1024
-//                        : 0f;
-//                final float scale = m.isPlaying() && dim != null
-//                        ? Math.min((float) webcamImagePanel.getSize().width / (float) dim.width, (float) webcamImagePanel.getSize().height / (float) dim.height)
-//                        : 0f;
-//                java.awt.EventQueue.invokeLater(new Runnable() {
-//                    public void run() {
-//                        if (sampling_enabled && webcam_available && dim != null) {
-//                            webcamTopLabel.setText(String.format("WEBCAM [ON] (%dx%d)", dim.width, dim.height));
-//                        } else {
-//                            webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
-//                        }
-//                        webcamBottomLabel.setText(String.format("Framerate: %.1f fps (%.1f kb/s).  Escala: %.2f",
-//                                                                fps, kbps, scale));
-//                    }
-//                });
-//                try {
-//                    sleep(1000);
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//                //Indica se entrou no loop 
-//                boolean a = false;
-//                while (!m.isPlaying()) {
-//                    try {
-//                        sleep(2000);
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                    if (a = false) {
-//                        java.awt.EventQueue.invokeLater(new Runnable() {
-//                            public void run() {
-//                                webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
-//                            }
-//                        });
-//                    }
-//                    a = true;
-//                }
-//                if (a) play_start_time = System.currentTimeMillis();
-//            }
+//            Dimension dim;
+            long play_start_time = System.currentTimeMillis();
+            final MediaPlayer m = mediaPlayerComponent.getMediaPlayer();
+            while (true) {
+                final boolean sampling_enabled = gerenciadorCamera.isSampling_enabled();
+                final boolean webcam_available = gerenciadorCamera.isWebcam_available();
+                final Dimension dim = mediaPlayerComponent.getMediaPlayer().getVideoDimension();
+
+
+                final long time = (System.currentTimeMillis() - play_start_time) / 1000;
+                final float fps = m.isPlaying()
+                        ? (float) m.getMediaStatistics().i_displayed_pictures / (float) time
+                        : 0f;
+                final float kbps = m.isPlaying() && time > 0
+                        ? (float) m.getMediaStatistics().i_read_bytes / (float) time / (float) 1024
+                        : 0f;
+                final float scale = m.isPlaying() && dim != null
+                        ? Math.min((float) webcamImagePanel.getSize().width / (float) dim.width, (float) webcamImagePanel.getSize().height / (float) dim.height)
+                        : 0f;
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        if (sampling_enabled && webcam_available && dim != null) {
+                            webcamTopLabel.setText(String.format("WEBCAM [ON] (%dx%d)", dim.width, dim.height));
+                            webcamBottomLabel.setText(String.format("Framerate: %.1f fps (%.1f kb/s).  Escala: %.2f",
+                                                                    fps, kbps, scale));
+                        } else {
+                            webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
+                            webcamBottomLabel.setText("Framerate: ---- fps (--- kb/s).  Escala: -----");
+                        }
+
+                    }
+                });
+                try {
+                    sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //Indica se entrou no loop 
+                boolean a = false;
+                while (!m.isPlaying()) {
+                    try {
+                        sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(JanelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if (a == false) {
+                        java.awt.EventQueue.invokeLater(new Runnable() {
+                            public void run() {
+                                webcamTopLabel.setText(String.format("WEBCAM [OFF]"));
+                                webcamBottomLabel.setText("Framerate: ---- fps (--- kb/s).  Escala: -----");
+                            }
+                        });
+                    }
+                    a = true;
+                }
+                if (a) play_start_time = System.currentTimeMillis();
+            }
         }
     }
 
@@ -998,12 +1071,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JToolBar bottomToolBar;
     private visual.gui.ConnectionButtonListener connectionButtonListener;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JPanel mapLeftPanel;
+    private visual.gui.FloatJSlider maxSpeedSlider;
+    private javax.swing.JTextField maxSpeedTextField;
     private visual.gui.ImagePanel movementImagePanel;
     private javax.swing.JButton novoButton;
     private javax.swing.JButton openButton;

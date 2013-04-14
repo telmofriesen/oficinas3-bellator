@@ -2,9 +2,13 @@ package dados;
 
 import events.MyChangeEvent;
 import events.MyChangeListener;
+import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import processing.core.PApplet;
 import processing.core.PVector;
+import robo.ServerMessageProcessor;
 import visual.Ponto;
 
 /**
@@ -14,7 +18,7 @@ import visual.Ponto;
  *
  * @author stefan
  */
-public class GerenciadorSensores implements MyChangeListener {
+public class GerenciadorSensores extends Thread implements MyChangeListener {
 
     /**
      * Estados de amostragem
@@ -30,15 +34,22 @@ public class GerenciadorSensores implements MyChangeListener {
     private boolean recordEnabled = false;
     //Gravação de amostras foi interrompida e continuada posteriormente?
     private boolean recordInterruptedAndResumed = false;
+    private int numAmostrasAposInicioGravacao = 0;
     //Contadores do total de amostras.
     private int leituras_gravadas = 0, leituras_descartadas = 0;
     //Controle de taxas de amostragem
     ContadorAmostragem amostragemRobo; //Taxa de amostragem efetiva no robô
     ContadorAmostragemTempoReal amostragemEstacaoBase; //Taxa de recebimento de amostras na estação base
+    //Array que armazena a fila de comandos
+    private ArrayList<AmostraSensores> commandsList = new ArrayList<AmostraSensores>();
+    //Indica se a thread deve rodar ou não
+    private boolean run = true;
     //Listeners de eventos da classe
     private final CopyOnWriteArrayList<MyChangeListener> listeners;
     //Indicação se esta classe (this) foi adicionada como listener no contador de amostragem de tempo real
 //    private boolean listener_added = false;
+    private float ultimaVelocidadeEncoders = 0;
+    private float ultimaVelocidadeAngularEncoders = 0;
 
     /**
      *
@@ -57,6 +68,45 @@ public class GerenciadorSensores implements MyChangeListener {
         sensorSampleStatus = SAMPLE_STOPPED;
     }
 
+    @Override
+    public void run() {
+        run = true;
+        AmostraSensores command;
+        int num_elementos = 0;
+        while (run) {
+            synchronized (this) {
+                num_elementos = commandsList.size();
+            }
+            //Enquanto o vetor tiver elementos....
+            while (num_elementos > 0) {
+                synchronized (this) {
+                    command = commandsList.get(0);
+                    try {
+                        //Executa o comando da posicao 0...
+                        processaLeituraSensores(command);
+                    } catch (NumIRException ex) {
+                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), command);
+                    } catch (TimestampException ex) {
+                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), command);
+                    }
+
+                    //Faz a fila andar....
+                    commandsList.remove(0);
+                    num_elementos = commandsList.size();
+                }
+            }
+            synchronized (this) {
+                while (commandsList.isEmpty() && run) { //Enquanto a fila estiver vazia, espera até que hajam elementos.
+                    try {
+                        this.wait();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(GerenciadorSensores.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Recebe nova leitura dos sensores, armazenando as informações se a
      * gravação estiver habilitada. Atualiza os valores de taxa de amostras por segundo.
@@ -73,13 +123,12 @@ public class GerenciadorSensores implements MyChangeListener {
      * recebido OU o número de sensores no vetor distIR diferir do número de
      * sensores presentes no robô.
      */
-    public void novaLeituraSensores(float aceleracao, float aceleracao_angular, float[] distIR, long timestamp)
-            throws NumIRException, TimestampException {
+    public void novaLeituraSensores(AmostraSensores amostra) {
         synchronized (this) {
 //            if (!listener_added) {
 //                amostragemEstacaoBase.addMyChangeListener(this);
 //            }
-            amostragemRobo.novaAmostra(timestamp);
+            amostragemRobo.novaAmostra(amostra.unixTimestamp);
             amostragemEstacaoBase.novaAmostra();
 //        amostragemEstacaoBase.novaAmostra(System.currentTimeMillis());
 //        if (amostragemRobo.isSample_rate_changed() || amostragemEstacaoBase.isSample_rate_changed())
@@ -87,11 +136,35 @@ public class GerenciadorSensores implements MyChangeListener {
             if (!recordEnabled) {
                 leituras_descartadas++;
             } else {
-                _novaLeituraSensores(aceleracao, aceleracao_angular, distIR, timestamp);
+//                _novaLeituraSensores(aceleracao, aceleracao_angular, distIR, timestamp);
                 leituras_gravadas++;
+                commandsList.add(amostra);
+                this.notifyAll();
             }
         }
         fireChangeEvent();
+    }
+
+    public static int calculaDeslocamentoEncoders(int dist_encoder_esq, int dist_encoder_dir) {
+        return Math.round((float) dist_encoder_esq + (float) dist_encoder_dir) / 2;
+    }
+
+    public static float calculaDeslocamentoAngularEncoders(int dist_encoder_esq, int dist_encoder_dir, int dist_entre_rodas) {
+        //Caso especial 1: os dois deslocamentos são iguais, o raio tende a infinito e a aceleração angular tende a 0.
+        if (dist_encoder_esq == dist_encoder_dir) {
+            return 0;
+        }
+        //Caso especial 2: um deslocamento é o inverso do outro, ou seja, o robô rotaciona em torno do seu centro de movimento. 
+        //A aceleracao angular é indeterminada usando-se a fórmula geral.
+        if (dist_encoder_esq == -dist_encoder_dir) {
+            return 2 * dist_encoder_esq / dist_entre_rodas;
+        }
+        //Raio do movimento circular
+        float R = (float) dist_entre_rodas * ((float) dist_encoder_esq + (float) dist_encoder_dir) / (2f* ((float) dist_encoder_esq  - (float) dist_encoder_dir ));
+        //Deslocamento do robo
+        float deslocamento_encoders = calculaDeslocamentoEncoders(dist_encoder_esq, dist_encoder_dir);
+        //Deslocamento angular
+        return deslocamento_encoders * PApplet.TWO_PI / R;
     }
 
     /**
@@ -110,57 +183,108 @@ public class GerenciadorSensores implements MyChangeListener {
      * recebido OU o número de sensores no vetor distIR diferir do número de
      * sensores presentes no robô.
      */
-    protected void _novaLeituraSensores(float aceleracao, float aceleracao_angular, float[] distIR, long timestamp) throws NumIRException, TimestampException {
+    protected void processaLeituraSensores(AmostraSensores amostra) throws NumIRException, TimestampException {
+        int dist_encoder_esq = amostra.transformedEncoderEsq();
+        int dist_encoder_dir = amostra.transformedEncoderDir();
+
         //
         // Efetua interpretação das leituras do acelerômetro e giroscópio (levando em conta a timestamp).
         //
-        PosInfo new_pos;
-        float angulo = 0;
+        //Nova posicao do robo depois de efetuar os calculos 
+        PosInfo novaPosicao;
+        float novoAngulo = 0;
         //Se o robo tiver apenas uma posicao armazenada, com timestamp 0 significa que ele acabou de ser inicializado.
         if (robo.getNumPosicoes() == 1 && robo.getUltimaPosicao().getTimestamp() == 0) {
             //Apenas muda a timestamp para a hora atual.
-            robo.getUltimaPosicao().setTimestamp(timestamp);
-            new_pos = robo.getUltimaPosicao();
+            robo.getUltimaPosicao().setTimestamp(amostra.unixTimestamp);
+            novaPosicao = robo.getUltimaPosicao();
+            //Calcula o deslocamento no centro de movimento a partir dos deslocamentos de cada roda.
+            //É uma média simples das duas medidas, uma vez que o centro de movimento é o ponto médio entre as duas rodas.
+//            ultimoDeslocamentoEncoders = calculaDeslocamentoEncoders(dist_encoder_esq, dist_encoder_dir);
+//            ultimoDeslocamentoAngularEncoders = calculaDeslocamentoAngularEncoders(dist_encoder_esq, dist_encoder_dir, robo.getLargura());
         } else { //Adiciona uma nova posição
-            PosInfo penultPos = robo.getUltimaPosicao(); //É a penúltima posição pois será adicionada uma nova posição a seguir.
+            PosInfo ultimaPosicao = robo.getUltimaPosicao(); //É a ultima posicao do robô.
 
-            if (timestamp < penultPos.getTimestamp()) {
-                throw new TimestampException(timestamp, penultPos.getTimestamp(),
-                                             String.format("O timestamp (%d) é menor do que o da última posição (%d).", timestamp, penultPos.getTimestamp()));
+            if (amostra.unixTimestamp < ultimaPosicao.getTimestamp()) {
+                throw new TimestampException(amostra.unixTimestamp, ultimaPosicao.getTimestamp(),
+                                             String.format("O timestamp (%d) é menor do que o da última posição (%d).", amostra.unixTimestamp, ultimaPosicao.getTimestamp()));
             }
 
             if (recordInterruptedAndResumed) { //Caso a gravação tenha sido interrompida e agora continuada...
                 //Copia a última posição do robô, mas com o timestamp atual.
                 //Isso indica que o robô ficou parado por todo o tempo.
-                PosInfo newPos = penultPos.copy();
-                newPos.setTimestamp(timestamp);
-                robo.addPosicao(newPos);
-                recordInterruptedAndResumed = false;
+                PosInfo novaPos = ultimaPosicao.copy();
+                novaPos.setTimestamp(amostra.unixTimestamp);
+                robo.addPosicao(novaPos);
+//                robo.setVelocidadeAtual(0);
+                numAmostrasAposInicioGravacao++;
+                if (numAmostrasAposInicioGravacao >= 2) {
+                    recordInterruptedAndResumed = false;
+                    numAmostrasAposInicioGravacao = 0;
+                }
                 return; //Não é necessário fazer os cálculos nessa etapa
             }
+            Ponto ultimoPonto = ultimaPosicao.getPonto();
+            float ultimoAngulo = ultimaPosicao.getAngulo();
+            long difftime = amostra.unixTimestamp - ultimaPosicao.getTimestamp(); //(ms) Diferença de tempo entre a última e penútlima timestamps. 
 
-            Ponto lastXY = penultPos.getPonto();
-            float penultAngulo = penultPos.getAngulo();
-            long difftime = timestamp - penultPos.getTimestamp(); //(ms) Diferença de tempo entre a última e penútlima timestamps. 
+            //
+            // Determinar aceleração linear e angular medida pelos encoders
+            //
+            float acelEncoders, acelAngularEncoders;
+            int novoDeslocamentoEncoders = calculaDeslocamentoEncoders(dist_encoder_esq, dist_encoder_dir);
+            float novoDeslocamentoAngularEncoders = calculaDeslocamentoAngularEncoders(dist_encoder_esq, dist_encoder_dir, robo.getLargura());
+            float novaVelocidadeEncoders = ((float) novoDeslocamentoEncoders) / (float) difftime; //(mm) / (ms) = (m/s)
+            float novaVelocidadeAngularEncoders = ((float) novoDeslocamentoAngularEncoders) * 1000 / (float) difftime;//(rad) * 1000/(ms) = rad/s
+            //Se o robo tiver apenas 2 posicoes, a aceleracao ainda nao pode ser calculada (apenas pode ser calculada com 3 pontos ou mais)
+
+            acelEncoders = (novaVelocidadeEncoders - ultimaVelocidadeEncoders) * 1000 / (float) difftime;//(m/s) * 1000/ms = (m/s^2)
+            acelAngularEncoders = (novaVelocidadeAngularEncoders - ultimaVelocidadeAngularEncoders) * 1000 / (float) difftime; //(rad/s) * 1000/ms = (rad/s^2)
+            //Atualiza os ultimos deslocamentos e velocidades
+            ultimaVelocidadeEncoders = novaVelocidadeEncoders;
+            ultimaVelocidadeAngularEncoders = novaVelocidadeAngularEncoders;
+
+
+            //
+            // Comparar com aceleração linear e angular do acelerômetro e giroscópio e calcular pesos de cada aceleração (encoders vs. acel&gyro).
+            //
+
+            //
+            //  Calcular a aceleracao final
+            //TODO: utilizar valores do acelerometro e giroscopio
+            float aceleracao = acelEncoders;
+            float aceleracaoAngular = acelAngularEncoders;
+
+            //
+            // Calcular velocidades linear e angular a partir da aceleracao calculada anteriormente
+            //
 
             //Efetua as integrações numéricas para calcular as novas posições a partir das acelerações
-            float velocidade = robo.getVelocidadeAtual() + (aceleracao * difftime) / 1000; // (m/s)
-            robo.setVelocidadeAtual(velocidade);
-            float deslocamento = velocidade * difftime; //(mm) Deslocamento 
-            float velocidade_angular = robo.getVelocidadeAngularAtual() + aceleracao_angular * difftime / 1000; // (rad/s)
-            robo.setVelocidadeAngularAtual(velocidade_angular);
-            angulo = (penultPos.getAngulo() + velocidade_angular * difftime / 1000) % PApplet.TWO_PI; //(rad) angulo
+            float velocidade = robo.getVelocidadeAtual() + (aceleracao * difftime) / 1000; //(m/s) + (m/s^2)*(ms)/1000 = (m/s)
+//            robo.setVelocidadeAtual(velocidade);
+            float velocidadeAngular = robo.getVelocidadeAngularAtual() + aceleracaoAngular * difftime / 1000; // (rad/s)
 
-            //Calcula as novas posições x e y. O cálculo é feito levando-se em conta o ângulo da PENÚLTIMA posição e a velocidade da ÙLTIMA posição.
-            int new_X = lastXY.x() + PApplet.round(deslocamento * PApplet.cos(penultAngulo));
-            int new_Y = lastXY.y() + PApplet.round(deslocamento * PApplet.sin(penultAngulo));
-            new_pos = new PosInfo(new Ponto(new_X, new_Y), angulo, timestamp);
-            robo.addPosicao(new_pos);
+            //
+            // Calcular nova posição integrando-se a velocidade.
+            //
+
+            float deslocamento = velocidade * difftime; //(m/s) * (ms) = (mm) Deslocamento 
+
+            //Calcula as novas posições x e y. O cálculo é feito levando-se em conta o ângulo da ultima posição (armazenada) do robo e a a nova velocidade (calculada) do robo.
+            int newX = ultimoPonto.x() + PApplet.round(deslocamento * PApplet.cos(ultimoAngulo));
+            int newY = ultimoPonto.y() + PApplet.round(deslocamento * PApplet.sin(ultimoAngulo));
+            novoAngulo = (ultimaPosicao.getAngulo() + velocidadeAngular * difftime / 1000) % PApplet.TWO_PI; //(rad) angulo
+            novaPosicao = new PosInfo(new Ponto(newX, newY), novoAngulo, amostra.unixTimestamp);
+            robo.addPosicao(novaPosicao);
+            robo.setVelocidadeAtual(velocidade);
+            robo.setVelocidadeAngularAtual(velocidadeAngular);
         }
+
 
         //
         //Interpreta leituras dos sensores IR
         //
+        int[] distIR = amostra.transformedIR();
         //Detecta diferenças entre o número de medidas no vetor distIR e o número de sensores do robô.
         if ((robo.getNumSensoresIR() > 0 && distIR.length != robo.getNumSensoresIR()) || (robo.getNumSensoresIR() == 0 && distIR != null)) {
             throw new NumIRException(distIR.length, robo.getNumSensoresIR(),
@@ -170,11 +294,11 @@ public class GerenciadorSensores implements MyChangeListener {
         for (int i = 0; i < distIR.length; i++) {
             SensorIR sensor = robo.getSensor(i);
             if (distIR[i] > sensor.getMin_detec() && distIR[i] < sensor.getMax_detec()) {
-                PVector Vc = new_pos.getPonto().getPVector(); //Ultima posição do centro do robô
+                PVector Vc = novaPosicao.getPonto().getPVector(); //Ultima posição do centro do robô
                 PVector v1 = sensor.getPosicaoNoRobo().getPVector(); //Posição do sensor no robô (relativa ao centro)
-                v1.rotate(angulo); //Rotaciona v1 pelo ângulo do robo
-                PVector v2 = PVector.fromAngle(angulo + sensor.getAngulo()); //v2 é o vetor que vai do sensor até o obstáculo.
-                v2.setMag(distIR[i]);
+                v1.rotate(novoAngulo); //Rotaciona v1 pelo ângulo do robo
+                PVector v2 = PVector.fromAngle(novoAngulo + sensor.getAngulo()); //v2 é o vetor que vai do sensor até o obstáculo.
+                v2.setMag((float) distIR[i]);
                 //Soma v2 com v1 e Vc de modo a encontrar a posição do obstáculo.
                 v2.add(v1);
                 v2.add(Vc);
@@ -213,7 +337,7 @@ public class GerenciadorSensores implements MyChangeListener {
         return recordEnabled;
     }
 
-    public void startRecord() {
+    public void startRecording() {
         synchronized (this) {
             recordEnabled = true;
             if (robo.getNumPosicoes() > 1) {
@@ -223,7 +347,7 @@ public class GerenciadorSensores implements MyChangeListener {
         fireChangeEvent();
     }
 
-    public void stopRecord() {
+    public void stopRecording() {
         synchronized (this) {
             recordEnabled = false;
             recordInterruptedAndResumed = true;

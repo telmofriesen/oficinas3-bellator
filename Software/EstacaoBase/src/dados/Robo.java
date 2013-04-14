@@ -21,7 +21,6 @@ public class Robo {
     private Ponto centroMovimento;
     private ArrayList<PosInfo> posInfos = new ArrayList<PosInfo>();
     private ArrayList<SensorIR> sensoresIR = new ArrayList<SensorIR>();
-    //TODO armazenar valores da velocidade na memoria ao inves de calcular toda vez.
     private float velocidadeAtual = 0;
     private float velocidadeAngularAtual = 0;
 
@@ -115,7 +114,19 @@ public class Robo {
     }
 
     public synchronized PosInfo getUltimaPosicao() {
-        return posInfos.get(posInfos.size() - 1);
+        if (posInfos.size() <= 0) {
+            return null;
+        } else {
+            return posInfos.get(posInfos.size() - 1);
+        }
+    }
+
+    public synchronized PosInfo getPenultimaPosicao() {
+        if (posInfos.size() <= 1) {
+            return null;
+        } else {
+            return posInfos.get(posInfos.size() - 1);
+        }
     }
 
     public synchronized int getNumPosicoes() {

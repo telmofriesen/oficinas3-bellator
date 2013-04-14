@@ -2,6 +2,7 @@ package robo;
 
 import comunicacao.SenderMessage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,9 +20,9 @@ public class ServerSender extends Thread {
     //Stream de saida
     private BufferedWriter output;
     //Fila de mensagens normais
-    private CopyOnWriteArrayList<SenderMessage> messages = new CopyOnWriteArrayList();
+    private ArrayList<SenderMessage> messages = new ArrayList();
     //Fila de mensagens prioritárias
-    private CopyOnWriteArrayList<SenderMessage> priorityMessages = new CopyOnWriteArrayList();
+    private ArrayList<SenderMessage> priorityMessages = new ArrayList();
     //Indica se o loop principal deve executar ou não
     private boolean run = true;
 
@@ -49,14 +50,16 @@ public class ServerSender extends Thread {
                 sendNormalMessage = false;
                 //Verifica primeiro a fila de mensagens prioritárias
                 //Se o vetor de mensagens não estiver vazio....
-                if (!priorityMessages.isEmpty()) {
-                    msg = priorityMessages.get(0);
-                    sendPriorityMessage = true;
-                    sendNormalMessage = false;
-                } else if (!messages.isEmpty()) {
-                    msg = messages.get(0);
-                    sendPriorityMessage = false;
-                    sendNormalMessage = true;
+                synchronized (this) {
+                    if (!priorityMessages.isEmpty()) {
+                        msg = priorityMessages.get(0);
+                        sendPriorityMessage = true;
+                        sendNormalMessage = false;
+                    } else if (!messages.isEmpty()) {
+                        msg = messages.get(0);
+                        sendPriorityMessage = false;
+                        sendNormalMessage = true;
+                    }
                 }
                 if (sendPriorityMessage || sendNormalMessage) {
                     String str = msg.getMessage();
@@ -66,8 +69,10 @@ public class ServerSender extends Thread {
                     output.newLine();
                     if (msg.isFlushBuffer()) output.flush();
                     System.out.println("[TR_ServerSender] Mensagem enviada!");
-                    if (sendPriorityMessage) priorityMessages.remove(0); //Faz a fila andar.
-                    else if (sendNormalMessage) messages.remove(0); //Faz a fila andar.
+                    synchronized (this) {
+                        if (sendPriorityMessage) priorityMessages.remove(0); //Faz a fila andar.
+                        else if (sendNormalMessage) messages.remove(0); //Faz a fila andar.
+                    }
                 }
             }
             output.close();
@@ -75,13 +80,15 @@ public class ServerSender extends Thread {
             System.out.println("[TR_ServerSender] Erro de IO: " + ex.getMessage());
             synchronized (this) {
                 run = false;
+                messages.clear();
             }
             connection.closeConnection();
-            messages.clear();
         } catch (InterruptedException ex) {
             Logger.getLogger(ServerSender.class.getName()).log(Level.SEVERE, null, ex);
         }
-        messages.clear(); //TODO verificar se é melhor solucao para liberar memoria
+        synchronized (this) {
+            messages.clear(); //TODO verificar se é a melhor solucao para liberar memoria
+        }
     }
 
     /**
@@ -99,7 +106,7 @@ public class ServerSender extends Thread {
     public synchronized void kill() {
         run = false;
         try {
-            output.close();
+            if (output != null) output.close();
         } catch (IOException ex) {
 //            Logger.getLogger(TR_ClientSender.class.getName()).log(Level.SEVERE, null, ex);
         }

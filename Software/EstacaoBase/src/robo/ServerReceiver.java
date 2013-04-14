@@ -63,7 +63,7 @@ public class ServerReceiver extends Thread {
     public void terminate() {
         run = false;
         try {
-            input.close();
+            if(input != null) input.close();
         } catch (IOException ex) {
             connection.closeConnection();
             Logger.getLogger(ClientReceiver.class.getName()).log(Level.SEVERE, null, ex);
@@ -75,7 +75,7 @@ public class ServerReceiver extends Thread {
      */
     public void kill() {
         try {
-            input.close();
+            if(input != null) input.close();
         } catch (IOException ex) {
             Logger.getLogger(ClientSender.class.getName()).log(Level.SEVERE, null, ex);
         }

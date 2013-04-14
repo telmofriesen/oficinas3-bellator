@@ -16,6 +16,7 @@ import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +31,8 @@ import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
  * @author stefan
  */
 public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
-    public static final int WEBCAM_STREAM_DEFAULT_PORT = 5050;
 
+    public static final int WEBCAM_STREAM_DEFAULT_PORT = 5050;
     private Webcam webcam;
 //    private WebcamStreamerNew webcamStreamer;
     //Indica se a amostragem está habilitada. OBS: a amostragem efetiva só ocorrerá se tanto 'sample' quanto 'webcam_available' forem verdadeiros.
@@ -58,6 +59,8 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
         this.resolution = resolution;
         this.mediaFactory = new MediaPlayerFactory();
         this.mediaStreamer = mediaFactory.newHeadlessMediaPlayer();
+        List<Webcam> list = Webcam.getWebcams();
+//        Webcam w = list.get(1);
         Webcam w = Webcam.getDefault();
 
         if (w == null) {
@@ -127,9 +130,9 @@ public class WebcamManager implements WebcamListener, WebcamDiscoveryListener {
 //        StringBuilder sb = new StringBuilder(60);
 //        return String.format(":sout=#transcode{vcodec=mp4v,bitrate=%d,fps=%f,width=%d,height=%d}:rtp{dst=%s,port=%d,mux=ts}",
 //                             bitrate, fps, resolution.width, resolution.height, host_ip, host_port);
-        return String.format(":sout=#standard{access=http,width=%d,height=%d,fps=%.2f,mux=mpjpeg,dst=%s:host_port}",
+        return String.format(":sout=#standard{access=http,width=%d,height=%d,fps=%.2f,mux=mpjpeg,dst=%s:%d}",
                              resolution.width, resolution.height, fps, "0.0.0.0", host_port);
-        
+
     }
 
 //    public synchronized float getSample_rate() {

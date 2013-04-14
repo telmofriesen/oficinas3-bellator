@@ -1,13 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+//TODO:
+//Reposicionamento do robô no mapa
+//Usar leituras do acelerômetro e giroscópio
+
 package robo;
 
 import robo.ServerListener;
 import robo.ServerConnection;
 import com.github.sarxos.webcam.util.ImageUtils;
 import comunicacao.Base64new;
+import comunicacao.SenderMessage;
 import dados.AmostraSensores;
 import robo.gerenciamento.EnginesManager;
 import robo.gerenciamento.SensorsManager;
@@ -35,7 +36,7 @@ public class Main extends Thread {
     private SensorsManager sensorsManager;
     private SensorsInfoListnener sensorsInfoListener;
     //Amostragem da webcam
-    private WebcamManagerNew2 webcamManager;
+    private WebcamManager webcamManager;
     private WebcamInfoListener webcamInfoListener;
     private EnginesManager enginesManager;
     private SerialCommunicator serialCommunicator;
@@ -55,16 +56,16 @@ public class Main extends Thread {
     public Main(boolean enable_serial) {
         //Inicializa o listener, que escuta novas conexões de clientes (estações base)
         listener = new ServerListener(this, ServerListener.LISTENER_DEFAULT_PORT);
-        sensorsManager = new SensorsManager(1);
+        sensorsManager = new SensorsManager(this, 1);
         sensorsInfoListener = new SensorsInfoListnener();
         sensorsManager.addMyChangeListener(sensorsInfoListener);
         //[176x144] [320x240] [352x288] [480x400] [640x480] [1024x768] 
-        webcamManager = new WebcamManagerNew2(new Dimension(320, 240));
+        webcamManager = new WebcamManager(1, new Dimension(320, 240));
 //        webcamManager = new WebcamManager(new Dimension(640, 480));
 
         webcamInfoListener = new WebcamInfoListener();
         webcamManager.addMyChangeListener(webcamInfoListener);
-        enginesManager = new EnginesManager();
+        enginesManager = new EnginesManager(this);
         if (enable_serial) {
             serialCommunicator = new SerialCommunicator(this);
         }
@@ -110,12 +111,16 @@ public class Main extends Thread {
 
     /**
      * Notifica que a conexão com o host principal foi finalizada.
+     * Para o robô e reseta os status.
      */
     public void mainHostDisconnected() {
+        //Para o robô e reseta os status
+        enginesManager.setEnginesSpeed(0, 0);
         sensorsManager.stopSampling();
         sensorsManager.setSample_rate(1);
         sensorsManager.resetTests();
         webcamManager.reset();
+        //TODO mandar mensagem de parada para o robo via porta serial
     }
 
     /**
@@ -158,7 +163,7 @@ public class Main extends Thread {
         return sensorsManager;
     }
 
-    public WebcamManagerNew2 getWebcamManager() {
+    public WebcamManager getWebcamManager() {
         return webcamManager;
     }
 
@@ -169,8 +174,18 @@ public class Main extends Thread {
     public SerialCommunicator getSerialCommunicator() {
         return serialCommunicator;
     }
-    
-    
+
+    /**
+     * Adiciona uma mensagem à fila de envio para o host principal (se ele estiver conectado).
+     *
+     * @param message Mensagem a ser enviada.
+     * @param flush_buffer Indica se um flush no buffer deve ser feito.
+     */
+    public synchronized void sendMessageToMainHost(String message, boolean flush_buffer) {
+        if (listener.getNumServerConnections() >= 1) {
+            listener.getServerConnection(0).sendMessage(new SenderMessage(message, flush_buffer));
+        }
+    }
 
     class SensorsInfoListnener implements MyChangeListener {
 
@@ -185,32 +200,31 @@ public class Main extends Thread {
                 SensorsManager s = (SensorsManager) evt.getSource();
                 boolean samplingStatus = s.isSamplingEnabled();
                 //Verifica o numero de conexões abertas
-                if (listener.getNumServerConnections() < 1) {
-                    return;
-                }
-                //Envia a última amostra à estação base se houver uma nova.
-                ServerConnection con = listener.getServerConnection(0);
-                //Envia o status à estação base se o mesmo mudar.
-                if (samplingStatus != lastSamplingStatus) {
-                    //Envia o status 
-                    con.sendMessageWithPriority(s.getStatusMessage(), false);
-                    synchronized (this) {
-                        lastSamplingStatus = samplingStatus;
+                if (listener.getNumServerConnections() >= 1) {
+                    ServerConnection con = listener.getServerConnection(0);
+                    //Envia o status à estação base se o mesmo mudar.
+                    if (samplingStatus != lastSamplingStatus) {
+                        //Envia o status 
+                        con.sendMessageWithPriority(s.getStatusMessage(), false);
+                        synchronized (this) {
+                            lastSamplingStatus = samplingStatus;
+                        }
                     }
                 }
-                AmostraSensores a = s.getCurrentSample();
+
+//                AmostraSensores a = s.getCurrentSample();
                 //Envia a última amostra à estação base se houver uma nova (e a amostragem estiver ativada).
-                if (samplingStatus == true && lastSample != a) {
-                    //Monsta a string da mensagem a partir da amostra
-                    String str = String.format("SENSORS SAMPLE %.2f %.2f ", a.getAceleracao(), a.getAceleracaoAngular());
-                    float[] distIR = a.getDistIR();
-                    for (int i = 0; i < distIR.length; i++) {
-                        str += String.format("%.2f ", distIR[i]);
-                    }
-                    str += String.format("%d", a.getTimestamp());
-                    con.sendMessage(str, false);
-                    lastSample = a;
-                }
+//                if (samplingStatus == true && lastSample != a) {
+//                    //Monsta a string da mensagem a partir da amostra
+//                    String str = String.format("SENSORS SAMPLE %.2f %.2f ", a.getAceleracao(), a.getAceleracaoAngular());
+//                    float[] distIR = a.getDistIR();
+//                    for (int i = 0; i < distIR.length; i++) {
+//                        str += String.format("%.2f ", distIR[i]);
+//                    }
+//                    str += String.format("%d", a.getTimestamp());
+//                    con.sendMessage(str, false);
+//                    lastSample = a;
+//                }
             }
         }
     }
@@ -271,7 +285,7 @@ public class Main extends Thread {
     public static void main(String args[]) {
         boolean enable_serial = false;
 //        if (args[0].equals("serial")) {
-            enable_serial = true;
+//            enable_serial = true;
 //        }
         Main s = new Main(enable_serial);
         s.startThreads();

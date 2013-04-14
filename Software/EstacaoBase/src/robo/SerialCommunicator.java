@@ -1,10 +1,14 @@
 package robo;
 
+import comunicacao.ClientMessageProcessor;
 import robo.Main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is a very simple example showing the most basic use of
@@ -173,21 +177,22 @@ public class SerialCommunicator implements SerialNetwork_iface {
     //- Usar bytes ao invés de inteiros
     //- Implementar a interpretação de mensagens das leituras dos sensores: recebe leituras e manda elas para a estação base
     public void parseInput(int id, int numBytes, byte[] message) {
-        if (resend_active) {
-            network.writeSerial(numBytes, message);
-            System.out.print("received and sent back the following message: ");
-        } else {
-            System.out.print("[SERIAL] received the following message: ");
-        }
-        String str = String.valueOf(message[0]);
-        for (int i = 1; i < numBytes; ++i) {
-            str += ", ";
-            str += String.valueOf(message[i]);
-        }
-        str += "\n";
-        //Manda a mensagem para a estação base (sem modificações)
-        main.getListener().getServerConnection(0).sendMessage(str, false);
-//        System.out.println();
+//        try {
+
+            System.out.printf("[SERIAL] received the following message: %X", message[0]);
+            if(message[0] == ClientMessageProcessor.SENSORS){
+                main.getSensorsSampler().novaLeituraSensores(message);
+            }
+            //        }
+            //        String str = String.valueOf(message);
+//            String str = new String(message, "ISO-8859-1"); //Converte o array de bytes para string, usando a codificação ISO-8859-1 para preservar cada bit.
+//            if (main.getListener().getNumServerConnections() >= 1) {
+//                ServerConnection con = main.getListener().getServerConnection(0);
+//                con.sendMessage(str, false);
+//            }
+//        } catch (UnsupportedEncodingException ex) {
+//            Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     /**

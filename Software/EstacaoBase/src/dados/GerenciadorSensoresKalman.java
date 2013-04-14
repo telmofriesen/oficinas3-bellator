@@ -35,7 +35,7 @@ public class GerenciadorSensoresKalman extends GerenciadorSensores {
         }
     }
 
-    @Override
+    //@Override
     public void novaLeituraSensores(float velocidade, float angulo, float[] distIR, long timestamp) throws NumIRException, TimestampException {
         //
         //Aplica os filtros de Kalman a cada leitura
@@ -59,6 +59,6 @@ public class GerenciadorSensoresKalman extends GerenciadorSensores {
             distIR[i] = kalman_IR[i].nextX(distIR[i]);
         }
         //Passa os valores filtrados ao método pai
-        super.novaLeituraSensores(velocidade, angulo, distIR, timestamp);
+//        super.novaLeituraSensores(velocidade, angulo, distIR, timestamp);
     }
 }

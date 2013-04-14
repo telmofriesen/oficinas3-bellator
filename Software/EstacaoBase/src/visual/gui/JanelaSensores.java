@@ -173,7 +173,7 @@ public class JanelaSensores extends javax.swing.JFrame implements MyChangeListen
         webcamFramerateTextField.setText(String.format("%.1f", webcamFramerateSlider.getFloatValue()));
         webcamBitrateSlider.setValue(2048);
         webcamBitrateTextField.setText(String.format("%d", webcamBitrateSlider.getValue()));
-        webcamResolutionComboBox.setSelectedIndex(4);
+        webcamResolutionComboBox.setSelectedIndex(1);
         webcamFramerateSliderStateChanged(new ChangeEvent(webcamFramerateSlider));
         webcamBitrateSliderStateChanged(new ChangeEvent(webcamBitrateSlider));
         webcamResolutionComboBoxActionPerformed(null);

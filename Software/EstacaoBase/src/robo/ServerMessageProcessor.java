@@ -138,7 +138,7 @@ public class ServerMessageProcessor extends Thread {
                         return true;
                     }
                 } else if (split[0].equals("WEBCAM")) { //WEBCAM
-                    WebcamManagerNew2 w = connection.getListener().getServer().getWebcamManager();
+                    WebcamManager w = connection.getListener().getServer().getWebcamManager();
                     if (split[1].equals("START")) {
                         w.startSampling();
 //                        connection.sendMessageWithPriority(w.getStatusMessage(), true);
@@ -171,29 +171,7 @@ public class ServerMessageProcessor extends Thread {
                     float left = Float.parseFloat(split[1]);
                     float right = Float.parseFloat(split[2]);
                     connection.getListener().getServer().getEnginesManager().setEnginesSpeed(left, right);
-
-                    byte[] message = new byte[3];
-                    message[0] = (byte) 0xB0;
-                    message[1] = (byte) (Math.abs((int) Math.floor((float) 127 * left)));
-                    if (left > 0)
-                        message[1] = (byte) ((byte) message[1] | (byte) 0x80);
-//                    message[1] = (byte) (Math.floor(Math.abs((float) 125 * left))
-//                                         + (left > 0
-//                                         ? 128
-//                                         : 0));
-//                    if (left > 0) message[1] = (byte)message[1] + (byte)128;
-//                    message[2] = 0;
-                    message[2] = (byte) (Math.abs((int) Math.floor((float) 127 * right)));
-                    if (right > 0)
-                        message[2] = (byte) ((byte) message[2] | (byte) 0x80);
-//                    message[2] = (byte) (Math.floor(Math.abs((float) 125 * right))
-//                                         + (right > 0
-//                                         ? 128
-//                                         : 0));
-//                    if (right > 0) message[2] = message[2] + 128;
-//                    message[4] = 0;
-//                    message[3] = 254; //END_CMD
-                    connection.getListener().getServer().getSerialCommunicator().sendMessage(message);
+                    
 //                    connection.getListener().getServer().setVelocidadeRodas(dir, esq);
                     return true;
 //                    System.out.printf("");

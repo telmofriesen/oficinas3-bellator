@@ -65,8 +65,8 @@ public class ServerConnection extends Thread {
     //Intervalo máximo para envio de pacotes. Usado para enviar KEEPALIVE quando necessário
     private int package_send_interval_max = 2000;
     //Intervalos máximos para recebimento de pacotes:
-    private int package_recv_interval_echo = 4000; //Envia um ECHO REQUEST
-    private int package_recv_interval_warning = 8000; //Entra em estado de Warning
+    private int package_recv_interval_echo = 3000; //Envia um ECHO REQUEST
+    private int package_recv_interval_warning = 5000; //Entra em estado de Warning
     private int package_recv_interval_timeout = 15000; //Timeout (desconecta do host)
     //Indica se o loop principal deve executar ou não.
     private boolean run;
@@ -120,11 +120,15 @@ public class ServerConnection extends Thread {
                         //Se nenhum pacote tiver sido recebido no intervalo de tempo para timeout...
                         //Desconecta o socket.
                         System.out.printf("[TR_ServerConnection] Timeout\n");
+                        //Para o robô por precaução
+                        listener.getServer().getEnginesManager().setEnginesSpeed(0, 0);
                         closeConnection();
                     } else if (difftime > package_recv_interval_warning) { //WARNING
                         //Se nenhum pacote tiver sido recebido no intervalo de tempo para warning...
                         //Significa que a conexão está com falha de tempo de comunicação (apesar de o socket não estar fechado ainda)
                         System.out.printf("[TR_ServerConnection] Aviso: tempo excessivo sem receber mensagens: %d ms\n", current_time - last_package_received_time);
+                        //Para o robô por precaução
+                        listener.getServer().getEnginesManager().setEnginesSpeed(0, 0);
                         sendEchoRequest();
 //                        setError(WARNING_COMMUNICATION_TIME, String.format("%d ms", current_time - last_package_received_time));
                     } else if (difftime > package_recv_interval_echo) { //ECHO
