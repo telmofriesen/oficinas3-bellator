@@ -18,4 +18,4 @@
 \contentsline {chapter}{\numberline {3}\MakeUppercase {Diagramas do hardware}}{30}
 \contentsline {section}{\numberline {3.1}\MakeUppercase {Diagrama de blocos}}{30}
 \contentsline {section}{\numberline {3.2}\MakeUppercase {Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico}}{31}
-\contentsline {chapter}{REFER\^ENCIAS}{33}
+\contentsline {chapter}{REFER\^ENCIAS}{34}

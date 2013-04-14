@@ -1,3 +1,46 @@
+/*
+ * imu.h
+ *
+ *  Created on: Mar 21, 2013
+ *      Author: telmo
+ */
+
+#ifndef IMU_H_
+#define IMU_H_
+
+/* Master */
+
+// A START condition has been transmitted.
+#define TW_START                0x08
+// A repeated START	condition has been transmitted.
+#define TW_REP_START            0x10
+
+/* Master Transmitter */
+
+// SLA+W has been transmitted; ACK has been received.
+#define TW_MT_SLA_ACK           0x18
+// SLA+W has been transmitted; NOT ACK has been received.
+#define TW_MT_SLA_NACK          0x20
+// Data byte in I2DAT has been transmitted; ACK has been received.
+#define TW_MT_DATA_ACK          0x28
+// Data byte in I2DAT has been transmitted; NOT ACK has been received.
+#define TW_MT_DATA_NACK         0x30
+// Arbitration lost in SLA+R/W or Data bytes.
+#define TW_MT_ARB_LOST          0x38
+
+/* Master Receiver */
+#define TW_MR_ARB_LOST          0x38
+#define TW_MR_SLA_ACK           0x40
+#define TW_MR_SLA_NACK          0x48
+#define TW_MR_DATA_ACK          0x50
+#define TW_MR_DATA_NACK         0x58
+
+#define TW_OK                   0
+#define TW_ERROR                1
+
+#define I2C_WRITE 				0x00
+#define I2C_READ 				0x01
+
 // I2Cdev library collection - MPU6050 I2C device class
 // Based on InvenSense MPU-6050 register map document rev. 2.0, 5/19/2011 (RM-MPU-6000A-00)
 // 10/3/2011 by Jeff Rowberg <jeff@rowberg.net>
@@ -33,10 +76,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
-
-#ifndef MPU6050_H_
-#define MPU6050_H_
-
 #define MPU6050_ADDRESS_AD0_LOW 0x68 // address pin low (GND), default for InvenSense evaluation board
 #define MPU6050_ADDRESS_AD0_HIGH 0x69 // address pin high (VCC)
 #define MPU6050_DEFAULT_ADDRESS MPU6050_ADDRESS_AD0_LOW
@@ -391,14 +430,10 @@ THE SOFTWARE.
 #define MPU6050_DMP_MEMORY_BANK_SIZE 256
 #define MPU6050_DMP_MEMORY_CHUNK_SIZE 16
 
+
+void i2c_init(void);
+
 void mpu_init(void);
-void mpu_set_clock_source(char source);
-void mpu_set_full_scale_gyro_range(char range);
-void mpu_set_full_scale_accel_range(char range);
-void mpu_set_sleep_enable(int enable);
-void mpu_set_temperature_sensor_enabled(char enabled);
-void mpu_set_gyro_rate(char rate);
-void mpu_set_DLPF_mode(char mode);
 void mpu_set_6axis_FIFO_enabled(char enabled);
 void mpu_set_interrupt_mode(char mode);
 void mpu_set_interrupt_drive(char drive);
@@ -410,6 +445,6 @@ void mpu_set_FIFO_enabled(char enabled);
 void mpu_reset_FIFO(void);
 void mpu_get_FIFO_size(int* size);
 void mpu_get_motion6(char* buff);
-void mpu_get_FIFO_motion6(char* buff);
+//void mpu_get_FIFO_motion6(char* buff);
 
-#endif /* MPU6050_H_ */
+#endif /* IMU_H_ */

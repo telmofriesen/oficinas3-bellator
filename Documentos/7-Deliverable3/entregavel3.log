@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  7 APR 2013 14:47
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.17)  9 APR 2013 19:17
 entering extended mode
  %&-line parsing enabled.
 **entregavel3
@@ -948,11 +948,11 @@ Overfull \hbox (4.01436pt too wide) in paragraph at lines 17--18
 [30
 
  <./figuras/diagrama_blocos_hardware.jpg>]
-<./figuras/hardware2_1.pdf, id=124, 1690.315pt x 2392.94pt>
-File: ./figuras/hardware2_1.pdf Graphic file (type pdf)
+<./figuras/hardware2_2.pdf, id=124, 1690.315pt x 2392.94pt>
+File: ./figuras/hardware2_2.pdf Graphic file (type pdf)
 
-<use ./figuras/hardware2_1.pdf>) (./entregavel3.bbl [31] [32 <./figuras/hardwar
-e2_1.pdf>]) AED: lastpage setting LastPage [33
+<use ./figuras/hardware2_2.pdf> [31] [32 <./figuras/hardware2_2.pdf>])
+(./entregavel3.bbl [33]) AED: lastpage setting LastPage [34
 
 ]
 +-------------------------------------------------------------------+
@@ -973,9 +973,9 @@ r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/tex
 mf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/
 fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/time
 s/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on entregavel3.pdf (34 pages, 3510884 bytes).
+Output written on entregavel3.pdf (35 pages, 3513537 bytes).
 PDF statistics:
- 157 PDF objects out of 1000 (max. 8388607)
+ 160 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

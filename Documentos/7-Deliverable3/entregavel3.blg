@@ -6,7 +6,7 @@ Database file #1: abnt-options.bib
 Database file #2: referencias.bib
 Warning--entry type for "vlc" isn't style-file defined
 --line 143 of file referencias.bib
-Reallocated wiz_functions (elt_size=4) to 9000 items from 472446408560.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 +---------------------------------------------------------+
 | Estilo bibliografico abnt-alf.bst versao 1.53           |
 | Implementa a NBR6023, NBR10520 e NBR10523               |
