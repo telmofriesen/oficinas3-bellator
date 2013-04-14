@@ -123,6 +123,7 @@
               <Image iconType="3" name="/visual/gui/icons/gtk-media-record.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="N&#xc3;O gravando"/>
+            <Property name="toolTipText" type="java.lang.String" value="O programa n&#xe3;o est&#xe1; gravando movimentos do rob&#xf4; no mapa."/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -143,6 +144,21 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sensoresButtonListenerActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="repositionButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/visual/gui/icons/transform-move.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Reposicionar"/>
+            <Property name="toolTipText" type="java.lang.String" value="Reposicionar o rob&#xf4;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="repositionButtonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -240,9 +256,9 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="webcamImagePanel" max="32767" attributes="0"/>
-                              <Component id="webcamTopLabel" alignment="0" pref="226" max="32767" attributes="0"/>
-                              <Component id="webcamBottomLabel" alignment="0" pref="226" max="32767" attributes="0"/>
+                              <Component id="webcamImagePanel" pref="160" max="32767" attributes="0"/>
+                              <Component id="webcamTopLabel" alignment="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="webcamBottomLabel" alignment="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -253,7 +269,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <Component id="webcamTopLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="webcamImagePanel" pref="156" max="32767" attributes="0"/>
+                          <Component id="webcamImagePanel" pref="171" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="webcamBottomLabel" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -315,7 +331,7 @@
                                   <Component id="movementImagePanel" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
-                              <Component id="jLabel1" pref="238" max="32767" attributes="0"/>
+                              <Component id="jLabel1" pref="172" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Component id="maxSpeedSlider" pref="0" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -366,7 +382,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="165" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="150" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>

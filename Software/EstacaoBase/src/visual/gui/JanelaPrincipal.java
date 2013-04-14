@@ -14,6 +14,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import comunicacao.ClientMessageProcessor;
 import comunicacao.ClientConnector;
+import dados.PosInfo;
 import events.MyChangeEvent;
 import events.MyChangeListener;
 import java.awt.BorderLayout;
@@ -69,6 +70,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private JanelaConexao janelaConexao;
     private ClientConnector connector;
     private JanelaSensores janelaSensores;
+    private JanelaReposicionamento janelaReposicionamento;
+    private ConnectorListener connectorListener;
     private GerenciadorSensoresListener infoListenerControleSensores;
     private CameraInfoListener cameraInfoListener;
     private MovementKeyboardListener movementKeyboardListener;
@@ -103,6 +106,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
         janelaSensores = new JanelaSensores(gerenciadorSensores, gerenciadorCamera, connector);
+        janelaReposicionamento = new JanelaReposicionamento(this, gerenciadorSensores);
         //Inicia as threads.
         interpreter.start();
         connector.start();
@@ -295,6 +299,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
      * Inicializa os listeners.
      */
     private void initListeners() {
+        connectorListener = new ConnectorListener();
         infoListenerControleSensores = new GerenciadorSensoresListener();
         cameraInfoListener = new CameraInfoListener();
         videoInfoListener = new VideoInfoListener();
@@ -313,6 +318,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         gerenciadorCamera.getContadorFramerate().addMyChangeListener(cameraInfoListener);
 //        imagePanelListener1.addMyChangeListener(cameraInfoListener);
 //        controleCamera.addMyChangeListener(imagePanelListener1);
+        connector.addMyChangeListener(connectorListener);
         connector.addMyChangeListener(sensoresButtonListener);
         connector.addMyChangeListener(janelaSensores);
         connector.addMyChangeListener(connectionButtonListener);
@@ -341,6 +347,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         connectionButtonListener = new visual.gui.ConnectionButtonListener();
         recordButton = new visual.gui.RecordButtonListener();
         sensoresButtonListener = new visual.gui.SensoresButtonListener();
+        repositionButton = new javax.swing.JButton();
         bottomToolBar = new javax.swing.JToolBar();
         bottomLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -422,6 +429,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         recordButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/gtk-media-record.png"))); // NOI18N
         recordButton.setText("NÃO gravando");
+        recordButton.setToolTipText("O programa não está gravando movimentos do robô no mapa.");
         recordButton.setFocusable(false);
         recordButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         recordButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -443,6 +451,19 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             }
         });
         topToolBar.add(sensoresButtonListener);
+
+        repositionButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/visual/gui/icons/transform-move.png"))); // NOI18N
+        repositionButton.setText("Reposicionar");
+        repositionButton.setToolTipText("Reposicionar o robô");
+        repositionButton.setFocusable(false);
+        repositionButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        repositionButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        repositionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                repositionButtonActionPerformed(evt);
+            }
+        });
+        topToolBar.add(repositionButton);
 
         bottomToolBar.setFloatable(false);
         bottomToolBar.setRollover(true);
@@ -498,9 +519,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, topRightPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(topRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(webcamImagePanel)
-                    .addComponent(webcamTopLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addComponent(webcamBottomLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
+                    .addComponent(webcamImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                    .addComponent(webcamTopLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(webcamBottomLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         topRightPanelLayout.setVerticalGroup(
@@ -508,7 +529,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, topRightPanelLayout.createSequentialGroup()
                 .addComponent(webcamTopLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(webcamImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                .addComponent(webcamImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(webcamBottomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -531,7 +552,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         );
         movementImagePanelLayout.setVerticalGroup(
             movementImagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 165, Short.MAX_VALUE)
+            .addGap(0, 150, Short.MAX_VALUE)
         );
 
         maxSpeedSlider.setFocusable(false);
@@ -565,7 +586,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     .addGroup(bottomRightPanelLayout.createSequentialGroup()
                         .addComponent(movementImagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
                     .addGroup(bottomRightPanelLayout.createSequentialGroup()
                         .addComponent(maxSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -699,15 +720,21 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         if (selected) {
             gerenciadorSensores.startRecording();
             recordButton.setText("Gravando");
-            recordButton.setToolTipText("O programa está gravando movimentos do robô.");
+            recordButton.setToolTipText("O programa está gravando movimentos do robô no mapa.");
             saved = false;
         } else {
             gerenciadorSensores.stopRecording();
             recordButton.setText("Não Gravando");
-            recordButton.setToolTipText("O programa não está gravando movimentos do robô.");
+            recordButton.setToolTipText("O programa não está gravando movimentos do robô no mapa.");
         }
 //        System.out.println(controleSensores.isRecordEnabled());
     }//GEN-LAST:event_recordButtonActionPerformed
+
+    public void stopRecording() {
+        if (recordButton.isSelected()) { //Desabilita a gravação de movimentos se ela estiver ativa
+            recordButton.doClick();
+        }
+    }
 
     private void connectionButtonListenerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectionButtonListenerActionPerformed
         janelaConexao.setVisible(true);
@@ -725,10 +752,45 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private void maxSpeedSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_maxSpeedSliderStateChanged
         // TODO add your handling code here:
         maxSpeedTextField.setText(String.format("%.2f", maxSpeedSlider.getFloatValue()));
-        if(!maxSpeedSlider.getValueIsAdjusting()){
+        if (!maxSpeedSlider.getValueIsAdjusting()) {
             gerenciadorMotores.setCurrentMultiplier(maxSpeedSlider.getFloatValue());
         }
     }//GEN-LAST:event_maxSpeedSliderStateChanged
+
+    private void repositionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_repositionButtonActionPerformed
+        // TODO add your handling code here:
+        PosInfo pos = mapa.getRobo().getUltimaPosicaoTrilhaAtual();
+        janelaReposicionamento.setParameters(pos.getPonto().x() / 10, pos.getPonto().y() / 10, PApplet.degrees(pos.getAngulo()));
+        janelaReposicionamento.setVisible(true);
+    }//GEN-LAST:event_repositionButtonActionPerformed
+
+    /**
+     * Classe responsável por escutar mudanças importantes em ClientConnector e atualizar o display de informações e botôes caso necessário.
+     * NOTA: os botoes de gravacao e de conexao são habilitados pelas proprias classes (RecordButtonListener e ConnectionButtonListener).
+     * Elas proprias escutam por mudancas no ClientConnector.
+     */
+    class ConnectorListener implements MyChangeListener {
+
+        @Override
+        public void changeEventReceived(MyChangeEvent evt) {
+            if (evt.getSource() instanceof ClientConnector) {
+                final ClientConnector c = (ClientConnector) evt.getSource();
+                if (!c.isConnected()) {
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+//                            repositionButton.setEnabled(false);
+                        }
+                    });
+                } else {
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+//                            repositionButton.setEnabled(true);
+                        }
+                    });
+                }
+            }
+        }
+    }
 
     /**
      * Classe responsável por escutar mudanças importantes em GerenciadorSensores e atualizar o display de informações caso necessário.
@@ -976,12 +1038,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     class MotoresListener implements MyChangeListener {
 
         int lastMovType = -1;
+        EnginesSpeed lastEngineSpeed = null;
 
         @Override
         public void changeEventReceived(MyChangeEvent evt) {
             if (evt.getSource() instanceof GerenciadorMotores) {
                 GerenciadorMotores c = (GerenciadorMotores) evt.getSource();
                 int movType = c.getMovementType();
+                EnginesSpeed newEngineSpeed = c.getNewEngineSpeed();
                 String icon = "";
                 synchronized (this) {
                     if (movType != lastMovType) {
@@ -1014,15 +1078,19 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                                 icon = "/visual/gui/icons/arrows/rotate_right.png";
                                 break;
                         }
-                        lastMovType = movType;
-
-
                         if (connector.isConnected()) {
                             movementImagePanel.changeImageFromRelativePath(icon);
-                            EnginesSpeed speed = c.getNewEngineSpeed();
-                            connector.sendMessage(String.format("ENGINES %.2f %.2f", speed.leftSpeed, speed.rightSpeed), true);
                         }
+                        lastMovType = movType;
                     }
+                    if (newEngineSpeed != lastEngineSpeed) {
+                        if (connector.isConnected()) {
+//                            movementImagePanel.changeImageFromRelativePath(icon);
+                            connector.sendMessage(String.format("ENGINES %.2f %.2f", newEngineSpeed.leftSpeed, newEngineSpeed.rightSpeed), true);
+                        }
+                        lastEngineSpeed = newEngineSpeed;
+                    }
+
                 }
             }
         }
@@ -1084,6 +1152,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton novoButton;
     private javax.swing.JButton openButton;
     private visual.gui.RecordButtonListener recordButton;
+    private javax.swing.JButton repositionButton;
     private javax.swing.JButton saveButton;
     private visual.gui.SensoresButtonListener sensoresButtonListener;
     private javax.swing.JPanel topRightPanel;

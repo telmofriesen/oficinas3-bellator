@@ -115,13 +115,20 @@ public class Tests {
         try {
             //Novos testes com encoders
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 1000));
-            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 2000));
-            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 3000));
-            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 4000));
-            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(110, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 5000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 2000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 3000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 4000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 5000));
+//            robo.novaTrilha(new Ponto(1000,1000));
+            gerenciadorSensores.mudaPosicaoRobo(new Ponto(5000,5000), -1.5f);
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 6000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 7000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 8000));
+            gerenciadorSensores.mudaPosicaoRobo(new Ponto(0,-2000), 1);
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 9000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 10000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 11000));
+            gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 12000));
 
 
 //Outros testes

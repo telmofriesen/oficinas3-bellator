@@ -30,7 +30,7 @@ public class RoboDrawable implements Drawable2D {
         Viewer2D viewer2D = (Viewer2D) a;
         float escala = viewer2D.getEscala();
         float angulo_interface = viewer2D.getAngulo();
-        PosInfo lastPos = robo.getUltimaPosicao(); //Pega a ultima posicao do robo
+        PosInfo lastPos = robo.getUltimaPosicaoTrilhaAtual(); //Pega a ultima posicao do robo
         Ponto pontoLastPos = lastPos.getPonto();
 
         //

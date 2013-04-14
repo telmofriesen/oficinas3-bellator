@@ -15,7 +15,7 @@ public class RoboTrilhaDrawableProp {
     private Color corTrilha = new Color(0, 255, 0);
     private Color corPontos = new Color(0, 0, 0);
     private int tamanhoPontosTrilha = 3;
-    private boolean trilhaEnabled = true, pontosEnabled = true, origemEnabled = true;
+    private boolean linhaEnabled = true, pontosEnabled = true, origemEnabled = true;
     private boolean coordenadasEnabled=true;
 
     public boolean isCoordenadasEnabled() {
@@ -38,8 +38,8 @@ public class RoboTrilhaDrawableProp {
         this.tamanhoPontosTrilha = tamanhoPontosTrilha;
     }
 
-    public void setTrilhaEnabled(boolean trilhaEnabled) {
-        this.trilhaEnabled = trilhaEnabled;
+    public void setLinhaEnabled(boolean trilhaEnabled) {
+        this.linhaEnabled = trilhaEnabled;
     }
 
     public void setPontosEnabled(boolean pontosEnabled) {
@@ -62,8 +62,8 @@ public class RoboTrilhaDrawableProp {
         return tamanhoPontosTrilha;
     }
 
-    public boolean isTrilhaEnabled() {
-        return trilhaEnabled;
+    public boolean isLinhaEnabled() {
+        return linhaEnabled;
     }
 
     public boolean isPontosEnabled() {

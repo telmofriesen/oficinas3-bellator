@@ -17,9 +17,9 @@ public class PosInfo {
 
     /**
      * 
-     * @param ponto Ponto cartesiano da posição (milímetros)
-     * @param angulo Ângulo do robô nessa posição (àngulo relativo à primeira posição dele)
-     * @param timestamp Timestamp UNIX em milissegundos do horário em que o robô esteve nessa posição
+     * @param ponto Ponto no plano cartesiano da posição em milímetros.
+     * @param angulo Ângulo em radianos em que o robô está. O ângulo é zero quando o robô está virado, para a direita (eixo X positivo), e os ângulos aumentam no sentido HORÁRIO (atenção).
+     * @param timestamp Timestamp UNIX em milissegundos do horário em que o robô esteve nessa posição.
      */
     public PosInfo(Ponto ponto, float angulo, long timestamp) {
         this.ponto = ponto;

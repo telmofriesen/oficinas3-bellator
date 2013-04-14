@@ -33,15 +33,15 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     //Gravação de amostras habilitada ou não
     private boolean recordEnabled = false;
     //Gravação de amostras foi interrompida e continuada posteriormente?
-    private boolean recordInterruptedAndResumed = false;
-    private int numAmostrasAposInicioGravacao = 0;
+//    private boolean recordInterruptedAndResumed = false;
+//    private int numAmostrasAposInicioGravacao = 0;
     //Contadores do total de amostras.
     private int leituras_gravadas = 0, leituras_descartadas = 0;
     //Controle de taxas de amostragem
     ContadorAmostragem amostragemRobo; //Taxa de amostragem efetiva no robô
     ContadorAmostragemTempoReal amostragemEstacaoBase; //Taxa de recebimento de amostras na estação base
     //Array que armazena a fila de comandos
-    private ArrayList<AmostraSensores> commandsList = new ArrayList<AmostraSensores>();
+    private ArrayList<AmostraSensores> sampleList = new ArrayList<AmostraSensores>();
     //Indica se a thread deve rodar ou não
     private boolean run = true;
     //Listeners de eventos da classe
@@ -71,32 +71,32 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     @Override
     public void run() {
         run = true;
-        AmostraSensores command;
+        AmostraSensores amostra;
         int num_elementos = 0;
         while (run) {
             synchronized (this) {
-                num_elementos = commandsList.size();
+                num_elementos = sampleList.size();
             }
             //Enquanto o vetor tiver elementos....
             while (num_elementos > 0) {
                 synchronized (this) {
-                    command = commandsList.get(0);
+                    amostra = sampleList.get(0);
                     try {
                         //Executa o comando da posicao 0...
-                        processaLeituraSensores(command);
+                        processaLeituraSensores(amostra);
                     } catch (NumIRException ex) {
-                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), command);
+                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
                     } catch (TimestampException ex) {
-                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), command);
+                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
                     }
 
                     //Faz a fila andar....
-                    commandsList.remove(0);
-                    num_elementos = commandsList.size();
+                    sampleList.remove(0);
+                    num_elementos = sampleList.size();
                 }
             }
             synchronized (this) {
-                while (commandsList.isEmpty() && run) { //Enquanto a fila estiver vazia, espera até que hajam elementos.
+                while (sampleList.isEmpty() && run) { //Enquanto a fila estiver vazia, espera até que hajam elementos.
                     try {
                         this.wait();
                     } catch (InterruptedException ex) {
@@ -138,7 +138,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             } else {
 //                _novaLeituraSensores(aceleracao, aceleracao_angular, distIR, timestamp);
                 leituras_gravadas++;
-                commandsList.add(amostra);
+                sampleList.add(amostra);
                 this.notifyAll();
             }
         }
@@ -160,11 +160,48 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             return 2 * dist_encoder_esq / dist_entre_rodas;
         }
         //Raio do movimento circular
-        float R = (float) dist_entre_rodas * ((float) dist_encoder_esq + (float) dist_encoder_dir) / (2f* ((float) dist_encoder_esq  - (float) dist_encoder_dir ));
+        float R = (float) dist_entre_rodas * ((float) dist_encoder_esq + (float) dist_encoder_dir) / (2f * ((float) dist_encoder_esq - (float) dist_encoder_dir));
         //Deslocamento do robo
         float deslocamento_encoders = calculaDeslocamentoEncoders(dist_encoder_esq, dist_encoder_dir);
         //Deslocamento angular
         return deslocamento_encoders * PApplet.TWO_PI / R;
+    }
+
+    /**
+     * Muda a posicao do robô.
+     *
+     * @param novaPosicao
+     */
+    public synchronized void mudaPosicaoRobo(Ponto novaPosicao, float novoAngulo) {
+        // Primeiramente, esvazia a lista de amostras a serem processadas.
+        processaListaInteiraAmostras();
+        // Depois, moda a posicao do robo
+        robo.novaTrilha(novaPosicao, novoAngulo);
+        fireChangeEvent();
+    }
+
+    /**
+     * Processa todas as amostras que estajam na lista.
+     */
+    public synchronized void processaListaInteiraAmostras() {
+        int num_elementos;
+        num_elementos = sampleList.size();
+        //Enquanto o vetor tiver elementos....
+        while (num_elementos > 0) {
+            AmostraSensores amostra = sampleList.get(0);
+            try {
+                //Executa o comando da posicao 0...
+                processaLeituraSensores(amostra);
+            } catch (NumIRException ex) {
+                System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
+            } catch (TimestampException ex) {
+                System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
+            }
+
+            //Faz a fila andar....
+            sampleList.remove(0);
+            num_elementos = sampleList.size();
+        }
     }
 
     /**
@@ -192,38 +229,37 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
         //
         //Nova posicao do robo depois de efetuar os calculos 
         PosInfo novaPosicao;
-        float novoAngulo = 0;
         //Se o robo tiver apenas uma posicao armazenada, com timestamp 0 significa que ele acabou de ser inicializado.
-        if (robo.getNumPosicoes() == 1 && robo.getUltimaPosicao().getTimestamp() == 0) {
+        if (robo.getNumPosicoesTrilhaAtual() == 1 && robo.getUltimaPosicaoTrilhaAtual().getTimestamp() == 0) {
             //Apenas muda a timestamp para a hora atual.
-            robo.getUltimaPosicao().setTimestamp(amostra.unixTimestamp);
-            novaPosicao = robo.getUltimaPosicao();
+            robo.getUltimaPosicaoTrilhaAtual().setTimestamp(amostra.unixTimestamp);
+            novaPosicao = robo.getUltimaPosicaoTrilhaAtual();
             //Calcula o deslocamento no centro de movimento a partir dos deslocamentos de cada roda.
             //É uma média simples das duas medidas, uma vez que o centro de movimento é o ponto médio entre as duas rodas.
 //            ultimoDeslocamentoEncoders = calculaDeslocamentoEncoders(dist_encoder_esq, dist_encoder_dir);
 //            ultimoDeslocamentoAngularEncoders = calculaDeslocamentoAngularEncoders(dist_encoder_esq, dist_encoder_dir, robo.getLargura());
         } else { //Adiciona uma nova posição
-            PosInfo ultimaPosicao = robo.getUltimaPosicao(); //É a ultima posicao do robô.
+            PosInfo ultimaPosicao = robo.getUltimaPosicaoTrilhaAtual(); //É a ultima posicao do robô.
 
             if (amostra.unixTimestamp < ultimaPosicao.getTimestamp()) {
                 throw new TimestampException(amostra.unixTimestamp, ultimaPosicao.getTimestamp(),
                                              String.format("O timestamp (%d) é menor do que o da última posição (%d).", amostra.unixTimestamp, ultimaPosicao.getTimestamp()));
             }
 
-            if (recordInterruptedAndResumed) { //Caso a gravação tenha sido interrompida e agora continuada...
-                //Copia a última posição do robô, mas com o timestamp atual.
-                //Isso indica que o robô ficou parado por todo o tempo.
-                PosInfo novaPos = ultimaPosicao.copy();
-                novaPos.setTimestamp(amostra.unixTimestamp);
-                robo.addPosicao(novaPos);
-//                robo.setVelocidadeAtual(0);
-                numAmostrasAposInicioGravacao++;
-                if (numAmostrasAposInicioGravacao >= 2) {
-                    recordInterruptedAndResumed = false;
-                    numAmostrasAposInicioGravacao = 0;
-                }
-                return; //Não é necessário fazer os cálculos nessa etapa
-            }
+//            if (recordInterruptedAndResumed) { //Caso a gravação tenha sido interrompida e agora continuada...
+//                //Copia a última posição do robô, mas com o timestamp atual.
+//                //Isso indica que o robô ficou parado por todo o tempo.
+//                PosInfo novaPos = ultimaPosicao.copy();
+//                novaPos.setTimestamp(amostra.unixTimestamp);
+//                robo.addPosicao(novaPos);
+////                robo.setVelocidadeAtual(0);
+//                numAmostrasAposInicioGravacao++;
+//                if (numAmostrasAposInicioGravacao >= 2) {
+//                    recordInterruptedAndResumed = false;
+//                    numAmostrasAposInicioGravacao = 0;
+//                }
+//                return; //Não é necessário fazer os cálculos nessa etapa
+//            }
             Ponto ultimoPonto = ultimaPosicao.getPonto();
             float ultimoAngulo = ultimaPosicao.getAngulo();
             long difftime = amostra.unixTimestamp - ultimaPosicao.getTimestamp(); //(ms) Diferença de tempo entre a última e penútlima timestamps. 
@@ -273,7 +309,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             //Calcula as novas posições x e y. O cálculo é feito levando-se em conta o ângulo da ultima posição (armazenada) do robo e a a nova velocidade (calculada) do robo.
             int newX = ultimoPonto.x() + PApplet.round(deslocamento * PApplet.cos(ultimoAngulo));
             int newY = ultimoPonto.y() + PApplet.round(deslocamento * PApplet.sin(ultimoAngulo));
-            novoAngulo = (ultimaPosicao.getAngulo() + velocidadeAngular * difftime / 1000) % PApplet.TWO_PI; //(rad) angulo
+            float novoAngulo = (ultimaPosicao.getAngulo() + velocidadeAngular * difftime / 1000) % PApplet.TWO_PI; //(rad) angulo
             novaPosicao = new PosInfo(new Ponto(newX, newY), novoAngulo, amostra.unixTimestamp);
             robo.addPosicao(novaPosicao);
             robo.setVelocidadeAtual(velocidade);
@@ -296,8 +332,8 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             if (distIR[i] > sensor.getMin_detec() && distIR[i] < sensor.getMax_detec()) {
                 PVector Vc = novaPosicao.getPonto().getPVector(); //Ultima posição do centro do robô
                 PVector v1 = sensor.getPosicaoNoRobo().getPVector(); //Posição do sensor no robô (relativa ao centro)
-                v1.rotate(novoAngulo); //Rotaciona v1 pelo ângulo do robo
-                PVector v2 = PVector.fromAngle(novoAngulo + sensor.getAngulo()); //v2 é o vetor que vai do sensor até o obstáculo.
+                v1.rotate(novaPosicao.getAngulo()); //Rotaciona v1 pelo ângulo do robo
+                PVector v2 = PVector.fromAngle(novaPosicao.getAngulo() + sensor.getAngulo()); //v2 é o vetor que vai do sensor até o obstáculo.
                 v2.setMag((float) distIR[i]);
                 //Soma v2 com v1 e Vc de modo a encontrar a posição do obstáculo.
                 v2.add(v1);
@@ -340,9 +376,11 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     public void startRecording() {
         synchronized (this) {
             recordEnabled = true;
-            if (robo.getNumPosicoes() > 1) {
-                recordInterruptedAndResumed = true;
-            }
+            //Inicia uma nova trilha da mesma posição em que o robô está atualmente.
+            mudaPosicaoRobo(robo.getUltimaPosicaoTrilhaAtual().getPonto(), robo.getUltimaPosicaoTrilhaAtual().getAngulo());
+//            if (robo.getNumPosicoesTrilhaAtual() > 1) {
+//                recordInterruptedAndResumed = true;
+//            }
         }
         fireChangeEvent();
     }
@@ -350,7 +388,8 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     public void stopRecording() {
         synchronized (this) {
             recordEnabled = false;
-            recordInterruptedAndResumed = true;
+            processaListaInteiraAmostras();
+//            recordInterruptedAndResumed = true;
         }
         fireChangeEvent();
     }

@@ -127,11 +127,12 @@ public class GerenciadorMotores implements MyChangeListener {
         fireChangeEvent();
     }
 
-    public float getCurrentMultiplier() {
+    public synchronized float getCurrentMultiplier() {
         return currentMultiplier;
     }
 
-    public void setCurrentMultiplier(float currentMultiplier) {
+    public synchronized void setCurrentMultiplier(float currentMultiplier) {
         this.currentMultiplier = currentMultiplier;
+        fireChangeEvent();
     }
 }

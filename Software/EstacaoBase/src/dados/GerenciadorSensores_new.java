@@ -117,12 +117,12 @@ public class GerenciadorSensores_new implements MyChangeListener {
         PosInfo new_pos;
         float angulo = 0;
         //Se o robo tiver apenas uma posicao armazenada, com timestamp 0 significa que ele acabou de ser inicializado.
-        if (robo.getNumPosicoes() == 1 && robo.getUltimaPosicao().getTimestamp() == 0) {
+        if (robo.getNumPosicoesTrilhaAtual() == 1 && robo.getUltimaPosicaoTrilhaAtual().getTimestamp() == 0) {
             //Apenas muda a timestamp para a hora atual.
-            robo.getUltimaPosicao().setTimestamp(timestamp);
-            new_pos = robo.getUltimaPosicao();
+            robo.getUltimaPosicaoTrilhaAtual().setTimestamp(timestamp);
+            new_pos = robo.getUltimaPosicaoTrilhaAtual();
         } else { //Adiciona uma nova posição
-            PosInfo penultPos = robo.getUltimaPosicao(); //É a penúltima posição pois será adicionada uma nova posição a seguir.
+            PosInfo penultPos = robo.getUltimaPosicaoTrilhaAtual(); //É a penúltima posição pois será adicionada uma nova posição a seguir.
 
             if (timestamp < penultPos.getTimestamp()) {
                 throw new TimestampException(timestamp, penultPos.getTimestamp(),
@@ -216,7 +216,7 @@ public class GerenciadorSensores_new implements MyChangeListener {
     public void startRecord() {
         synchronized (this) {
             recordEnabled = true;
-            if (robo.getNumPosicoes() > 1) {
+            if (robo.getNumPosicoesTrilhaAtual() > 1) {
                 recordInterruptedAndResumed = true;
             }
         }

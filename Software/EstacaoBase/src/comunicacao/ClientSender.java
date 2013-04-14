@@ -68,7 +68,7 @@ public class ClientSender extends Thread {
                     output.write(str, 0, str.length());
                     output.newLine();
                     if (msg.isFlushBuffer()) output.flush();
-                    System.out.println("[TR_ClientSender] Mensagem enviada!");
+//                    System.out.println("[TR_ClientSender] Mensagem enviada!");
                     synchronized (this) {
                         if (sendPriorityMessage) priorityMessages.remove(0); //Faz a fila andar.
                         else if (sendNormalMessage) messages.remove(0); //Faz a fila andar.

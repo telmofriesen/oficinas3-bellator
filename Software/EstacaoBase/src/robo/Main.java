@@ -1,5 +1,4 @@
 //TODO:
-//Reposicionamento do robô no mapa
 //Usar leituras do acelerômetro e giroscópio
 
 package robo;
