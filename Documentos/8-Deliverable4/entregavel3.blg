@@ -1,0 +1,57 @@
+This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
+The top-level auxiliary file: entregavel3.aux
+The style file: abnt-alf.bst
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: abnt-options.bib
+Database file #2: referencias.bib
+Warning--entry type for "vlc" isn't style-file defined
+--line 143 of file referencias.bib
+Reallocated wiz_functions (elt_size=4) to 9000 items from 472446408560.
++---------------------------------------------------------+
+| Estilo bibliografico abnt-alf.bst versao 1.53           |
+| Implementa a NBR6023, NBR10520 e NBR10523               |
+| Em caso de duvidas ou problemas com este estilo procure |
+| http://abntex.codigolivre.org.br                        |
++---------------------------------------------------------+
+You've used 5 entries,
+            6522 wiz_defined-function locations,
+            1176 strings with 9532 characters,
+and the built_in function-call counts, 2932 in all, are:
+= -- 313
+> -- 59
+< -- 2
++ -- 66
+- -- 19
+* -- 147
+:= -- 412
+add.period$ -- 6
+call.type$ -- 7
+change.case$ -- 28
+chr.to.int$ -- 11
+cite$ -- 2
+duplicate$ -- 79
+empty$ -- 285
+format.name$ -- 84
+if$ -- 740
+int.to.chr$ -- 2
+int.to.str$ -- 2
+missing$ -- 67
+newline$ -- 17
+num.names$ -- 10
+pop$ -- 88
+preamble$ -- 1
+purify$ -- 17
+quote$ -- 0
+skip$ -- 300
+stack$ -- 1
+substring$ -- 91
+swap$ -- 27
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 14
+width$ -- 0
+write$ -- 35
+(There was 1 warning)
