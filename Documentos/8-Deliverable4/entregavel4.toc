@@ -22,7 +22,7 @@
 \contentsline {section}{\numberline {4.1}\MakeUppercase {Encoders}}{36}
 \contentsline {subsection}{\numberline {4.1.1}Deslocamento de cada roda}{37}
 \contentsline {subsection}{\numberline {4.1.2}Deslocamento do centro de movimento do rob\IeC {\^o}}{38}
-\contentsline {subsubsection}{\numberline {4.1.2.1}Raio do movimento}{39}
+\contentsline {subsubsection}{\numberline {4.1.2.1}Raio do movimento circular uniforme}{39}
 \contentsline {subsubsection}{\numberline {4.1.2.2}Deslocamento linear}{39}
 \contentsline {subsubsection}{\numberline {4.1.2.3}Deslocamento angular}{40}
 \contentsline {subsubsection}{\numberline {4.1.2.4}Casos especiais}{41}
