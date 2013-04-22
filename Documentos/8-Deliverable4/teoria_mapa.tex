@@ -6,11 +6,11 @@ Neste projeto, a determinação do deslocamento do robô é determinada primaria
 
 Na próxima seção será explicada a teoria da determinação do deslocamento, velocidade e aceleração do centro de movimento do robô a partir das leituras dos encoders em cada instante. Na seção \ref{sec:teoria_acel_giro} será explicitada a forma como as leituras do acelerômetro e giroscópio serão utilizadas para aumentar a confiabilidade das medições.
 
-Na Figura \ref{fig:robo} está presente um esquema básico do robô visto de cima e virado com a frente para a direita. Nessa figura estão presentes os nomes das variáveis que são utilizadas nos cálculos posteriores.
+Na Figura \ref{fig:robo} está presente um esquema básico do robô visto de cima e virado com a frente para a direita. Na figura estão presentes os nomes das variáveis que são utilizadas nos cálculos posteriores. As medidas $R$, $R_D$ e $R_E$ representam os raios de um movimento circular uniforme descrito pelo robô, supondo que e roda esquerda esteja se deslocando mais do que a direita. Esse aspecto será melhor explicado nas seções seguintes. 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.5\textwidth, keepaspectratio]{./figuras/robo/robo.png}
+  \includegraphics[width=0.8\textwidth, keepaspectratio]{./figuras/robo/robo.png}
   \caption{Representação básica do robô (visão superior).}
   \label{fig:robo}
 \end{figure}
@@ -259,7 +259,7 @@ O valor obtido é indeterminado quando usa-se essa equação. Porém, analisando
 A velocidade e aceleração lineares do centro de movimento do robô podem ser calculadas por derivação numérica do deslocamento e velocidade em cada intervalo de tempo, considerando-se a velocidade e aceleração anteriores. Em cada intervalo discreto $n$:
 
 \begin{equation}
-  v_{c (n)} = \frac{x_{c (n)} - x_{c (n-1)}}{t_{(n)} - t_{(n-1)}}
+  v_{c (n)} = \frac{\Delta x_{c (n)} }{t_{(n)} - t_{(n-1)}}
   \label{eq:velocidade}
 \end{equation}
 
@@ -272,7 +272,7 @@ A velocidade e aceleração lineares do centro de movimento do robô podem ser c
 A velocidade e aceleração angulares podem ser também obtidas por derivação numérica, considerando-se que o raio do movimento circular uniforme do robô é constante dentro do intervalo considerado. Em cada intervalo discreto $n$:
 
 \begin{equation}
-  \omega_{c (n)} = \frac{\theta_{c (n)} - \theta_{c (n-1)}}{t_{(n)} - t_{(n-1)}}
+  \omega_{c (n)} = \frac{\Delta \theta_{c (n)} }{t_{(n)} - t_{(n-1)}}
   \label{eq:velocidade}
 \end{equation}
 
