@@ -256,7 +256,7 @@ O valor obtido é indeterminado quando usa-se essa equação. Porém, analisando
 
 \subsubsection{Velocidade e aceleraçao}
 
-A velocidade e aceleração lineares do centro de movimento do robô podem ser calculadas por derivação numérica do deslocamento e velocidade em cada intervalo de tempo, considerando-se a velocidade e aceleração anteriores. Em cada intervalo discreto $n$:
+A velocidade e aceleração lineares do centro de movimento do robô podem ser calculadas por derivação numérica do deslocamento e velocidade em cada intervalo de tempo. Em cada intervalo discreto $n$:
 
 \begin{equation}
   v_{c (n)} = \frac{\Delta x_{c (n)} }{t_{(n)} - t_{(n-1)}}
@@ -289,7 +289,7 @@ O acelerômetro e o giroscópio são utilizados para aumentar a confiabilidade d
 
 
 
-Como definido na seção \ref{sec:codificacao_mensagens}, é recebido um valor de 2 bytes para cada eixo do acelerômetro. A faixa de funcionamento do acelerômetro está configurada em $-+2g$, logo a sensibilidade pelo \textit{datasheet} é de $16384 LSB/g$. Portanto, o valor de aceleração pode ser obtido pela fórmula:
+Como definido na seção \ref{sec:codificacao_mensagens}, é recebido um valor de 2 bytes para cada eixo do acelerômetro. A faixa de funcionamento do acelerômetro está configurada em $\pm 2$ g, logo a sensibilidade pelo \textit{datasheet} é de 16384 LSB/g. Portanto, o valor de aceleração pode ser obtido pela fórmula:
 
 \begin{equation}
   a = \frac{valorMedido}{16384} \cdot g \unit{m/s^2}
@@ -298,7 +298,7 @@ Como definido na seção \ref{sec:codificacao_mensagens}, é recebido um valor d
 
 Onde g é a aceleração da gravidade ($9,80665 \unit{m/s^2}$). 
 
-Para cada eixo do giroscópio, também e obtido um valor de 2 bytes. A faixa de funcionamento do giroscópio está configurada em $-+250$ graus/s, logo a sensibilidade pelo \textit{datasheet} é de 131 LSB/(graus/s). Portanto, o valor de velocidade angular pode ser obtida pela fórmula:
+Para cada eixo do giroscópio, também e obtido um valor de 2 bytes. A faixa de funcionamento do giroscópio está configurada em $\pm 250$ graus/s, logo a sensibilidade pelo \textit{datasheet} é de 131 LSB/(graus/s). Portanto, o valor de velocidade angular pode ser obtida pela fórmula:
 
 \begin{equation}
   \omega = \frac{valorMedido}{131} \unit{graus/s} = \frac{\pi}{180} \cdot \frac{valorMedido}{131} \unit{rad/s}
@@ -308,7 +308,7 @@ Para cada eixo do giroscópio, também e obtido um valor de 2 bytes. A faixa de 
 
 A princípio, apenas o eixo X do acelerômetro (voltado para a frente do robô) e o eixo Z do giroscópio (posicionado no sentido baixo/cima) serão utilizados para mapeamento, visto que poderão ser comparados facilmente com os dados obtidos pelos encoders. A ideia é posicioná-los no centro de movimento do robô (ponto médio entre as rodas) para que a comparação seja feita.
 
-A velocidade e deslocamento lineares podem ser obtidos por integração numérica da aceleração linear em cada intervalo discreto $n$:
+A velocidade e deslocamento lineares podem ser obtidos por integração numérica (simples e dupla) da aceleração linear em cada intervalo discreto $n$:
 
 \begin{equation}
   v_{(n)} = v_{(n - 1)} + a_{(n)} \cdot (t_{(n)} - t_{(n-1)})
