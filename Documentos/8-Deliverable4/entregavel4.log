@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  21 APR 2013 20:03
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  21 APR 2013 23:51
 entering extended mode
  %&-line parsing enabled.
-**entregavel3
-(./entregavel3.tex
+**entregavel4
+(./entregavel4.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
 yphenation, portuguese, loaded.
@@ -708,7 +708,7 @@ Package: booktabs 2005/04/14 v1.61803 publication quality tables
 )
 (/usr/share/texmf-texlive/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen157
-) (./entregavel3.aux
+) (./entregavel4.aux
 
 LaTeX Warning: Label `eq:velocidade' multiply defined.
 
@@ -725,7 +725,7 @@ LaTeX Warning: Label `eq:v_acel' multiply defined.
 LaTeX Warning: Label `eq:v_acel' multiply defined.
 
 )
-\openout1 = `entregavel3.aux'.
+\openout1 = `entregavel4.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 56.
 LaTeX Font Info:    ... okay on input line 56.
@@ -815,9 +815,9 @@ Underfull \hbox (badness 1253) in paragraph at lines 59--59
 []\OT1/ptm/m/n/12 Terceiro en-treg[]avel apre-sen-tado []a Uni-dade Cur-
  []
 
-[1] (./entregavel3.toc)
+[1] (./entregavel4.toc)
 \tf@toc=\write3
-\openout3 = `entregavel3.toc'.
+\openout3 = `entregavel4.toc'.
 
  [1
 
@@ -1015,31 +1015,39 @@ File: ./figuras/hardware2_2.pdf Graphic file (type pdf)
 <use ./figuras/hardware2_2.pdf> [32] [33 <./figuras/hardware2_2.pdf>])
 (./teoria_mapa.tex [34]
 Cap\'{\i }tulo 4.
-[35
+<./figuras/robo/robo.png, id=142, 571.13374pt x 424.58624pt>
+File: ./figuras/robo/robo.png Graphic file (type png)
 
-] [36] [37] [38] [39]
-Overfull \hbox (4.59846pt too wide) in paragraph at lines 197--198
+<use ./figuras/robo/robo.png> [35
+
+ <./figuras/robo/robo.png (PNG copy)>]
+<./figuras/robo/roda_encoder.png, id=146, 481.8pt x 361.35pt>
+File: ./figuras/robo/roda_encoder.png Graphic file (type png)
+
+<use ./figuras/robo/roda_encoder.png> [36 <./figuras/robo/roda_encoder.png (PNG
+ copy)>] [37] [38] [39] [40] [41]
+Overfull \hbox (4.59846pt too wide) in paragraph at lines 272--273
 []\OT1/ptm/m/n/12 A ve-lo-ci-dade e acelera[][]ao an-gu-la-res po-dem ser tamb[
 ]em ob-ti-das por deriva[][]ao num[]erica,
  []
 
-[40] [41]) (./entregavel3.bbl [42]) AED: lastpage setting LastPage [43
+[42] [43]) (./entregavel4.bbl [44]) AED: lastpage setting LastPage [45
 
 ]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./entregavel3.aux)
+(./entregavel4.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6882 strings out of 495041
- 105224 string characters out of 1181897
+ 6903 strings out of 495041
+ 105709 string characters out of 1181897
  185821 words of memory out of 3000000
- 9793 multiletter control sequences out of 15000+50000
+ 9810 multiletter control sequences out of 15000+50000
  30332 words of font info for 69 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
  61i,14n,96p,1107b,388s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1051,9 +1059,9 @@ cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/shar
 e/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/texmf-texlive/fonts
 /type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utm
 r8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on entregavel3.pdf (44 pages, 3630078 bytes).
+Output written on entregavel4.pdf (46 pages, 3646669 bytes).
 PDF statistics:
- 208 PDF objects out of 1000 (max. 8388607)
+ 216 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 111 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 121 words of extra memory for PDF output out of 10000 (max. 10000000)
 

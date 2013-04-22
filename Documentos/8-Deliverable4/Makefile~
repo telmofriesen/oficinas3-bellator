@@ -1,6 +1,6 @@
 #Script do make para compilar o texto feito no Latex.
 
-TEX = "entregavel4"
+TEX = "entregavel3"
 
 all: compilar
 compilar: pdflatex

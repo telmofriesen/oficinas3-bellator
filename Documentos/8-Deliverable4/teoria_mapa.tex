@@ -1,4 +1,4 @@
-\chapter{Geraçaõ do mapa}
+\chapter{Geração do mapa}
 
 A posição do robô no mapa em cada instante é representada por um ponto no plano cartesiano e por um ângulo, que indica para qual sentido o robô está orientado. Esse ponto no plano indica onde está o centro de movimento do robô, que é o ponto médio entre as duas rodas.
 
@@ -6,9 +6,27 @@ Neste projeto, a determinação do deslocamento do robô é determinada primaria
 
 Na próxima seção será explicada a teoria da determinação do deslocamento, velocidade e aceleração do centro de movimento do robô a partir das leituras dos encoders em cada instante. Na seção \ref{sec:teoria_acel_giro} será explicitada a forma como as leituras do acelerômetro e giroscópio serão utilizadas para aumentar a confiabilidade das medições.
 
+Na Figura \ref{fig:robo} está presente um esquema básico do robô visto de cima e virado com a frente para a direita. Nessa figura estão presentes os nomes das variáveis que são utilizadas nos cálculos posteriores.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth, keepaspectratio]{./figuras/robo/robo.png}
+  \caption{Representação básica do robô (visão superior).}
+  \label{fig:robo}
+\end{figure}
+
 \section{Encoders}
 
 Há dois dados importantes a determinar sobre o deslocamento do centro de movimento do robô: o deslocamento linear (distância absoluta percorrida) e o angular (variação do ângulo de orientação do robô). Cada encoder fornece uma medida de contagem de pulsos por volta a cada intervalo de amostragem. 
+
+Na Figura \ref{fig:roda_encoder} está presente um representação básica de uma roda, acoplada a um encoder. Os números da figura são utilizados como índices nos cálculos explicitados posteriormente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth, keepaspectratio]{./figuras/robo/roda_encoder.png}
+  \caption{Representação de uma roda acoplada a um encoder.}
+  \label{fig:roda_encoder}
+\end{figure}
 
 \subsection{Deslocamento de cada roda}
 
@@ -19,7 +37,7 @@ Um princípio importante utilizado nos cálculos é a relação entre o deslocam
   \label{eq:deslocamento_circunferencia}
 \end{equation}
 
-Nos cálculos a seguir, faz-se uso do índice 1 para o eixo da roda, 2 para o eixo do encoder e 3 para a própria roda. Para determinar a distância percorrida pela roda, deve-se considerar a circunferência do eixo da roda ($C_1$), a circunferência do eixo do encoder ($C_2$) e a circunferência da roda ($C_3$).
+Nos cálculos a seguir, faz-se uso do índice 1 para o eixo da roda, 2 para o eixo do encoder e 3 para a própria roda, de acordo com a figura \ref{fig:roda_encoder}. Para determinar a distância percorrida pela roda, deve-se considerar a circunferência do eixo da roda ($C_1$), a circunferência do eixo do encoder ($C_2$) e a circunferência da roda ($C_3$).
 
 O acoplamento do eixo do encoder com o eixo da roda é feita por uma correia de borracha, e portanto considera-se que o deslocamento ($ \Delta x_1$) na superfície do eixo da roda é igual ao deslocamento ($ \Delta x_2$) na superfície do eixo do encoder. Pode-se, com isso, calcular:
 
@@ -179,6 +197,63 @@ O deslocamento angular ($\Delta \theta_c$) do centro de movimento do robô em ca
 
 Onde $\Delta x_C$ é o deslocamento linear do robô (equação \ref{eq:desloc_linear}) e $R$ é o raio do movimento circular uniforme (equação \ref{eq:R}). 
 
+\subsubsection{Casos especiais}
+
+Há dois casos especiais que devem ser considerados no cálculo do deslocamento (a partir dos dados dos encoders) do centro de movimento do robo. O primeiro é quando as duas rodas têm deslocamento igual ($\Delta x_E = \Delta x_D$). O raio do movimento circular (equação \ref{eq:R}) neste caso é:
+
+\begin{equation}
+  R = h \cdot \frac{\Delta x_E + \Delta x_D} {\Delta x_E - \Delta x_D} = h \cdot \frac{2 \cdot \Delta x_E}{0} \rightarrow \infty
+  \label{eq:caso_especial1_R}
+\end{equation}
+
+
+O raio tende a infinito, o que implica que o deslocamento angular (equação \ref{eq:desloc_angular}) seja:
+
+\begin{equation}
+  \Delta \theta_c = \frac{\Delta x_C}{R} = \frac{\Delta x_C}{\infty} \rightarrow 0
+  \label{eq:caso_especial1_theta}
+\end{equation}
+
+Já o deslocamento linear (equação \ref{eq:desloc_linear}) é:
+
+\begin{equation}
+  \Delta x_C = \frac{\Delta x_E + \Delta x_D}{2} = \frac{2 \Delta x_E}{2} = \Delta x_E
+  \label{eq:caso_especial1_x}
+\end{equation}
+
+Isso corresponde à realidade, uma vez que quando as rodas têm deslocamentos iguais o robô está se deslocando sem fazer curvas. Não há deslocamento angular, portanto, e o deslocamento linear do centro de movimento é igual ao deslocamento de cada roda.
+
+O segundo caso especial ocorre quando os deslocamento têm módulos iguais, porêm sentidos contrários (ou seja, $\Delta x_E = - \Delta x_D$). O raio nesse caso é:
+
+\begin{equation}
+  R = h \cdot \frac{\Delta x_E + \Delta x_D} {\Delta x_E - \Delta x_D} = h \cdot \frac{\Delta x_E - \Delta x_E}{\Delta x_E + \Delta x_E} = 0
+    \label{eq:caso_especial2_R}
+\end{equation}
+
+
+O deslocamento linear (equação \ref{eq:desloc_linear}) é:
+
+\begin{equation}
+  \Delta x_C = \frac{\Delta x_E + \Delta x_D}{2} = \frac{\Delta x_E - \Delta x_E}{2} = 0
+  \label{eq:caso_especial2_x}
+\end{equation}
+
+Esse valor corresponde à realidade, pois quando as rodas se deslocam em sentidos contários, e na mesma quantidade, o centro de movimento do robô não se desloca linearmente, mas apenas muda seu ângulo.
+Usando-se a equação \ref{eq:desloc_angular}, tenta-se calcular o valor do deslocamento angular:
+
+\begin{equation}
+  \Delta \theta_c = \frac{\Delta x_C}{R} = \frac{0}{0}
+  \label{eq:caso_especial2_theta}
+\end{equation}
+
+O valor obtido é indeterminado quando usa-se essa equação. Porém, analisando-se a natureza deste caso especial, pode ser notado que há um movimento circular cujo centro é o ponto médio entre as rodas (que é o centro de movimento do robô). O raio do MCU é a distância $h$ entre uma roda e o centro do robô, e o deslocamento ao longo da circunferência é o deslocamento de qualquer uma uma das rodas. Portanto, a equação \ref{eq:deslocamento_circunferencia} pode ser utilizada, isolando-se a variável $\theta$, para determinar o deslocamento angular do robô:
+
+\begin{equation}
+  \Delta \theta_c = \frac{\Delta x_E}{h}
+  \label{eq:caso_especial2_theta2}
+\end{equation}
+
+
 \subsubsection{Velocidade e aceleraçao}
 
 A velocidade e aceleração lineares do centro de movimento do robô podem ser calculadas por derivação numérica do deslocamento e velocidade em cada intervalo de tempo, considerando-se a velocidade e aceleração anteriores. Em cada intervalo discreto $n$:
@@ -233,7 +308,7 @@ Para cada eixo do giroscópio, também e obtido um valor de 2 bytes. A faixa de 
 
 A princípio, apenas o eixo X do acelerômetro (voltado para a frente do robô) e o eixo Z do giroscópio (posicionado no sentido baixo/cima) serão utilizados para mapeamento, visto que poderão ser comparados facilmente com os dados obtidos pelos encoders. A ideia é posicioná-los no centro de movimento do robô (ponto médio entre as rodas) para que a comparação seja feita.
 
-A velocidade e deslocamento lineares podem ser obtidos por integração numérica em cada intervalo discreto $n$:
+A velocidade e deslocamento lineares podem ser obtidos por integração numérica da aceleração linear em cada intervalo discreto $n$:
 
 \begin{equation}
   v_{(n)} = v_{(n - 1)} + a_{(n)} \cdot (t_{(n)} - t_{(n-1)})
@@ -245,7 +320,7 @@ A velocidade e deslocamento lineares podem ser obtidos por integração numéric
   \label{eq:v_acel}
 \end{equation}
 
-O deslocamento angular pode ser obtido por integração numérica da velocidade angular:
+O deslocamento angular pode ser obtido por integração numérica da velocidade angular em cada intervalo discreto $n$:
 
 \begin{equation}
   \Delta \theta_{(n)} = \Delta \theta_{(n - 1)} + \omega_{(n)} \cdot (t_{(n)} - t_{(n-1)})
@@ -272,20 +347,20 @@ Sendo $\overrightarrow{P_C}$ o vetor que sai da origem e vai até o centro de mo
 \end{equation}
 
 
-O vetor $\overrightarrow{P_C}$ é determinado facilmente, pois é a última posição do robô. $\overrightarrow{P_1}$ é o vetor da posição do sensor relativa ao centro (informação obtida das configurações iniciais do robô), rotacionado pelo ângulo em que o robô está na última posição. $\overrightarrow{P_2}$ pode ser obtido criando-se um vetor com magnitude igual à distância detectada pelo sensor, e ângulo igual a: ângulo relativo do sensor no robô (informação obtida das configurações iniciais) somado com o ângulo da última posição do robô em que o robô está.
+O vetor $\overrightarrow{P_C}$ é determinado facilmente, pois é a última posição do robô. $\overrightarrow{P_1}$ é o vetor da posição do sensor relativa ao centro (informação obtida das configurações iniciais do robô), rotacionado pelo ângulo em que o robô está na última posição. $\overrightarrow{P_2}$ pode ser obtido criando-se um vetor com magnitude igual à distância detectada pelo sensor, e ângulo igual a: ângulo relativo do sensor no robô (informação obtida das configurações iniciais) somado com o ângulo em que o robô está na última posição.
 
 \section{Algoritmo de posicionamento}
 
 O algoritmo proposto para utilização dos vários sensores (encoder, acelerômetro e giroscópio) está exposto abaixo. Para cada amostra dos sensores recebida, o algoritmo efetua os seguintes passos:
 
 \begin{enumerate}
-      \item A partir das leituras dos encoders, calcular deslocamento linear ($x_e$, em $m$) e angular ($\theta$, em $rad$) do centro de movimento do robô.
+      \item A partir das leituras dos encoders, calcular deslocamento linear ($x_e$, em metros) e angular ($\theta$, em $rad$) do centro de movimento do robô.
       \item Derivar duas vezes o deslocamento linear $x_e$ para obter aceleração linear ($a_e$, em $m/s^2$). Derivar uma vez o deslocamento angular $\theta_e$ para obter a velocidade angular ($\omega_e$, em $rad/s$).
-      \item Comparar aceleração linear $a_e$ e velocidade angular $\omega_e$, obtidas com os encoders, com as leituras do acelerômetro ($a_a$) e giroscópio ($\omega_g$). Caso a diferença das acelerações passe de um limite (determinado experimentalmente), é provável que um escorregamento tenha ocorrido.
+      \item Comparar aceleração linear $a_e$ e velocidade angular $\omega_e$, obtidas com os encoders, com as leituras do acelerômetro ($a_a$) e giroscópio ($\omega_g$). Caso a diferença das acelerações passe de um limite (determinado experimentalmente), é provável que um escorregamento de rodas tenha ocorrido.
       \item Baseado na comparação anterior, especificar pesos para a aceleração linear (encoders \textit{vs.} acelerômetro) e velocidade angular (encoders \textit{vs.} giroscópio), dando mais prioridade ao acelerômetro e giroscópio caso escorregamentos sejam detectados.
       \item Integrar duas vezes a aceleração linear final para obter o deslocamento linear do robô. Integrar uma vez a velocidade angular final para obter o deslocamento angular do robô.
 \end{enumerate}
 
 
-O acelerômetro e giroscópio entram em ação quando diferenças muito grandes entre os dados destes e dos encoders forem detectadas, sendo que o limite para que isso ocorra é determinado experimentalmente.
+O acelerômetro e giroscópio entram em ação quando diferenças muito grandes entre os dados destes e dos encoders forem detectadas. A diferença limite para que essa detecção ocorra é determinada experimentalmente.
 
