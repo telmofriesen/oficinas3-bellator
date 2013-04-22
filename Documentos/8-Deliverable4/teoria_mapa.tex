@@ -11,9 +11,11 @@ Na Figura \ref{fig:robo} está presente um esquema básico do robô visto de cim
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth, keepaspectratio]{./figuras/robo/robo.png}
-  \caption{Representação básica do robô (visão superior).}
+  \caption{Representação básica do robô em movimento circular uniforme (visão superior).}
   \label{fig:robo}
 \end{figure}
+
+Um aspecto importante a ressaltar é que o sistema de coordenadas do Processing (a biblioteca usada para desenhar o mapa 2D na interface gráfica) possui o eixo Y invertido. Portanto, os ângulos crescem no sentido horário, e não no anti-horário como seria o convencional. Essa convenção do Processing (ângulos que crescem em sentido horário) foi utilizada integralmente neste projeto.
 
 \section{Encoders}
 
@@ -253,6 +255,18 @@ O valor obtido é indeterminado quando usa-se essa equação. Porém, analisando
   \label{eq:caso_especial2_theta2}
 \end{equation}
 
+\subsubsection{Considerações sobre a notação utilizada}
+
+A notação utilizada no decorrer do texto para representar o estado de uma variável em certo instante discreto de tempo é um número subscrito entre parênteses. Por exemplo, a posição $\overrightarrow{P}$ do robô em um instante de tempo $n$ é representado por:$\overrightarrow{P}_{(n)}$. 
+
+Outro aspecto presente no decorrer do texto, que vale ser ressaltado para que haja melhor entendimento das demostrações, é o fato de que $\Delta x_{(n)}$ é o deslocamento absoluto do robô do intervalo de tempo discreto de $(n-1)$ até $n$.
+
+%\begin{equation}
+%  \Delta x_{(n)} = x_{(n)} - x_{(n - 1)}
+%  \label{eq:delta_x}
+%\end{equation}
+%
+%Sendo que $\Delta x_{(n)}$ é o deslocamento do robô do intervalo $(n-1)$ até $n$.
 
 \subsubsection{Velocidade e aceleraçao}
 
@@ -260,12 +274,12 @@ A velocidade e aceleração lineares do centro de movimento do robô podem ser c
 
 \begin{equation}
   v_{c (n)} = \frac{\Delta x_{c (n)} }{t_{(n)} - t_{(n-1)}}
-  \label{eq:velocidade}
+  \label{eq:velocidade_encoders}
 \end{equation}
 
 \begin{equation}
   a_{c (n)} = \frac{v_{c (n)} - v_{c (n-1)}}{t_{(n)} - t_{(n-1)}}
-  \label{eq:velocidade}
+  \label{eq:aceleracao_encoders}
 \end{equation}
 
 
@@ -273,12 +287,12 @@ A velocidade e aceleração angulares podem ser também obtidas por derivação 
 
 \begin{equation}
   \omega_{c (n)} = \frac{\Delta \theta_{c (n)} }{t_{(n)} - t_{(n-1)}}
-  \label{eq:velocidade}
+  \label{eq:omega_encoders}
 \end{equation}
 
 \begin{equation}
   \alpha_{c (n)} = \frac{\omega_{c (n)} - \omega_{c (n-1)}}{t_{(n)} - t_{(n-1)}}
-  \label{eq:velocidade}
+  \label{eq:alpha_encoders}
 \end{equation}
 
 
@@ -306,61 +320,122 @@ Para cada eixo do giroscópio, também e obtido um valor de 2 bytes. A faixa de 
 \end{equation}
 
 
-A princípio, apenas o eixo X do acelerômetro (voltado para a frente do robô) e o eixo Z do giroscópio (posicionado no sentido baixo/cima) serão utilizados para mapeamento, visto que poderão ser comparados facilmente com os dados obtidos pelos encoders. A ideia é posicioná-los no centro de movimento do robô (ponto médio entre as rodas) para que a comparação seja feita.
+A princípio, apenas o eixo X do acelerômetro (voltado para a frente do robô) e o eixo Z do giroscópio (posicionado no sentido baixo/cima) serão utilizados para mapeamento, visto que os dados poderão ser dessa forma comparados facilmente com os dados obtidos pelos encoders. Os sensores serão posicionados no centro de movimento do robô (ponto médio entre as rodas) para realizar uma comparação de acelerações (encoders \textit{vs} acelerômetro) e velocidades angulares (encoders \textit{vs.} giroscópio).
 
-A velocidade e deslocamento lineares podem ser obtidos por integração numérica (simples e dupla) da aceleração linear em cada intervalo discreto $n$:
+Para determinar a velocidade e deslocamento lineares a partir dos dados do acelerômetro, efetua-se uma integração numérica (simples e dupla) da aceleração linear em cada intervalo discreto $n$:
 
 \begin{equation}
   v_{(n)} = v_{(n - 1)} + a_{(n)} \cdot (t_{(n)} - t_{(n-1)})
-  \label{eq:v_acel}
+  \label{eq:v_acelerometro}
 \end{equation}
-
 \begin{equation}
-  \Delta x_{(n)} = \Delta x_{(n - 1)} + v_{(n)} \cdot (t_{(n)} - t_{(n-1)})
-  \label{eq:v_acel}
+  \Delta x_{(n)} = v_{(n)} \cdot (t_{(n)} - t_{(n-1)})
+  \label{eq:x_acelerometro}
 \end{equation}
 
-O deslocamento angular pode ser obtido por integração numérica da velocidade angular em cada intervalo discreto $n$:
+Para determinar o deslocamento angular a partir dos dados do giroscópio, efetua-se uma integração numérica (simples) da velocidade angular em cada intervalo discreto $n$:
 
 \begin{equation}
   \Delta \theta_{(n)} = \Delta \theta_{(n - 1)} + \omega_{(n)} \cdot (t_{(n)} - t_{(n-1)})
-  \label{eq:v_acel}
+  \label{eq:theta_giroscopio}
 \end{equation}
 
 
 
 \section{Sensores infra-vermelhos}
 
-Para obter a posição em que cada obstáculo detectado está no mapa, primeiramente deve-se obter a distância detectada por cada sensor infra-vermelho. Como explicitado em \cite{bellator_2012}, o valor recebido em 1 byte do sensor pode ser convertido para a distãncia em centímetros pela fórmula (obtida por interpolação polinomial):
+Os sensores infra-vermelhos são usados para detectar obstáculos próximos ao robô (de 30 a 150 cm de distância). Na Figura \ref{fig:robo_ir} está explicitada uma representação de um sensor infra-vermelho detectando um obstáculo. Na figura estão presentes os nomes das variáveis utilizadas nos cálculos. Como já explicado no começo do capítulo, o sistema de coordenadas do Processing (a biblioteca utilizada para desenhar o mapa 2D na interface gráfica) possui o eixo Y invertido. Portanto, os ângulos crescem no sentido horário e não no anti-horário como seria o convencional. Por essa razão, o ângulo ``-theta(n)'' da figura é negativo. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth, keepaspectratio]{./figuras/robo/robo_ir.png}
+  \caption{Representação básica do robô e um sensor infra-vermelho detectando um obstáculo (visão superior).}
+  \label{fig:robo_ir}
+\end{figure}
+
+Para obter a posição em que um obstáculo detectado está no mapa, primeiramente deve-se obter a distância entre o obstáculo e o sensor infra-vermelho. Como explicitado em \cite{bellator_2012}, o valor $x$ recebido em 1 byte do sensor pode ser convertido para a distãncia $d$ em centímetros pela fórmula (obtida por interpolação polinomial):
 
 \begin{equation}
-  y = 3,6404 \cdot 10^{-7} x^3 - 2,4435 \cdot 10^{-4} x^3 + 6,0732 \cdot 10^{-2} x^2 - 6,8962 x + 339,361
+  d = 3,6404 \cdot 10^{-7} x^3 - 2,4435 \cdot 10^{-4} x^3 + 6,0732 \cdot 10^{-2} x^2 - 6,8962 x + 339,361
   \label{eq:IR_dist}
 \end{equation}
 
 
-Sendo $\overrightarrow{P_C}$ o vetor que sai da origem e vai até o centro de movimento do robô, $\overrightarrow{P_1}$ o vetor que vai do centro do robô até o sensor, e $\overrightarrow{P_2}$ o vetor que vai do sensor até o ponto do obstáculo detectado, faz-se a seguinte soma vetorial para encontrar o vetor $\overrightarrow{P}$, que é o ponto do obstáculo detectado no mapa:
+Sendo $\overrightarrow{P_C}$ o vetor que sai da origem e vai até o centro de movimento do robô, $\overrightarrow{P_1}$ o vetor que vai do centro do robô até o sensor, e $\overrightarrow{P_2}$ o vetor que vai do sensor até o ponto do obstáculo detectado, faz-se a seguinte soma vetorial para encontrar o vetor $\overrightarrow{P_O}$, que é a posição do obstáculo no mapa:
 
 \begin{equation}
-  \overrightarrow{P} = \overrightarrow{P_C} + \overrightarrow{P_1} + \overrightarrow{P_2}
+  \overrightarrow{P_O} = \overrightarrow{P_C} + \overrightarrow{P_1} + \overrightarrow{P_2}
   \label{eq:IR_vector}
 \end{equation}
 
 
-O vetor $\overrightarrow{P_C}$ é determinado facilmente, pois é a última posição do robô. $\overrightarrow{P_1}$ é o vetor da posição do sensor relativa ao centro (informação obtida das configurações iniciais do robô), rotacionado pelo ângulo em que o robô está na última posição. $\overrightarrow{P_2}$ pode ser obtido criando-se um vetor com magnitude igual à distância detectada pelo sensor, e ângulo igual a: ângulo relativo do sensor no robô (informação obtida das configurações iniciais) somado com o ângulo em que o robô está na última posição.
+O vetor $\overrightarrow{P_C}$ pode ser facilmente determinado de acordo com a equação abaixo. Sendo $\overrightarrow{P}_{(n)}$ a última posição do robô (intervalo discreto $n$):
 
+\begin{equation}
+  \overrightarrow{P_C} = \overrightarrow{P}_{(n)}
+  \label{eq:IR-P_C}
+\end{equation}
+
+O vetor $\overrightarrow{P_1}$ é o vetor que vai do centro de movimento do robô até o sensor infra-vermelho (informação obtida das configurações iniciais do robô), rotacionado pelo ângulo em que o robô está na última posição. Sendo $\overrightarrow{P_{IR}}$ o vetor que vai do centro do robô até o sensor, e $\theta_{(n)}$ o ângulo em que o robô está orientado na última posição (intervalo discreto $n$):
+
+
+\begin{equation}
+  |\overrightarrow{P_1}| = |\overrightarrow{P_{IR}}|
+  \label{eq:IR-P_1_modulo}
+\end{equation}
+\begin{equation}
+  \phi \left\{ \overrightarrow{P_1} \right\} = \phi \left\{ \overrightarrow{P_{IR}} \right\} + \theta_{(n)}
+  \label{eq:IR-P_1_fase}
+\end{equation}
+
+
+O vetor $\overrightarrow{P_2}$ é um vetor com magnitude igual à distância detectada pelo sensor, e ângulo igual a: ângulo relativo do sensor no robô (informação obtida das configurações iniciais) somado com o ângulo em que o robô está na última posição. Sendo $d$ a distãncia detectada pelo sensor infra-vermelho, $\theta_{IR}$ o ângulo em que o sensor infra-vermelho está posicionado no robô, e tendo $\theta_{(n)}$ o mesmo significado que na equação anterior:
+
+\begin{equation}
+  |\overrightarrow{P_2}| = d
+  \label{eq:IR-P_2_modulo}
+\end{equation}
+\begin{equation}
+  \phi \left\{ \overrightarrow{P_2} \right\} = \theta_{IR} + \theta_{(n)}
+  \label{eq:IR-P_2_fase}
+\end{equation}
+
+
+%Em termos matemáticos:
+%\begin{equation}
+%  \overrightarrow{P_C} = \overrightarrow{P}
+%  \label{eq:IR-P_C}
+%\end{equation}
+%\begin{eqnarray*}
+%  |\overrightarrow{P_1}| &=&  \overrightarrow{P_{IR}}\\
+%  \phi(\overrightarrow{P_1}) &=& \theta
+%  \label{eq:IR-P_!}
+%\end{eqnarray*}
+%
 \section{Algoritmo de posicionamento}
 
-O algoritmo proposto para utilização dos vários sensores (encoder, acelerômetro e giroscópio) está exposto abaixo. Para cada amostra dos sensores recebida, o algoritmo efetua os seguintes passos:
+O algoritmo proposto para determinação da posição do robô em cada instante de tempo, utilizando os vários sensores (encoders, acelerômetro e giroscópio), está explicitado nesta seção. Para cada amostra dos sensores recebida, o algoritmo efetua os seguintes passos:
 
 \begin{enumerate}
-      \item A partir das leituras dos encoders, calcular deslocamento linear ($x_e$, em metros) e angular ($\theta$, em $rad$) do centro de movimento do robô.
-      \item Derivar duas vezes o deslocamento linear $x_e$ para obter aceleração linear ($a_e$, em $m/s^2$). Derivar uma vez o deslocamento angular $\theta_e$ para obter a velocidade angular ($\omega_e$, em $rad/s$).
-      \item Comparar aceleração linear $a_e$ e velocidade angular $\omega_e$, obtidas com os encoders, com as leituras do acelerômetro ($a_a$) e giroscópio ($\omega_g$). Caso a diferença das acelerações passe de um limite (determinado experimentalmente), é provável que um escorregamento de rodas tenha ocorrido.
-      \item Baseado na comparação anterior, especificar pesos para a aceleração linear (encoders \textit{vs.} acelerômetro) e velocidade angular (encoders \textit{vs.} giroscópio), dando mais prioridade ao acelerômetro e giroscópio caso escorregamentos sejam detectados.
-      \item Integrar duas vezes a aceleração linear final para obter o deslocamento linear do robô. Integrar uma vez a velocidade angular final para obter o deslocamento angular do robô.
+  \item A partir das leituras dos encoders ($\Delta x_E$ e $\Delta x_D$), usando as equações \ref{eq:desloc_linear} e \ref{eq:desloc_angular}, calcular deslocamento linear ($\Delta x_C$, em metros) e angular ($\Delta \theta_c$, em $rad$) do centro de movimento do robô.
+  \item Derivar duas vezes o deslocamento linear ($\Delta x_C$), usando as equações \ref{eq:velocidade_encoders} e \ref{eq:aceleracao_encoders} para obter aceleração linear ($a_C$, em $m/s^2$), e derivar uma vez o deslocamento angular ($\theta_C$), usando a equação \ref{eq:omega_encoders}, para obter a velocidade angular ($\omega_C$, em $rad/s$).
+  \item Comparar a aceleração linear ($a_C$) e a velocidade angular ($\omega_C$), obtidas com os encoders, com as leituras do acelerômetro ($a_a$) e giroscópio ($\omega_g$). Caso a diferença dos valores passe de um limite (determinado experimentalmente), é provável que um escorregamento de rodas tenha ocorrido.
+  \item Baseado na comparação anterior, especificar pesos para a aceleração linear (encoders \textit{vs.} acelerômetro) e velocidade angular (encoders \textit{vs.} giroscópio), dando mais prioridade ao acelerômetro e giroscópio caso escorregamentos sejam detectados. Calcular com base nesses pesos a aceleração linear final ($a$) e a velocidade angular final ($\omega$).
+  \item Usando-se as equações \ref{eq:v_acelerometro} e \ref{eq:x_acelerometro}, integrar duplamente a aceleração linear ($a$) para obter o deslocamento linear ($\bm{\Delta x}$) do robô, e a partir da equação \ref{eq:theta_giroscopio} integrar uma vez a velocidade angular ($\omega$) para obter o deslocamento angular ($\bm{\Delta \theta}$) do robô.
+  \item A partir das equações \ref{eq:P_x} e \ref{eq:P_y} explicitadas abaixo, calcular a nova posição ($\overrightarrow{P}_{(n)}$) do robô, e a partir da equação \ref{eq:theta_n} calcular o novo ângulo $\theta_{(n)}$ do robô. Decompondo-se o vetor posição ($\overrightarrow{P}$) em suas componentes $P_x$ e $P_y$, tem-se que no intervalo discreto $n$:
+    \begin{equation}
+      P_{x (n)} = P_{x (n-1)} + \Delta x \cdot \cos{(\theta_{(n-1)})}
+      \label{eq:P_x}
+    \end{equation}
+    \begin{equation}
+      P_{y (n)} = P_{y (n-1)} + \Delta x \cdot \sin{(\theta_{(n-1)})}
+      \label{eq:P_y}
+    \end{equation}
+    \begin{equation}
+      \theta_{(n)} = \theta_{(n-1)} + \Delta \theta
+      \label{eq:theta_n}
+    \end{equation}
 \end{enumerate}
 
-
-O acelerômetro e giroscópio entram em ação quando diferenças muito grandes entre os dados destes e dos encoders forem detectadas. A diferença limite para que essa detecção ocorra é determinada experimentalmente.
+%Nota-se que o acelerômetro e giroscópio entram em ação quando diferenças muito grandes entre os dados destes e dos encoders forem detectadas. As diferenças limites para que essa detecção ocorra são determinadas experimentalmente.
 

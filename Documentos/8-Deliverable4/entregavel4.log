@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  22 APR 2013 11:26
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  22 APR 2013 18:45
 entering extended mode
  %&-line parsing enabled.
 **entregavel4
@@ -686,6 +686,10 @@ Package: mathtools 2008/08/01 v1.06 mathematical typesetting tools (MH)
 \EQ_tag_box=\box63
 \g_EQ_temprow_int=\count141
 )
+(/usr/share/texmf-texlive/tex/latex/tools/bm.sty
+Package: bm 2004/02/26 v1.1c Bold Symbol Support (DPC/FMi)
+LaTeX Info: Redefining \bm on input line 204.
+)
 (/usr/share/texmf-texlive/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2005/04/14 v1.61803 publication quality tables
 \heavyrulewidth=\dimen144
@@ -708,39 +712,24 @@ Package: booktabs 2005/04/14 v1.61803 publication quality tables
 )
 (/usr/share/texmf-texlive/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen157
-) (./entregavel4.aux
-
-LaTeX Warning: Label `eq:velocidade' multiply defined.
-
-
-LaTeX Warning: Label `eq:velocidade' multiply defined.
-
-
-LaTeX Warning: Label `eq:velocidade' multiply defined.
-
-
-LaTeX Warning: Label `eq:v_acel' multiply defined.
-
-
-LaTeX Warning: Label `eq:v_acel' multiply defined.
-
-)
+) (./entregavel4.aux)
 \openout1 = `entregavel4.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 56.
-LaTeX Font Info:    ... okay on input line 56.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 56.
-LaTeX Font Info:    ... okay on input line 56.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 56.
-LaTeX Font Info:    ... okay on input line 56.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 56.
-LaTeX Font Info:    ... okay on input line 56.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 56.
-LaTeX Font Info:    ... okay on input line 56.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 56.
-LaTeX Font Info:    ... okay on input line 56.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 56.
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 57.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
@@ -758,7 +747,7 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 Package caption Info: Begin \AtBeginDocument code.
 Package caption3 Info: subfig package 1.2 or 1.3 is loaded.
-LaTeX Info: Redefining \subref on input line 56.
+LaTeX Info: Redefining \subref on input line 57.
 Package caption Info: float package is loaded.
 Package caption Info: longtable package is loaded.
  (/usr/share/texmf-texlive/tex/latex/caption/ltcaption.sty
@@ -777,41 +766,41 @@ Package color Info: Driver file: pdftex.def on input line 130.
 )
 \Hy@linkcounter=\count151
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 58.
-LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 58
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
+LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 59
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ztmcm.fd
 File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
 )
-LaTeX Font Info:    Try loading font information for OML+ztmcm on input line 58
+LaTeX Font Info:    Try loading font information for OML+ztmcm on input line 59
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omlztmcm.fd
 File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
 )
-LaTeX Font Info:    Try loading font information for OMS+ztmcm on input line 58
+LaTeX Font Info:    Try loading font information for OMS+ztmcm on input line 59
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsztmcm.fd
 File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
 )
-LaTeX Font Info:    Try loading font information for OMX+ztmcm on input line 58
+LaTeX Font Info:    Try loading font information for OMX+ztmcm on input line 59
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omxztmcm.fd
 File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 58.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 58.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 58.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 1253) in paragraph at lines 59--59
+Underfull \hbox (badness 1253) in paragraph at lines 60--60
 []\OT1/ptm/m/n/12 Terceiro en-treg[]avel apre-sen-tado []a Uni-dade Cur-
  []
 
@@ -1015,7 +1004,7 @@ File: ./figuras/hardware2_2.pdf Graphic file (type pdf)
 <use ./figuras/hardware2_2.pdf> [32] [33 <./figuras/hardware2_2.pdf>])
 (./teoria_mapa.tex [34]
 Cap\'{\i }tulo 4.
-<./figuras/robo/robo.png, id=142, 481.8pt x 361.35pt>
+<./figuras/robo/robo.png, id=142, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo.png Graphic file (type png)
 
 <use ./figuras/robo/robo.png> [35
@@ -1024,45 +1013,51 @@ File: ./figuras/robo/robo.png Graphic file (type png)
 <./figuras/robo/roda_encoder.png, id=146, 481.8pt x 361.35pt>
 File: ./figuras/robo/roda_encoder.png Graphic file (type png)
 
-<use ./figuras/robo/roda_encoder.png> [36 <./figuras/robo/robo.png (PNG copy)> 
-<./figuras/robo/roda_encoder.png (PNG copy)>] [37] [38] [39] [40] [41]
-Overfull \hbox (4.59846pt too wide) in paragraph at lines 272--273
+<use ./figuras/robo/roda_encoder.png> [36 <./figuras/robo/robo.png (PNG copy)>]
+[37 <./figuras/robo/roda_encoder.png (PNG copy)>] [38] [39] [40] [41] [42]
+Overfull \hbox (4.59846pt too wide) in paragraph at lines 286--287
 []\OT1/ptm/m/n/12 A ve-lo-ci-dade e acelera[][]ao an-gu-la-res po-dem ser tamb[
 ]em ob-ti-das por deriva[][]ao num[]erica,
  []
 
-[42] [43] [44]) (./entregavel4.bbl [45]) AED: lastpage setting LastPage
-[46
+[43]
+Overfull \hbox (7.31091pt too wide) in paragraph at lines 325--326
+[]\OT1/ptm/m/n/12 Para de-ter-mi-nar a ve-lo-ci-dade e des-lo-ca-mento li-ne-a-
+res a par-tir dos da-dos do ace-ler[]ometro,
+ []
+
+<./figuras/robo/robo_ir.png, id=178, 602.25pt x 451.6875pt>
+File: ./figuras/robo/robo_ir.png Graphic file (type png)
+
+<use ./figuras/robo/robo_ir.png> [44] [45 <./figuras/robo/robo_ir.png (PNG copy
+)>] [46]) (./entregavel4.bbl [47]) AED: lastpage setting LastPage [48
 
 ]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./entregavel4.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+(./entregavel4.aux) ) 
 Here is how much of TeX's memory you used:
- 6903 strings out of 495041
- 105709 string characters out of 1181897
- 185821 words of memory out of 3000000
- 9810 multiletter control sequences out of 15000+50000
+ 6983 strings out of 495041
+ 106721 string characters out of 1181897
+ 187052 words of memory out of 3000000
+ 9886 multiletter control sequences out of 15000+50000
  30332 words of font info for 69 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
  61i,14n,96p,1107b,388s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/public/
-amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/
-cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/shar
-e/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/texmf-texlive/fonts
-/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utm
-r8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on entregavel4.pdf (47 pages, 3648358 bytes).
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</us
+r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
+mf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/
+fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/
+usyr.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/
+texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/
+type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr
+i8a.pfb>
+Output written on entregavel4.pdf (49 pages, 3670342 bytes).
 PDF statistics:
- 219 PDF objects out of 1000 (max. 8388607)
+ 227 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 121 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 126 words of extra memory for PDF output out of 10000 (max. 10000000)
 
