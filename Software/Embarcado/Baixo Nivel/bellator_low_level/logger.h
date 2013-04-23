@@ -14,7 +14,8 @@
 //#	define logger_init(str)
 //#endif
 
-#define CRYSTAL12MHz
+//#define CRYSTAL12MHz
+#define CRYSTAL14745600Hz
 
 //#define ERROR
 //#define WARNING

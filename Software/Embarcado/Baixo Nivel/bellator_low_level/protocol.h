@@ -12,6 +12,7 @@
 
 // Comandos para controlar os motores
 #define ENGINES				0xB0
+#define ENGINES_ACK			0xB1
 
 // Comandos para envio dos dados dos sensores
 #define SENSORS				0xC0
@@ -24,9 +25,6 @@
 #define IR_R				0xC7
 
 #define TEST				0xD0
-
-// Byte que sinaliza fim do comando
-#define	END_CMD 			0xFE
 
 // Mascara para obter o valor do pwm e o sentido
 // o bit mais significativo representa o sentido,

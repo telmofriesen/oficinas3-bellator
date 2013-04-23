@@ -4,8 +4,8 @@
  *
  */
 /* global defines */
-#define CRYSTAL12MHz
-//#define CRYSTAL14745600Hz
+//#define CRYSTAL12MHz
+#define CRYSTAL14745600Hz
 #define CMD_BUFF_SIZE 32 // has to be a power of two
 #define DATA_BUFF_SIZE 256 // has to be a power of two
 
@@ -14,9 +14,17 @@
 #define SAMPLE_RATE_250HZ 2;
 #define SAMPLE_RATE_125HZ 4;
 #define SAMPLE_RATE_062HZ 8;
-#define SAMPLE_RATE_012HZ 4096;
+#define SAMPLE_RATE_008HZ 64;
+#define SAMPLE_RATE_001HZ 512;
 
-#define SAMPLE_RATE SAMPLE_RATE_125HZ
+#define SAMPLE_RATE SAMPLE_RATE_008HZ
+//#define MAX_COUNT_PER_SAMPLE 32 // 27
+//#define PD_GAIN 4 // 1/gain
+
+#define ENC_ST_INIT 0
+#define ENC_ST_AR 1
+#define ENC_ST_F 2
+#define ENC_ST_B 3
 
 #define IENABLE \
 		asm volatile ( "MRS		LR, SPSR" 		); /* copy SPSR_irq to LR */ \
@@ -60,6 +68,7 @@ static inline void sampler_init(void);
 static inline void get_ir_sensor_data(char * buff);
 static inline void get_encoders_count(short * left_encoder, short * right_encoder);
 static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel);
+//static inline void update_wheel_pwm(unsigned short left_wheel_count, unsigned short right_wheel_count);
 
 /* auxiliary functions */
 static inline void protocol_out_cmd(void);
@@ -73,7 +82,7 @@ struct cmd_buff {
 
 struct sensors_data {
 	short encoder_left, encoder_right;
-	char ir_r, ir_mr, ir_m, ir_ml, ir_l;
+	char ir_l, ir_ml, ir_m, ir_mr, ir_r;
 	char ax_h, ax_l, ay_h, ay_l, az_h, az_l, gx_h, gx_l, gy_h, gy_l, gz_h, gz_l;
 	unsigned short timestamp;
 };
@@ -81,17 +90,27 @@ static struct sensors_data* in_data;
 static struct sensors_data* out_data;
 
 /* global variables */
+// protocol
 static struct cmd_buff cmd_out = { 0, };
 static struct cmd_buff cmd_in = { 0, };
+
+// pulses in (encoder)
 volatile int encoder_count[2] = { 0, 0};
 static int sent_encoder_count[2] = { 0, 0};
-static int forward_r = 0, forward_l = 0;
+//static int forward_r = 0, forward_l = 0;
+static short encoder_r_st = ENC_ST_INIT, encoder_l_st = ENC_ST_INIT;
+
+// pwm out
+//static volatile short pwm_setpoint_r = 0, pwm_setpoint_l = 0;
+//static short pwm_currval_r = 0, pwm_currval_l = 0;
+
+// general
 unsigned volatile char send_data = 0;
 static struct sensors_data sensors_data_buff[DATA_BUFF_SIZE]; // Circular Buffer
 unsigned volatile short data_in_pos = 0; // last valid data in
 unsigned volatile short data_out_pos = 0; // last data sent
-static unsigned short timestamp = 0;
-volatile unsigned short tmp;
+static unsigned short timestamp = 0, checksum = 0;
+volatile unsigned short tmp1, tmp2;
 
 
 /**
@@ -129,41 +148,48 @@ int main(void){
 
 				out_data = &(sensors_data_buff[data_out_pos]);
 
+				cmd_out.buff[0] = SENSORS;
+
 				// encoders
-				cmd_out.buff[0] = (out_data->encoder_left >> 0x8) & 0xFF;
-				cmd_out.buff[1] = out_data->encoder_left & 0xFF;
-				cmd_out.buff[2] = (out_data->encoder_right >> 0x8) & 0xFF;
-				cmd_out.buff[3] = out_data->encoder_right & 0xFF;
+				cmd_out.buff[1] = (out_data->encoder_left >> 0x8) & 0xFF;
+				cmd_out.buff[2] = out_data->encoder_left & 0xFF;
+				cmd_out.buff[3] = (out_data->encoder_right >> 0x8) & 0xFF;
+				cmd_out.buff[4] = out_data->encoder_right & 0xFF;
 
 				// Infra Red
-				cmd_out.buff[4] = out_data->ir_l;
-				cmd_out.buff[5] = out_data->ir_ml;
-				cmd_out.buff[6] = out_data->ir_m;
-				cmd_out.buff[7] = out_data->ir_mr;
-				cmd_out.buff[8] = out_data->ir_r;
+				cmd_out.buff[5] = out_data->ir_l;
+				cmd_out.buff[6] = out_data->ir_ml;
+				cmd_out.buff[7] = out_data->ir_m;
+				cmd_out.buff[8] = out_data->ir_mr;
+				cmd_out.buff[9] = out_data->ir_r;
 
 				// IMU data
-				cmd_out.buff[9] = out_data->ax_h;
-				cmd_out.buff[10] = out_data->ax_l;
-				cmd_out.buff[11] = out_data->ay_h;
-				cmd_out.buff[12] = out_data->ay_l;
-				cmd_out.buff[13] = out_data->az_h;
-				cmd_out.buff[14] = out_data->az_l;
-				cmd_out.buff[15] = out_data->gx_h;
-				cmd_out.buff[16] = out_data->gx_l;
-				cmd_out.buff[17] = out_data->gy_h;
-				cmd_out.buff[18] = out_data->gy_l;
-				cmd_out.buff[19] = out_data->gz_h;
-				cmd_out.buff[20] = out_data->gz_l;
+				cmd_out.buff[10] = out_data->ax_h;
+				cmd_out.buff[11] = out_data->ax_l;
+				cmd_out.buff[12] = out_data->ay_h;
+				cmd_out.buff[13] = out_data->ay_l;
+				cmd_out.buff[14] = out_data->az_h;
+				cmd_out.buff[15] = out_data->az_l;
+				cmd_out.buff[16] = out_data->gx_h;
+				cmd_out.buff[17] = out_data->gx_l;
+				cmd_out.buff[18] = out_data->gy_h;
+				cmd_out.buff[19] = out_data->gy_l;
+				cmd_out.buff[20] = out_data->gz_h;
+				cmd_out.buff[21] = out_data->gz_l;
 
 				// Timestamp
-				cmd_out.buff[21] = (out_data->timestamp >> 8) & 0xFF;
-				cmd_out.buff[22] = out_data->timestamp & 0xFF;
+				cmd_out.buff[22] = (out_data->timestamp >> 8) & 0xFF;
+				cmd_out.buff[23] = out_data->timestamp & 0xFF;
 
-				// end cmd
-				cmd_out.buff[23] = END_CMD;
-				cmd_out.buff[24] = '\n';
-				cmd_out.i = 25;
+				for (short i = 0; i < 24; i++) {
+					checksum += cmd_out.buff[i];
+				}
+
+				// checksum
+				cmd_out.buff[24] = (checksum >> 8) & 0xFF;
+				cmd_out.buff[25] = checksum & 0xFF;
+
+				cmd_out.i = 26;
 
 				protocol_out_cmd();
 			}
@@ -418,7 +444,7 @@ static inline void protocol_init(void){
 	cmd_out.i = 0;
 	cmd_in.i = 0;
 
-	tmp = U1IIR;   // Read IrqID - Required to Get Interrupts Started
+	tmp1 = U1IIR;   // Read IrqID - Required to Get Interrupts Started
 	U1IER = 1;       // Enable UART1 RX (and THRE Interrupts)
 
 	log_string_debug("<< protocol_init\n");
@@ -466,10 +492,10 @@ static void protocol_in(void){
 	log_string_debug(">> protocol_in\n");
 
 	// Repeat while there is at least one interrupt source.
-	while (((tmp = U1IIR) & 0x01) == 0) {
-		switch (tmp & 0x0E) {
+	while (((tmp1 = U1IIR) & 0x01) == 0) {
+		switch (tmp1 & 0x0E) {
 		case 0x06: // Receive Line Status
-			tmp = U1LSR; // Just clear the interrupt source
+			tmp1 = U1LSR; // Just clear the interrupt source
 			break;
 
 		case 0x04: // Receive Data Available
@@ -478,12 +504,44 @@ static void protocol_in(void){
 
 			if (cmd_in.buff[cmd_in.i] == END_CMD) {
 				// ENGINES
-				if (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)] == ENGINES) {
+				if (cmd_in.buff[(cmd_in.i-5) & (CMD_BUFF_SIZE-1)] == ENGINES) {
 					log_string_debug("ENGINES\n");
 
-					set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]),
-								(unsigned short) (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]));
+					// check checksum
+					short checksum = 0;
+					for (short i = 5; i >= 3; i--) {
+						checksum += cmd_in.buff[(cmd_in.i-i) & (CMD_BUFF_SIZE-1)];
+					}
 
+					// checksum ok
+					if ((cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == (checksum >> 8) & 0xFF)
+						&& (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == checksum & 0xFF)) {
+
+						set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-4) & (CMD_BUFF_SIZE-1)]),
+									(unsigned short) (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]));
+
+						cmd_out.buff[0] = ENGINES_ACK;
+
+						// value
+						cmd_out.buff[1] = (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]);
+						cmd_out.buff[2] = (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]);
+
+						checksum = 0;
+						for (short i = 0; i < 3; i++) {
+							checksum += cmd_out.buff[i];
+						}
+
+						// checksum
+						cmd_out.buff[3] = (checksum >> 8) & 0xFF;
+						cmd_out.buff[4] = checksum & 0xFF;
+
+						cmd_out.i = 5;
+
+						protocol_out_cmd();
+					}
+
+					cmd_in.buff[(cmd_in.i-5) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i-4) & (CMD_BUFF_SIZE-1)] = 0;
 					cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)] = 0;
 					cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] = 0;
 					cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] = 0;
@@ -502,15 +560,52 @@ static void protocol_in(void){
 				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == TEST) {
 					log_string_debug("TEST\n");
 
-					short left, right;
-					get_encoders_count(&left, &right);
-					cmd_out.buff[0] = (left >> 0x8) & 0xFF; ;
-					cmd_out.buff[1] = left & 0xFF;
-					cmd_out.buff[2] = (right >> 0x8) & 0xFF; ;
-					cmd_out.buff[3] = right & 0xFF;
-					cmd_out.buff[4] = END_CMD;
-					cmd_out.buff[5] = '\n';
-					cmd_out.i = 6;
+					short checksum = 0;
+
+					out_data = &(sensors_data_buff[data_out_pos]);
+
+					cmd_out.buff[0] = SENSORS;
+
+					// encoders
+					cmd_out.buff[1] = (out_data->encoder_left >> 0x8) & 0xFF;
+					cmd_out.buff[2] = out_data->encoder_left & 0xFF;
+					cmd_out.buff[3] = (out_data->encoder_right >> 0x8) & 0xFF;
+					cmd_out.buff[4] = out_data->encoder_right & 0xFF;
+
+					// Infra Red
+					cmd_out.buff[5] = out_data->ir_l;
+					cmd_out.buff[6] = out_data->ir_ml;
+					cmd_out.buff[7] = out_data->ir_m;
+					cmd_out.buff[8] = out_data->ir_mr;
+					cmd_out.buff[9] = out_data->ir_r;
+
+					// IMU data
+					cmd_out.buff[10] = out_data->ax_h;
+					cmd_out.buff[11] = out_data->ax_l;
+					cmd_out.buff[12] = out_data->ay_h;
+					cmd_out.buff[13] = out_data->ay_l;
+					cmd_out.buff[14] = out_data->az_h;
+					cmd_out.buff[15] = out_data->az_l;
+					cmd_out.buff[16] = out_data->gx_h;
+					cmd_out.buff[17] = out_data->gx_l;
+					cmd_out.buff[18] = out_data->gy_h;
+					cmd_out.buff[19] = out_data->gy_l;
+					cmd_out.buff[20] = out_data->gz_h;
+					cmd_out.buff[21] = out_data->gz_l;
+
+					// Timestamp
+					cmd_out.buff[22] = (out_data->timestamp >> 8) & 0xFF;
+					cmd_out.buff[23] = out_data->timestamp & 0xFF;
+
+					for (short i = 0; i < 24; i++) {
+						checksum += cmd_out.buff[i];
+					}
+
+					// checksum
+					cmd_out.buff[24] = (checksum >> 8) & 0xFF;
+					cmd_out.buff[25] = checksum & 0xFF;
+
+					cmd_out.i = 26;
 
 					protocol_out_cmd();
 
@@ -523,11 +618,11 @@ static void protocol_in(void){
 			break;
 
 		case 0x02: // THRE Interrupt, transmit interrupt
-			U1THR = tmp; // Just clear the interrupt source
+			U1THR = tmp1; // Just clear the interrupt source
 			break;
 
 		case 0x00: // Modem Interrupt
-			tmp = U1MSR; // Just clear the interrupt source
+			tmp1 = U1MSR; // Just clear the interrupt source
 			break;
 
 		default:
@@ -552,36 +647,80 @@ void pulse_in(void) {
 	log_string_debug("p\n");
 	//log_string_debug(">> pulse_in\n");
 
-	tmp = T2IR;
+	tmp1 = T2IR;
+	tmp2 = EXTINT;
 
-	// pulses in int
-	if (tmp & (0x1 << 4)) { //CAP2.0 left encoder
-		//log_string_debug("FIQ2\n");
-		forward_l--;
-		T2IR |= 0x1 << 4; // reset CAP2.0
+	// AR - channel A rising edge
+	// AF - channel A falling edge
+	// BR - channel B rising edge
+	if ((tmp1 & (0x1 << 4)) || (tmp2 & 0x1 << 0)) { // left encoder
+		switch (encoder_l_st) {
+		case ENC_ST_INIT:
+			// CAP2.0
+			if (tmp1 & (0x1 << 4)) { // AR event received
+				encoder_l_st = ENC_ST_AR;
+				T2CCR |= 0x6 << 0; // capture and interrupt on CAP2.0 falling edge
+				T2IR |= 0x1 << 4; // reset CAP2.0
+			}
+			// EINT0
+			else if (tmp2 & 0x1 << 0) {
+				EXTINT |= 0x1 << 0; // reset EINT0
+			}
+			break;
+		case ENC_ST_AR:
+			// EINT0
+			if (tmp2 & 0x1 << 0) { // BR event received
+				// Forward
+				encoder_count[0]++;
+				encoder_l_st = ENC_ST_INIT;
+				T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
+				EXTINT |= 0x1 << 0; // reset EINT0
+			}
+			// CAP2.0
+			else if (tmp1 & (0x1 << 4)) { // AF event received
+				// Backwards
+				encoder_count[0]--;
+				encoder_l_st = ENC_ST_INIT;
+				T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
+				T2IR |= 0x1 << 4; // reset CAP2.0
+			}
+			break;
+		}
 	}
-	if (tmp & (0x1 << 5)) { //CAP2.1 right encoder
-		//log_string_debug("FIQ3\n");
-		forward_r++;
-		if (forward_r > 0)
-			encoder_count[1]++;
-		else
-			encoder_count[1]--;
-		T2IR |= 0x1 << 5; // reset CAP2.1
-	}
-	if (tmp & (0x1 << 6)) { //CAP2.2 right encoder
-		//log_string_debug("FIQ4\n");
-		forward_r--;
-		T2IR |= 0x1 << 6; // reset CAP2.2
-	}
-	if (EXTINT & 0x1 << 0) { // EINT0 left encoder
-		//log_string_debug("FIQ1\n");
-		forward_l++;
-		if (forward_l > 0)
-			encoder_count[0]++;
-		else
-			encoder_count[0]--;
-		EXTINT |= 0x1 << 0; // reset EINT0
+	
+	if ((tmp1 & (0x1 << 6)) || (tmp1 & (0x1 << 5))) { // right encoder
+		switch (encoder_r_st) {
+		case ENC_ST_INIT:
+			// CAP2.2
+			if (tmp1 & (0x1 << 6)) { // AR event received
+				encoder_r_st = ENC_ST_AR;
+				T2CCR |= 0x6 << 6; // capture and interrupt on CAP2.2 falling edge
+				T2IR |= 0x1 << 6; // reset CAP2.2
+			}
+			// CAP2.1
+			else if (tmp1 & (0x1 << 5)) {
+				T2IR |= 0x1 << 5; // reset CAP2.1
+			}
+			break;
+		case ENC_ST_AR:
+			// CAP2.1
+			if (tmp1 & (0x1 << 5)) { // BR event received
+				// Forward
+				encoder_count[1]++;
+				encoder_r_st = ENC_ST_INIT;
+				T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
+				T2IR |= 0x1 << 5; // reset CAP2.1
+			}
+			// CAP2.2
+			else if (tmp1 & (0x1 << 6)) { // AF event received
+				// Backwards
+				encoder_count[1]--;
+				encoder_r_st = ENC_ST_INIT;
+				T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
+				T2IR |= 0x1 << 6; // reset CAP2.2
+			}
+			break;
+		}
 	}
 
 	//log_string_debug("<< pulse_in\n");
@@ -612,8 +751,8 @@ void pulse_in(void) {
  * data_in_pos -
  */
 static void sample(void) {
-	tmp = T3IR;
-	if(tmp & 0x1) { // MAT3.0
+	tmp1 = T3IR;
+	if(tmp1 & 0x1) { // MAT3.0
 		log_string_debug(">> sample\n");
 
 		log_string_debug("IENABLE\n");
@@ -644,6 +783,9 @@ static void sample(void) {
 		get_ir_sensor_data(&(in_data->ir_l));
 
 		in_data->timestamp = timestamp++;
+
+		// update PWM
+		//update_wheel_pwm(in_data->encoder_left, in_data->encoder_right);
 
 		log_string_debug("IDISABLE\n");
 		IDISABLE
@@ -726,17 +868,17 @@ static inline void get_encoders_count(short * left_encoder, short * right_encode
  */
 static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel) {
 
-//	if (left_wheel > 8)
-//		left_wheel -= 8;
-//	else
-//		left_wheel = 0;
+	if (left_wheel > 12)
+		left_wheel -= 12;
+	else
+		left_wheel = 0;
 
 	if (right_wheel & PWM_DIR) { // Forward
-		T0MR2 = 256;
+		T0MR0 = 256;
 		T0MR1 = 256 - (right_wheel & ~PWM_DIR)*2;
 	} else { // Backwards
 		T0MR1 = 256;
-		T0MR2 = 256 - right_wheel*2;
+		T0MR0 = 256 - right_wheel*2;
 	}
 
 	if (left_wheel & PWM_DIR) { // Forward
@@ -747,6 +889,31 @@ static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right
 		T1MR0 = 256 - left_wheel*2;
 	}
 }
+
+/**
+ * Set the output pwm value
+ */
+//static inline void update_wheel_pwm(unsigned short left_wheel_count, unsigned short right_wheel_count) {
+//
+//	pwm_currval_l = pwm_currval_l + ((pwm_setpoint_l - ((left_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/PD_GAIN); // curr_val + erro * PD
+//	pwm_currval_r = pwm_currval_r + ((pwm_setpoint_r - ((right_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/PD_GAIN);
+//
+//	if (pwm_currval_r > 0) { // Forward
+//		T0MR2 = 256;
+//		T0MR1 = 256 - pwm_currval_r;
+//	} else { // Backwards
+//		T0MR1 = 256;
+//		T0MR2 = 256 + pwm_currval_r;
+//	}
+//
+//	if (pwm_currval_l > 0) { // Forward
+//		T1MR0 = 256;
+//		T1MR1 = 256 - pwm_currval_l;
+//	} else { // Backwards
+//		T1MR1 = 256;
+//		T1MR0 = 256 + pwm_currval_l;
+//	}
+//}
 
 /**
  *
