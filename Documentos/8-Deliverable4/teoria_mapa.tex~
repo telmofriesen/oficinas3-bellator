@@ -358,11 +358,11 @@ O algoritmo proposto para determinação da posição do robô em cada instante 
   
   \item A partir das equações \ref{eq:P_x} e \ref{eq:P_y} explicitadas abaixo, calcular a nova posição ($\overrightarrow{P}_{(n)}$) do robô, e a partir da equação \ref{eq:theta_n} calcular o novo ângulo $\theta_{(n)}$ do robô. Decompondo-se o vetor posição ($\overrightarrow{P}$) em suas componentes $P_x$ e $P_y$, tem-se que no intervalo discreto $n$:
     \begin{equation}
-      P_{x (n)} = P_{x (n-1)} + \Delta x_{(n)} \cdot \cos{(\theta_{(n-1)})}
+      P_{x (n)} = P_{x (n-1)} + \Delta x \cdot \cos{(\theta_{(n-1)})}
       \label{eq:P_x}
     \end{equation}
     \begin{equation}
-      P_{y (n)} = P_{y (n-1)} + \Delta x_{(n)} \cdot \sin{(\theta_{(n-1)})}
+      P_{y (n)} = P_{y (n-1)} + \Delta x \cdot \sin{(\theta_{(n-1)})}
       \label{eq:P_y}
     \end{equation}
     \begin{equation}
@@ -376,7 +376,7 @@ O algoritmo proposto para determinação da posição do robô em cada instante 
 
 \section{Sensores infra-vermelhos}
 
-Os sensores infra-vermelhos são usados para detectar obstáculos próximos ao robô (de 30 a 150 cm de distância). Na Figura \ref{fig:robo_ir} está explicitada uma representação de um sensor infra-vermelho detectando um obstáculo. Na figura estão presentes os nomes das variáveis utilizadas nos cálculos. Como já explicado no começo do capítulo, o sistema de coordenadas utilizado nesse projeto possui o eixo Y invertido. Portanto, os ângulos crescem no sentido horário e não no anti-horário como seria o convencional. Por essa razão, o ângulo ``-theta(n)'' da figura -- que nesse caso específico está em sentido anti-horário em relação ao eixo X (horizontal) do mapa -- é negativo. O ângulo ``thetaIR'' é medido com com relação ao eixo X do robô (não do mapa). Na figura ele é positivo pois está em sentido horário em relação a esse eixo.
+Os sensores infra-vermelhos são usados para detectar obstáculos próximos ao robô (de 30 a 150 cm de distância). Na Figura \ref{fig:robo_ir} está explicitada uma representação de um sensor infra-vermelho detectando um obstáculo. Na figura estão presentes os nomes das variáveis utilizadas nos cálculos. Como já explicado no começo do capítulo, o sistema de coordenadas utilizado nesse projeto possui o eixo Y invertido. Portanto, os ângulos crescem no sentido horário e não no anti-horário como seria o convencional. Por essa razão, o ângulo ``-theta(n)'' da figura -- que nesse caso específico está em sentido anti-horário em relação ao eixo X (horizontal) do mapa -- é negativo. O ângulo ``thetaIR'' é medido com com relação ao eixo X do robô (e não do mapa), e na figura ele é positivo pois está em sentido horário em relação a esse eixo.
 
 \begin{figure}[H]
   \centering
@@ -408,7 +408,7 @@ O vetor $\overrightarrow{P_C}$ pode ser facilmente determinado de acordo com a e
   \label{eq:IR-P_C}
 \end{equation}
 
-O vetor $\overrightarrow{P_1}$ é o vetor que vai do centro de movimento do robô até o sensor infra-vermelho (informação obtida das configurações iniciais do robô), rotacionado pelo ângulo em que o robô está na última posição. Sendo $\overrightarrow{P_{IR}}$ o vetor que vai do centro do robô até o sensor, e $\theta_{(n)}$ o ângulo em que o robô está orientado na última posição (intervalo discreto $n$):
+O vetor $\overrightarrow{P_1}$ é o vetor que vai do centro de movimento do robô até o sensor infra-vermelho. Sendo $\overrightarrow{P_{IR}}$ que vai do centro do robô até o sensor (este vetor é especificado nas configurações iniciais, supondo que o robô não esteja rotacionado), e $\theta_{(n)}$ o ângulo em que o robô está orientado em sua última posição (instante discreto $n$):
 
 
 \begin{equation}
@@ -421,7 +421,7 @@ O vetor $\overrightarrow{P_1}$ é o vetor que vai do centro de movimento do rob�
 \end{equation}
 
 
-O vetor $\overrightarrow{P_2}$ é um vetor com magnitude igual à distância detectada pelo sensor, e ângulo igual a: ângulo relativo do sensor no robô (informação obtida das configurações iniciais) somado com o ângulo em que o robô está na última posição. Sendo $d$ a distãncia detectada pelo sensor infra-vermelho, $\theta_{IR}$ o ângulo em que o sensor infra-vermelho está posicionado no robô, e tendo $\theta_{(n)}$ o mesmo significado que na equação anterior:
+O vetor $\overrightarrow{P_2}$ é o vetor que vai do sensor infra-vermelho até o obstáculo. Sendo $d$ a distãncia detectada pelo sensor, $\theta_{IR}$ o ângulo em que o sensor infra-vermelho está posicionado relativamente ao robô (este ângulo é especificado nas configurações iniciais, supondo que o robô não esteja rotacionado), e tendo $\theta_{(n)}$ o mesmo significado que na equação anterior:
 
 \begin{equation}
   |\overrightarrow{P_2}| = d
