@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  22 APR 2013 18:45
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  23 APR 2013 21:13
 entering extended mode
  %&-line parsing enabled.
 **entregavel4
@@ -1026,11 +1026,11 @@ Overfull \hbox (7.31091pt too wide) in paragraph at lines 325--326
 res a par-tir dos da-dos do ace-ler[]ometro,
  []
 
-<./figuras/robo/robo_ir.png, id=178, 602.25pt x 451.6875pt>
+[44] <./figuras/robo/robo_ir.png, id=181, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo_ir.png Graphic file (type png)
 
-<use ./figuras/robo/robo_ir.png> [44] [45 <./figuras/robo/robo_ir.png (PNG copy
-)>] [46]) (./entregavel4.bbl [47]) AED: lastpage setting LastPage [48
+<use ./figuras/robo/robo_ir.png> [45] [46 <./figuras/robo/robo_ir.png (PNG copy
+)>]) (./entregavel4.bbl [47]) AED: lastpage setting LastPage [48
 
 ]
 +-------------------------------------------------------------------+
@@ -1055,7 +1055,7 @@ usyr.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/
 texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/
 type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr
 i8a.pfb>
-Output written on entregavel4.pdf (49 pages, 3670342 bytes).
+Output written on entregavel4.pdf (49 pages, 3670568 bytes).
 PDF statistics:
  227 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

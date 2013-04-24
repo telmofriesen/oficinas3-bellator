@@ -388,7 +388,7 @@ Os sensores infra-vermelhos são usados para detectar obstáculos próximos ao r
 Para obter a posição em que um obstáculo detectado está no mapa, primeiramente deve-se obter a distância entre o obstáculo e o sensor infra-vermelho. Como explicitado em \cite{bellator_2012}, o valor $x$ recebido em 1 byte do sensor pode ser convertido para a distãncia $d$ em centímetros pela fórmula (obtida por interpolação polinomial):
 
 \begin{equation}
-  d = 3,6404 \cdot 10^{-7} x^4 - 2,4435 \cdot 10^{-4} x^3 + 6,0732 \cdot 10^{-2} x^2 - 6,8962 x + 339,361
+  d = 3,6404 \cdot 10^{-7} x^3 - 2,4435 \cdot 10^{-4} x^3 + 6,0732 \cdot 10^{-2} x^2 - 6,8962 x + 339,361
   \label{eq:IR_dist}
 \end{equation}
 
