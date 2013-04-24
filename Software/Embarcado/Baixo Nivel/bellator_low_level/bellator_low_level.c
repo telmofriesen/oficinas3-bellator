@@ -18,13 +18,16 @@
 #define SAMPLE_RATE_001HZ 512;
 
 #define SAMPLE_RATE SAMPLE_RATE_008HZ
-//#define MAX_COUNT_PER_SAMPLE 32 // 27
-//#define PD_GAIN 4 // 1/gain
 
 #define ENC_ST_INIT 0
 #define ENC_ST_AR 1
 #define ENC_ST_F 2
 #define ENC_ST_B 3
+
+#define PROT_ST_WAITING 0
+#define PROT_ST_SYNC 1
+#define PROT_ST_ENGINES 2
+#define PROT_ST_TEST 3
 
 #define IENABLE \
 		asm volatile ( "MRS		LR, SPSR" 		); /* copy SPSR_irq to LR */ \
@@ -97,12 +100,8 @@ static struct cmd_buff cmd_in = { 0, };
 // pulses in (encoder)
 volatile int encoder_count[2] = { 0, 0};
 static int sent_encoder_count[2] = { 0, 0};
-//static int forward_r = 0, forward_l = 0;
 static short encoder_r_st = ENC_ST_INIT, encoder_l_st = ENC_ST_INIT;
-
-// pwm out
-//static volatile short pwm_setpoint_r = 0, pwm_setpoint_l = 0;
-//static short pwm_currval_r = 0, pwm_currval_l = 0;
+static short protocol_st = PROT_ST_WAITING;
 
 // general
 unsigned volatile char send_data = 0;
@@ -502,65 +501,27 @@ static void protocol_in(void){
 		case 0x0C: // Character Time-Out
 			cmd_in.buff[cmd_in.i] = U1RBR;
 
-			if (cmd_in.buff[cmd_in.i] == END_CMD) {
-				// ENGINES
-				if (cmd_in.buff[(cmd_in.i-5) & (CMD_BUFF_SIZE-1)] == ENGINES) {
-					log_string_debug("ENGINES\n");
+			switch (protocol_st) {
+			case PROT_ST_WAITING:
 
-					// check checksum
-					short checksum = 0;
-					for (short i = 5; i >= 3; i--) {
-						checksum += cmd_in.buff[(cmd_in.i-i) & (CMD_BUFF_SIZE-1)];
-					}
+				switch (cmd_in.buff[cmd_in.i]) {
+				case SYNC:
+					//protocol_st = PROT_ST_SYNC;
 
-					// checksum ok
-					if ((cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] == (checksum >> 8) & 0xFF)
-						&& (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == checksum & 0xFF)) {
-
-						set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-4) & (CMD_BUFF_SIZE-1)]),
-									(unsigned short) (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]));
-
-						cmd_out.buff[0] = ENGINES_ACK;
-
-						// value
-						cmd_out.buff[1] = (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]);
-						cmd_out.buff[2] = (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)]);
-
-						checksum = 0;
-						for (short i = 0; i < 3; i++) {
-							checksum += cmd_out.buff[i];
-						}
-
-						// checksum
-						cmd_out.buff[3] = (checksum >> 8) & 0xFF;
-						cmd_out.buff[4] = checksum & 0xFF;
-
-						cmd_out.i = 5;
-
-						protocol_out_cmd();
-					}
-
-					cmd_in.buff[(cmd_in.i-5) & (CMD_BUFF_SIZE-1)] = 0;
-					cmd_in.buff[(cmd_in.i-4) & (CMD_BUFF_SIZE-1)] = 0;
-					cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)] = 0;
-					cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] = 0;
-					cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] = 0;
-					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
-				}
-				// SYNC
-				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == SYNC) {
 					log_string_debug("SYNC\n");
-
 					send_data = 1;
-
-					cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] = 0;
 					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
-				}
 
-				else if (cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == TEST) {
+					//protocol_st = PROT_ST_WAITING;
+					break;
+				case ENGINES:
+					protocol_st = PROT_ST_ENGINES;
+					break;
+				case TEST:
+					//protocol_st = PROT_ST_TEST;
+
 					log_string_debug("TEST\n");
-
-					short checksum = 0;
+					short checksum_test = 0;
 
 					out_data = &(sensors_data_buff[data_out_pos]);
 
@@ -598,20 +559,74 @@ static void protocol_in(void){
 					cmd_out.buff[23] = out_data->timestamp & 0xFF;
 
 					for (short i = 0; i < 24; i++) {
-						checksum += cmd_out.buff[i];
+						checksum_test += cmd_out.buff[i];
 					}
 
 					// checksum
-					cmd_out.buff[24] = (checksum >> 8) & 0xFF;
-					cmd_out.buff[25] = checksum & 0xFF;
-
+					cmd_out.buff[24] = (checksum_test >> 8) & 0xFF;
+					cmd_out.buff[25] = checksum_test & 0xFF;
 					cmd_out.i = 26;
 
 					protocol_out_cmd();
 
+					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
+
+					//protocol_st = PROT_ST_WAITING;
+					break;
+				}
+
+				break;
+			//case PROT_ST_SYNC:
+				//break;
+			case PROT_ST_ENGINES:
+				// wait until complete command was received
+				if (cmd_in.buff[(cmd_in.i-4) & (CMD_BUFF_SIZE-1)] == ENGINES) {
+					log_string_debug("ENGINES\n");
+
+					// check checksum
+					short checksum_engines = 0;
+					for (short i = 4; i >= 2; i--) {
+						checksum_engines += cmd_in.buff[(cmd_in.i-i) & (CMD_BUFF_SIZE-1)];
+					}
+
+					// checksum ok
+					if ((cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == ((checksum_engines >> 8) & 0xFF))
+						&& (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] == (checksum_engines & 0xFF))) {
+
+						set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]),
+									(unsigned short) (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]));
+
+						cmd_out.buff[0] = ENGINES_ACK;
+
+						// value
+						cmd_out.buff[1] = (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]);
+						cmd_out.buff[2] = (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]);
+
+						checksum_engines = 0;
+						for (short i = 0; i < 3; i++) {
+							checksum_engines += cmd_out.buff[i];
+						}
+
+						// checksum
+						cmd_out.buff[3] = (checksum_engines >> 8) & 0xFF;
+						cmd_out.buff[4] = checksum_engines & 0xFF;
+
+						cmd_out.i = 5;
+
+						protocol_out_cmd();
+					}
+
+					cmd_in.buff[(cmd_in.i-4) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)] = 0;
+					cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)] = 0;
 					cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] = 0;
 					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
+
+					protocol_st = PROT_ST_WAITING;
 				}
+				break;
+			//case PROT_ST_TEST:
+				//break;
 			}
 
 			cmd_in.i = (cmd_in.i + 1) & (CMD_BUFF_SIZE-1);
