@@ -358,11 +358,11 @@ O algoritmo proposto para determinação da posição do robô em cada instante 
   
   \item A partir das equações \ref{eq:P_x} e \ref{eq:P_y} explicitadas abaixo, calcular a nova posição ($\overrightarrow{P}_{(n)}$) do robô, e a partir da equação \ref{eq:theta_n} calcular o novo ângulo $\theta_{(n)}$ do robô. Decompondo-se o vetor posição ($\overrightarrow{P}$) em suas componentes $P_x$ e $P_y$, tem-se que no intervalo discreto $n$:
     \begin{equation}
-      P_{x (n)} = P_{x (n-1)} + \Delta x \cdot \cos{(\theta_{(n-1)})}
+      P_{x (n)} = P_{x (n-1)} + \Delta x_{(n)} \cdot \cos{(\theta_{(n-1)})}
       \label{eq:P_x}
     \end{equation}
     \begin{equation}
-      P_{y (n)} = P_{y (n-1)} + \Delta x \cdot \sin{(\theta_{(n-1)})}
+      P_{y (n)} = P_{y (n-1)} + \Delta x_{(n)} \cdot \sin{(\theta_{(n-1)})}
       \label{eq:P_y}
     \end{equation}
     \begin{equation}
@@ -381,14 +381,14 @@ Os sensores infra-vermelhos são usados para detectar obstáculos próximos ao r
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth, keepaspectratio]{./figuras/robo/robo_ir.png}
-  \caption{Representação básica do robô e um sensor infra-vermelho detectando um obstáculo (visão superior).}
+  \caption{Representação do robô e um sensor infra-vermelho detectando um obstáculo (visão superior).}
   \label{fig:robo_ir}
 \end{figure}
 
 Para obter a posição em que um obstáculo detectado está no mapa, primeiramente deve-se obter a distância entre o obstáculo e o sensor infra-vermelho. Como explicitado em \cite{bellator_2012}, o valor $x$ recebido em 1 byte do sensor pode ser convertido para a distãncia $d$ em centímetros pela fórmula (obtida por interpolação polinomial):
 
 \begin{equation}
-  d = 3,6404 \cdot 10^{-7} x^3 - 2,4435 \cdot 10^{-4} x^3 + 6,0732 \cdot 10^{-2} x^2 - 6,8962 x + 339,361
+  d = 3,6404 \cdot 10^{-7} x^4 - 2,4435 \cdot 10^{-4} x^3 + 6,0732 \cdot 10^{-2} x^2 - 6,8962 x + 339,361
   \label{eq:IR_dist}
 \end{equation}
 
@@ -432,6 +432,29 @@ O vetor $\overrightarrow{P_2}$ é um vetor com magnitude igual à distância det
   \label{eq:IR-P_2_fase}
 \end{equation}
 
+
+\section{Medidas do robô}
+
+Na Tabela \ref{tab:medidas_robo} estão presentes as medidas do robô.
+
+\begin{table}[h]
+  \caption{Medidas do robô.}
+  \centering
+  \begin{tabular}{l|l}
+    \toprule
+    \textbf{Medida} & \textbf{Valor} \\
+    \midrule
+    Comprimento da carcaça & 50 cm \\ \hline
+    Largura da carcaça & 40 cm \\ \hline
+    Distância entre a parte da frente do robô e os eixos das rodas & 14 cm \\ \hline
+    Largura de cada roda & 4 cm \\ \hline
+    Circunferência de cada roda & 64 cm \\ \hline
+    Circunferência do eixo de cada roda & 7,5 cm \\ \hline
+    Circunferência do eixo de cada encoder & 22 cm \\ 
+    \bottomrule
+  \end{tabular}
+  \label{tab:medidas_robo}
+\end{table}
 
 %Em termos matemáticos:
 %\begin{equation}
