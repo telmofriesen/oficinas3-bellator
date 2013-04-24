@@ -1,0 +1,37 @@
+## Comandos para carregar o kernel via rede na TS ##
+
+#OBS: Iniciar apache2 e nfs antes de executar os comandos abaixo!
+#Carregar kernel
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/part2.dd
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/kernel/zImage-2.6.29-ts
+
+#Boot via NFS
+exec -b 0x00218000 -l 0x002980000 -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 init=/linuxrc root=/dev/nfs rw"
+exec -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 init=/linuxrc root=/dev/nfs rw"
+
+
+
+
+exec -r 0x00600000 -s 0x00070850 -b 0x00218000 -l 0x000C0000 -c "console=ttyAM0,115200 root=/dev/ram0 init=/linuxrc rw"
+exec -r 0x0080_0000 -b 0x00218000 -l 0x000C0000 -c "console=ttyAM0,115200 root=/dev/ram0 init=/linuxrc rw"
+
+exec -b 0x00218000 -l 0x164BB3 -c "console=ttyAM0,115200 ip=dhcp nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4"
+
+ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0:::
+
+exec -b 0x00218000 -l 0x164BB3 -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 init=/bin/bash"
+
+
+#Carregar initrd
+load -r -v -b 0x00600000 -m http -h 192.168.10.36 /TS/ts7260-sdcard-initrd-1.03.gz
+
+
+exec -r 0x00600000 -s 0x00100000 -b 0x00218000 -l 0x002980000 -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 root=/dev/ram0 init=/linuxrc rw"
+
+exec -r 0x00600000 -b 0x00218000 -l 0x002980000 -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 root=/dev/ram0 init=/linuxrc rw"
+
+
+
+
+
+

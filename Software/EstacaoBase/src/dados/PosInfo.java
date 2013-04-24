@@ -27,6 +27,10 @@ public class PosInfo {
         this.timestamp = timestamp;
     }
     
+    public String getString(){
+        return String.format("%d %d %f %d", ponto.x, ponto.y, angulo, timestamp);
+    }
+    
     public PosInfo copy(){
         return new PosInfo(ponto.copy(), angulo, timestamp);
     }

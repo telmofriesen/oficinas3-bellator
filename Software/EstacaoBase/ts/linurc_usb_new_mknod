@@ -1,0 +1,7 @@
+mknod dev/ttyAM0 c 204 16
+mknod dev/rtc0 c 254 0
+ln -s rtc0 dev/rtc
+mknod dev/mmcblk0 b 179 0
+mknod dev/mmcblk0p1 b 179 1
+mknod dev/sda b 8 0
+mknod dev/sda1 b 8 1

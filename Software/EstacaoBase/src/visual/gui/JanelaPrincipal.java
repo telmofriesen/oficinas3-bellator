@@ -71,6 +71,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private ClientConnector connector;
     private JanelaSensores janelaSensores;
     private JanelaReposicionamento janelaReposicionamento;
+    private JanelaAvancado janelaAvancado;
     private ConnectorListener connectorListener;
     private GerenciadorSensoresListener infoListenerControleSensores;
     private CameraInfoListener cameraInfoListener;
@@ -101,14 +102,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         maxSpeedSlider.setFloatValue(1);
         maxSpeedTextField.setText(String.format("%.1f", maxSpeedSlider.getFloatValue()));
 
-        ClientMessageProcessor interpreter = new ClientMessageProcessor(connector, gerenciadorSensores, gerenciadorCamera);
-        connector.setInterpreter(interpreter);
+        ClientMessageProcessor processor = new ClientMessageProcessor(connector, gerenciadorSensores, gerenciadorCamera);
+        connector.setInterpreter(processor);
         //Inicializa as janelas de configuração.
         janelaConexao = new JanelaConexao(connector);
         janelaSensores = new JanelaSensores(gerenciadorSensores, gerenciadorCamera, connector);
         janelaReposicionamento = new JanelaReposicionamento(this, gerenciadorSensores);
+        janelaAvancado = new JanelaAvancado(this, processor, gerenciadorSensores);
         //Inicia as threads.
-        interpreter.start();
+        processor.start();
         connector.start();
         gerenciadorSensores.start();
 
@@ -265,12 +267,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //
         //Inicializa o Robo
         //
-        Robo robo = new Robo(400, 500, new Ponto(-200, 200));
-        robo.addSensorIR(new SensorIR(new Ponto(200, -200), PApplet.radians(-60), 200, 1500));
-        robo.addSensorIR(new SensorIR(new Ponto(200, -100), PApplet.radians(-30), 20, 150));
-        robo.addSensorIR(new SensorIR(new Ponto(200, 0), PApplet.radians(0), 200, 1500));
-        robo.addSensorIR(new SensorIR(new Ponto(200, 100), PApplet.radians(30), 20, 150));
-        robo.addSensorIR(new SensorIR(new Ponto(200, 200), PApplet.radians(60), 200, 1500));
+        Robo robo = new Robo(400, 500, new Ponto(-140, 200));
+        robo.addSensorIR(new SensorIR(new Ponto(140, -200), PApplet.radians(-60), 200, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, -100), PApplet.radians(-30), 20, 150));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 0), PApplet.radians(0), 200, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 100), PApplet.radians(30), 20, 150));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 200), PApplet.radians(60), 200, 1500));
 
         RoboDrawable roboDrawable = new RoboDrawable(robo);
 
@@ -348,6 +350,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         recordButton = new visual.gui.RecordButtonListener();
         sensoresButtonListener = new visual.gui.SensoresButtonListener();
         repositionButton = new javax.swing.JButton();
+        avancadoButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         bottomToolBar = new javax.swing.JToolBar();
         bottomLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -464,6 +468,28 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             }
         });
         topToolBar.add(repositionButton);
+
+        avancadoButton.setText("Avançado");
+        avancadoButton.setFocusable(false);
+        avancadoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        avancadoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        avancadoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avancadoButtonActionPerformed(evt);
+            }
+        });
+        topToolBar.add(avancadoButton);
+
+        jButton1.setText(" ");
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        topToolBar.add(jButton1);
 
         bottomToolBar.setFloatable(false);
         bottomToolBar.setRollover(true);
@@ -763,6 +789,24 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         janelaReposicionamento.setParameters(pos.getPonto().x() / 10, pos.getPonto().y() / 10, PApplet.degrees(pos.getAngulo()));
         janelaReposicionamento.setVisible(true);
     }//GEN-LAST:event_repositionButtonActionPerformed
+
+    private void avancadoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avancadoButtonActionPerformed
+        // TODO add your handling code here:
+        janelaAvancado.setVisible(true);
+    }//GEN-LAST:event_avancadoButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        mediaPlayerComponent.getMediaPlayer().playMedia("http://192.168.10.50:5050");
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    public Mapa getMapa() {
+        return mapa;
+    }
+
+    public Viewer2D getViewer2D() {
+        return viewer2D;
+    }
 
     /**
      * Classe responsável por escutar mudanças importantes em ClientConnector e atualizar o display de informações e botôes caso necessário.
@@ -1131,6 +1175,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton avancadoButton;
     private javax.swing.JLabel bottomLabel1;
     private javax.swing.JLabel bottomLabel2;
     private javax.swing.JLabel bottomLabel3;
@@ -1138,6 +1183,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel bottomRightPanel;
     private javax.swing.JToolBar bottomToolBar;
     private visual.gui.ConnectionButtonListener connectionButtonListener;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JToolBar.Separator jSeparator1;

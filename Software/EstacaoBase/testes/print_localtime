@@ -1,0 +1,4 @@
+#!/bin/bash
+
+n=`echo $1| cut -f1 -d"."`
+echo  "$n/1000"| bc | perl -e 'print localtime(<>) . "\n";'

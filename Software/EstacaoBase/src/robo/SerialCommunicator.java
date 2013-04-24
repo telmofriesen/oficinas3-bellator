@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import robo.gerenciamento.SensorsManager;
 
 /**
  * This is a very simple example showing the most basic use of
@@ -31,13 +32,13 @@ public class SerialCommunicator implements SerialNetwork_iface {
 
     public SerialCommunicator(Main server) {
         this.main = server;
-        network = new SerialNetwork(0, this, (byte) 0xFE);
+        network = new SerialNetwork(0, this);
 
         // initializing reader from command line
         int i, inp_num = 0;
-        String input;
-        BufferedReader in_stream = new BufferedReader(new InputStreamReader(
-                System.in));
+//        String input;
+//        BufferedReader in_stream = new BufferedReader(new InputStreamReader(
+//                System.in));
 
         // getting a list of the available serial ports
         Vector<String> ports = network.getPortList();
@@ -58,8 +59,7 @@ public class SerialCommunicator implements SerialNetwork_iface {
         }
         boolean valid_answer = false;
         while (!valid_answer) {
-            System.out
-                    .println("enter the id (1,2,...) of the connection to connect to: ");
+            System.out.println("enter the id (1,2,...) of the connection to connect to: ");
             try {
 //                input = in_stream.readLine();
 //                inp_num = Integer.parseInt(input);
@@ -158,8 +158,11 @@ public class SerialCommunicator implements SerialNetwork_iface {
     //TODO:
     //- Usar bytes ao invés de inteiros
     public void sendMessage(byte[] message) {
+        System.out.print("[SERIAL] enviando mensagem: ");
+        for (int i = 0; i < message.length; i++) {
+            System.out.printf("%X ", message[i]);
+        }
         network.writeSerial(message.length, message);
-
     }
 
     /**
@@ -178,13 +181,36 @@ public class SerialCommunicator implements SerialNetwork_iface {
     //- Implementar a interpretação de mensagens das leituras dos sensores: recebe leituras e manda elas para a estação base
     public void parseInput(int id, int numBytes, byte[] message) {
 //        try {
+        //Imprime mensagem de debug
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < numBytes; i++) {
+            sb.append(String.format("%X ", message[i]));
+        }
+        String str = sb.toString();
+        System.out.printf("[SERIAL] received (%d): %s\n", numBytes, str);
 
-            System.out.printf("[SERIAL] received the following message: %X", message[0]);
-            if(message[0] == ClientMessageProcessor.SENSORS){
-                main.getSensorsSampler().novaLeituraSensores(message);
-            }
-            //        }
-            //        String str = String.valueOf(message);
+//        int sum = 0;
+//        //Calcula o checksum
+//        for (int i = 0; i < numBytes - 2; i++) {
+//            sum += message[i];
+//        }
+        int sum = 0;
+        for (int i = 0; i < message.length - 2; i++) {
+            sum = (sum + (short)(message[i]) & 0x00FF ) % 65536;
+        }
+//        short sum_short = (short) sum;
+
+        int checksum = (int) SensorsManager.bytesToShort(message[numBytes - 2], message[numBytes - 1]) & 0x0000FFFF;
+        if (checksum != sum) {
+            System.out.printf("[SERIAL] erro de checksum. sum=%d, checksum=%d, mensagem:%s \n", sum, checksum, str);
+        }
+
+        if (message[0] == ClientMessageProcessor.SENSORS) {
+            System.out.println("[SERIAL] Sensors");
+            main.getSensorsSampler().novaLeituraSensores(message);
+        }
+        //        }
+        //        String str = String.valueOf(message);
 //            String str = new String(message, "ISO-8859-1"); //Converte o array de bytes para string, usando a codificação ISO-8859-1 para preservar cada bit.
 //            if (main.getListener().getNumServerConnections() >= 1) {
 //                ServerConnection con = main.getListener().getServerConnection(0);

@@ -91,9 +91,9 @@ public class SerialNetwork {
      * {@link net.Network_iface#parseInput(int, int, int[])} once the
      * following {@link #divider} could be identified.
      */
-    public SerialNetwork(int id, SerialNetwork_iface contact, byte divider) {
+    public SerialNetwork(int id, SerialNetwork_iface contact) {
         this.contact = contact;
-        this.divider = divider;
+//        this.divider = divider;
 //        if (this.divider > 255)
 //            this.divider = (byte)255;
 //        if (this.divider < 0)
@@ -108,10 +108,9 @@ public class SerialNetwork {
      *
      * @see #Network(int, Network_iface, int)
      */
-    public SerialNetwork(int id, SerialNetwork_iface contact) {
-        this(id, contact, (byte) 0xFE);
-    }
-
+//    public SerialNetwork(int id, SerialNetwork_iface contact) {
+//        this(id, contact, (byte) 0xFE);
+//    }
     /**
      * Just as {@link #Network(int, Network_iface, int)}, but with a default
      * {@link #divider} of <b>255</b> and a default {@link #id} of 0. This
@@ -236,34 +235,78 @@ public class SerialNetwork {
     private class SerialReader implements Runnable {
 
         InputStream in;
+        //Comandos que podem ser recebidos
+        private byte[] comandos = {(byte) 0xC0, (byte) 0XB1};
+        //Tamanho de cada comando (contando com o opcode)
+        private int[] comandos_tamanho = {26, 5};
+        private int indice_comando_atual = -1;
 
         public SerialReader(InputStream in) {
             this.in = in;
         }
+//        private boolean sensors = false;
 
         public void run() {
             byte[] buffer = new byte[1024];
-            byte temp;
+            byte byte_atual;
             int len = -1, i;
             try {
                 while (!end) {
                     if ((in.available()) > 0) {
                         if ((len = this.in.read(buffer)) > -1) {
                             for (i = 0; i < len; i++) {
-                                temp = buffer[i];
+                                byte_atual = buffer[i];
+                                //System.out.printf("%X ", temp);
                                 // adjust from C-Byte to Java-Byte
-                                if (temp < 0)
-                                    temp += 256;
-                                if (temp == divider) {
-                                    if (numTempBytes > 0) {
-                                        contact.parseInput(id, numTempBytes,
-                                                           tempBytes);
+                                if (byte_atual < 0)
+                                    byte_atual += 256;
+                                //Se o índice de comando atual for -1, significa que está esperando por um novo comando
+                                if (indice_comando_atual == -1) {
+                                    //Verifica se o byte é algum comando
+                                    for (int k = 0; k < comandos.length; k++) {
+                                        if (byte_atual == comandos[k]) {
+                                            indice_comando_atual = k;
+                                        }
                                     }
-                                    numTempBytes = 0;
-                                } else {
-                                    tempBytes[numTempBytes] = temp;
-                                    ++numTempBytes;
                                 }
+
+                                if (indice_comando_atual >= 0) {
+                                    tempBytes[numTempBytes] = byte_atual;
+                                    numTempBytes++;
+                                }
+
+                                //Se já foram lidos todos os bytes do comando...
+                                if (numTempBytes == comandos_tamanho[indice_comando_atual]) {
+                                    //Interpreta o comando
+                                    contact.parseInput(id, numTempBytes, tempBytes);
+                                    //Reseta o buffer
+                                    numTempBytes = 0;
+                                    //Reseta o índice do comando atual
+                                    indice_comando_atual = -1;
+                                }
+
+//                                if (sensors == false && temp == (byte) 0xC0) {
+//                                    //System.out.println("---SENSORS");
+//                                    numTempBytes = 0;
+//                                    sensors = true;
+////                                    numTempBytes = 1;
+//                                }
+//                                if (sensors == true && numTempBytes == 24) {
+//                                    //System.out.println("Divider");
+//                                    if (numTempBytes > 0) {
+//                                        contact.parseInput(id, numTempBytes,
+//                                                           tempBytes);
+//                                    }
+//                                    numTempBytes = 0;
+//                                    sensors = false;
+//                                } else if (numTempBytes > 24) {
+//                                    //System.out.println("--->24");
+//                                    numTempBytes = 0;
+////                                    sensors = false;
+//                                } else {
+//                                    tempBytes[numTempBytes] = temp;
+//                                    ++numTempBytes;
+//                                }
                             }
                         }
                     }
@@ -280,10 +323,57 @@ public class SerialNetwork {
                 connected = false;
                 contact.networkDisconnected(id);
                 contact.writeLog(id, "connection has been interrupted");
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                System.out.printf("Array out of bounds. %s\n", ex.getMessage());
             }
         }
     }
 
+//        public void run() {
+//            byte[] buffer = new byte[1024];
+//            byte temp;
+//            int len = -1, i;
+//            try {
+//                while (!end) {
+//                    if ((in.available()) > 0) {
+//                        if ((len = this.in.read(buffer)) > -1) {
+//                            for (i = 0; i < len; i++) {
+//                                temp = buffer[i];
+//                                // adjust from C-Byte to Java-Byte
+//                                if (temp < 0)
+//                                    temp += 256;
+//                                if (temp == divider) {
+//                                    System.out.println("Divider");
+//                                    if (numTempBytes > 0) {
+//                                        contact.parseInput(id, numTempBytes,
+//                                                           tempBytes);
+//                                    }
+//                                    numTempBytes = 0;
+//                                } else {
+//                                    tempBytes[numTempBytes] = temp;
+//                                    ++numTempBytes;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                end = true;
+//                try {
+//                    outputStream.close();
+//                    inputStream.close();
+//                } catch (IOException e1) {
+//                    e1.printStackTrace();
+//                }
+//                serialPort.close();
+//                connected = false;
+//                contact.networkDisconnected(id);
+//                contact.writeLog(id, "connection has been interrupted");
+//            } catch (ArrayIndexOutOfBoundsException ex) {
+//                System.out.printf("Array out of bounds. %s\n", ex.getMessage());
+//            }
+//        }
+//    }
     /**
      * Simple function closing the connection held by this instance of
      * {@link net.Network}. It also ends the Thread {@link net.Network#reader}.
@@ -369,37 +459,33 @@ public class SerialNetwork {
      * .
      */
     public synchronized boolean writeSerial(int numBytes, byte message[]) {
-        System.out.println("... " + isConnected());
+//        System.out.println("... " + isConnected());
         boolean success = true;
         int i;
-        for (i = 0; i < numBytes; ++i) {
-            if (message[i] == divider) {
-                success = false;
-                System.out.println("Divider");
-                break;
-            }
-        }
+//        for (i = 0; i < numBytes; ++i) {
+//            if (message[i] == divider) {
+//                success = false;
+//                System.out.println("Divider");
+//                break;
+//            }
+//        }
         if (success && isConnected()) {
-            System.out.println("... 2" + isConnected());
+//            System.out.println("... 2" + isConnected());
             try {
                 for (i = 0; i < numBytes; ++i) {
-                    System.out.println(message[i]);
+                    System.out.printf("%X ", message[i]);
                     outputStream.write(message[i]);
                 }
-                outputStream.write(divider);
+//                outputStream.write(divider);
             } catch (IOException e) {
                 success = false;
                 disconnect();
             }
-        } else if (!success) {
-            // message contains the divider
-            contact.writeLog(id, "The message contains the divider.");
         } else {
             contact.writeLog(id, "No port is connected.");
         }
         return success;
     }
-
 //    private byte changeToByte(int num) {
 //        byte number;
 //        int temp;

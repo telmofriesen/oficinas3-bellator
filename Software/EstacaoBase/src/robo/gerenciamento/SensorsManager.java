@@ -40,10 +40,10 @@ public class SensorsManager extends Thread {
     private int lastSequenceTimestamp = 65532;
     //Listeners de eventos da classe
     private final CopyOnWriteArrayList<MyChangeListener> listeners = new CopyOnWriteArrayList<MyChangeListener>();
-    private boolean first_sent = false;
-    private boolean second_sent = false;
-    private boolean third_sent = false;
-    private long first_sample_time;
+//    private boolean first_sent = false;
+//    private boolean second_sent = false;
+//    private boolean third_sent = false;
+//    private long first_sample_time;
 
     public SensorsManager(Main main, float sample_rate) {
         this.main = main;
@@ -57,16 +57,6 @@ public class SensorsManager extends Thread {
         }
         long sleep_time;
         while (run) {
-            //            AmostraSensores a = gerarExemplo();
-            //Envia comando SYNC
-            //            main.getSerialCommunicator().sendMessage(new byte[]{ClientMessageProcessor.SYNC});
-            //TESTES (remover para uso com o robô)
-            byte[] amostra = gerarExemploEmBytes();
-            novaLeituraSensores2(amostra);
-            //----
-
-//                String str = new String(amostra, "ISO-8859-1");
-//                main.sendMessageToMainHost(str, false);
             synchronized (this) {
                 //                currentSample = a;
                 sleep_time = (long) (1000f / syncRate);
@@ -87,6 +77,21 @@ public class SensorsManager extends Thread {
                     }
                 }
             }
+            //Envia comando SYNC
+            if (main.getSerialCommunicator() != null) {
+                main.getSerialCommunicator().sendMessage(new byte[]{ClientMessageProcessor.SYNC});
+                System.out.println("[SensorsManager]: Comando SYNC enviado.");
+            } else {
+                System.out.println("[SensorsManager]: Comando SYNC não enviado!");
+            }
+            //TESTES para simulação (comentar essa seção se for usar com o robô)
+//                        AmostraSensores a = gerarExemplo();
+            byte[] amostra = gerarExemploEmBytes();
+            novaLeituraSensores(amostra);
+            //----
+
+//                String str = new String(amostra, "ISO-8859-1");
+//                main.sendMessageToMainHost(str, false);
         }
     }
 
@@ -98,13 +103,14 @@ public class SensorsManager extends Thread {
         return bb.getShort(0);
     }
 
-    public void novaLeituraSensores2(byte[] sensors) {
-        if (sensors[0] != ClientMessageProcessor.SENSORS) {
-            return;
-        }
-        //
-        // Converter os valores para inteiro
-        //
+    public void novaLeituraSensores(byte[] sensors) {
+        try {
+            if (sensors[0] != ClientMessageProcessor.SENSORS) {
+                return;
+            }
+            //
+            // Converter os valores para inteiro
+            //
 //        int encoder_esq = (int) bytesToShort(sensors[1], sensors[2]) & 0x0000ffff;
 //        int encoder_dir = (int) bytesToShort(sensors[3], sensors[4]) & 0x0000ffff;
 //        int[] IR = {
@@ -119,45 +125,48 @@ public class SensorsManager extends Thread {
 //        int GX = (int) bytesToShort(sensors[16], sensors[17]) & 0x0000ffff;
 //        int GY = (int) bytesToShort(sensors[18], sensors[19]) & 0x0000ffff;
 //        int GZ = (int) bytesToShort(sensors[20], sensors[21]) & 0x0000ffff;
-        int sequenceTimestamp = (int) bytesToShort(sensors[22], sensors[23]) & 0x0000ffff;
+            int sequenceTimestamp = (int) bytesToShort(sensors[22], sensors[23]) & 0x0000ffff;
 
-        //
-        // Calcular a UNIX timestamp a partir da Sequence timestamp
-        //
+            //
+            // Calcular a UNIX timestamp a partir da Sequence timestamp
+            //
 
-        if (lastUnixTimestamp == -1) { //Executado na primeira vez somente
-            lastUnixTimestamp = System.currentTimeMillis();
-            lastSequenceTimestamp = sequenceTimestamp;
+            if (lastUnixTimestamp == -1) { //Executado na primeira vez somente
+                lastUnixTimestamp = System.currentTimeMillis();
+                lastSequenceTimestamp = sequenceTimestamp;
+            }
+            int count = 0;
+            if (sequenceTimestamp < lastSequenceTimestamp) {
+                count = (65536 - lastSequenceTimestamp) + sequenceTimestamp;
+                lastSequenceTimestamp = sequenceTimestamp;
+            } else {
+                count = sequenceTimestamp - lastSequenceTimestamp;
+                lastSequenceTimestamp = sequenceTimestamp;
+            }
+            long unixTimestamp = lastUnixTimestamp + (lowLevelSamplePeriod * count);
+            lastUnixTimestamp = unixTimestamp;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("S ");
+            sb.append(new AmostraSensores((int) bytesToShort(sensors[1], sensors[2]),
+                                          (int) bytesToShort(sensors[3], sensors[4]),
+                                          new int[]{
+                        (int) bytesToShort((byte) 0, sensors[5]),
+                        (int) bytesToShort((byte) 0, sensors[6]),
+                        (int) bytesToShort((byte) 0, sensors[7]),
+                        (int) bytesToShort((byte) 0, sensors[8]),
+                        (int) bytesToShort((byte) 0, sensors[9])},
+                                          (int) bytesToShort(sensors[10], sensors[11]), //& 0x0000ffff,
+                                          (int) bytesToShort(sensors[12], sensors[13]), //& 0x0000ffff,
+                                          (int) bytesToShort(sensors[14], sensors[15]), //& 0x0000ffff,
+                                          (int) bytesToShort(sensors[16], sensors[17]), //& 0x0000ffff,
+                                          (int) bytesToShort(sensors[18], sensors[19]), //& 0x0000ffff,
+                                          (int) bytesToShort(sensors[20], sensors[21]), //& 0x0000ffff,
+                                          unixTimestamp).toString());
+            main.sendMessageToMainHost(sb.toString(), false);
+        } catch (NullPointerException ex) {
+            System.out.printf("[SensorsManager] Erro: %s\n", ex.getMessage());
         }
-        int count = 0;
-        if (sequenceTimestamp < lastSequenceTimestamp) {
-            count = (65536 - lastSequenceTimestamp) + sequenceTimestamp;
-            lastSequenceTimestamp = sequenceTimestamp;
-        } else {
-            count = sequenceTimestamp - lastSequenceTimestamp;
-            lastSequenceTimestamp = sequenceTimestamp;
-        }
-        long unixTimestamp = lastUnixTimestamp + (lowLevelSamplePeriod * count);
-        lastUnixTimestamp = unixTimestamp;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("S ");
-        sb.append(new AmostraSensores((int) bytesToShort(sensors[1], sensors[2]) & 0x0000ffff,
-                                         (int) bytesToShort(sensors[3], sensors[4]) & 0x0000ffff,
-                                         new int[]{
-                    (int) bytesToShort((byte) 0, sensors[5]),
-                    (int) bytesToShort((byte) 0, sensors[6]),
-                    (int) bytesToShort((byte) 0, sensors[7]),
-                    (int) bytesToShort((byte) 0, sensors[8]),
-                    (int) bytesToShort((byte) 0, sensors[9])},
-                                         (int) bytesToShort(sensors[10], sensors[11]) & 0x0000ffff,
-                                         (int) bytesToShort(sensors[12], sensors[13]) & 0x0000ffff,
-                                         (int) bytesToShort(sensors[14], sensors[15]) & 0x0000ffff,
-                                         (int) bytesToShort(sensors[16], sensors[17]) & 0x0000ffff,
-                                         (int) bytesToShort(sensors[18], sensors[19]) & 0x0000ffff,
-                                         (int) bytesToShort(sensors[20], sensors[21]) & 0x0000ffff,
-                                         unixTimestamp).toString());
-        main.sendMessageToMainHost(sb.toString(), false);
     }
 
     /**
@@ -166,7 +175,7 @@ public class SensorsManager extends Thread {
      *
      * @param mensagem
      */
-    public void novaLeituraSensores(byte[] mensagem) {
+    public void novaLeituraSensores_old(byte[] mensagem) {
         if (mensagem[0] != ClientMessageProcessor.SENSORS) {
             return;
         }
@@ -215,9 +224,9 @@ public class SensorsManager extends Thread {
         ByteBuffer buf = ByteBuffer.allocate(24);
         byte[] bytes = ByteBuffer.allocate(4).putInt(example_counter).array();
         buf.put(new byte[]{ClientMessageProcessor.SENSORS,
-                           0, 100,
-                           0, 105,
-                           (byte) 150, (byte) 0, (byte) 0, (byte) 0, (byte) 150,
+                           0, 20,
+                           0, 15,
+                           (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
                            0, 0,
                            0, 0,
                            0, 0,
@@ -340,10 +349,9 @@ public class SensorsManager extends Thread {
             l.changeEventReceived(evt);
         }
     }
-
-    public synchronized void resetTests() {
-        first_sent = false;
-        second_sent = false;
-        third_sent = false;
-    }
+//    public synchronized void resetTests() {
+//        first_sent = false;
+//        second_sent = false;
+//        third_sent = false;
+//    }
 }

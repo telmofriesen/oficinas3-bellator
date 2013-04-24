@@ -100,7 +100,6 @@ public class Robo {
     public ArrayList<ArrayList<PosInfo>> getPosInfos() {
         return posInfos;
     }
-        
 
     /**
      * Adiciona a próxima posição do robô.
@@ -112,8 +111,18 @@ public class Robo {
         posInfos.get(trilhaAtual).add(pos);
     }
     
-    public synchronized void novaTrilha(Ponto novaPosicaoInicial, float novoAngulo){
-        if(posInfos.size() > 1 && posInfos.get(trilhaAtual).size() == 1){ //Se a trilha atual só tiver um ponto (e ela não for a primeira trilha, que indica a origem), ela é removida.
+    public synchronized void novaTrilha(PosInfo novaPosicao) {
+        if (posInfos.size() > 1 && posInfos.get(trilhaAtual).size() == 1) { //Se a trilha atual não for a primeira trilha, que é a origem E só tiver um ponto,ela é removida.
+            posInfos.remove(trilhaAtual);
+            trilhaAtual--;
+        }
+        trilhaAtual++;
+        posInfos.add(new ArrayList<PosInfo>());
+        posInfos.get(trilhaAtual).add(novaPosicao); //Adiciona a posição inicial na trilha.
+    }
+
+    public synchronized void novaTrilha(Ponto novaPosicaoInicial, float novoAngulo) {
+        if (posInfos.size() > 1 && posInfos.get(trilhaAtual).size() == 1) { //Se a trilha atual só tiver um ponto (e ela não for a primeira trilha, que indica a origem), ela é removida.
             posInfos.remove(trilhaAtual);
             trilhaAtual--;
         }
@@ -131,6 +140,7 @@ public class Robo {
     }
 
     public synchronized PosInfo getUltimaPosicaoTrilhaAtual() {
+        if(posInfos.isEmpty()) return null;
         if (posInfos.get(trilhaAtual).size() <= 0) {
             return null;
         } else {
@@ -186,7 +196,7 @@ public class Robo {
         this.centroMovimento = centroMovimento;
     }
 
-    public String infoToString() {
+    public synchronized String infoToString() {
         return String.format("%d %d %d %d\n",
                              largura,
                              comprimento,
@@ -194,7 +204,7 @@ public class Robo {
                              centroMovimento.y);
     }
 
-    public String sensoresToString() {
+    public synchronized String sensoresToString() {
         String str = "";
         for (int i = 0; i < sensoresIR.size(); i++) {
             str = str + String.format("%d %d %f %d %d\n",
@@ -207,16 +217,19 @@ public class Robo {
         return str;
     }
 
-    public String pontosToString() {
+    /**
+     * Gera uma string contendo as informações de posição linha a linha.
+     * As diferentes trilhas geradas são separadas por uma linha com barra.
+     * @return 
+     */
+    public synchronized String pontosToString() {
         StringBuilder sb = new StringBuilder();
         for (int k = 0; k < posInfos.size(); k++) {
-            if(k>=1) sb.append("/\n");
-            for (int i = 0; i < posInfos.size(); i++) {
-                sb.append(String.format("%d %d %f %d\n",
-                                          posInfos.get(i).get(trilhaAtual).getPonto().x,
-                                          posInfos.get(i).get(trilhaAtual).getPonto().y,
-                                          posInfos.get(i).get(trilhaAtual).getAngulo(),
-                                          posInfos.get(i).get(trilhaAtual).getTimestamp()));
+            if (k >= 1) sb.append("/\n");//Insere uma barra para separar as diferentes trilhas (se houve mais de uma)
+            ArrayList<PosInfo> trilha = posInfos.get(k);
+            for (int i = 0; i < trilha.size(); i++) {
+                sb.append(trilha.get(i).getString());
+                sb.append('\n');
             }
         }
         return sb.toString();
@@ -230,11 +243,10 @@ public class Robo {
     }
 
     public synchronized void reset() {
-        posInfos.clear();
+        clearPosInfos();
         sensoresIR.clear();
         largura = 0;
         comprimento = 0;
         centroMovimento = null;
-        posInfos.get(trilhaAtual).add(new PosInfo(new Ponto(0, 0), 0, 0)); //Adiciona a posição inicial
     }
 }

@@ -1,0 +1,29 @@
+#!/bin/nash
+
+
+#http://www.simonf.com/usb/usb.html
+
+
+echo "Loading jbd.o module"
+insmod /lib/jbd.o
+echo "Loading ext3.o module"
+insmod /lib/ext3.o
+echo Mounting /proc filesystem
+mount -t proc /proc /proc
+echo "Loading usb modules"
+insmod /lib/usbcore.o
+insmod /lib/scsi_mod.o
+insmod /lib/sd_mod.o
+insmod /lib/usb-storage.o
+insmod /lib/usb-uhci.o
+/bin/sleep 5
+echo Creating block devices
+mkdevices /dev
+echo Creating root device
+mkrootdev /dev/root
+/bin/sfdisk -R /dev/sda
+echo 0x0100 > /proc/sys/kernel/real-root-dev
+echo Mounting root filesystem
+mount -o defaults --ro -t ext3 /dev/root /sysroot
+pivot_root /sysroot /sysroot/initrd
+umount /initrd/proc

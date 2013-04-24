@@ -25,8 +25,7 @@ public class EnginesManager {
 
     public EnginesManager(Main main) {
         this.main = main;
-    }    
-    
+    }
 
     public synchronized EnginesSpeed getEnginesSpeed() {
         return enginesSpeed;
@@ -35,7 +34,7 @@ public class EnginesManager {
     public synchronized void setEnginesSpeed(EnginesSpeed enginesSpeed) {
         this.enginesSpeed = enginesSpeed;
         System.out.printf("[EnginesManager] EnginesSpeed: %.2f %.2f\n", enginesSpeed.leftSpeed, enginesSpeed.rightSpeed);
-        byte[] message = new byte[3];
+        byte[] message = new byte[5];
         message[0] = (byte) 0xB0;
         message[1] = (byte) (Math.abs((int) Math.floor((float) 127 * enginesSpeed.leftSpeed))); //Calcula os 7 bits menos significativos
         if (enginesSpeed.leftSpeed > 0) { //Se o movimento for para frente, muda o bit mais significativo para 1
@@ -46,6 +45,19 @@ public class EnginesManager {
             message[2] = (byte) ((byte) message[2] | (byte) 0x80);
         }
 
+        int sum = 0;
+        for (int i = 0; i < message.length - 2; i++) {
+            sum = (sum + (short)(message[i]) & 0x00FF ) % 65536;
+        }
+        short sum_short = (short) sum;
+        message[message.length - 2] = (byte) ((sum_short >> 8) & 0XFF);
+        message[message.length - 1] = (byte) ((sum_short) & 0XFF);
+
+        System.out.print("[SERIAL] enviando mensagem: ");
+        for (int i = 0; i < message.length; i++) {
+            System.out.printf("%X ", message[i]);
+        }
+
         //TODO descomentar a linha seguinte para que os comandos sejam mandados à placa de baixo nivel via serial
 //        main.getSerialCommunicator().sendMessage(message);
         fireChangeEvent();
@@ -54,7 +66,7 @@ public class EnginesManager {
     public synchronized void setEnginesSpeed(float left, float right) {
         setEnginesSpeed(new EnginesSpeed(left, right));
     }
-    
+
 //    public synchronized float getLeftSpeed() {
 //        return leftSpeed;
 //    }

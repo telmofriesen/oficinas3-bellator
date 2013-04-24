@@ -35,7 +35,7 @@ public class Main extends Thread {
     private SensorsManager sensorsManager;
     private SensorsInfoListnener sensorsInfoListener;
     //Amostragem da webcam
-    private WebcamManager webcamManager;
+    private WebcamManagerNew2 webcamManager;
     private WebcamInfoListener webcamInfoListener;
     private EnginesManager enginesManager;
     private SerialCommunicator serialCommunicator;
@@ -59,7 +59,7 @@ public class Main extends Thread {
         sensorsInfoListener = new SensorsInfoListnener();
         sensorsManager.addMyChangeListener(sensorsInfoListener);
         //[176x144] [320x240] [352x288] [480x400] [640x480] [1024x768] 
-        webcamManager = new WebcamManager(1, new Dimension(320, 240));
+        webcamManager = new WebcamManagerNew2(new Dimension(320, 240));
 //        webcamManager = new WebcamManager(new Dimension(640, 480));
 
         webcamInfoListener = new WebcamInfoListener();
@@ -117,7 +117,7 @@ public class Main extends Thread {
         enginesManager.setEnginesSpeed(0, 0);
         sensorsManager.stopSampling();
         sensorsManager.setSample_rate(1);
-        sensorsManager.resetTests();
+//        sensorsManager.resetTests();
         webcamManager.reset();
         //TODO mandar mensagem de parada para o robo via porta serial
     }
@@ -162,7 +162,7 @@ public class Main extends Thread {
         return sensorsManager;
     }
 
-    public WebcamManager getWebcamManager() {
+    public WebcamManagerNew2 getWebcamManager() {
         return webcamManager;
     }
 

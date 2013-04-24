@@ -8,6 +8,7 @@ import dados.NumIRException;
 import dados.TimestampException;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -33,8 +34,12 @@ public class ClientMessageProcessor extends Thread {
     //
     //Indica se as amostras dos sensores devem ser salvas em um arquivo.
 
-    private final boolean DEBUG_RECORD_SAMPLES = true;
-    private BufferedOutputStream debugBufferdOutputStream;
+    private boolean gravarLeiturasSensores = false;
+    private boolean carregandoLeiturasSensores = false;
+    private String nomeArquivoGravacaoLeituras = "";
+    private BufferedOutputStream streamArquivoLeituras;
+    private BufferedOutputStream streamArquivoLeituras_reais;
+    private final Object lockStreamArquivoLeituras;
     //Array que armazena a fila de comandos
     private ArrayList<String> commandsList = new ArrayList();
     //Referecia ao objeto connector do cliente
@@ -54,14 +59,72 @@ public class ClientMessageProcessor extends Thread {
         this.connector = connector;
         this.gerenciadorSensores = controleSensores;
         this.controleCamera = controleCamera;
-        if (DEBUG_RECORD_SAMPLES) {
-            String filename = "";
+        this.lockStreamArquivoLeituras = new Object();
+//        startGravacaoLeiturasSensores();
+//        if (gravarLeiturasSensores) {
+//            initStreamArquivoLeituras();
+//        }
+    }
+
+    protected final void initStreamArquivoLeituras() {
+        synchronized (lockStreamArquivoLeituras) {
+            File f = new File("testes");
+            f.mkdir(); // Cria a pasta "testes"
+            nomeArquivoGravacaoLeituras = "";
             try {
-                filename = String.format("testes/%d.txt", System.currentTimeMillis());
-                debugBufferdOutputStream = new BufferedOutputStream(new FileOutputStream(filename));
+                nomeArquivoGravacaoLeituras = String.format("testes/%d.csv", System.currentTimeMillis());
+                streamArquivoLeituras = new BufferedOutputStream(new FileOutputStream(nomeArquivoGravacaoLeituras));
+                streamArquivoLeituras_reais = new BufferedOutputStream(new FileOutputStream(nomeArquivoGravacaoLeituras + "_real"));
             } catch (IOException ex) {
-                System.out.printf("Erro ao abrir arquivo para gravação: %s. (%s)\n", filename, ex.getMessage());
+                System.out.printf("Erro ao abrir arquivo para gravação: %s. (%s)\n", nomeArquivoGravacaoLeituras, ex.getMessage());
             }
+        }
+    }
+
+    protected final void closeStreamArquivoLeituras() {
+        synchronized (lockStreamArquivoLeituras) {
+            if (streamArquivoLeituras != null) {
+                try {
+                    streamArquivoLeituras.close();
+                    streamArquivoLeituras_reais.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ClientMessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    public final void startGravacaoLeiturasSensores() {
+        synchronized (lockStreamArquivoLeituras) {
+            if (!gravarLeiturasSensores) {
+                gravarLeiturasSensores = true;
+                initStreamArquivoLeituras();
+            }
+        }
+    }
+
+    public final void stopGravacaoLeiturasSensoresArquivo() {
+        synchronized (lockStreamArquivoLeituras) {
+            if (gravarLeiturasSensores) {
+                gravarLeiturasSensores = false;
+                closeStreamArquivoLeituras();
+            }
+        }
+    }
+
+    public String getNomeArquivoGravacaoLeituras() {
+        return nomeArquivoGravacaoLeituras;
+    }
+
+    public boolean isCarregandoLeiturasSensores() {
+        synchronized (lockStreamArquivoLeituras) {
+            return carregandoLeiturasSensores;
+        }
+    }
+
+    public void setCarregandoLeiturasSensores(boolean carregandoLeiturasSensores) {
+        synchronized (lockStreamArquivoLeituras) {
+            this.carregandoLeiturasSensores = carregandoLeiturasSensores;
         }
     }
 
@@ -235,7 +298,7 @@ public class ClientMessageProcessor extends Thread {
              }
              }
              * */
-            if (split[0].equals("S")) { //SENSORS (amostra)
+            if (split[0].equals("S") && !isCarregandoLeiturasSensores()) { //SENSORS (amostra)
                 int encoder_esq = Integer.parseInt(split[1]);
                 int encoder_dir = Integer.parseInt(split[2]);
                 int[] IR = {Integer.parseInt(split[3]),
@@ -251,14 +314,22 @@ public class ClientMessageProcessor extends Thread {
                 int GZ = Integer.parseInt(split[13]);
                 long unixTimestamp = Long.parseLong(split[14]);
                 AmostraSensores amostra = new AmostraSensores(encoder_esq, encoder_dir, IR, AX, AY, AZ, GX, GY, GZ, unixTimestamp);
-                if (DEBUG_RECORD_SAMPLES) {
-                    try {
-                        debugBufferdOutputStream.write(amostra.toString().getBytes("UTF-8"));
-                        debugBufferdOutputStream.write("\n".getBytes("UTF-8"));
-                        debugBufferdOutputStream.flush();
-                    } catch (IOException ex) {
-                        System.out.printf("Erro ao escrever no arquivo: %s. (%s)\n", ex.getMessage());
+                synchronized (lockStreamArquivoLeituras) {
+                    if (gravarLeiturasSensores) {
+                        if (streamArquivoLeituras != null) {
+                            try {
+                                //Grava as leituras dos sensores em um arquivo de texto
+                                streamArquivoLeituras.write(amostra.toString().getBytes("UTF-8"));
+                                streamArquivoLeituras.write("\n".getBytes("UTF-8"));
+                                streamArquivoLeituras.flush();
+                                streamArquivoLeituras_reais.write(amostra.transformedToString().getBytes("UTF-8"));
+                                streamArquivoLeituras_reais.write("\n".getBytes("UTF-8"));
+                                streamArquivoLeituras_reais.flush();
+                            } catch (IOException ex) {
+                                System.out.printf("Erro ao escrever no arquivo: %s. (%s)\n", ex.getMessage());
 //                        Logger.getLogger(ClientMessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                     }
                 }
                 gerenciadorSensores.novaLeituraSensores(amostra);

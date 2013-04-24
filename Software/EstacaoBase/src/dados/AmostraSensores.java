@@ -5,7 +5,7 @@
 package dados;
 
 /**
- * Classe que representa uma amostra dos sensores (acelerometro, giroscópio e IR).
+ * Classe que representa uma amostra dos sensores (Encoders, IR, acelerometro e giroscópio).
  *
  * @author stefan
  */
@@ -17,6 +17,12 @@ public class AmostraSensores {
     public final int AX, AY, AZ;
     public final int GX, GY, GZ;
     public final long unixTimestamp;
+    //Aceleração da gravidade
+    public static final double g = 9.80665; //m/s^2
+    //Circunferências (eixo da roda, eixo do encoder, roda em si) em milímetros
+    public static final int C1 = 75,
+            C2 = 220,
+            C3 = 640;
 
     public AmostraSensores(int encoder_esq, int encoder_dir, int[] IR, int AX, int AY, int AZ, int GX, int GY, int GZ, long unixTimestamp) {
         this.encoder_esq = encoder_esq;
@@ -33,7 +39,8 @@ public class AmostraSensores {
 
     /**
      * Retorna uma string conendo todos os atributos separados por espaço.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -47,13 +54,25 @@ public class AmostraSensores {
         return sb.toString();
     }
 
+    public String transformedToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%d %d ", transformedEncoderEsq(), transformedEncoderDir()));
+        for (int i = 0; i < IR.length; i++) {
+            sb.append(String.format("%d ", SensorIR.getDistFromByte(IR[i])));
+        }
+        sb.append(String.format("%f %f %f %f %f %f ", transformedAX(), transformedAY(), transformedAZ(), transformedGX(), transformedGY(), transformedGZ()));
+        sb.append(String.format("%d", unixTimestamp));
+        return sb.toString();
+    }
+
     /**
      * Retorna a distância percorrida pela roda esquerda, a partir da contagem obtida do encoder esquerdo.
      *
      * @return
      */
     public int transformedEncoderEsq() {
-        return encoder_esq;
+        return Math.round(((float) (C2 * C3) / (float) (1800*C1)) * encoder_esq);
+//        return encoder_esq;
     }
 
     /**
@@ -62,7 +81,8 @@ public class AmostraSensores {
      * @return
      */
     public int transformedEncoderDir() {
-        return encoder_dir;
+        return Math.round(((float) (C2 * C3) / (float) (1800*C1)) * encoder_dir);
+//        return encoder_dir;
     }
 
     /**
@@ -71,7 +91,7 @@ public class AmostraSensores {
      * @return
      */
     public float transformedAX() {
-        return 0;
+        return (float) ((double) AX / ((double) 16384 / g));
     }
 
     /**
@@ -80,7 +100,7 @@ public class AmostraSensores {
      * @return
      */
     public float transformedAY() {
-        return 0;
+        return (float) ((double) AY / ((double) 16384 / g));
     }
 
     /**
@@ -89,7 +109,7 @@ public class AmostraSensores {
      * @return
      */
     public float transformedAZ() {
-        return 0;
+        return (float) ((double) AZ / ((double) 16384 / g));
     }
 
     /**
@@ -98,7 +118,7 @@ public class AmostraSensores {
      * @return
      */
     public float transformedGX() {
-        return 0;
+        return (float) ((double) GX * Math.PI / ((double) 131 * 180));
     }
 
     /**
@@ -107,7 +127,7 @@ public class AmostraSensores {
      * @return
      */
     public float transformedGY() {
-        return 0;
+        return (float) ((double) GY * Math.PI / ((double) 131 * 180));
     }
 
     /**
@@ -116,7 +136,7 @@ public class AmostraSensores {
      * @return
      */
     public float transformedGZ() {
-        return 0;
+        return (float) ((double) GZ * Math.PI / ((double) 131 * 180));
     }
 
     public int[] transformedIR() {

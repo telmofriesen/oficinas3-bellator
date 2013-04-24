@@ -1,0 +1,60 @@
+#!/bin/sh
+
+cd /
+echo "Iniciando"
+# Mount the /proc and /sys filesystems.
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount /dev
+#mount /dev/pts
+#Start udev
+/etc/init.d/udev start
+
+#Load USB modules
+modprobe ohci-hcd
+modprobe usb-storage
+
+#exec /bin/bash
+#sleep 5
+echo -n "Aguardando pendrive USB."
+DEVPATH=/dev/sda1
+until test -e $DEVPATH
+do
+	sleep 1
+	echo -n "."
+done
+echo "OK"
+
+# Mount the root filesystem.
+#mkdir -p /mnt
+mount /dev/sda1 /mnt
+#umount /dev
+#umount /dev/pts
+
+/etc/init.d/udev stop
+
+cd /mnt
+pivot_root . tmp
+/bin/umount tmp/proc
+/bin/mount -n --move tmp/dev /dev
+/bin/mount -t proc proc /proc
+
+exec /usr/sbin/chroot . /bin/sh <<- EOF
+  /bin/umount tmp
+  exec /sbin/init
+EOF
+
+# Clean up.
+#umount /proc
+#umount /sys
+#/etc/init.d/udev stop
+#umount /dev
+#umount /dev/pts
+
+# Boot the real thing.
+#exec switch_root /mnt/root /sbin/init
+
+
+exec /bin/bash
+#exec /sbin/init
+

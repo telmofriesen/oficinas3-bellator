@@ -122,7 +122,7 @@ public class JanelaReposicionamento extends javax.swing.JFrame {
             }
         });
 
-        cancelButton.setText("Cancelar");
+        cancelButton.setText("Fechar");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);

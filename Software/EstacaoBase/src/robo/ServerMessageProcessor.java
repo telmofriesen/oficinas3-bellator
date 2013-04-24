@@ -138,7 +138,7 @@ public class ServerMessageProcessor extends Thread {
                         return true;
                     }
                 } else if (split[0].equals("WEBCAM")) { //WEBCAM
-                    WebcamManager w = connection.getListener().getServer().getWebcamManager();
+                    WebcamManagerNew2 w = connection.getListener().getServer().getWebcamManager();
                     if (split[1].equals("START")) {
                         w.startSampling();
 //                        connection.sendMessageWithPriority(w.getStatusMessage(), true);

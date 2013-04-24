@@ -79,7 +79,7 @@ public class Viewer2D extends PApplet {
      * deve ser chamado diretamente, mas somente pelo método redraw().
      */
     @Override
-    public void draw() {
+    public synchronized void draw() {
         background(255);
         pushMatrix();
         pushStyle();
@@ -324,7 +324,7 @@ public class Viewer2D extends PApplet {
      *
      * @param step Quantidade a ser adicionada à escala
      */
-    public void zoom_view(float step) {
+    public synchronized void zoom_view(float step) {
         if (step > 0 || escala > 0.02f) {
             origemRealNaInterface.setMag(origemRealNaInterface.mag() * ((float) 1 + step / escala));
             setEscala(escala + step);
@@ -338,7 +338,7 @@ public class Viewer2D extends PApplet {
      *
      * @param step
      */
-    public void rotate_view(float step) {
+    public synchronized void rotate_view(float step) {
         setAngulo(angulo_visao + step);
         origemRealNaInterface.rotate(step);
     }
@@ -437,7 +437,7 @@ public class Viewer2D extends PApplet {
         }
     }
 
-    public void resetView() {
+    public synchronized void resetView() {
         setEscala(escala_default);
         setAngulo(0);
         origemRealNaInterface.x = (0);
