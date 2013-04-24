@@ -63,7 +63,7 @@ O projeto da placa de circuito impresso (PCB) do sistema embarcado de baixo nív
 
 \begin{figure}[htpb!]
   \centering
-  \includegraphics[width=0.7\textwidth, keepaspectratio]{./figuras/hardware/pcb_pronta.jpg}
+  \includegraphics[width=0.7\textwidth, keepaspectratio]{./figuras/hardware/pcb_baixo.jpg}
   \caption{PCB montada.}
   \label{fig:pcb_pronta}
 \end{figure}

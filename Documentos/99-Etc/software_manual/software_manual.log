@@ -1,8 +1,8 @@
 This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  24 APR 2013 17:34
 entering extended mode
  %&-line parsing enabled.
-**entregavel4
-(./entregavel4.tex
+**software_manual.tex
+(./software_manual.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
 yphenation, portuguese, loaded.
@@ -624,138 +624,71 @@ File: pppdftex.def 2009/02/07 v0.4g Pdfpages driver for pdfTeX (AM)
 \c@AM@survey=\count130
 \AM@templatesizebox=\box57
 )
-(/usr/share/texmf-texlive/tex/latex/enumitem/enumitem.sty
-Package: enumitem 2009/05/18 v2.2 Customized lists
-\enit@toks=\toks28
-\labelindent=\skip63
-\enit@outerparindent=\dimen132
-\enitdp@desc=\count131
-)
-(/usr/share/texmf-texlive/tex/latex/tools/longtable.sty
-Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
-\LTleft=\skip64
-\LTright=\skip65
-\LTpre=\skip66
-\LTpost=\skip67
-\LTchunksize=\count132
-\LTcapwidth=\dimen133
-\LT@head=\box58
-\LT@firsthead=\box59
-\LT@foot=\box60
-\LT@lastfoot=\box61
-\LT@cols=\count133
-\LT@rows=\count134
-\c@LT@tables=\count135
-\c@LT@chunks=\count136
-\LT@p@ftn=\toks29
-)
-(/usr/share/texmf-texlive/tex/latex/amsfonts/amssymb.sty
-Package: amssymb 2009/06/22 v3.00
-
-(/usr/share/texmf-texlive/tex/latex/amsfonts/amsfonts.sty
-Package: amsfonts 2009/06/22 v3.00 Basic AMSFonts support
-\symAMSa=\mathgroup6
-\symAMSb=\mathgroup7
-LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
-(Font)                  U/euf/m/n --> U/euf/b/n on input line 96.
-))
-(/usr/share/texmf-texlive/tex/latex/mh/empheq.sty
-Package: empheq 2007/12/03 v2.12 Emphasizing equations (MH)
-
-(/usr/share/texmf-texlive/tex/latex/mh/mhsetup.sty
-Package: mhsetup 2007/12/03 v1.2 programming setup (MH)
-)
-(/usr/share/texmf-texlive/tex/latex/mh/mathtools.sty
-Package: mathtools 2008/08/01 v1.06 mathematical typesetting tools (MH)
-\g_MT_multlinerow_int=\count137
-\l_MT_multwidth_dim=\dimen134
-)
-\l_EQ_equationtype_int=\count138
-\l_EQ_alignmentmode_int=\count139
-\l_EQ_totalwidth_dim=\dimen135
-\l_EQ_displaywidth_dim=\dimen136
-\l_EQ_temp_linewidth_dim=\dimen137
-\EmphEqdelimitershortfall=\dimen138
-\EmphEqdelimiterfactor=\count140
-\g_EQ_toptag_height_dim=\dimen139
-\g_EQ_bottomtag_depth_dim=\dimen140
-\g_EQ_toprow_height_dim=\dimen141
-\g_EQ_bottomrow_depth_dim=\dimen142
-\g_EQ_widesttag_dim=\dimen143
-\EQ_mathdisplay_box=\box62
-\EQ_tag_box=\box63
-\g_EQ_temprow_int=\count141
-)
-(/usr/share/texmf-texlive/tex/latex/tools/bm.sty
-Package: bm 2004/02/26 v1.1c Bold Symbol Support (DPC/FMi)
-LaTeX Info: Redefining \bm on input line 204.
-)
 (/usr/share/texmf-texlive/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2005/04/14 v1.61803 publication quality tables
-\heavyrulewidth=\dimen144
-\lightrulewidth=\dimen145
-\cmidrulewidth=\dimen146
-\belowrulesep=\dimen147
-\belowbottomsep=\dimen148
-\aboverulesep=\dimen149
-\abovetopsep=\dimen150
-\cmidrulesep=\dimen151
-\cmidrulekern=\dimen152
-\defaultaddspace=\dimen153
-\@cmidla=\count142
-\@cmidlb=\count143
-\@aboverulesep=\dimen154
-\@belowrulesep=\dimen155
-\@thisruleclass=\count144
-\@lastruleclass=\count145
-\@thisrulewidth=\dimen156
+\heavyrulewidth=\dimen132
+\lightrulewidth=\dimen133
+\cmidrulewidth=\dimen134
+\belowrulesep=\dimen135
+\belowbottomsep=\dimen136
+\aboverulesep=\dimen137
+\abovetopsep=\dimen138
+\cmidrulesep=\dimen139
+\cmidrulekern=\dimen140
+\defaultaddspace=\dimen141
+\@cmidla=\count131
+\@cmidlb=\count132
+\@aboverulesep=\dimen142
+\@belowrulesep=\dimen143
+\@thisruleclass=\count133
+\@lastruleclass=\count134
+\@thisrulewidth=\dimen144
 )
 (/usr/share/texmf-texlive/tex/latex/multirow/multirow.sty
-\bigstrutjot=\dimen157
-) (./entregavel4.aux)
-\openout1 = `entregavel4.aux'.
+\bigstrutjot=\dimen145
+)
+(./software_manual.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 57.
+LaTeX Warning: Label `tab:alternativas_desenho' multiply defined.
 
-(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+)
+\openout1 = `software_manual.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 47.
+LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 47.
+LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 47.
+LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 47.
+LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 47.
+LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 47.
+LaTeX Font Info:    ... okay on input line 47.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 47.
+ (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count146
-\scratchdimen=\dimen158
-\scratchbox=\box64
-\nofMPsegments=\count147
-\nofMParguments=\count148
-\everyMPshowfont=\toks30
-\MPscratchCnt=\count149
-\MPscratchDim=\dimen159
-\MPnumerator=\count150
-\everyMPtoPDFconversion=\toks31
+\scratchcounter=\count135
+\scratchdimen=\dimen146
+\scratchbox=\box58
+\nofMPsegments=\count136
+\nofMParguments=\count137
+\everyMPshowfont=\toks28
+\MPscratchCnt=\count138
+\MPscratchDim=\dimen147
+\MPnumerator=\count139
+\everyMPtoPDFconversion=\toks29
 )
 Package caption Info: Begin \AtBeginDocument code.
 Package caption3 Info: subfig package 1.2 or 1.3 is loaded.
-LaTeX Info: Redefining \subref on input line 57.
+LaTeX Info: Redefining \subref on input line 47.
 Package caption Info: float package is loaded.
-Package caption Info: longtable package is loaded.
- (/usr/share/texmf-texlive/tex/latex/caption/ltcaption.sty
-Package: ltcaption 2008/03/28 v1.2 longtable captions (AR)
-)
 Package caption Info: End \AtBeginDocument code.
-
-ABD: EveryShipout initializing macros
+ ABD: EveryShipout initializing macros
 (/usr/share/texmf-texlive/tex/latex/graphics/color.sty
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 
@@ -764,310 +697,192 @@ File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 )
-\Hy@linkcounter=\count151
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
-LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 59
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 49.
+LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 49
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ztmcm.fd
 File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
 )
-LaTeX Font Info:    Try loading font information for OML+ztmcm on input line 59
+LaTeX Font Info:    Try loading font information for OML+ztmcm on input line 49
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omlztmcm.fd
 File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
 )
-LaTeX Font Info:    Try loading font information for OMS+ztmcm on input line 59
+LaTeX Font Info:    Try loading font information for OMS+ztmcm on input line 49
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsztmcm.fd
 File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
 )
-LaTeX Font Info:    Try loading font information for OMX+ztmcm on input line 59
+LaTeX Font Info:    Try loading font information for OMX+ztmcm on input line 49
 .
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omxztmcm.fd
 File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 49.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 49.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 59.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 49.
  [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [1] (./entregavel4.toc)
-\tf@toc=\write3
-\openout3 = `entregavel4.toc'.
-
- [1
-
-
-]
-(./deliverable4_intro.tex
-Cap\'{\i }tulo 1.
-
-Overfull \hbox (2.28294pt too wide) in paragraph at lines 3--4
-[]\OT1/ptm/m/n/12 Conforme es-ta-be-le-cido na rela[][]ao de \OT1/ptm/m/it/12 d
-e-li-ve-ra-bles \OT1/ptm/m/n/12 do do-cu-mento de an[]alise tec-nol[]ogica,
- []
-
-[3
-
-
-]) (./modelagem_uml.tex [4]
-Cap\'{\i }tulo 2.
-[5
-
-]
-<./figuras/estacaoBase/usecase_estacao_base.jpg, id=23, 1302.36563pt x 846.9140
-6pt>
-File: ./figuras/estacaoBase/usecase_estacao_base.jpg Graphic file (type jpg)
- <use ./figuras/estacaoBase/usecase_estacao_base.jpg> [6]
-<./figuras/sistEmbarcado/usecase_linux_embarcado.jpg, id=28, 1157.07281pt x 796
-.47563pt>
-File: ./figuras/sistEmbarcado/usecase_linux_embarcado.jpg Graphic file (type jp
-g)
- <use ./figuras/sistEmbarcado/usecase_linux_embarcado.jpg>
-<./figuras/sistEmbarcado/usecase_placa_baixo_nivel.jpg, id=29, 1102.87032pt x 7
-88.9475pt>
-File: ./figuras/sistEmbarcado/usecase_placa_baixo_nivel.jpg Graphic file (type 
-jpg)
- <use ./figuras/sistEmbarcado/usecase_placa_baixo_nivel.jpg> [7 <./figuras/esta
-caoBase/usecase_estacao_base.jpg> <./figuras/sistEmbarcado/usecase_linux_embarc
-ado.jpg>]
-<./figuras/estacaoBase/class_estacaoBase.jpg, id=33, 5491.01437pt x 4650.12282p
-t>
-File: ./figuras/estacaoBase/class_estacaoBase.jpg Graphic file (type jpg)
- <use ./figuras/estacaoBase/class_estacaoBase.jpg> [8 <./figuras/sistEmbarcado/
-usecase_placa_baixo_nivel.jpg>]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[9 <./figuras/estacaoBase/class_estacaoBase.jpg>]
-Underfull \hbox (badness 4328) in paragraph at lines 118--118
-[]\OT1/ptm/m/n/12 Respons[]avel por re-pre-sen-tar o rob[]o, este
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[10]
-Underfull \hbox (badness 2790) in paragraph at lines 145--145
-[]\OT1/ptm/m/n/12 Thread res-pons[]avel pelo pro-ces-sa-mento de
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-<./figuras/sistEmbarcado/class_sistEmbarcado.jpg, id=43, 2670.97874pt x 1349.79
-282pt>
-File: ./figuras/sistEmbarcado/class_sistEmbarcado.jpg Graphic file (type jpg)
- <use ./figuras/sistEmbarcado/class_sistEmbarcado.jpg> [11] [12])
-(./protocolo.tex [13 <./figuras/sistEmbarcado/class_sistEmbarcado.jpg>]
-[14] (./codificacao_mensagens.tex
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 5.
-
-(/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
-File: omsptm.fd 
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [1] (./software_manual.toc
 )
-LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 5.
- [15] [16] [17]
-Underfull \hbox (badness 10000) in paragraph at lines 135--146
+\tf@toc=\write3
+\openout3 = `software_manual.toc'.
 
- []
+ [1
 
-[18]) [19]
-<./figuras/estacaoBase/statemachine_conexao_estacaoBase.jpg, id=74, 939.51pt x 
-993.7125pt>
-File: ./figuras/estacaoBase/statemachine_conexao_estacaoBase.jpg Graphic file (
-type jpg)
- <use ./figuras/estacaoBase/statemachine_conexao_estacaoBase.jpg>
-[20]
-<./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.jpg, id=78, 942.521
-26pt x 928.21782pt>
-File: ./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.jpg Graphic fi
-le (type jpg)
 
-<use ./figuras/sistEmbarcado/statemachine_conexao_sistEmbarcado.jpg> [21 <./fig
-uras/estacaoBase/statemachine_conexao_estacaoBase.jpg>]
-<./figuras/statemachine_Sender.jpg, id=82, 856.70062pt x 660.21657pt>
-File: ./figuras/statemachine_Sender.jpg Graphic file (type jpg)
+]
+(./manual_software.tex <ini_ts.pdf, id=15, page=1, 597.55246pt x 845.07718pt>
+File: ini_ts.pdf Graphic file (type pdf)
 
-<use ./figuras/statemachine_Sender.jpg> [22 <./figuras/sistEmbarcado/statemachi
-ne_conexao_sistEmbarcado.jpg>]
-<./figuras/statemachine_Receiver.jpg, id=86, 750.55406pt x 497.60907pt>
-File: ./figuras/statemachine_Receiver.jpg Graphic file (type jpg)
+<use ini_ts.pdf, page 1>
+File: ini_ts.pdf Graphic file (type pdf)
+ <use ini_ts.pdf, page 1>
+File: ini_ts.pdf Graphic file (type pdf)
+ <use ini_ts.pdf, page 1>
+File: ini_ts.pdf Graphic file (type pdf)
 
-<use ./figuras/statemachine_Receiver.jpg> [23 <./figuras/statemachine_Sender.jp
-g>] <./figuras/statemachine_Processor.jpg, id=90, 713.66624pt x 566.115pt>
-File: ./figuras/statemachine_Processor.jpg Graphic file (type jpg)
+<use ini_ts.pdf, page 1>
+Cap\'{\i }tulo 1.
+File: ini_ts.pdf Graphic file (type pdf)
+<use ini_ts.pdf, page 1> [3
 
-<use ./figuras/statemachine_Processor.jpg> [24 <./figuras/statemachine_Receiver
-.jpg>]
-<./figuras/sistEmbarcado/statemachine_motores_sistEmbarcado.jpg, id=95, 924.453
-75pt x 512.66531pt>
-File: ./figuras/sistEmbarcado/statemachine_motores_sistEmbarcado.jpg Graphic fi
-le (type jpg)
 
-<use ./figuras/sistEmbarcado/statemachine_motores_sistEmbarcado.jpg> [25 <./fig
-uras/statemachine_Processor.jpg>]
-<./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg, id=
-99, 784.43062pt x 566.115pt>
-File: ./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg
- Graphic file (type jpg)
+ <./ini_ts.pdf>]
+<ini_ts.pdf, id=27, page=2, 597.55246pt x 845.07718pt>
+File: ini_ts.pdf Graphic file (type pdf)
 
-<use ./figuras/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg>
+<use ini_ts.pdf, page 2>
+File: ini_ts.pdf Graphic file (type pdf)
+ <use ini_ts.pdf, page 2>
+File: ini_ts.pdf Graphic file (type pdf)
+ <use ini_ts.pdf, page 2>
+File: ini_ts.pdf Graphic file (type pdf)
 
-<./figuras/estacaoBase/statemachine_webcam_estacaoBase.jpg, id=100, 551.05875pt
- x 506.6428pt>
-File: ./figuras/estacaoBase/statemachine_webcam_estacaoBase.jpg Graphic file (t
-ype jpg)
- <use ./figuras/estacaoBase/statemachine_webcam_estacaoBase.jpg>
-[26 <./figuras/sistEmbarcado/statemachine_motores_sistEmbarcado.jpg> <./figuras
-/sistEmbarcado/statemachine_AmostragemSensores_sistEmbarcado.jpg>]
-<./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg, id=104, 596.227
-5pt x 476.53032pt>
-File: ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg Graphic fil
-e (type jpg)
+<use ini_ts.pdf, page 2>
+File: ini_ts.pdf Graphic file (type pdf)
+ <use ini_ts.pdf, page 2> [4 <./ini_ts.pdf>]
+Cap\'{\i }tulo 2.
+<./images/interface_grafica.png, id=36, 820.06375pt x 544.0325pt>
+File: ./images/interface_grafica.png Graphic file (type png)
 
-<use ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg> [27 <./figu
-ras/estacaoBase/statemachine_webcam_estacaoBase.jpg>]
-<./figuras/estacaoBase/sequence_motores_estacaoBase.jpg, id=108, 805.50937pt x 
-460.72125pt>
-File: ./figuras/estacaoBase/sequence_motores_estacaoBase.jpg Graphic file (type
- jpg)
- <use ./figuras/estacaoBase/sequence_motores_estacaoBase.jpg>
-[28 <./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg>]
-<./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg, id=112, 1238.37656
-pt x 530.73282pt>
-File: ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg Graphic file (
-type jpg)
+<use ./images/interface_grafica.png>
+<./images/document-new.png, id=37, 24.09pt x 24.09pt>
+File: ./images/document-new.png Graphic file (type png)
 
-<use ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg>
-<./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg, id=113, 916.92563
-pt x 548.0475pt>
-File: ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg Graphic file 
-(type jpg)
+<use ./images/document-new.png>
+<./images/document-open.png, id=39, 24.09pt x 24.09pt>
+File: ./images/document-open.png Graphic file (type png)
 
-<use ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> [29 <./figura
-s/estacaoBase/sequence_motores_estacaoBase.jpg> <./figuras/sistEmbarcado/sequen
-ce_motores_sistEmbarcado.jpg>]
-<./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg, id=117, 1307.63531pt 
-x 554.07pt>
-File: ./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg Graphic file (typ
-e jpg)
- <use ./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg>
-<./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg, id=118, 1669.73813pt x 
-561.59813pt>
-File: ./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg Graphic file (type 
-jpg)
- <use ./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg>
-[30 <./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> <./figuras/es
-tacaoBase/sequence_sensores_estacaoBase.jpg>]
-<./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg, id=123, 1172.12906p
-t x 536.0025pt>
-File: ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg Graphic file (t
-ype jpg)
+<use ./images/document-open.png>
+<./images/document-save_24.png, id=40, 24.09pt x 24.09pt>
+File: ./images/document-save_24.png Graphic file (type png)
 
-<use ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg>)
-(./diagrama_hardware.tex [31 <./figuras/estacaoBase/sequence_webcam_estacaoBase
-.jpg> <./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg>]
+<use ./images/document-save_24.png>
+<./images/camera-web.png, id=41, 19.272pt x 19.272pt>
+File: ./images/camera-web.png Graphic file (type png)
+
+<use ./images/camera-web.png>
+<./images/wifi2-blue.png, id=42, 24.09pt x 24.09pt>
+File: ./images/wifi2-blue.png Graphic file (type png)
+
+<use ./images/wifi2-blue.png>
+<./images/wifi2-red.png, id=43, 24.09pt x 24.09pt>
+File: ./images/wifi2-red.png Graphic file (type png)
+
+<use ./images/wifi2-red.png>
+<./images/gtk-media-record.png, id=44, 24.09pt x 24.09pt>
+File: ./images/gtk-media-record.png Graphic file (type png)
+
+<use ./images/gtk-media-record.png> [6
+
+ <./images/interface_grafica.png (PNG copy)>] <./images/seta_direita.png, id=49
+, 160.34906pt x 159.59625pt>
+File: ./images/seta_direita.png Graphic file (type png)
+
+<use ./images/seta_direita.png>
+<./images/seta_esquerda.png, id=50, 160.34906pt x 159.59625pt>
+File: ./images/seta_esquerda.png Graphic file (type png)
+
+<use ./images/seta_esquerda.png>
+<./images/seta_cima.png, id=51, 159.59625pt x 160.34906pt>
+File: ./images/seta_cima.png Graphic file (type png)
+
+<use ./images/seta_cima.png>
+<./images/seta_baixo.png, id=52, 159.59625pt x 160.34906pt>
+File: ./images/seta_baixo.png Graphic file (type png)
+
+<use ./images/seta_baixo.png>
+<./images/curva_direita_cima.png, id=53, 158.84344pt x 159.59625pt>
+File: ./images/curva_direita_cima.png Graphic file (type png)
+
+<use ./images/curva_direita_cima.png>
+<./images/curva_direita_abaixo.png, id=54, 158.84344pt x 159.59625pt>
+File: ./images/curva_direita_abaixo.png Graphic file (type png)
+
+<use ./images/curva_direita_abaixo.png>
+<./images/curva_esquerda_cima.png, id=55, 158.84344pt x 159.59625pt>
+File: ./images/curva_esquerda_cima.png Graphic file (type png)
+
+<use ./images/curva_esquerda_cima.png>
+<./images/curva_esquerda_abaixo.png, id=56, 158.84344pt x 159.59625pt>
+File: ./images/curva_esquerda_abaixo.png Graphic file (type png)
+
+<use ./images/curva_esquerda_abaixo.png>
+<./images/giro_horario.png, id=57, 179.92218pt x 181.42781pt>
+File: ./images/giro_horario.png Graphic file (type png)
+
+<use ./images/giro_horario.png>
+<./images/giro_anti_horario.png, id=58, 179.92218pt x 181.42781pt>
+File: ./images/giro_anti_horario.png Graphic file (type png)
+
+<use ./images/giro_anti_horario.png> [7 <./images/document-new.png> <./images/d
+ocument-open.png> <./images/document-save_24.png> <./images/camera-web.png> <./
+images/wifi2-blue.png> <./images/wifi2-red.png> <./images/gtk-media-record.png>
+ <./images/seta_direita.png (PNG copy)> <./images/seta_esquerda.png (PNG copy)>
+ <./images/seta_cima.png (PNG copy)> <./images/seta_baixo.png (PNG copy)> <./im
+ages/curva_direita_cima.png (PNG copy)> <./images/curva_direita_abaixo.png (PNG
+ copy)> <./images/curva_esquerda_cima.png (PNG copy)> <./images/curva_esquerda_
+abaixo.png (PNG copy)> <./images/giro_horario.png (PNG copy)> <./images/giro_an
+ti_horario.png (PNG copy)>]
 Cap\'{\i }tulo 3.
+<./images/conectado.png, id=70, 618.31pt x 272.01625pt>
+File: ./images/conectado.png Graphic file (type png)
 
-<./figuras/hardware/diagrama_blocos_hardware.jpg, id=127, 712.91344pt x 595.474
-69pt>
-File: ./figuras/hardware/diagrama_blocos_hardware.jpg Graphic file (type jpg)
- <use ./figuras/hardware/diagrama_blocos_hardware.jpg>
-Overfull \hbox (4.01436pt too wide) in paragraph at lines 17--18
-\OT1/ptm/m/n/12 ler[]ometro e gi-rosc[]opios. Al[]em disso pos-sui a implementa
-[][]ao do pro-to-colo de comunica[][]ao
- []
+<use ./images/conectado.png>) AED: lastpage setting LastPage [8
 
-[32
-
- <./figuras/hardware/diagrama_blocos_hardware.jpg>]
-<./figuras/hardware/hardware2_2.pdf, id=131, 1690.315pt x 2392.94pt>
-File: ./figuras/hardware/hardware2_2.pdf Graphic file (type pdf)
-
-<use ./figuras/hardware/hardware2_2.pdf> [33] [34 <./figuras/hardware/hardware2
-_2.pdf>] <./figuras/hardware/pcb_cima.jpg, id=142, 654.445pt x 605.26125pt>
-File: ./figuras/hardware/pcb_cima.jpg Graphic file (type jpg)
-
-<use ./figuras/hardware/pcb_cima.jpg>
-<./figuras/hardware/pcb_baixo.jpg, id=143, 618.31pt x 604.2575pt>
-File: ./figuras/hardware/pcb_baixo.jpg Graphic file (type jpg)
-
-<use ./figuras/hardware/pcb_baixo.jpg>
-<./figuras/hardware/pcb_pronta.jpg, id=144, 886.31125pt x 598.235pt>
-File: ./figuras/hardware/pcb_pronta.jpg Graphic file (type jpg)
-
-<use ./figuras/hardware/pcb_pronta.jpg>) (./teoria_mapa.tex [35 <./figuras/hard
-ware/pcb_cima.jpg>] [36 <./figuras/hardware/pcb_baixo.jpg> <./figuras/hardware/
-pcb_pronta.jpg>]
-Cap\'{\i }tulo 4.
-<./figuras/robo/robo.png, id=152, 602.25pt x 451.6875pt>
-File: ./figuras/robo/robo.png Graphic file (type png)
-
-<use ./figuras/robo/robo.png> [37
-
-]
-<./figuras/robo/roda_encoder.png, id=156, 481.8pt x 361.35pt>
-File: ./figuras/robo/roda_encoder.png Graphic file (type png)
-
-<use ./figuras/robo/roda_encoder.png> [38 <./figuras/robo/robo.png (PNG copy)>]
-[39 <./figuras/robo/roda_encoder.png (PNG copy)>] [40] [41] [42] [43] [44]
-Overfull \hbox (4.59846pt too wide) in paragraph at lines 286--287
-[]\OT1/ptm/m/n/12 A ve-lo-ci-dade e acelera[][]ao an-gu-la-res po-dem ser tamb[
-]em ob-ti-das por deriva[][]ao num[]erica,
- []
-
-[45]
-Overfull \hbox (7.31091pt too wide) in paragraph at lines 325--326
-[]\OT1/ptm/m/n/12 Para de-ter-mi-nar a ve-lo-ci-dade e des-lo-ca-mento li-ne-a-
-res a par-tir dos da-dos do ace-ler[]ometro,
- []
-
-[46] <./figuras/robo/robo_ir.png, id=190, 602.25pt x 451.6875pt>
-File: ./figuras/robo/robo_ir.png Graphic file (type png)
-
-<use ./figuras/robo/robo_ir.png> [47] [48 <./figuras/robo/robo_ir.png (PNG copy
-)>]) (./entregavel4.bbl [49]) AED: lastpage setting LastPage [50
-
-]
+ <./images/conectado.png (PNG copy)>]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./entregavel4.aux) ) 
+(./software_manual.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
 Here is how much of TeX's memory you used:
- 7003 strings out of 495041
- 107355 string characters out of 1181897
- 187052 words of memory out of 3000000
- 9902 multiletter control sequences out of 15000+50000
- 30332 words of font info for 69 fonts, out of 3000000 for 9000
+ 5635 strings out of 495041
+ 83056 string characters out of 1181897
+ 158279 words of memory out of 3000000
+ 8618 multiletter control sequences out of 15000+50000
+ 20692 words of font info for 43 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
- 61i,14n,96p,1107b,388s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</us
-r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
-mf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/
-fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/
-public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/
-usyr.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/
-texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/
-type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr
-i8a.pfb>
-Output written on entregavel4.pdf (51 pages, 4024028 bytes).
+ 61i,16n,96p,677b,486s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
+ve/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/t
+imes/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+Output written on software_manual.pdf (8 pages, 266210 bytes).
 PDF statistics:
- 236 PDF objects out of 1000 (max. 8388607)
+ 86 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 141 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 126 words of extra memory for PDF output out of 10000 (max. 10000000)
 

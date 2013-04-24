@@ -1,0 +1,4 @@
+\select@language {brazil}
+\contentsline {chapter}{\numberline {1}\MakeUppercase {Iniciando a ts}}{}
+\contentsline {chapter}{\numberline {2}\MakeUppercase {Conhecendo a esta\IeC {\c c}\IeC {\~a}o base}}{6}
+\contentsline {chapter}{\numberline {3}\MakeUppercase {Conectando ao sistema embarcado}}{8}

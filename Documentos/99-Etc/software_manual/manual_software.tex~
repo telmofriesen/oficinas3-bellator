@@ -9,7 +9,7 @@ A seguir, é apresentada a interface gráfica da estação-base.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{./images/interface_grafica.png}
-\caption{Mensagem de conexão com sucesso da estação-base}
+\caption{Interface gráfica da estação-base}
 \label{fig:ui}
 \end{figure}
 
@@ -50,9 +50,9 @@ A seguir, é apresentada a interface gráfica da estação-base.
   \label{tab:alternativas_desenho}
 \end{table}
 
-\chapter{Conectando à estação-base}
+\chapter{Conectando ao sistema embarcado}
 
-Para que a estação base e o robô se conectem, a placa com o linux embarcado precisa estar ligada a pelo menos 30 segundos, para garantir que o sistema operacional da placa e o dongle WI-FI estejam plenamente funcionais. Tanto o computador, quanto o robô precisam estar na mesma rede WI-FI. Em seguida, é preciso acessar o software da estação-base e clicar em conectar. Na janela que aparecer, clicar em conectar novamente. A estação base exibirá uma mensagem informando que a conexão foi estabelecida com sucesso, conforme a Figura \ref{fig:conectado}.
+Para que a estação base e o robô se conectem, a placa com o linux embarcado precisa estar ligada a pelo menos 2 minutos, para garantir que o sistema operacional da placa e o dongle WI-FI estejam plenamente funcionais. Tanto o computador, quanto o robô precisam estar na mesma rede WI-FI. Em seguida, é preciso acessar o software da estação-base e clicar em ``Conexão''. Na janela que aparecer, digitar o ip e a porta e clicar em ``Conectar''. Se o comando for bem sucedido, a estação base exibirá uma mensagem informando que a conexão foi estabelecida com sucesso, conforme a Figura \ref{fig:conectado}.
 
 
 \begin{figure}[H]
