@@ -1,0 +1,65 @@
+% \documentclass{report}
+% \usepackage[utf8]{inputenc}
+% \usepackage[brazil]{babel}
+
+\documentclass[oneside,a4paper,12pt]{normas-utf-tex}
+
+\usepackage{breakurl}
+\usepackage[alf,abnt-emphasize=bf,bibjustif,recuo=0cm, abnt-etal-cite=2]{abntcite}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx,subfig}
+\usepackage{times}
+\usepackage[plain]{fancyref}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{amssymb}
+\usepackage{bm}
+%\usepackage[loose]{units}
+
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{~[#1]}}}
+
+
+
+%%% Complemento para tabelas
+\usepackage{booktabs, multirow}
+\setlength{\heavyrulewidth}{0.1em}
+\renewcommand{\toprule}{\midrule[\heavyrulewidth]}
+\renewcommand{\arraystretch}{1.2}
+%%%
+
+\instituicao{Universidade Tecnológica Federal do Paraná}
+\departamento{Departamento Acadêmico de Eletrônica}
+\departamentodois{Departamento Acadêmico de Informática}
+\programa{Curso de Engenharia de Computação}
+\unidade{Oficina de Integração 3}
+
+\titulo{\MakeUppercase{Mapeamento de ambientes com o robô Bellator}}
+\documento{Manual do software}
+
+\autor{Luis Guilherme Machado Camargo}
+\autordois{Pedro Alberto de Borba}
+\autortres{Ricardo Farah}
+\autorquatro{Stefan Campana Fuchs}
+\autorcinco{Telmo Friesen}
+
+\cita{CAMARGO, L.G.M; BORBA, P.A.; FARAH, R.; FUCHS, S.C.; FRIESEN, T}
+
+\comentario{\UTFPRdocumentodata\ apresentado à Unidade Curricular de \UTFPRunidadedata\ do \UTFPRprogramadata\ da \ABNTinstituicaodata\ como requisito parcial para aprovação.}
+
+\local{Curitiba}
+\data{\the\year}
+
+\begin{document}
+
+\capa
+\folhaderosto
+\sumario
+\input{manual_software}
+\raggedright
+
+\end{document}
+

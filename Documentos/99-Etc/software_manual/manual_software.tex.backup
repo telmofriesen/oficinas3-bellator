@@ -1,0 +1,42 @@
+\includepdf[pagecommand=\chapter{Iniciando a ts}]{ini_ts.pdf}
+\includepdf[pages=2, pagecommand=]{ini_ts.pdf}
+
+\chapter{Interagindo com a estação-base}
+É possível salvar os obstáculos identificados pelo robô bellator durante uma seção de testes em um arquivo \textit{.bellator}.
+
+\begin{table}[H]
+  \caption{Comparação entre Bibliotecas para desenhos 2D.}
+  \centering
+  \begin{tabular}{p{2cm}p{12cm}}
+    \toprule
+    \includegraphics[width=0.03\textwidth]{./images/document-new.png} & Inicia um novo arquivo no formato \textit{.bellator} \\
+    \includegraphics[width=0.03\textwidth]{./images/document-open.png} & Abre um arquivo salvo no formato \textit{.bellator} \\
+    \includegraphics[width=0.03\textwidth]{./images/document-save_24.png} & Salva um arquivo no formato \textit{.bellator} \\
+    \includegraphics[width=0.03\textwidth]{./images/camera-web.png} & Abre a janela de controle dos sensores, na qual é possível ajustar parâmetros dos sensores e da webcam. \\
+    \includegraphics[width=0.03\textwidth]{./images/wifi2-blue.png} & Quando acionado, indica que a conexão WI-FI está funcional \\
+    \includegraphics[width=0.03\textwidth]{./images/wifi2-red.png} &  Indica que a conexão WI-FI não está funcional \\
+    \includegraphics[width=0.03\textwidth]{./images/gtk-media-record.png} & Inicia a gravação dos obstáculos. Esta função só está disponível após o estabelecimento de uma conexão funcional com o robô.\\
+    \hline
+  \end{tabular}
+  \label{tab:alternativas_desenho}
+\end{table}
+
+\begin{table}[H]
+  \caption{Botões da interface gráfica e suas funcionalidades}
+  \centering
+  \begin{tabular}{p{2cm}p{8cm}}
+    \toprule
+    \includegraphics[width=0.05\textwidth]{./images/seta_direita.png} & Movimentar para direita \\
+    \includegraphics[width=0.05\textwidth]{./images/seta_esquerda.png} & Movimentar para a esquerda \\
+    \includegraphics[width=0.05\textwidth]{./images/seta_cima.png} & Movimentar para frente \\
+    \includegraphics[width=0.05\textwidth]{./images/seta_baixo.png} & Movimentar para trás \\
+    \includegraphics[width=0.05\textwidth]{./images/curva_direita_cima.png} & Fazer curva para frente e à direita  \\
+    \includegraphics[width=0.05\textwidth]{./images/curva_direita_abaixo.png} & Fazer curva para trás e à direita \\
+    \includegraphics[width=0.05\textwidth]{./images/curva_esquerda_cima.png} & Fazer curva para frente e à esquerda \\
+    \includegraphics[width=0.05\textwidth]{./images/curva_esquerda_abaixo.png} & Fazer curva para trás e à esquerda  \\
+    \includegraphics[width=0.05\textwidth]{./images/giro_horario.png} & Girar no sentido horário \\
+    \includegraphics[width=0.05\textwidth]{./images/giro_anti_horario.png} & Girar no sentido anti-horário \\
+    \hline
+  \end{tabular}
+  \label{tab:alternativas_desenho}
+\end{table}
