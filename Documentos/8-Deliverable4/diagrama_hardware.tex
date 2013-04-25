@@ -5,7 +5,7 @@
 
 Na figura \ref{fig:diagrama_blocos_hardware} mostra-se o diagrama de blocos do sistema embarcado e suas conexões com o restante do robô. A seguir está também uma descrição para cada um dos blocos da placa de circuito impresso do sistema embarcado.
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{./figuras/hardware/diagrama_blocos_hardware.jpg}
   \caption{Diagrama de blocos do hardware}
@@ -26,7 +26,7 @@ Na figura \ref{fig:diagrama_blocos_hardware} mostra-se o diagrama de blocos do s
 
 Na figura \ref{fig:diagrama_eletrico_eletronico} mostra-se o diagrama de elétrico eletrônico do sistema embarcado. Cada bloco da figura \ref{fig:diagrama_blocos_hardware} corresponde a alguns componentes do diagrama elétrico eletrônico. A seguir detalha-se um pouco mais cada bloco.
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.9\textwidth, keepaspectratio]{./figuras/hardware/hardware2_2.pdf}
   \caption{Diagrama elétrico/eletrônico.}
@@ -47,23 +47,45 @@ Na figura \ref{fig:diagrama_eletrico_eletronico} mostra-se o diagrama de elétri
 
 O projeto da placa de circuito impresso (PCB) do sistema embarcado de baixo nível está explicitado nas Figuras \ref{fig:pcb_cima} e \ref{fig:pcb_baixo}. Na Figura \ref{fig:pcb_pronta} está presente uma foto da placa pronta com os componentes soldados.
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth, keepaspectratio]{./figuras/hardware/pcb_cima.jpg}
   \caption{Projeto da PCB -- lado de cima.}
   \label{fig:pcb_cima}
 \end{figure}
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth, keepaspectratio]{./figuras/hardware/pcb_baixo.jpg}
   \caption{Projeto da PCB -- lado de baixo.}
   \label{fig:pcb_baixo}
 \end{figure}
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth, keepaspectratio]{./figuras/hardware/pcb_pronta.jpg}
   \caption{PCB montada.}
   \label{fig:pcb_pronta}
 \end{figure}
+
+\subsection{Guia de montagem do hardware}
+
+Os passos a seguir, juntamente com a Figura \ref{fig:conexoes_hardware} indicam como a placa embarcada deve ser montada.
+
+\begin{enumerate}
+\item Conexão com sensores IR. A conexão deve ser feita de acordo com a indicação da placa, respeitando os pinos de alimentação e sinal.
+\item Conexão com os encoders. A conexão deve ser feita de acordo com a indicação da placa, respeitando os pinos de alimentação e sinal.
+\item Conexão para drivers de potência dos motores. Cada pino é um sinal de PWM.
+\item Conexão Serial RS232 com a placa TS-7260.
+\item Conexão Serial RS232 para envio de logs ao computador ou programação do microcontrolador. (não necessita obrigatoriamente estar conectado durante operação normal)
+\item Jumper para seleção do modo ISP para gravação do microcontrolador. (Modo ISP selecionado quando com o jumper durante o boot ou reset da placa).
+\item Conexão da alimentação. 12V, negativo na parte externa do conector jack.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth, keepaspectratio]{./figuras/hardware/conexoes_hardware.jpg}
+  \caption{PCB montada.}
+  \label{fig:conexoes_hardware}
+\end{figure}
+
