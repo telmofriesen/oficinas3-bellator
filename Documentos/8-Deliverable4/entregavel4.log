@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  24 APR 2013 18:21
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  25 APR 2013 18:22
 entering extended mode
  %&-line parsing enabled.
 **entregavel4
@@ -1002,45 +1002,49 @@ File: ./figuras/hardware/hardware2_2.pdf Graphic file (type pdf)
 _2.pdf>] <./figuras/hardware/pcb_cima.jpg, id=142, 654.445pt x 605.26125pt>
 File: ./figuras/hardware/pcb_cima.jpg Graphic file (type jpg)
 
-<use ./figuras/hardware/pcb_cima.jpg>
-<./figuras/hardware/pcb_baixo.jpg, id=143, 618.31pt x 604.2575pt>
+<use ./figuras/hardware/pcb_cima.jpg> [35]
+<./figuras/hardware/pcb_baixo.jpg, id=146, 618.31pt x 604.2575pt>
 File: ./figuras/hardware/pcb_baixo.jpg Graphic file (type jpg)
 
 <use ./figuras/hardware/pcb_baixo.jpg>
-<./figuras/hardware/pcb_pronta.jpg, id=144, 886.31125pt x 598.235pt>
+<./figuras/hardware/pcb_pronta.jpg, id=147, 886.31125pt x 598.235pt>
 File: ./figuras/hardware/pcb_pronta.jpg Graphic file (type jpg)
 
-<use ./figuras/hardware/pcb_pronta.jpg>) (./teoria_mapa.tex [35 <./figuras/hard
-ware/pcb_cima.jpg>] [36 <./figuras/hardware/pcb_baixo.jpg> <./figuras/hardware/
-pcb_pronta.jpg>]
+<use ./figuras/hardware/pcb_pronta.jpg> [36 <./figuras/hardware/pcb_cima.jpg> <
+./figuras/hardware/pcb_baixo.jpg>]
+<./figuras/hardware/conexoes_hardware.jpg, id=152, 602.25pt x 576.65437pt>
+File: ./figuras/hardware/conexoes_hardware.jpg Graphic file (type jpg)
+
+<use ./figuras/hardware/conexoes_hardware.jpg> [37 <./figuras/hardware/pcb_pron
+ta.jpg>]) (./teoria_mapa.tex [38 <./figuras/hardware/conexoes_hardware.jpg>]
 Cap\'{\i }tulo 4.
-<./figuras/robo/robo.png, id=152, 602.25pt x 451.6875pt>
+<./figuras/robo/robo.png, id=159, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo.png Graphic file (type png)
 
-<use ./figuras/robo/robo.png> [37
+<use ./figuras/robo/robo.png> [39
 
 ]
-<./figuras/robo/roda_encoder.png, id=156, 481.8pt x 361.35pt>
+<./figuras/robo/roda_encoder.png, id=163, 481.8pt x 361.35pt>
 File: ./figuras/robo/roda_encoder.png Graphic file (type png)
 
-<use ./figuras/robo/roda_encoder.png> [38 <./figuras/robo/robo.png (PNG copy)>]
-[39 <./figuras/robo/roda_encoder.png (PNG copy)>] [40] [41] [42] [43] [44]
+<use ./figuras/robo/roda_encoder.png> [40 <./figuras/robo/robo.png (PNG copy)>]
+[41 <./figuras/robo/roda_encoder.png (PNG copy)>] [42] [43] [44] [45] [46]
 Overfull \hbox (4.59846pt too wide) in paragraph at lines 286--287
 []\OT1/ptm/m/n/12 A ve-lo-ci-dade e acelera[][]ao an-gu-la-res po-dem ser tamb[
 ]em ob-ti-das por deriva[][]ao num[]erica,
  []
 
-[45]
+[47]
 Overfull \hbox (7.31091pt too wide) in paragraph at lines 325--326
 []\OT1/ptm/m/n/12 Para de-ter-mi-nar a ve-lo-ci-dade e des-lo-ca-mento li-ne-a-
 res a par-tir dos da-dos do ace-ler[]ometro,
  []
 
-[46] <./figuras/robo/robo_ir.png, id=190, 602.25pt x 451.6875pt>
+[48] <./figuras/robo/robo_ir.png, id=198, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo_ir.png Graphic file (type png)
 
-<use ./figuras/robo/robo_ir.png> [47] [48 <./figuras/robo/robo_ir.png (PNG copy
-)>]) (./entregavel4.bbl [49]) AED: lastpage setting LastPage [50
+<use ./figuras/robo/robo_ir.png> [49] [50 <./figuras/robo/robo_ir.png (PNG copy
+)>]) (./entregavel4.bbl [51]) AED: lastpage setting LastPage [52
 
 ]
 +-------------------------------------------------------------------+
@@ -1049,10 +1053,10 @@ File: ./figuras/robo/robo_ir.png Graphic file (type png)
 +-------------------------------------------------------------------+
 (./entregavel4.aux) ) 
 Here is how much of TeX's memory you used:
- 7003 strings out of 495041
- 107355 string characters out of 1181897
+ 7009 strings out of 495041
+ 107578 string characters out of 1181897
  187052 words of memory out of 3000000
- 9902 multiletter control sequences out of 15000+50000
+ 9907 multiletter control sequences out of 15000+50000
  30332 words of font info for 69 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
  61i,14n,96p,1107b,388s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1065,9 +1069,9 @@ usyr.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/
 texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/
 type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr
 i8a.pfb>
-Output written on entregavel4.pdf (51 pages, 4023877 bytes).
+Output written on entregavel4.pdf (53 pages, 4107867 bytes).
 PDF statistics:
- 236 PDF objects out of 1000 (max. 8388607)
+ 243 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 141 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 146 words of extra memory for PDF output out of 10000 (max. 10000000)
 
