@@ -54,8 +54,10 @@ public class Tests {
         robo.addSensorIR(new SensorIR(new Ponto(200, 0), PApplet.radians(0), 200, 1500));
 //        robo.addSensorIR(new SensorIR(new Ponto(20, 10), PApplet.radians(30), 20, 150));
         robo.addSensorIR(new SensorIR(new Ponto(200, 200), PApplet.radians(60), 200, 1500));
+        
+        Robo robo_aux = new Robo(400, 500, new Ponto(-200, 200));
 
-        Mapa mapa = new Mapa(robo, obstaculos);
+        Mapa mapa = new Mapa(robo, obstaculos, robo_aux);
 
         RoboDrawable roboDrawable = new RoboDrawable(robo);
 
@@ -105,7 +107,7 @@ public class Tests {
         //
         // Inicializa o controle dos sensores
         //
-        GerenciadorSensores gerenciadorSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        GerenciadorSensores gerenciadorSensores = new GerenciadorSensores(robo, obstaculos, robo_aux); //Sem filtragem de ruidos por filtro de Kalman
         gerenciadorSensores.start();
         gerenciadorSensores.startRecording();
 //        ControleSensoresKalman controleSensores = new ControleSensoresKalman(robo, obstaculos, 0.1f, 0.05f, 5f); //Com filtragem por filtro de Kalman
@@ -120,11 +122,11 @@ public class Tests {
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 4000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 5000));
 //            robo.novaTrilha(new Ponto(1000,1000));
-            gerenciadorSensores.mudaPosicaoRobo(new Ponto(5000,5000), -1.5f);
+            gerenciadorSensores.mudaPosicaoRobo(new Ponto(5000, 5000), -1.5f);
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 6000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 7000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 8000));
-            gerenciadorSensores.mudaPosicaoRobo(new Ponto(0,-2000), 1);
+            gerenciadorSensores.mudaPosicaoRobo(new Ponto(0, -2000), 1);
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 9000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 10000));
             gerenciadorSensores.novaLeituraSensores(new AmostraSensores(100, 100, new int[]{150, 0, 150}, 0, 0, 0, 0, 0, 0, 11000));

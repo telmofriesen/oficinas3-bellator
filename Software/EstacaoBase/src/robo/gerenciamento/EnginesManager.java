@@ -47,7 +47,7 @@ public class EnginesManager {
 
         int sum = 0;
         for (int i = 0; i < message.length - 2; i++) {
-            sum = (sum + (short)(message[i]) & 0x00FF ) % 65536;
+            sum = (sum + ((short)(message[i]) & 0x00FF)) % 65536;
         }
         short sum_short = (short) sum;
         message[message.length - 2] = (byte) ((sum_short >> 8) & 0XFF);
@@ -59,7 +59,7 @@ public class EnginesManager {
         }
 
         //TODO descomentar a linha seguinte para que os comandos sejam mandados à placa de baixo nivel via serial
-//        main.getSerialCommunicator().sendMessage(message);
+        main.getSerialCommunicator().sendMessage(message);
         fireChangeEvent();
     }
 

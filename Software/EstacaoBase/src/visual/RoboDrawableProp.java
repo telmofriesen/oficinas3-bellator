@@ -19,6 +19,7 @@ public class RoboDrawableProp {
     private Color corOrigem = new Color(0, 0, 200, 200);
     private boolean roboEnabled = true;
     private boolean coordenadasEnabled = true;
+    private boolean textoEnabled = true;
     private int larguraRodas = 50;
     private int comprimentoRodas = 150;
     private Color corRodas = new Color(0, 0, 0, 200);
@@ -93,5 +94,13 @@ public class RoboDrawableProp {
 
     public void setCoordenadasEnabled(boolean coordenadasEnabled) {
         this.coordenadasEnabled = coordenadasEnabled;
+    }
+
+    public boolean isTextoEnabled() {
+        return textoEnabled;
+    }
+
+    public void setTextoEnabled(boolean textoEnabled) {
+        this.textoEnabled = textoEnabled;
     }
 }

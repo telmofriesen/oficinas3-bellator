@@ -55,8 +55,8 @@ public class JanelaAvancado extends javax.swing.JFrame {
         fileNameJLabel = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         fileLoadButton = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        saveButton = new javax.swing.JButton();
+        robo_auxCheckbox = new javax.swing.JCheckBox();
+        kalmanCheckbox = new javax.swing.JCheckBox();
 
         recordCheckBox.setText("Gravar leituras dos sensores em arquivo");
         recordCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -65,7 +65,7 @@ public class JanelaAvancado extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("Nome do arquivo:");
+        jLabel1.setText("Nome da pasta:");
 
         fileNameJLabel.setText("--");
 
@@ -78,12 +78,18 @@ public class JanelaAvancado extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setText("Salvar valores para plotagem");
-
-        saveButton.setText("SALVAR");
-        saveButton.addActionListener(new java.awt.event.ActionListener() {
+        robo_auxCheckbox.setText("Mostrar robo_aux");
+        robo_auxCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveButtonActionPerformed(evt);
+                robo_auxCheckboxActionPerformed(evt);
+            }
+        });
+
+        kalmanCheckbox.setSelected(true);
+        kalmanCheckbox.setText("Usar filtro de Kalman para sensores IR");
+        kalmanCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                kalmanCheckboxActionPerformed(evt);
             }
         });
 
@@ -102,8 +108,8 @@ public class JanelaAvancado extends javax.swing.JFrame {
                     .addComponent(recordCheckBox)
                     .addComponent(jLabel2)
                     .addComponent(fileLoadButton)
-                    .addComponent(jLabel3)
-                    .addComponent(saveButton))
+                    .addComponent(robo_auxCheckbox)
+                    .addComponent(kalmanCheckbox))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -120,10 +126,10 @@ public class JanelaAvancado extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fileLoadButton)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel3)
+                .addComponent(robo_auxCheckbox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(saveButton)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(kalmanCheckbox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -132,10 +138,10 @@ public class JanelaAvancado extends javax.swing.JFrame {
     private void recordCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recordCheckBoxActionPerformed
         // TODO add your handling code here:
         if (recordCheckBox.isSelected()) {
-            clientMessageProcessor.startGravacaoLeiturasSensores();
-            fileNameJLabel.setText(clientMessageProcessor.getNomeArquivoGravacaoLeituras());
+            gerenciadorSensores.startGravacaoLeiturasSensores();
+            fileNameJLabel.setText(gerenciadorSensores.getNomeArquivoGravacaoLeituras());
         } else {
-            clientMessageProcessor.stopGravacaoLeiturasSensoresArquivo();
+            gerenciadorSensores.stopGravacaoLeiturasSensoresArquivo();
             fileNameJLabel.setText("--");
         }
     }//GEN-LAST:event_recordCheckBoxActionPerformed
@@ -153,30 +159,36 @@ public class JanelaAvancado extends javax.swing.JFrame {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 //                janelaPrincipal.stopRecording();
 //                synchronized (gerenciadorSensores) {
-                        clientMessageProcessor.stopGravacaoLeiturasSensoresArquivo();
+                        gerenciadorSensores.stopGravacaoLeiturasSensoresArquivo();
                         clientMessageProcessor.setCarregandoLeiturasSensores(true);
                         gerenciadorSensores.limpaFilaAmostras();
                         gerenciadorSensores.startRecording();
                         janelaPrincipal.getMapa().getRobo().clearPosInfos();
                         janelaPrincipal.getMapa().getObstaculos().reset();
+                        janelaPrincipal.getMapa().getRobo_aux().clearPosInfos();
                         String line;
+                        boolean first = true;
                         while ((line = reader.readLine()) != null) {
+                            if (first) { //Pula a primeira linha do arquivo
+                                first = false;
+                                continue;
+                            }
                             //line = line.replaceAll("^", "S ");
                             String[] split = line.split(" ");
-                            int encoder_esq = Integer.parseInt(split[0]);
-                            int encoder_dir = Integer.parseInt(split[1]);
-                            int[] IR = {Integer.parseInt(split[2]),
-                                        Integer.parseInt(split[3]),
+                            long unixTimestamp = Long.parseLong(split[0]);
+                            int encoder_esq = Integer.parseInt(split[1]);
+                            int encoder_dir = Integer.parseInt(split[2]);
+                            int[] IR = {Integer.parseInt(split[3]),
                                         Integer.parseInt(split[4]),
                                         Integer.parseInt(split[5]),
-                                        Integer.parseInt(split[6])};
-                            int AX = Integer.parseInt(split[7]);
-                            int AY = Integer.parseInt(split[8]);
-                            int AZ = Integer.parseInt(split[9]);
-                            int GX = Integer.parseInt(split[10]);
-                            int GY = Integer.parseInt(split[11]);
-                            int GZ = Integer.parseInt(split[12]);
-                            long unixTimestamp = Long.parseLong(split[13]);
+                                        Integer.parseInt(split[6]),
+                                        Integer.parseInt(split[7])};
+                            int AX = Integer.parseInt(split[8]);
+                            int AY = Integer.parseInt(split[9]);
+                            int AZ = Integer.parseInt(split[10]);
+                            int GX = Integer.parseInt(split[11]);
+                            int GY = Integer.parseInt(split[12]);
+                            int GZ = Integer.parseInt(split[13]);
                             AmostraSensores amostra = new AmostraSensores(encoder_esq, encoder_dir, IR, AX, AY, AZ, GX, GY, GZ, unixTimestamp);
                             try {
                                 gerenciadorSensores.processaAmostraSensores(amostra);
@@ -202,9 +214,29 @@ public class JanelaAvancado extends javax.swing.JFrame {
         }.start();
     }//GEN-LAST:event_fileLoadButtonActionPerformed
 
-    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+    private void robo_auxCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_robo_auxCheckboxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_saveButtonActionPerformed
+        if (robo_auxCheckbox.isSelected()) {
+            janelaPrincipal.getRobo_auxDrawable().getPropriedades().setRoboEnabled(true);
+            janelaPrincipal.getRobo_auxDrawable().getRobo_trilha().getPropriedades().setPontosEnabled(true);
+            janelaPrincipal.getRobo_auxDrawable().getRobo_trilha().getPropriedades().setLinhaEnabled(true);
+            janelaPrincipal.getViewer2D().redraw();
+        } else {
+            janelaPrincipal.getRobo_auxDrawable().getPropriedades().setRoboEnabled(false);
+            janelaPrincipal.getRobo_auxDrawable().getRobo_trilha().getPropriedades().setPontosEnabled(false);
+            janelaPrincipal.getRobo_auxDrawable().getRobo_trilha().getPropriedades().setLinhaEnabled(false);
+            janelaPrincipal.getViewer2D().redraw();
+        }
+    }//GEN-LAST:event_robo_auxCheckboxActionPerformed
+
+    private void kalmanCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalmanCheckboxActionPerformed
+        // TODO add your handling code here:
+        if (kalmanCheckbox.isSelected()) {
+            gerenciadorSensores.setKalman_IR_enabled(true);
+        } else {
+            gerenciadorSensores.setKalman_IR_enabled(false);
+        }
+    }//GEN-LAST:event_kalmanCheckboxActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -244,8 +276,8 @@ public class JanelaAvancado extends javax.swing.JFrame {
     private javax.swing.JLabel fileNameJLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JCheckBox kalmanCheckbox;
     private javax.swing.JCheckBox recordCheckBox;
-    private javax.swing.JButton saveButton;
+    private javax.swing.JCheckBox robo_auxCheckbox;
     // End of variables declaration//GEN-END:variables
 }

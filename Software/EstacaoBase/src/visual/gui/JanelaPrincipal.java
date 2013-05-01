@@ -77,6 +77,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private CameraInfoListener cameraInfoListener;
     private MovementKeyboardListener movementKeyboardListener;
     private MotoresListener motoresListener;
+    private RoboDrawable robo_auxDrawable;
 //    private Player webcamPlayer;
 //    private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 //    Canvas canvas;
@@ -268,20 +269,32 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //Inicializa o Robo
         //
         Robo robo = new Robo(400, 500, new Ponto(-140, 200));
-        robo.addSensorIR(new SensorIR(new Ponto(140, -200), PApplet.radians(-60), 200, 1500));
-        robo.addSensorIR(new SensorIR(new Ponto(140, -100), PApplet.radians(-30), 20, 150));
+        robo.addSensorIR(new SensorIR(new Ponto(140, -160), PApplet.radians(-60), 200, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, -80), PApplet.radians(-30), 20, 150));
         robo.addSensorIR(new SensorIR(new Ponto(140, 0), PApplet.radians(0), 200, 1500));
-        robo.addSensorIR(new SensorIR(new Ponto(140, 100), PApplet.radians(30), 20, 150));
-        robo.addSensorIR(new SensorIR(new Ponto(140, 200), PApplet.radians(60), 200, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 80), PApplet.radians(30), 20, 150));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 160), PApplet.radians(60), 200, 1500));
 
         RoboDrawable roboDrawable = new RoboDrawable(robo);
 
-        mapa = new Mapa(robo, obstaculos);
+        Robo robo_aux = new Robo(400, 500, new Ponto(-140, 200));
+        robo_auxDrawable = new RoboDrawable(robo_aux);
+        RoboTrilhaDrawableProp prop = robo_auxDrawable.getRobo_trilha().getPropriedades();
+        prop.setCorTrilha(Color.blue);
+        prop.setCorPontos(Color.blue);
+        prop.setLinhaEnabled(false);
+        prop.setPontosEnabled(false);
+        robo_auxDrawable.getPropriedades().setCorRobo(Color.blue);
+        robo_auxDrawable.getPropriedades().setRoboEnabled(false);
+        robo_auxDrawable.getPropriedades().setTextoEnabled(false);
+
+        mapa = new Mapa(robo, obstaculos, robo_aux);
 
         //
         //Inicializa o Viewer2D e Adiciona os Drawable2D a ele
         //
         viewer2D = new Viewer2D();
+        viewer2D.addDrawable2D(robo_auxDrawable);
         viewer2D.addDrawable2D(obstaculosDrawable);
         viewer2D.addMouseListener2D(obstaculosDrawable);
         viewer2D.addDrawable2D(roboDrawable);
@@ -294,7 +307,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //
         // Inicializa o controle dos sensores
         //
-        gerenciadorSensores = new GerenciadorSensores(robo, obstaculos); //Sem filtragem de ruidos por filtro de Kalman
+        gerenciadorSensores = new GerenciadorSensores(robo, obstaculos, robo_aux); //Sem filtragem de ruidos por filtro de Kalman
     }
 
     /**
@@ -737,6 +750,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 //        initMapaTeste();
         mapa.getRobo().clearPosInfos();
         mapa.getObstaculos().reset();
+        mapa.getRobo_aux().clearPosInfos();
         viewer2D.resetView();
     }//GEN-LAST:event_novoButtonActionPerformed
 
@@ -797,12 +811,18 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        mediaPlayerComponent.getMediaPlayer().playMedia("http://192.168.10.50:5050");
+        mediaPlayerComponent.getMediaPlayer().playMedia(String.format("http://%s:%d", connector.getHost(), gerenciadorCamera.getStream_port()));
     }//GEN-LAST:event_jButton1ActionPerformed
 
     public Mapa getMapa() {
         return mapa;
     }
+
+    public RoboDrawable getRobo_auxDrawable() {
+        return robo_auxDrawable;
+    }
+    
+    
 
     public Viewer2D getViewer2D() {
         return viewer2D;

@@ -258,8 +258,8 @@ public class SerialNetwork {
                                 byte_atual = buffer[i];
                                 //System.out.printf("%X ", temp);
                                 // adjust from C-Byte to Java-Byte
-                                if (byte_atual < 0)
-                                    byte_atual += 256;
+//                                if (byte_atual < 0)
+//                                    byte_atual += 256;
                                 //Se o índice de comando atual for -1, significa que está esperando por um novo comando
                                 if (indice_comando_atual == -1) {
                                     //Verifica se o byte é algum comando

@@ -34,4 +34,32 @@ exec -r 0x00600000 -b 0x00218000 -l 0x002980000 -c "console=ttyAM0,115200 ip=192
 
 
 
+-----
+BOOT VIA NFS
+
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/kernel/new2/zImage
+exec -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 init=/linuxrc root=/dev/nfs rw"
+
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/kernel/3.8.3/zImage
+exec -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/home/stefan/Downloads/TS/part4 init=/linuxrc root=/dev/nfs rw"
+
+
+BOOT DO LINUX EMBARCADO
+
+fis load vmlinux
+exec -c "console=ttyAM0,115200 root=/dev/mtdblock1"
+
+insmod -f bootloader
+cd boot
+bootload zImage -c "console=ttyAM0,115200 root=/dev/ram" -r initrd
+
+
+
+
+
+
+------
+load -v -r -b 0x00218000 -m http -h 192.168.10.36 /TS/kernel/new2/zImage
+exec -c "console=ttyAM0,115200 init=/linuxrc_debian root=/dev/mtdblock1"
+
 

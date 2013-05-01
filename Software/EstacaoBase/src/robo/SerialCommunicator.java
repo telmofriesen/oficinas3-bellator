@@ -195,8 +195,8 @@ public class SerialCommunicator implements SerialNetwork_iface {
 //            sum += message[i];
 //        }
         int sum = 0;
-        for (int i = 0; i < message.length - 2; i++) {
-            sum = (sum + (short)(message[i]) & 0x00FF ) % 65536;
+        for (int i = 0; i < numBytes - 2; i++) {
+            sum = (sum + ((short)(message[i]) & 0x00FF)) % 65536;
         }
 //        short sum_short = (short) sum;
 

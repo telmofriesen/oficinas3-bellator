@@ -18,43 +18,46 @@ modprobe usb-storage
 #sleep 5
 echo -n "Aguardando pendrive USB."
 DEVPATH=/dev/sda1
+#n=1
 until test -e $DEVPATH
 do
 	sleep 1
 	echo -n "."
+	#[ n -eq 15 ] && e2fsck /dev/sda1
 done
 echo "OK"
 
 # Mount the root filesystem.
-#mkdir -p /mnt
+#e2fsck /dev/sda1
 mount /dev/sda1 /mnt
-#umount /dev
-#umount /dev/pts
 
 /etc/init.d/udev stop
+/etc/init.d/portmap stop
+# pkill -9 portmap
+
+#exec /bin/bash
 
 cd /mnt
-pivot_root . tmp
-/bin/umount tmp/proc
-/bin/mount -n --move tmp/dev /dev
+mkdir -p tmp_old
+pivot_root . tmp_old
+/bin/umount tmp_old/proc
+#/bin/umount tmp_old/sysfs
+/bin/mount -n --move tmp_old/dev /dev
 /bin/mount -t proc proc /proc
+/bin/mount -t sysfs none /sys
+#/bin/umount tmp
+
+echo
+echo "------- INICIANDO DEBIAN SQUEEZE (via pen drive USB) ------"
+echo
 
 exec /usr/sbin/chroot . /bin/sh <<- EOF
-  /bin/umount tmp
+  /bin/umount tmp_old
+  #/bin/bash
   exec /sbin/init
 EOF
 
-# Clean up.
-#umount /proc
-#umount /sys
-#/etc/init.d/udev stop
-#umount /dev
-#umount /dev/pts
+#/bin/bash
 
-# Boot the real thing.
-#exec switch_root /mnt/root /sbin/init
-
-
-exec /bin/bash
-#exec /sbin/init
+#exec /bin/bash
 

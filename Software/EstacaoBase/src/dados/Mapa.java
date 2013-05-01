@@ -24,11 +24,13 @@ import visual.Ponto;
 public class Mapa {
 
     private final Robo robo;
+    private final Robo robo_aux;
     private final Obstaculos obstaculos;
 
-    public Mapa(Robo robo, Obstaculos obstaculos) {
+    public Mapa(Robo robo, Obstaculos obstaculos, Robo robo_aux) {
         this.robo = robo;
         this.obstaculos = obstaculos;
+        this.robo_aux = robo_aux;
     }
 
     /**
@@ -65,6 +67,7 @@ public class Mapa {
 
             robo.reset(); //Limpa as informações do robo
             obstaculos.reset(); //Limpa as informações de obstaculos
+            robo_aux.reset();
             //Linha atual lida do arquivo
             String line;
             //Grupo de dados atualmente sendo lido 
@@ -129,7 +132,6 @@ public class Mapa {
 //    public void setRobo(Robo robo) {
 //        this.robo = robo;
 //    }
-
     public Obstaculos getObstaculos() {
         return obstaculos;
     }
@@ -137,9 +139,13 @@ public class Mapa {
 //    public void setObstaculos(Obstaculos obstaculos) {
 //        this.obstaculos = obstaculos;
 //    }
+    public Robo getRobo_aux() {
+        return robo_aux;
+    }
 
     public void reset() {
         robo.reset();
         obstaculos.reset();
+        robo_aux.reset();
     }
 }

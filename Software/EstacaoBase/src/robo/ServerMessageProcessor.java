@@ -138,9 +138,13 @@ public class ServerMessageProcessor extends Thread {
                         return true;
                     }
                 } else if (split[0].equals("WEBCAM")) { //WEBCAM
-                    WebcamManagerNew2 w = connection.getListener().getServer().getWebcamManager();
+                    final WebcamManagerNew2 w = connection.getListener().getServer().getWebcamManager();
                     if (split[1].equals("START")) {
-                        w.startSampling();
+                        new Thread() {
+                            public void run() {
+                                w.startSampling();
+                            }
+                        }.start();
 //                        connection.sendMessageWithPriority(w.getStatusMessage(), true);
                         return true;
                     } else if (split[1].equals("STOP")) {
@@ -171,7 +175,7 @@ public class ServerMessageProcessor extends Thread {
                     float left = Float.parseFloat(split[1]);
                     float right = Float.parseFloat(split[2]);
                     connection.getListener().getServer().getEnginesManager().setEnginesSpeed(left, right);
-                    
+
 //                    connection.getListener().getServer().setVelocidadeRodas(dir, esq);
                     return true;
 //                    System.out.printf("");

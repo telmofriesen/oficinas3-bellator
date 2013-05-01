@@ -45,23 +45,23 @@ public class AmostraSensores {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%d ", unixTimestamp));
         sb.append(String.format("%d %d ", encoder_esq, encoder_dir));
         for (int i = 0; i < IR.length; i++) {
             sb.append(String.format("%d ", IR[i]));
         }
-        sb.append(String.format("%d %d %d %d %d %d ", AX, AY, AZ, GX, GY, GZ));
-        sb.append(String.format("%d", unixTimestamp));
+        sb.append(String.format("%d %d %d %d %d %d", AX, AY, AZ, GX, GY, GZ));
         return sb.toString();
     }
 
     public String transformedToString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%d ", unixTimestamp));
         sb.append(String.format("%d %d ", transformedEncoderEsq(), transformedEncoderDir()));
         for (int i = 0; i < IR.length; i++) {
             sb.append(String.format("%d ", SensorIR.getDistFromByte(IR[i])));
         }
-        sb.append(String.format("%f %f %f %f %f %f ", transformedAX(), transformedAY(), transformedAZ(), transformedGX(), transformedGY(), transformedGZ()));
-        sb.append(String.format("%d", unixTimestamp));
+        sb.append(String.format("%f %f %f %f %f %f", transformedAX(), transformedAY(), transformedAZ(), transformedGX(), transformedGY(), transformedGZ()));
         return sb.toString();
     }
 

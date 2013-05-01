@@ -22,8 +22,8 @@ public class GerenciadorSensoresKalman extends GerenciadorSensores {
      * @param R_sensoresIR Amplitude esperada de ruidos nas medidas dos sensores
      * IR
      */
-    public GerenciadorSensoresKalman(Robo robo, Obstaculos obstaculos, float R_velocidade, float R_angulo, float R_sensoresIR) {
-        super(robo, obstaculos);
+    public GerenciadorSensoresKalman(Robo robo, Obstaculos obstaculos, Robo robo_aux, float R_velocidade, float R_angulo, float R_sensoresIR) {
+        super(robo, obstaculos, robo_aux);
         this.R_velocidade = R_velocidade;
         this.R_angulo = R_angulo;
         this.R_sensoresIR = R_sensoresIR;

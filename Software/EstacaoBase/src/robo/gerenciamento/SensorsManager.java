@@ -30,7 +30,7 @@ public class SensorsManager extends Thread {
     //Taxa de envios de syncs
     private float syncRate; //syncs/s
     //Período de amostragem na placa de baixo nivel
-    private int lowLevelSamplePeriod = 100;//Período de amostragem em milissegundos
+    private int lowLevelSamplePeriod = 1000;//Período de amostragem em milissegundos
     //Indica se o loop principal deve ser executado ou não.
     private boolean run = false;
     //Timestamp UNIX em milissegundos da última leitura.
@@ -86,8 +86,8 @@ public class SensorsManager extends Thread {
             }
             //TESTES para simulação (comentar essa seção se for usar com o robô)
 //                        AmostraSensores a = gerarExemplo();
-            byte[] amostra = gerarExemploEmBytes();
-            novaLeituraSensores(amostra);
+//            byte[] amostra = gerarExemploEmBytes();
+//            novaLeituraSensores(amostra);
             //----
 
 //                String str = new String(amostra, "ISO-8859-1");
@@ -226,9 +226,9 @@ public class SensorsManager extends Thread {
         buf.put(new byte[]{ClientMessageProcessor.SENSORS,
                            0, 20,
                            0, 15,
-                           (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
+                           (byte) 50, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
                            0, 0,
-                           0, 0,
+                           0, 10,
                            0, 0,
                            0, 0,
                            0, 0,

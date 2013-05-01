@@ -33,13 +33,9 @@ import java.util.logging.Logger;
 public class ClientMessageProcessor extends Thread {
     //
     //Indica se as amostras dos sensores devem ser salvas em um arquivo.
-
-    private boolean gravarLeiturasSensores = false;
+    
     private boolean carregandoLeiturasSensores = false;
-    private String nomeArquivoGravacaoLeituras = "";
-    private BufferedOutputStream streamArquivoLeituras;
-    private BufferedOutputStream streamArquivoLeituras_reais;
-    private final Object lockStreamArquivoLeituras;
+    private Object lockStreamArquivoLeituras;
     //Array que armazena a fila de comandos
     private ArrayList<String> commandsList = new ArrayList();
     //Referecia ao objeto connector do cliente
@@ -59,62 +55,14 @@ public class ClientMessageProcessor extends Thread {
         this.connector = connector;
         this.gerenciadorSensores = controleSensores;
         this.controleCamera = controleCamera;
-        this.lockStreamArquivoLeituras = new Object();
+        this.lockStreamArquivoLeituras=new Object();
 //        startGravacaoLeiturasSensores();
 //        if (gravarLeiturasSensores) {
 //            initStreamArquivoLeituras();
 //        }
     }
 
-    protected final void initStreamArquivoLeituras() {
-        synchronized (lockStreamArquivoLeituras) {
-            File f = new File("testes");
-            f.mkdir(); // Cria a pasta "testes"
-            nomeArquivoGravacaoLeituras = "";
-            try {
-                nomeArquivoGravacaoLeituras = String.format("testes/%d.csv", System.currentTimeMillis());
-                streamArquivoLeituras = new BufferedOutputStream(new FileOutputStream(nomeArquivoGravacaoLeituras));
-                streamArquivoLeituras_reais = new BufferedOutputStream(new FileOutputStream(nomeArquivoGravacaoLeituras + "_real"));
-            } catch (IOException ex) {
-                System.out.printf("Erro ao abrir arquivo para gravação: %s. (%s)\n", nomeArquivoGravacaoLeituras, ex.getMessage());
-            }
-        }
-    }
 
-    protected final void closeStreamArquivoLeituras() {
-        synchronized (lockStreamArquivoLeituras) {
-            if (streamArquivoLeituras != null) {
-                try {
-                    streamArquivoLeituras.close();
-                    streamArquivoLeituras_reais.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ClientMessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    public final void startGravacaoLeiturasSensores() {
-        synchronized (lockStreamArquivoLeituras) {
-            if (!gravarLeiturasSensores) {
-                gravarLeiturasSensores = true;
-                initStreamArquivoLeituras();
-            }
-        }
-    }
-
-    public final void stopGravacaoLeiturasSensoresArquivo() {
-        synchronized (lockStreamArquivoLeituras) {
-            if (gravarLeiturasSensores) {
-                gravarLeiturasSensores = false;
-                closeStreamArquivoLeituras();
-            }
-        }
-    }
-
-    public String getNomeArquivoGravacaoLeituras() {
-        return nomeArquivoGravacaoLeituras;
-    }
 
     public boolean isCarregandoLeiturasSensores() {
         synchronized (lockStreamArquivoLeituras) {
@@ -299,39 +247,22 @@ public class ClientMessageProcessor extends Thread {
              }
              * */
             if (split[0].equals("S") && !isCarregandoLeiturasSensores()) { //SENSORS (amostra)
-                int encoder_esq = Integer.parseInt(split[1]);
-                int encoder_dir = Integer.parseInt(split[2]);
-                int[] IR = {Integer.parseInt(split[3]),
-                            Integer.parseInt(split[4]),
+                long unixTimestamp = Long.parseLong(split[1]);
+                int encoder_esq = Integer.parseInt(split[2]);
+                int encoder_dir = Integer.parseInt(split[3]);
+                int[] IR = {Integer.parseInt(split[4]),
                             Integer.parseInt(split[5]),
                             Integer.parseInt(split[6]),
-                            Integer.parseInt(split[7])};
-                int AX = Integer.parseInt(split[8]);
-                int AY = Integer.parseInt(split[9]);
-                int AZ = Integer.parseInt(split[10]);
-                int GX = Integer.parseInt(split[11]);
-                int GY = Integer.parseInt(split[12]);
-                int GZ = Integer.parseInt(split[13]);
-                long unixTimestamp = Long.parseLong(split[14]);
+                            Integer.parseInt(split[7]),
+                            Integer.parseInt(split[8])};
+                int AX = Integer.parseInt(split[9]);
+                int AY = Integer.parseInt(split[10]);
+                int AZ = Integer.parseInt(split[11]);
+                int GX = Integer.parseInt(split[12]);
+                int GY = Integer.parseInt(split[13]);
+                int GZ = Integer.parseInt(split[14]);                
                 AmostraSensores amostra = new AmostraSensores(encoder_esq, encoder_dir, IR, AX, AY, AZ, GX, GY, GZ, unixTimestamp);
-                synchronized (lockStreamArquivoLeituras) {
-                    if (gravarLeiturasSensores) {
-                        if (streamArquivoLeituras != null) {
-                            try {
-                                //Grava as leituras dos sensores em um arquivo de texto
-                                streamArquivoLeituras.write(amostra.toString().getBytes("UTF-8"));
-                                streamArquivoLeituras.write("\n".getBytes("UTF-8"));
-                                streamArquivoLeituras.flush();
-                                streamArquivoLeituras_reais.write(amostra.transformedToString().getBytes("UTF-8"));
-                                streamArquivoLeituras_reais.write("\n".getBytes("UTF-8"));
-                                streamArquivoLeituras_reais.flush();
-                            } catch (IOException ex) {
-                                System.out.printf("Erro ao escrever no arquivo: %s. (%s)\n", ex.getMessage());
-//                        Logger.getLogger(ClientMessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-                }
+
                 gerenciadorSensores.novaLeituraSensores(amostra);
                 return true;
             } else if (command.equals("BELLATOR HANDSHAKE REPLY")) { //BELLATOR HANDSHAKE REPLY

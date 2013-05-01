@@ -237,8 +237,8 @@ public class Main extends Thread {
 
         @Override
         public void changeEventReceived(MyChangeEvent evt) {
-            if (evt.getSource() instanceof WebcamManager) {
-                WebcamManager w = (WebcamManager) evt.getSource();
+            if (evt.getSource() instanceof WebcamManagerNew2) {
+                WebcamManagerNew2 w = (WebcamManagerNew2) evt.getSource();
                 boolean sampling_enabled = w.isSamplingEnabled();
                 boolean webcam_status = w.isWebcam_available();
                 boolean stream_status = w.isStream_open();
@@ -282,7 +282,7 @@ public class Main extends Thread {
     }
 
     public static void main(String args[]) {
-        boolean enable_serial = false;
+        boolean enable_serial = true;
 //        if (args[0].equals("serial")) {
 //            enable_serial = true;
 //        }
