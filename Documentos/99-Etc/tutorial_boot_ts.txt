@@ -1,0 +1,83 @@
+---- TUTORIAL PARA BOOT DA PLACA TS ----
+
+Última atualização: 02/05/2013
+
+*** IMPORTANTE ***
+Senhas:
+Usuário: root - senha: "brasil"
+Usuário: user - senha: "brasil"
+
+Configuração do roteador Wi-Fi:
+essid: "bellator"
+senha: "1234567890" (WEP)
+
+Alimentação da TS:
+O lado direito do conector (voltado para o lado mais longo da placa) é o terra, e o lado esquerdo do conector (voltado para o lado mais curto da placa) é +12V.
+
+ -> Os comandos expostos abaixo pressupôem que haja privilegios de root ("su" ou "sudo"). <-
+ 
+*** Na primeira vez que for utilizado o computador para iniciar a TS ***
+- Instalar apache2 (comando "apt-get install apache2")
+- Copiar para a pasta /var/www/ a imagem do Kernel (zImage).
+- Criar uma pasta /ts e inserir nela o conteúdo do sistema operacional Debian.
+- Compartilhar a pasta /ts via nfs, adicionando a seguinte linha ao arquivo /etc/exports:
+	/ts 192.168.10.0/24(rw,sync,no_root_squash)
+- Reiniciar o serviço do nfs (comando "service nfs-kernel-server restart").
+
+
+*** Para inicializar o sistema operacional da TS (uma vez que o computador esteja configurado) ***
+
+- Ligar roteador
+- Conectar o pendrive e o dongle Wi-Fi nas portas USB da TS
+- Conectar TS no computador via porta serial.
+- Conctar a TS no computador via cabo de rede (pode ser conexão direta por crossover ou através de um roteador/switch).
+- Configurar IP do computador para 192.168.10.36/255.255.255.0 (comando "ifconfig eth0 192.168.10.36 netmask 255.255.255.0 up")
+	* OBS: pode ser necessário parar o serviço network-manager, pois ele atrapalha as configurações manuais (rodar o comando "service network-manager stop")
+- Abrir o minicom no computador: comando "minicom -D /dev/ttyUSB0" (escolha o dispositivo de serial de acordo com o que está configurado no seu computador).
+- Iniciar o apache2 no computador: comando "service apache2 start"
+- Ligar a TS na alimentação
+	* Nessa etapa devem aparecer mensagens de boot no terminal do minicom, e um prompt "redboot>" aparecerá em seguinda.
+- No terminal do minicom, executar os dois comandos seguintes:
+	---
+	load -v -r -b 0x00218000 -m http -h 192.168.10.36 /zImage
+	exec -c "console=ttyAM0,115200 ip=192.168.10.50:192.168.10.36:192.168.10.1:255.255.255.0::: nfsroot=192.168.10.36:/ts init=/linuxrc root=/dev/nfs rw"
+	---	
+	* O debian irá inicializar primeiramente via rede (NFS) e depois fará o boot via pendrive.
+	* O debian conectará automaticamente no roteador Wi-Fi se a rede estiver com essid "bellator" e senha "1234567890".
+- Fazer login como usuário "root", senha "brasil"
+- Verificar o endereço IP da interface wlan0 e da eth0 (comando "ifconfig").
+	* (IMPORTANTE) Se o endereço IP da eth0 estiver na mesma rede que wlan0, desativar a eth0 (comando "ifconfig eth0 down") para não dar conflito.
+	
+- A partir dessa etapa, o cabo de rede pode ser desconectado. 
+- Conectar o computador na mesma rede Wi-Fi que a TS (para facilitar a conexão, pode ser iniciado o network-manager novamente: comando "service network-manager start").
+- Testar a conexão com a TS fazendo um ping para o IP dela (comando "ping <IP>").
+- Acessar a TS via ssh (comando "ssh root@<IP>") SENHA: "brasil".
+
+
+*** Para executar o servidor do Bellator ***
+
+- Executar os comandos:
+	cd /root
+	./run_bellator.sh
+	
+
+*** Para transferir arquivos do computador para a TS ***
+
+- Arquivos únicos
+scp <arquivo local de origem> root@<IP da TS>:<Pasta de destino na TS>
+
+- Pastas
+scp -r <Pasta local de origem> root@<IP da TS>:<Pasta de destino na TS>
+
+
+*** Para transferir arquivos da TS para o computador ***
+
+- Arquivos únicos
+scp root@<IP da TS>:<Arquivo de origem na TS> <Arquivo local de destino>
+
+- Pastas
+scp -r root@<IP da TS>:<Pasta de origem na TS> <Pasta local de destino>
+
+
+
+
