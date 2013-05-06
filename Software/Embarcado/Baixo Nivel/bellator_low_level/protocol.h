@@ -9,6 +9,7 @@
 
 // Comando para requisição dos dados dos sensores
 #define SYNC				0xA0
+#define CLEAR_BUFF			0xA1
 
 // Comandos para controlar os motores
 #define ENGINES				0xB0
