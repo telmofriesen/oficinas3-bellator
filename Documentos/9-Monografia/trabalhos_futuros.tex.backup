@@ -1,0 +1,12 @@
+\chapter{Trabalhos futuros}
+Há inúmeros modos de se prosseguir com o projeto do robô Bellator, pois muitas melhorias podem ser efetuadas a fim de se atingir resultados melhores em termos de mapeamentos de ambientes. 
+No que diz respeito ao sensoriamento, é importante melhorar a confiabilidades dos dados dos encoders. Uma das formas de se fazer isso é utilizando um \textit{timing belt}, que é uma roda dentada acoplada a um sensor. Dessa forma, problemas de escorregamento da correia em relação à polias do robô seriam eliminados.
+Quanto ao uso do acelerômetro, a técnica do filtro de Kalman poderia ser explorada se forma a se realizar a fusão de dados dos três sensores do robô: encoder, acelerômetro e giroscópio. Se desenvolvida corretamente, em tese, a utilização desta técnica permitiria a compensação automática de erros dos sensores o que permitiria uma estimativa muito melhor do posicionamento do robô. As dificuldades de se utilizar esta técnica são: correta determinação da margem de erro de cada sensor, criação de um modelo matemático da movimentação do robô e complexidade do entendimento e implementação do filtro.
+Em relação à câmera, há dois aspectos a serem melhorados: o problema técnico de 
+
+
+- Trocar a placa da Ts por um hardware com linux embarcado com mais memória e processamento, melhorando assim a leitura e dando mais precisão;
+
+- Buscar diferentes alternativas para diminuir o delay da camera, como por exemplo melhorar o sistema distribuido da placa;
+- Substituir a correia por um timing belt, para evitar os deslizamentos e assim melhorar os dados coletados pelos encoders;
+- Fazer uma camera com movimento, para rotacionar em 360° e assim poder visualizar melhor o ambiente;

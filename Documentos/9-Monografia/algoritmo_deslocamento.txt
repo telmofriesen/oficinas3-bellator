@@ -1,0 +1,9 @@
+- Calcular deslocamento linear (metros) e angular (radianos) do centro de movimento do robô a partir das leituras dos dois encoders.
+
+- Derivar duas vezes o deslocamento linear para obter aceleração linear (m/s^2), derivar uma vez o deslocamento angular para obter a velocidade e angular (rad/s).
+
+- Comparar aceleração linear e velocidade angular obtidas com os encoders e com as leituras do acelerômetro e giroscópio (Caso a diferença das acelerações passe de um threshold, é provável que um escorregamento tenha ocorrido).
+
+- Baseado na comparação anterior, especificar pesos para a aceleração linear (encoders e acelerômetro) e velocidade angular (encoders e giroscópio), buscando chegar aos valores mais próximos da realidade.
+
+- Integrar duas vezes a aceleração linear para obter o deslocamento do robô. Integrar uma vez a velocidade angular para obter o deslocamento angular.

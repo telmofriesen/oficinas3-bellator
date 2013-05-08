@@ -1,0 +1,12 @@
+- Apresentação da PCB (Telmo)
+	- Diagramas da PCB
+	- Circuito impresso
+
+- Apresentação dos cálculos de deslocamento (encoders e acelerômetro/giroscópio) (Stefan)
+- Apresentação da Interface gráfica (Pedro)
+
+- Testes 
+	- Vídeos gravados
+	- Gráficos gerados a partir dos testes
+
+- Cronograma (Luis) <- Inserir projeto da PCB no cronograma!

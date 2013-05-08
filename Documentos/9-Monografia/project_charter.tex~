@@ -1,0 +1,85 @@
+\chapter{Declaração do Escopo em Alto Nível}
+
+O projeto apresentado neste documento trata-se do “Mapeamento de Ambientes com o robô Bellator” e é uma extensão do projeto “Bellator”. Ele teve sua última alteração em 2012 quando foi utilizado por Alexandre Jacques Marin, Júlio Cesar Nardelli Borges e Yuri Antin Wergrzn como plataforma de experimentos para o projeto final de conclusão de curso. O projeto para a disciplina de Oficina de Integração 3 será desenvolvido com base nesse robô. Na versão atual dele, está presente um conjunto de circuitos (com um microcontrolador) que gerencia as operações de baixo nível. Além disso, está presente um PC embarcado (executando o sistema Linux), que efetua as operações de alto nível.
+
+A equipe deste projeto propõe modificar o robô Bellator para efetuar o mapeamento 2D de ambientes controlados como, por exemplo, labirintos construídos para fins de teste do robô. Posteriormente, em trabalhos futuros, ajustes finos poderão ser feitos para o uso em ambientes diversos, como escritórios, salas e quartos.
+
+Na versão atual do Bellator, estão sendo utilizadas duas placas de circuito impresso – uma integrada com o microcontrolador e uma para a interface com os sensores – ambas ligadas por cabos entre si. Ao invés de produzir uma terceira placa para sensores adicionais (aspecto explicado mais à frente), o que aumentaria a quantidade de cabos, propõe-se desenvolver uma nova placa que realize a função de interface com todos os sensores e que seja acoplada ao microcontrolador. Este microcontrolador pode ser usado diretamente na forma encapsulada de circuito integrado (soldado diretamente na nova placa), ou integrado a um kit de desenvolvimento (acoplado como \textit{shield} na nova placa).
+
+O sistema embarcado do robô será a placa de interface de sensores acoplada com o microcontrolador. Esse sistema realizará as funções de baixo nível, ou seja, leitura de sensores e controle do PWM dos motores. A estação base será um computador, provido de um software que efetua comunicação bidirecional com o robô. A estação será capaz de enviar comandos de movimentação (especificados manualmente pelo teclado) a ele, além de receber imagens da câmera e leituras dos sensores. No software, a partir das leituras dos sensores, será produzido um mapa em 2D simplificado do ambiente, com os obstáculos que forem detectados à medida que o robô andar, além do caminho estimado percorrido por ele. Protocolos de comunicação serão utilizados entre: circuito de baixo nível e o PC embarcado (através de porta serial), e entre PC embarcado e estação base (através de conexão WI-FI). A conexão entre a estação base e o robô deve ter um alcance de até 20 metros, e para isso a tecnologia WI-FI mostra-se adequada.
+
+Um aspecto importante a ser notado é a exatidão e confiabilidade das medições de velocidade. No robô atual tem-se dois encoders, um para cada roda – a partir dos quais pode ser medida a velocidade e distância percorrida. Há certas desvantagens em utilizar essa abordagem, que são principalmente as questões de exatidão. Por exemplo, caso alguma roda escorregue, gire em falso ou sofra trepidações, as medições podem ser comprometidas – gerando distorções no mapa 2D. Por isso, propôe-se instalar novos sensores na carcaça do robô (acelerômetro e giroscópio) para adicionar maior confiabilidade nas medições do sistema – tendo em vista que esses sensores mensurarão o movimento real do robô e não somente o giro das rodas. Dessa forma, pode-se ter maior garantia de exatidão nos mapas gerados, levando-se em conta que a velocidade e posição do robô poderão ser melhor determinados. Especialmente em trabalhos futuros, se o robô for utilizado em ambientes acidentados ou em condições não ideais de terreno, esses sensores podem ser de grande valia – uma vez que nesses ambientes há maior chance da as rodas escorregarem, girarem em falso ou trepidarem.
+
+\chapter{Especificação de Objetivos/Metas}
+OBJETIVOS:
+
+\begin{itemize}
+  \item Implementar um software para comunicação de uma estação base (computador) com o robô, de forma que ela possa enviar comandos de movimentação ao robô, além de receber imagens da câmera e leituras dos sensores. Os comandos de movimentação (mover para frente, para trás, girar para esquerda/direita, parar) serão especificados por um utilizador humano através do teclado da estação base. 
+  \item O meio de comunicação entre a estação base e o robô deverá ter alcance máximo de 20 m (se não houverem paredes ou obstáculos entre a estação base e o robô). Para isso a tecnologia WI-FI mostra-se adequada e, portanto, ela será utilizada.
+  \item Inserir uma \textit{webcam} USB no robô, de modo que imagens do ambiente possam ser transmitidas à estação base. O propósito das imagens será unicamente permitir a visualização (pelo usuário da estação base, em tempo real) do ambiente no qual o robô está localizado. A câmera será conectada na porta USB do computador embarcado, e a transmissão de imagens será feita pelo canal Wi-Fi entre a estação base e o robô (o mesmo canal utilizado para a trasmissão de dados dos sensores e comandos de movimentação).
+  \item Implementar, no software utilizado na estação base, a geração de uma mapa em 2D com o caminho estimado percorrido pelo robô e os obstáculos detectados pelo mesmo. Os obstáculos serão representados a partir dos pontos em que houve detecção pelos sensores.
+  \item Instalar novos sensores (acelerômetro e giroscópio) para efetuar as medições de velocidade e posicionamento do robô com maior exatidão do que pode ser feito atualmente com os \textit{encoders}. Ambos os sensores serão posicionados na carcaça do robô. Caso discrepâncias de medição entre os \textit{encoders}, acelerômetro e giroscópio sejam detectadas (por exemplo, em caso de escorregamento de rodas), atenuações de erros poderão ser feitas no \textit{software} da estação base.
+%  A velocidade e deslocamento lineares instantâneos serão determinados a partir da integração numérica da aceleração linear (cujas amostras serão obtidas com o acelerômetro em intervalos de tempo discretos). A velocidade e deslocamento angular instantâneos serão determinados a partir da integração numérica da aceleração angular (cujas amostras serão obtidas com o giroscópio em intervalos de tempo discretos). A posição atual do robô será gradualmente atualizada na representação do mapa à medida em que as amostras de aceleração linear e angular forem recebidas na estação base.
+  \item Desenvolver uma placa de circuito impresso que realize a função de interface com os sensores e que seja acoplada ao microcontroldador. Este microcontrolador pode ser usado diretamente na forma encapsulada de circuito integrado (sendo soldado diretamente na nova placa) ou integrado a um kit de desenvolvimento (acoplado como \textit{shield} na nova placa).
+  \item Em caso de falha de comunicação entre o robô e a estação base, o robô deverá permanecer parado e aguardando a conexão ser reestabelecida.
+\end{itemize}
+
+METAS:
+\begin{itemize}
+  \item Concluir o trabalho com um prazo máximo de até 10 semanas. Incluindo planejamento, desenvolvimento, teste e documentação. 
+  \item Não ultrapassar o orçamento inicial e o orçamento limite, detalhados posteriormente.
+Desenvolver e manter um cronograma para que todos os integrantes da equipe tenham a possibilidade de trabalhar com o projeto sem causar prejuízos às outras matérias do curso.
+\end{itemize}
+
+\chapter{Premissas e restrições}
+PREMISSAS:
+\begin{itemize}
+  \item Por ser utilizado o robô Bellator que já provém de trabalhos anteriores, infere-se que não haverá necessidade de haver gastos de tempo com consertos de equipamentos defeituosos ou correções de bugs no código fonte. Parte-se do pressuposto que o robô funciona de acordo com o que foi exposto nos relatórios anteriores.
+  \item O robô é capaz de detectar obstáculos (paredes e objetos fixos de tamanho considerável que sejam maiores que ele) através dos sensores. A distância mínima para detecção é de 20cm e a máxima de 150cm.
+  \item O robô é capaz de locomover-se em terrenos planos, não acidentados e em condições não severas.
+  \item Pressupõe-se que o robô será disponibilizado para a equipe sem custos.
+Podem ser utilizados os equipamentos e componentes diversos que já estejam disponíveis, com o objetivo de redução de custos.
+\end{itemize}
+
+RESTRIÇÕES:
+\begin{itemize}
+  \item O tempo disponível para a equipe é limitado, portanto muita atenção será dada às fases de planejamento e testes iniciais de modo a evitar imprevistos.
+  \item A equipe deverá seguir um calendário previamente estabelecido, tendo o objetivo de evitar atrasos.
+  \item O robô não será capaz de se locomover em terrenos acidentados, em escadas e similares.
+  \item O robô não transportará cargas.
+  \item O robô e a estação base não executarão algoritmos de roteamento ou mapeamento autônomo de ambientes. O controle de movimentação deverá ser feito obrigatoriamente por um usuário humano junto à estação base. O robô não fará nenhuma movimentação automática em caso de falha de conexão. Ele permanecerá parado aguardando a conexão ser reestabelecida.
+  \item O robô e a estação base não serão capazes de efetuar mapeamento 3D.
+  \item O robô e a estação base não irão armazenar automaticamente fotos ou vídeos dos ambientes explorados.
+  \item O robô e o ponto de acesso WI-FI da estação base devem estar a uma distância máxima de 20 metros um do outro (supondo que não hajam paredes ou obstáculos). Caso contrário, não haverá garantias de que a comunicação entre a estação base e o robô seja funcional.
+  \item Não serão usadas imagens do ambiente para a geração dos mapas.
+  \item Os obstáculos não serão identificados quanto ao tipo ou forma. Serão apenas detectados pela sua presença.
+\end{itemize}
+
+\chapter{Designação do Gerente e da Equipe}
+A equipe consiste de cinco integrantes. O gerente ocupou esta função com consentimento de todos.
+
+GERENTE:
+\begin{itemize}
+  \item Luis Guilherme Machado Camargo.
+\end{itemize}
+COLABORADORES:	
+\begin{itemize}
+  \item Pedro Alberto de Borba, Ricardo Farah, Stefan Campana Fuchs, Telmo Friesen.
+\end{itemize}
+
+
+\chapter{Responsabilidades e Autoridade do Gerente}
+\begin{itemize}
+  \item O gerente poderá efetuar os gastos de valores estimados na análise de custos sempre informando os outros integrantes da equipe. Caso exista a necessidade de utilizar os valores previstos na margem de erro do orçamento, toda equipe deverá ser notificada e informada dos motivos.
+  \item O gerente poderá liberar verba para um membro da equipe caso seja necessário. O gerente deverá registrar o valor gasto, o produto/serviço requerido e a pessoa que solicitou os recursos. Além disso, deve informar os outros membros da equipe sobre o fato.
+  \item O gerente deverá atualizar o planejamento do projeto conforme exista a necessidade de mudanças, além de informar a equipe sobre o fato.
+  \item O gerente deverá garantir que o projeto esteja progredindo conforme planejado.
+  \item O gerente sempre deverá se portar educadamente a todos os membros da equipe.
+  \item O gerente não tem poderes para efetuar a demissão de ninguém.
+  \item O gerente tem o poder de tomar decisões em nome da equipe, preferencialmente considerando a opinião dos outros membros.
+  \item O gerente tem o poder de intervir em qualquer conflito que ocorra internamente ou externamente à equipe.
+  \item O gerente deve intermediar as reuniões da equipe.
+  \item O gerente deve controlar as horas de trabalho da equipe e o cumprimento de prazos.
+  \item O gerente deve falar em nome da equipe quando não for possível que toda ela o faça.
+  \item O gerente deverá cobrar a escrita de documentação por todos os integrantes da equipe, de acordo com o que for desenvolvido por cada um.
+\end{itemize}

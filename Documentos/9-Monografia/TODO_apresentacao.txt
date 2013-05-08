@@ -1,0 +1,11 @@
+Diagramas de casos de uso (estação base e sistema embarcado)
+Diagrama de classes (estação base)
+Diagrama em blocos (hardware)
+Explicação detalhada de cada bloco (hardware)
+Diagrama elétrico/eletrônico (hardware)
+
+Escrever explicação sobre diagrama elétrico
+
+Diagramas de estados
+Diagramas de sequẽncia
+Codificação das mensagens
