@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  25 APR 2013 18:22
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  7 MAY 2013 22:56
 entering extended mode
  %&-line parsing enabled.
 **entregavel4
@@ -1034,44 +1034,210 @@ Overfull \hbox (4.59846pt too wide) in paragraph at lines 286--287
 ]em ob-ti-das por deriva[][]ao num[]erica,
  []
 
-[47]
-Overfull \hbox (7.31091pt too wide) in paragraph at lines 325--326
+[47] <./figuras/hardware/eixos_mpu.png, id=194, 461.725pt x 398.48875pt>
+File: ./figuras/hardware/eixos_mpu.png Graphic file (type png)
+
+<use ./figuras/hardware/eixos_mpu.png>
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 327.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 327.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 327.
+ [48 <./figuras/hardware/eixos_mpu.png (PNG copy)>]
+Overfull \hbox (7.31091pt too wide) in paragraph at lines 333--334
 []\OT1/ptm/m/n/12 Para de-ter-mi-nar a ve-lo-ci-dade e des-lo-ca-mento li-ne-a-
 res a par-tir dos da-dos do ace-ler[]ometro,
  []
 
-[48] <./figuras/robo/robo_ir.png, id=198, 602.25pt x 451.6875pt>
+[49] <./figuras/robo/robo_ir.png, id=202, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo_ir.png Graphic file (type png)
 
-<use ./figuras/robo/robo_ir.png> [49] [50 <./figuras/robo/robo_ir.png (PNG copy
-)>]) (./entregavel4.bbl [51]) AED: lastpage setting LastPage [52
+<use ./figuras/robo/robo_ir.png> [50] [51 <./figuras/robo/robo_ir.png (PNG copy
+)>] [52]
+Cap\'{\i }tulo 5.
+
+LaTeX Warning: Reference `fig:teste1_foto' on page 53 undefined on input line 4
+61.
+
+[53
+
+]
+<./figuras/testes/teste1/mapa_encoders.png, id=215, 699.61375pt x 497.86pt>
+File: ./figuras/testes/teste1/mapa_encoders.png Graphic file (type png)
+
+<use ./figuras/testes/teste1/mapa_encoders.png>
+<./figuras/testes/teste1/mapa_encoders_giro.png, id=216, 668.4975pt x 488.82625
+pt>
+File: ./figuras/testes/teste1/mapa_encoders_giro.png Graphic file (type png)
+ <use ./figuras/testes/teste1/mapa_encoders_giro.png> [54 <./figuras/testes/tes
+te1/mapa_encoders.png (PNG copy)>]
+<./figuras/testes/teste1/mapa_encoders_giro_media0.png, id=221, 599.23875pt x 4
+29.605pt>
+File: ./figuras/testes/teste1/mapa_encoders_giro_media0.png Graphic file (type 
+png)
+ <use ./figuras/testes/teste1/mapa_encoders_giro_media0.png>
+<./figuras/testes/teste1/mapa_acelerometro.png, id=222, 548.0475pt x 450.68375p
+t>
+File: ./figuras/testes/teste1/mapa_acelerometro.png Graphic file (type png)
+ <use ./figuras/testes/teste1/mapa_acelerometro.png> [55 <./figuras/testes/test
+e1/mapa_encoders_giro.png (PNG copy)> <./figuras/testes/teste1/mapa_encoders_gi
+ro_media0.png (PNG copy)>]
+<./figuras/testes/teste1/grafico_giro.png, id=226, 1127.21124pt x 618.31pt>
+File: ./figuras/testes/teste1/grafico_giro.png Graphic file (type png)
+
+<use ./figuras/testes/teste1/grafico_giro.png>
+<./figuras/testes/teste1/grafico_acel.png, id=227, 1152.305pt x 726.715pt>
+File: ./figuras/testes/teste1/grafico_acel.png Graphic file (type png)
+
+<use ./figuras/testes/teste1/grafico_acel.png> [56 <./figuras/testes/teste1/map
+a_acelerometro.png (PNG copy)> <./figuras/testes/teste1/grafico_giro.png (PNG c
+opy)>]
+<./figuras/testes/teste2/foto_ambiente.jpg, id=231, 803.0pt x 1071.00125pt>
+File: ./figuras/testes/teste2/foto_ambiente.jpg Graphic file (type jpg)
+
+<use ./figuras/testes/teste2/foto_ambiente.jpg> [57 <./figuras/testes/teste1/gr
+afico_acel.png (PNG copy)>]
+<./figuras/testes/teste2/mapa_encoders.png, id=235, 701.62125pt x 466.74374pt>
+File: ./figuras/testes/teste2/mapa_encoders.png Graphic file (type png)
+
+<use ./figuras/testes/teste2/mapa_encoders.png> [58 <./figuras/testes/teste2/fo
+to_ambiente.jpg>]
+<./figuras/testes/teste2/mapa_encoders_giro.png, id=239, 646.415pt x 454.69875p
+t>
+File: ./figuras/testes/teste2/mapa_encoders_giro.png Graphic file (type png)
+ <use ./figuras/testes/teste2/mapa_encoders_giro.png>
+<./figuras/testes/teste2/mapa_encoders_giro_media3.png, id=240, 660.4675pt x 48
+3.8075pt>
+File: ./figuras/testes/teste2/mapa_encoders_giro_media3.png Graphic file (type 
+png)
+ <use ./figuras/testes/teste2/mapa_encoders_giro_media3.png> [59 <./figuras/tes
+tes/teste2/mapa_encoders.png (PNG copy)> <./figuras/testes/teste2/mapa_encoders
+_giro.png (PNG copy)>]
+<./figuras/testes/teste2/mapa_encoders_giro_media8.png, id=244, 648.4225pt x 42
+4.58624pt>
+File: ./figuras/testes/teste2/mapa_encoders_giro_media8.png Graphic file (type 
+png)
+ <use ./figuras/testes/teste2/mapa_encoders_giro_media8.png>
+<./figuras/testes/teste2/mapa_acelerometro.png, id=245, 568.1225pt x 424.58624p
+t>
+File: ./figuras/testes/teste2/mapa_acelerometro.png Graphic file (type png)
+ <use ./figuras/testes/teste2/mapa_acelerometro.png> [60 <./figuras/testes/test
+e2/mapa_encoders_giro_media3.png (PNG copy)> <./figuras/testes/teste2/mapa_enco
+ders_giro_media8.png (PNG copy)>]
+<./figuras/testes/teste2/grafico_giro.png, id=250, 775.89874pt x 414.54875pt>
+File: ./figuras/testes/teste2/grafico_giro.png Graphic file (type png)
+
+<use ./figuras/testes/teste2/grafico_giro.png>
+<./figuras/testes/teste2/grafico_acel.png, id=251, 1029.8475pt x 661.47125pt>
+File: ./figuras/testes/teste2/grafico_acel.png Graphic file (type png)
+
+<use ./figuras/testes/teste2/grafico_acel.png> [61 <./figuras/testes/teste2/map
+a_acelerometro.png (PNG copy)> <./figuras/testes/teste2/grafico_giro.png (PNG c
+opy)>] <./figuras/testes/teste3/foto_ambiente.jpg, id=255, 803.0pt x 602.25pt>
+File: ./figuras/testes/teste3/foto_ambiente.jpg Graphic file (type jpg)
+
+<use ./figuras/testes/teste3/foto_ambiente.jpg> [62 <./figuras/testes/teste2/gr
+afico_acel.png (PNG copy)>]
+<./figuras/testes/teste3/mapa_encoders.png, id=259, 580.1675pt x 512.91624pt>
+File: ./figuras/testes/teste3/mapa_encoders.png Graphic file (type png)
+
+<use ./figuras/testes/teste3/mapa_encoders.png>
+<./figuras/testes/teste3/mapa_encoders_giro.png, id=260, 631.35875pt x 482.8037
+6pt>
+File: ./figuras/testes/teste3/mapa_encoders_giro.png Graphic file (type png)
+ <use ./figuras/testes/teste3/mapa_encoders_giro.png> [63 <./figuras/testes/tes
+te3/foto_ambiente.jpg> <./figuras/testes/teste3/mapa_encoders.png (PNG copy)>]
+<./figuras/testes/teste3/mapa_encoders_giro_media5.png, id=264, 622.325pt x 451
+.6875pt>
+File: ./figuras/testes/teste3/mapa_encoders_giro_media5.png Graphic file (type 
+png)
+ <use ./figuras/testes/teste3/mapa_encoders_giro_media5.png>
+<./figuras/testes/teste3/mapa_acelerometro.png, id=265, 472.76625pt x 514.92375
+pt>
+File: ./figuras/testes/teste3/mapa_acelerometro.png Graphic file (type png)
+ <use ./figuras/testes/teste3/mapa_acelerometro.png> [64 <./figuras/testes/test
+e3/mapa_encoders_giro.png (PNG copy)> <./figuras/testes/teste3/mapa_encoders_gi
+ro_media5.png (PNG copy)>]
+<./figuras/testes/teste3/grafico_giro.png, id=269, 863.225pt x 466.74374pt>
+File: ./figuras/testes/teste3/grafico_giro.png Graphic file (type png)
+
+<use ./figuras/testes/teste3/grafico_giro.png> [65 <./figuras/testes/teste3/map
+a_acelerometro.png (PNG copy)>]
+<./figuras/testes/teste3/grafico_acel.png, id=273, 1030.85126pt x 666.49pt>
+File: ./figuras/testes/teste3/grafico_acel.png Graphic file (type png)
+
+<use ./figuras/testes/teste3/grafico_acel.png> [66 <./figuras/testes/teste3/gra
+fico_giro.png (PNG copy)> <./figuras/testes/teste3/grafico_acel.png (PNG copy)>
+]
+
+LaTeX Warning: Reference `fig:teste4_mapa_acelerometro' on page 67 undefined on
+ input line 641.
+
+<./figuras/testes/teste4/foto_ambiente.jpg, id=278, 803.0pt x 602.25pt>
+File: ./figuras/testes/teste4/foto_ambiente.jpg Graphic file (type jpg)
+
+<use ./figuras/testes/teste4/foto_ambiente.jpg>
+<./figuras/testes/teste4/mapa_encoders.png, id=279, 702.625pt x 426.59375pt>
+File: ./figuras/testes/teste4/mapa_encoders.png Graphic file (type png)
+
+<use ./figuras/testes/teste4/mapa_encoders.png> [67 <./figuras/testes/teste4/fo
+to_ambiente.jpg>]
+<./figuras/testes/teste4/mapa_encoders_giro.png, id=283, 816.04875pt x 414.5487
+5pt>
+File: ./figuras/testes/teste4/mapa_encoders_giro.png Graphic file (type png)
+ <use ./figuras/testes/teste4/mapa_encoders_giro.png>
+<./figuras/testes/teste4/mapa_encoders_giro_media4.png, id=284, 732.7375pt x 36
+1.35pt>
+File: ./figuras/testes/teste4/mapa_encoders_giro_media4.png Graphic file (type 
+png)
+ <use ./figuras/testes/teste4/mapa_encoders_giro_media4.png> [68 <./figuras/tes
+tes/teste4/mapa_encoders.png (PNG copy)> <./figuras/testes/teste4/mapa_encoders
+_giro.png (PNG copy)>]
+<./figuras/testes/teste4/grafico_giro.png, id=288, 774.895pt x 417.56pt>
+File: ./figuras/testes/teste4/grafico_giro.png Graphic file (type png)
+
+<use ./figuras/testes/teste4/grafico_giro.png>
+<./figuras/testes/teste4/grafico_acel.png, id=289, 1031.855pt x 663.47874pt>
+File: ./figuras/testes/teste4/grafico_acel.png Graphic file (type png)
+
+<use ./figuras/testes/teste4/grafico_acel.png> [69 <./figuras/testes/teste4/map
+a_encoders_giro_media4.png (PNG copy)> <./figuras/testes/teste4/grafico_giro.pn
+g (PNG copy)>] [70 <./figuras/testes/teste4/grafico_acel.png (PNG copy)>]
+Cap\'{\i }tulo 6.
+) (./entregavel4.bbl [71
+
+]) AED: lastpage setting LastPage [72
 
 ]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-(./entregavel4.aux) ) 
+(./entregavel4.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
 Here is how much of TeX's memory you used:
- 7009 strings out of 495041
- 107578 string characters out of 1181897
+ 7198 strings out of 495041
+ 114731 string characters out of 1181897
  187052 words of memory out of 3000000
- 9907 multiletter control sequences out of 15000+50000
- 30332 words of font info for 69 fonts, out of 3000000 for 9000
+ 10079 multiletter control sequences out of 15000+50000
+ 40793 words of font info for 94 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
- 61i,14n,96p,1107b,388s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</us
-r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
-mf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/
-fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/
-public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/
-usyr.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/
-texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/
-type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr
-i8a.pfb>
-Output written on entregavel4.pdf (53 pages, 4107867 bytes).
+ 61i,14n,96p,1382b,388s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
+ve/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/public/
+amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/
+cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/shar
+e/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/texmf-texlive/fonts
+/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utm
+r8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+Output written on entregavel4.pdf (73 pages, 5570296 bytes).
 PDF statistics:
- 243 PDF objects out of 1000 (max. 8388607)
+ 336 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 146 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 286 words of extra memory for PDF output out of 10000 (max. 10000000)
 
