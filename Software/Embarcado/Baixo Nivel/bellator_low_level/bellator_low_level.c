@@ -9,20 +9,14 @@
 #define CMD_BUFF_SIZE 32 // has to be a power of two
 #define DATA_BUFF_SIZE 256 // has to be a power of two
 
-#define SAMPLE_RATE_1kHZ 0;
-#define SAMPLE_RATE_500HZ 1;
-#define SAMPLE_RATE_250HZ 2;
-#define SAMPLE_RATE_125HZ 4;
-#define SAMPLE_RATE_062HZ 8;
-#define SAMPLE_RATE_008HZ 64;
-#define SAMPLE_RATE_001HZ 512;
+#define SAMPLE_RATE_016HZ 64;
+#define SAMPLE_RATE_004HZ 256;
+#define SAMPLE_RATE_002HZ 512;
 
-#define SAMPLE_RATE SAMPLE_RATE_008HZ
+#define SAMPLE_RATE SAMPLE_RATE_004HZ
 
-#define ENC_ST_INIT 0
-#define ENC_ST_AR 1
-#define ENC_ST_F 2
-#define ENC_ST_B 3
+#define MAX_COUNT_PER_SAMPLE 64
+#define INVERSE_PD_GAIN 4
 
 #define PROT_ST_WAITING 0
 #define PROT_ST_SYNC 1
@@ -71,7 +65,7 @@ static inline void sampler_init(void);
 static inline void get_ir_sensor_data(char * buff);
 static inline void get_encoders_count(short * left_encoder, short * right_encoder);
 static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right_wheel);
-//static inline void update_wheel_pwm(unsigned short left_wheel_count, unsigned short right_wheel_count);
+static inline void update_wheel_pwm(short left_wheel_count, short right_wheel_count);
 
 /* auxiliary functions */
 static inline void protocol_out_cmd(void);
@@ -100,17 +94,20 @@ static struct cmd_buff cmd_in = { 0, };
 // pulses in (encoder)
 volatile int encoder_count[2] = { 0, 0};
 static int sent_encoder_count[2] = { 0, 0};
-static short encoder_r_st = ENC_ST_INIT, encoder_l_st = ENC_ST_INIT;
 static short protocol_st = PROT_ST_WAITING;
 
 // general
-unsigned volatile char send_data = 0;
+unsigned volatile char send_data = 0, clear_buff = 0;
 static struct sensors_data sensors_data_buff[DATA_BUFF_SIZE]; // Circular Buffer
 unsigned volatile short data_in_pos = 0; // last valid data in
 unsigned volatile short data_out_pos = 0; // last data sent
 static unsigned short timestamp = 0, checksum = 0;
 volatile unsigned short tmp1, tmp2;
 
+// pwm
+short pwm_cur_val_l, pwm_cur_val_r;
+short pwm_setpoint_l_tmp, pwm_setpoint_r_tmp;
+volatile short pwm_setpoint_l, pwm_setpoint_r; // -127 / 128
 
 /**
  * Entry point
@@ -140,6 +137,11 @@ int main(void){
 		if (send_data) {
 			// while data available
 			while(data_out_pos != data_in_pos) {
+				if (clear_buff) {
+					data_out_pos = data_in_pos;
+					clear_buff = 0;
+					break;
+				}
 
 				log_string_debug("sending data");
 				// send next data
@@ -163,32 +165,33 @@ int main(void){
 				cmd_out.buff[9] = out_data->ir_r;
 
 				// IMU data
-				cmd_out.buff[10] = out_data->ax_h;
-				cmd_out.buff[11] = out_data->ax_l;
-				cmd_out.buff[12] = out_data->ay_h;
-				cmd_out.buff[13] = out_data->ay_l;
-				cmd_out.buff[14] = out_data->az_h;
-				cmd_out.buff[15] = out_data->az_l;
-				cmd_out.buff[16] = out_data->gx_h;
-				cmd_out.buff[17] = out_data->gx_l;
-				cmd_out.buff[18] = out_data->gy_h;
-				cmd_out.buff[19] = out_data->gy_l;
-				cmd_out.buff[20] = out_data->gz_h;
-				cmd_out.buff[21] = out_data->gz_l;
+				//cmd_out.buff[10] = out_data->ax_h;
+				//cmd_out.buff[11] = out_data->ax_l;
+				cmd_out.buff[10] = out_data->ay_h;
+				cmd_out.buff[11] = out_data->ay_l;
+				//cmd_out.buff[14] = out_data->az_h;
+				//cmd_out.buff[15] = out_data->az_l;
+				//cmd_out.buff[16] = out_data->gx_h;
+				//cmd_out.buff[17] = out_data->gx_l;
+				//cmd_out.buff[18] = out_data->gy_h;
+				//cmd_out.buff[19] = out_data->gy_l;
+				cmd_out.buff[12] = out_data->gz_h;
+				cmd_out.buff[13] = out_data->gz_l;
 
 				// Timestamp
-				cmd_out.buff[22] = (out_data->timestamp >> 8) & 0xFF;
-				cmd_out.buff[23] = out_data->timestamp & 0xFF;
+				cmd_out.buff[14] = (out_data->timestamp >> 8) & 0xFF;
+				cmd_out.buff[15] = out_data->timestamp & 0xFF;
 
-				for (short i = 0; i < 24; i++) {
+				checksum = 0;
+				for (short i = 0; i < 16; i++) {
 					checksum += cmd_out.buff[i];
 				}
 
 				// checksum
-				cmd_out.buff[24] = (checksum >> 8) & 0xFF;
-				cmd_out.buff[25] = checksum & 0xFF;
+				cmd_out.buff[16] = (checksum >> 8) & 0xFF;
+				cmd_out.buff[17] = checksum & 0xFF;
 
-				cmd_out.i = 26;
+				cmd_out.i = 18;
 
 				protocol_out_cmd();
 			}
@@ -270,25 +273,25 @@ static inline void pulses_in_init(void){
 	log_string_debug(">> pulses_in_init\n");
 
 	// Set the pin function
-	PINSEL1 |= 0x1 << 0;  // EINT0
+	// GPIO //PINSEL1 |= 0x1 << 0;  // EINT0
 	PINSEL1 |= 0x2 << 22; // CAP2.0
-	PINSEL1 |= 0x2 << 24; // CAP2.1
+	// GPIO //PINSEL1 |= 0x2 << 24; // CAP2.1
 	PINSEL1 |= 0x2 << 26; // CAP2.2
 
 	// EINT setup
-	EXTMODE |= 0x1 << 0; // EINT is edge sensitive
-	EXTPOLAR |= 0x1 << 0; // EINT is rising edge sensitive
-	EXTINT |= 0x1 << 0; // reset EINT0
+	//EXTMODE |= 0x1 << 0; // EINT is edge sensitive
+	//EXTPOLAR |= 0x1 << 0; // EINT is rising edge sensitive
+	//EXTINT |= 0x1 << 0; // reset EINT0
 
 	// Timer Setup
 	T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
-	T2CCR |= 0x5 << 3; // capture and interrupt on CAP2.1 rising edge
+	//T2CCR |= 0x5 << 3; // capture and interrupt on CAP2.1 rising edge
 	T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
 	T2TCR = 1; //enable T2
 
 	// Enable the interrupts
-	VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
-	VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
+	//VICIntSelect |= 0x1 << 14;// EINT2 as FIQ
+	//VICIntEnable |= 0x1 << 14; //source #14 enabled as FIQ or IRQ
 
 	VICIntSelect |= 0x1 << 26;// Timer 2 as FIQ
 	VICIntEnable |= 0x1 << 26; // source #26 enabled as FIQ or IRQ
@@ -514,6 +517,15 @@ static void protocol_in(void){
 
 					//protocol_st = PROT_ST_WAITING;
 					break;
+				case CLEAR_BUFF:
+					//protocol_st = PROT_ST_CLEAR_BUFF;
+
+					log_string_debug("CLEAR_BUFF\n");
+					clear_buff = 1;
+					cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] = 0;
+
+					//protocol_st = PROT_ST_CLEAR_BUFF;
+					break;
 				case ENGINES:
 					protocol_st = PROT_ST_ENGINES;
 					break;
@@ -593,8 +605,23 @@ static void protocol_in(void){
 					if ((cmd_in.buff[(cmd_in.i-1) & (CMD_BUFF_SIZE-1)] == ((checksum_engines >> 8) & 0xFF))
 						&& (cmd_in.buff[(cmd_in.i) & (CMD_BUFF_SIZE-1)] == (checksum_engines & 0xFF))) {
 
-						set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]),
-									(unsigned short) (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]));
+						//set_wheel_pwm((unsigned short) (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]),
+									//(unsigned short) (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]));
+
+						pwm_setpoint_l_tmp = (unsigned short) (cmd_in.buff[(cmd_in.i-3) & (CMD_BUFF_SIZE-1)]);
+						pwm_setpoint_r_tmp = (unsigned short) (cmd_in.buff[(cmd_in.i-2) & (CMD_BUFF_SIZE-1)]);
+
+						if (pwm_setpoint_r_tmp & PWM_DIR) { // Forward
+							pwm_setpoint_r = (pwm_setpoint_r_tmp & ~PWM_DIR)*2;
+						} else { // Backwards
+							pwm_setpoint_r = -(pwm_setpoint_r_tmp & ~PWM_DIR)*2;
+						}
+
+						if (pwm_setpoint_l_tmp & PWM_DIR) { // Forward
+							pwm_setpoint_l = (pwm_setpoint_l_tmp & ~PWM_DIR)*2;
+						} else { // Backwards
+							pwm_setpoint_l = -(pwm_setpoint_l_tmp & ~PWM_DIR)*2;
+						}
 
 						cmd_out.buff[0] = ENGINES_ACK;
 
@@ -663,81 +690,35 @@ void pulse_in(void) {
 	//log_string_debug(">> pulse_in\n");
 
 	tmp1 = T2IR;
-	tmp2 = EXTINT;
 
 	// AR - channel A rising edge
 	// AF - channel A falling edge
 	// BR - channel B rising edge
-	if ((tmp1 & (0x1 << 4)) || (tmp2 & 0x1 << 0)) { // left encoder
-		switch (encoder_l_st) {
-		case ENC_ST_INIT:
-			// CAP2.0
-			if (tmp1 & (0x1 << 4)) { // AR event received
-				encoder_l_st = ENC_ST_AR;
-				T2CCR |= 0x6 << 0; // capture and interrupt on CAP2.0 falling edge
-				T2IR |= 0x1 << 4; // reset CAP2.0
-			}
-			// EINT0
-			else if (tmp2 & 0x1 << 0) {
-				EXTINT |= 0x1 << 0; // reset EINT0
-			}
-			break;
-		case ENC_ST_AR:
-			// EINT0
-			if (tmp2 & 0x1 << 0) { // BR event received
-				// Forward
-				encoder_count[0]++;
-				encoder_l_st = ENC_ST_INIT;
-				T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
-				EXTINT |= 0x1 << 0; // reset EINT0
-			}
-			// CAP2.0
-			else if (tmp1 & (0x1 << 4)) { // AF event received
-				// Backwards
-				encoder_count[0]--;
-				encoder_l_st = ENC_ST_INIT;
-				T2CCR |= 0x5 << 0; // capture and interrupt on CAP2.0 rising edge
-				T2IR |= 0x1 << 4; // reset CAP2.0
-			}
-			break;
+	if (tmp1 & (0x1 << 4)) { // Left encoder AR event received
+		//log_string("LAR\n");
+		if (IOPIN & 0x1 << 16) {
+			// Forward
+			encoder_count[0]++;
+		} else {
+			// Backwards
+			encoder_count[0]--;
 		}
-	}
-	
-	if ((tmp1 & (0x1 << 6)) || (tmp1 & (0x1 << 5))) { // right encoder
-		switch (encoder_r_st) {
-		case ENC_ST_INIT:
-			// CAP2.2
-			if (tmp1 & (0x1 << 6)) { // AR event received
-				encoder_r_st = ENC_ST_AR;
-				T2CCR |= 0x6 << 6; // capture and interrupt on CAP2.2 falling edge
-				T2IR |= 0x1 << 6; // reset CAP2.2
-			}
-			// CAP2.1
-			else if (tmp1 & (0x1 << 5)) {
-				T2IR |= 0x1 << 5; // reset CAP2.1
-			}
-			break;
-		case ENC_ST_AR:
-			// CAP2.1
-			if (tmp1 & (0x1 << 5)) { // BR event received
-				// Forward
-				encoder_count[1]++;
-				encoder_r_st = ENC_ST_INIT;
-				T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
-				T2IR |= 0x1 << 5; // reset CAP2.1
-			}
-			// CAP2.2
-			else if (tmp1 & (0x1 << 6)) { // AF event received
-				// Backwards
-				encoder_count[1]--;
-				encoder_r_st = ENC_ST_INIT;
-				T2CCR |= 0x5 << 6; // capture and interrupt on CAP2.2 rising edge
-				T2IR |= 0x1 << 6; // reset CAP2.2
-			}
-			break;
-		}
+
+		T2IR |= 0x1 << 4; // reset CAP2.0
 	}
 
+	if (tmp1 & (0x1 << 6)) { // Right encoder AR event received
+		//log_string("RAR\n");
+		if (IOPIN & 0x1 << 28) {
+			// Backwards
+			encoder_count[1]--;
+		} else {
+			// Forward
+			encoder_count[1]++;
+		}
+
+		T2IR |= 0x1 << 6; // reset CAP2.2
+	}
 	//log_string_debug("<< pulse_in\n");
 
 	VICVectAddr = 0;
@@ -768,6 +749,7 @@ void pulse_in(void) {
 static void sample(void) {
 	tmp1 = T3IR;
 	if(tmp1 & 0x1) { // MAT3.0
+
 		log_string_debug(">> sample\n");
 
 		log_string_debug("IENABLE\n");
@@ -791,6 +773,9 @@ static void sample(void) {
 		// read encoder counts
 		get_encoders_count(&(in_data->encoder_left), &(in_data->encoder_right));
 
+		// update PWM
+		update_wheel_pwm((in_data->encoder_left), (in_data->encoder_right));
+
 		// read the last IMU data
 		mpu_get_motion6(&(in_data->ax_h));
 
@@ -798,9 +783,6 @@ static void sample(void) {
 		get_ir_sensor_data(&(in_data->ir_l));
 
 		in_data->timestamp = timestamp++;
-
-		// update PWM
-		//update_wheel_pwm(in_data->encoder_left, in_data->encoder_right);
 
 		log_string_debug("IDISABLE\n");
 		IDISABLE
@@ -893,6 +875,7 @@ static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right
 		T0MR1 = 256 - (right_wheel & ~PWM_DIR)*2;
 	} else { // Backwards
 		T0MR1 = 256;
+
 		T0MR0 = 256 - right_wheel*2;
 	}
 
@@ -908,27 +891,50 @@ static inline void set_wheel_pwm(unsigned short left_wheel, unsigned short right
 /**
  * Set the output pwm value
  */
-//static inline void update_wheel_pwm(unsigned short left_wheel_count, unsigned short right_wheel_count) {
-//
-//	pwm_currval_l = pwm_currval_l + ((pwm_setpoint_l - ((left_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/PD_GAIN); // curr_val + erro * PD
-//	pwm_currval_r = pwm_currval_r + ((pwm_setpoint_r - ((right_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/PD_GAIN);
-//
-//	if (pwm_currval_r > 0) { // Forward
-//		T0MR2 = 256;
-//		T0MR1 = 256 - pwm_currval_r;
-//	} else { // Backwards
-//		T0MR1 = 256;
-//		T0MR2 = 256 + pwm_currval_r;
-//	}
-//
-//	if (pwm_currval_l > 0) { // Forward
-//		T1MR0 = 256;
-//		T1MR1 = 256 - pwm_currval_l;
-//	} else { // Backwards
-//		T1MR1 = 256;
-//		T1MR0 = 256 + pwm_currval_l;
-//	}
-//}
+static inline void update_wheel_pwm(short left_wheel_count, short right_wheel_count) {
+
+	// encoder count -100 / 100 (MAX_COUNT_PER_SAMPLE)
+	// pwm_set_poit -256 / 255
+	// pwm_cur_val -256 / 255
+
+	if (pwm_cur_val_l == 0)
+		pwm_cur_val_l = pwm_cur_val_l + ((pwm_setpoint_l - 12 - ((left_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/INVERSE_PD_GAIN); // curr_val + erro * PD_GAIN
+	else
+		pwm_cur_val_l = pwm_cur_val_l + ((pwm_setpoint_l - ((left_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/INVERSE_PD_GAIN); // curr_val + erro * PD_GAIN
+	pwm_cur_val_r = pwm_cur_val_r + ((pwm_setpoint_r - ((right_wheel_count*256)/MAX_COUNT_PER_SAMPLE))/INVERSE_PD_GAIN);
+
+
+
+	if (pwm_setpoint_r != 0) {
+		if (pwm_cur_val_r > 0) { // Forward
+			T0MR0 = 256;
+			T0MR1 = 256 - pwm_cur_val_r;
+		} else { // Backwards
+			T0MR1 = 256;
+			T0MR0 = 256 + pwm_cur_val_r;
+		}
+	}
+	else {
+		pwm_cur_val_r = 0;
+		T0MR1 = 256;
+		T0MR0 = 256;
+	}
+
+	if (pwm_setpoint_l != 0) {
+		if (pwm_cur_val_l > 0) { // Forward
+			T1MR0 = 256;
+			T1MR1 = 256 - pwm_cur_val_l;
+		} else { // Backwards
+			T1MR1 = 256;
+			T1MR0 = 256 + pwm_cur_val_l;
+		}
+	}
+	else {
+		pwm_cur_val_l = 0;
+		T1MR1 = 256;
+		T1MR0 = 256;
+	}
+}
 
 /**
  *
