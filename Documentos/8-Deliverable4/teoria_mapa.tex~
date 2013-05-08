@@ -4,7 +4,7 @@ A posição do robô no mapa em cada instante é representada por um ponto no pl
 
 Neste projeto, a determinação do deslocamento do robô é determinada primariamente pelos encoders presentes cada roda. O acelerômetro e o giroscópio são utilizados para aumentar a confiabilidade dos cálculos de deslocamento, principalmente em caso de escorregamento das rodas.
 
-Na próxima seção será explicada a teoria da determinação do deslocamento, velocidade e aceleração do centro de movimento do robô a partir das leituras dos encoders em cada instante. Na seção \ref{sec:teoria_acel_giro} será explicitada a forma como as leituras do acelerômetro e giroscópio serão utilizadas para aumentar a confiabilidade das medições.
+Na próxima seção será explicada a teoria da determinação do deslocamento, velocidade e aceleração do centro de movimento do robô a partir das leituras dos encoders em cada instante. Na seção \ref{sec:teoria_acel_giro} será explicitada a forma como as leituras do acelerômetro e giroscópio serão utilizadas para aumentar a exatidão das medições.
 
 Na Figura \ref{fig:robo} está presente um esquema básico do robô visto de cima e virado com a frente para a direita. Na figura estão presentes os nomes das variáveis que são utilizadas nos cálculos posteriores. As medidas $R$, $R_D$ e $R_E$ representam os raios de um movimento circular uniforme descrito pelo robô, supondo que e roda esquerda esteja se deslocando mais do que a direita. Esse aspecto será melhor explicado nas seções seguintes. 
 
@@ -52,17 +52,17 @@ O acoplamento do eixo do encoder com o eixo da roda é feita por uma correia de 
   \label{eq:theta1_theta2}
 \end{equation}
 
-Calculando-se a relação entre a contagem de pulsos do encoder ($E$) e o ângulo de rotação ($\Delta \theta_2$) do eixo do encoder, levando-se em conta que há uma contagem de 1800 pulsos por volta:
+Calculando-se a relação entre a contagem de pulsos do encoder ($E$) e o ângulo de rotação ($\Delta \theta_2$) do eixo do encoder, levando-se em conta que há uma contagem de $PV$ pulsos por volta:
 
 \begin{equation}
-  \Delta \theta_2 = \frac{2 \pi}{1800} \cdot E \unit{rad}
+  \Delta \theta_2 = \frac{2 \pi}{PV} \cdot E \unit{rad}
   \label{eq:E_theta2}
 \end{equation}
 
 Substituindo-se a equação \ref{eq:E_theta2} na \ref{eq:theta1_theta2}, tem-se que:
 
 \begin{equation}
-  \Delta \theta_1 = \frac{C_2}{C_1} \frac{2 \pi}{1800} \cdot E \unit{rad}
+  \Delta \theta_1 = \frac{C_2}{C_1} \frac{2 \pi}{PV} \cdot E \unit{rad}
   \label{eq:theta_1}
 \end{equation}
 
@@ -75,17 +75,22 @@ Calculando-se a relação entre a variação do ângulo do eixo da roda ($\Delta
 Substituindo-se o valor de ($\Delta \theta_1$) da equação \ref{eq:theta_1}, obtém-se:
 
 \begin{eqnarray*}
-   \Delta x_3 = \frac{C_2}{C_1} \frac{2 \pi}{1800} \cdot E \cdot \frac{C_3}{2 \pi}
+   \Delta x_3 = \frac{C_2}{C_1} \frac{2 \pi}{PV} \cdot E \cdot \frac{C_3}{2 \pi}
 \end{eqnarray*}
 
 \begin{empheq}[box=\fbox]{equation}
-   \Delta x_3 = \frac{C_2 C_3}{1800 \cdot C_1} \cdot E
+   \Delta x_3 = \frac{C_2 C_3}{PV \cdot C_1} \cdot E
   \label{eq:x_3}
 \end{empheq}
 
 
 Que é o valor do deslocamento da roda em função da contagem de pulsos do encoder. 
 
+\subsubsection{Valores práticos}
+
+Os discos do encoders instalados atualmente no robô possuem nominalmente 1800 pulsos por volta. Porém, eles estão visivelmente danificados, o que gera falhas na geração de pulsos. Na prática, os valores reais foram determinados a partir de 10 rotações dos discos, calculando-se o valor médio. A roda esquerda gera aproximadamente $PV=1708$ pulsos, e a direita $PV=1627$ pulsos por volta.
+
+As medidas das circunferências $C_1$, $C_2$ e $C_3$ do robô estão presentes no Apêndice \ref{cap:medidas_robo}.
 
 \subsection{Deslocamento do centro de movimento do robô}
 
@@ -358,8 +363,40 @@ O algoritmo proposto para determinação da posição do robô em cada instante 
   
   \item Derivar duas vezes o deslocamento linear ($\Delta x_C$), usando as equações \ref{eq:velocidade_encoders} e \ref{eq:aceleracao_encoders} para obter aceleração linear ($a_C$, em $m/s^2$), e derivar uma vez o deslocamento angular ($\theta_C$), usando a equação \ref{eq:omega_encoders}, para obter a velocidade angular ($\omega_C$, em $rad/s$).
   
-  \item Comparar a aceleração linear ($a_C$) e a velocidade angular ($\omega_C$), obtidas com os encoders, com as leituras do acelerômetro ($a_a$) e giroscópio ($\omega_g$). Caso as diferenças dos valores passem de limiares $L_a$ e $L_\omega$ (determinados experimentalmente), é provável que um escorregamento de rodas tenha ocorrido. Especificar com base nas comparações pesos $p_{a_c}$ e $p_{a_a}$ para a aceleração linear (encoders \textit{vs.} acelerômetro) e pesos $p_{\omega_c}$ e $p_{\omega_g}$ para velocidade angular (encoders \textit{vs.} giroscópio), dando mais prioridade ao acelerômetro e giroscópio caso escorregamentos sejam detectados.
+  \item Comparar a aceleração linear ($a_C$) e a velocidade angular ($\omega_C$), obtidas com os encoders, com as leituras do acelerômetro ($a_a$) e giroscópio ($\omega_g$). Caso as diferenças dos valores passem de limiares $L_a$ e $L_\omega$ (determinados experimentalmente), é provável que um escorregamento de rodas ou falha de leitura tenha ocorrido. Especificar com base nas comparações pesos $p_{a_c}$ e $p_{a_a}$ para a aceleração linear (encoders \textit{vs.} acelerômetro) e pesos $p_{\omega_c}$ e $p_{\omega_g}$ para velocidade angular (encoders \textit{vs.} giroscópio), dando mais prioridade ao acelerômetro e giroscópio caso escorregamentos sejam detectados. Em termos formais, tem-se que:
   \label{item:pesos}
+  \[
+  p_{a_c} =  
+  \begin{cases}
+      0, & |a_C - a_a| > L_a \\
+      1, & \mbox{ caso contrário} 
+      \label{eq:p_ac}
+  \end{cases}
+  \]
+   \[
+  p_{a_a} =  
+  \begin{cases}
+      1, & |a_C - a_a| > L_a \\
+      0, & \mbox{ caso contrário}
+      \label{eq:p_ac}
+  \end{cases}
+  \]
+   \[
+  p_{\omega_c} =  
+  \begin{cases}
+      0, & |\omega_C - \omega_a| > L_\omega \\
+      1, & \mbox{ caso contrário}
+      \label{eq:p_ac}
+  \end{cases}
+  \]
+  \[
+  p_{\omega_g} =  
+  \begin{cases}
+      1, & |\omega_C - \omega_a| > L_\omega \\
+      0, & \mbox{ caso contrário}
+      \label{eq:p_ac}
+  \end{cases}
+  \]
   
   \item Calcular com base nos pesos obtidos anteriormente a aceleração linear final ($a$) e a velocidade angular final ($\omega$), de acordo com as equações \ref{eq:comb_linear_acel} e \ref{eq:comb_linear_vel_angular}.
   \begin{equation}
@@ -388,7 +425,7 @@ O algoritmo proposto para determinação da posição do robô em cada instante 
     \end{equation}
 \end{enumerate}
 
-Um ponto importante a ressaltar é que os pesos calculados no passo \ref{item:pesos} são utilizados (a princípio) como sendo 0 ou 1. Ou seja, se escorregamentos forem detectados nas rodas os pesos $p_{a_a}$ e $p_{\omega_g}$ devem valer 1, e $p_{a_c}$ e $p_{\omega_c}$ devem valer 0. Dessa forma os dados do acelerômetro e giroscópio são utilizados (nesses momentos específicos) em detrimento dos dados dos encoders.
+Um ponto importante a ressaltar é que os pesos calculados no passo \ref{item:pesos} são utilizados (a princípio) como sendo 0 ou 1. Ou seja, se escorregamentos forem detectados nas rodas os pesos $p_{a_a}$ e $p_{\omega_g}$ devem valer 1, e $p_{a_c}$ e $p_{\omega_c}$ devem valer 0. Dessa forma os dados do acelerômetro e do giroscópio são utilizados (nesses momentos específicos) em detrimento dos dados dos encoders.
 
 
 \section{Sensores infra-vermelhos}
@@ -449,23 +486,39 @@ O vetor $\overrightarrow{P_2}$ é o vetor que vai do sensor infra-vermelho até 
   \label{eq:IR-P_2_fase}
 \end{equation}
 
+\subsection{Filtragem}
+
+Percebeu-se, nos testes realizados com o robô, que os sensores infra-vermelhos utilizados na prática provêm, esporadicamente, leituras discrepantes e que não correspondem à realidade. Portanto, certos métodos de filtragem digital foram utilizados na estação base. O primeiro filtro é um passa-faixa, que deixar passar apenas medidas que estejam entre 30cm e 150cm, que são as distâncias mínima e máxima que podem ser detectadas com exatidão pelos sensores (segundo o \textit{datasheet} do dispositivo). O segundo filtro é uma média móvel. Esse filtro pode ser ativado pelo usuário através da interface gráfica, na qual pode-se também configurar o número de períodos da média. Em alguns ambientes testados a média móvel mostrou-se adequada para melhorar a qualidade do mapa.
+
 
 \chapter{Testes}
  
-Nesta seção serão expostos os testes realizados na prática com o robô. Durante os testes foi possível chegar ao ponto de utilizar com sucesso o giroscópio para correção de erros de escorregamento e de falhas de leituras dos encoders, como explicado a seguir. %A seguir estão explicitados com maiores detalhes os processos. 
+Nesta seção serão expostos os testes realizados na prática com o robô. Durante os testes foi possível chegar ao ponto de utilizar com sucesso o giroscópio para correção de erros de escorregamentos e de falhas de leituras dos encoders, como explicado a seguir. 
 
- 
+Um ponto que vale ser ressaltado, para melhor compreensão dos mapas, é que o robô sempre sai da origem (ponto marcado por (0,0) em cada mapa) e chega na posição em que está o seu ícone (\includegraphics[scale=0.02]{figuras/robo/robo_cor_transp_cortado.png}).
+
+
+%A seguir estão explicitados com maiores detalhes os processos. 
+
+
 \section{Primeiro teste}
 
 
-O primeiro teste bem-sucedido foi realizado utilizando com o \textit{layout} do ambiente da Figura \ref{fig:teste1_foto}. O robô fez um trajeto em sentido anti-horário no ambiente retangular, voltando à posição inicial $(0,0)$ ao final do caminho. Os encoders sofreram imprecisões nas medições em certos momentos do trajeto. No gráfico da Figura \ref{fig:teste1_giro_grafico} está explicitada uma comparação entre as velocidades angulares obtidas com os encoders e com o eixo Z do giroscópio. Vê-se que o giroscópio proveu medidas razoavelmente confiáveis no decorrer do tempo. 
+O primeiro teste bem-sucedido foi realizado utilizando com o \textit{layout} do ambiente da Figura \ref{fig:teste1_layout}. O robô fez um trajeto em sentido anti-horário no ambiente retangular, voltando à posição inicial $(0,0)$ ao final do caminho. Os encoders sofreram imprecisões nas medições em certos momentos do trajeto. No gráfico da Figura \ref{fig:teste1_giro_grafico} está explicitada uma comparação entre as velocidades angulares obtidas com os encoders e com o eixo Z do giroscópio. Vê-se que o giroscópio proveu medidas razoavelmente confiáveis no decorrer do tempo. 
 
 Na Figura \ref{fig:teste1_mapa_encoders} está presente o mapa produzido a partir desse teste somente utilizando os dados dos encoders, e na Figura \ref{fig:teste1_mapa_encoders_giro} está presente um mapa que foi produzido utilizando as leituras do giroscópio para correção de erros (o limiar utilizado foi $L_\omega = 0.025 \unit{rad/s}$). Vê-se que o trajeto do robô pôde ser determinado com maior exatidão no segundo mapa, usando-se o giroscópio. A posição final do robô ficou próxima da origem, e o mapa ficou mais semelhante à forma retangular que corresponde à realidade. 
 
-O acelerômetro, por outro lado, não provou-se eficaz para o fim de correção de erros, ao menos não da forma os dados estão sendo atualmente obtidos e tratados. A obtenção de dados é feita a partir de amostras instantâneas a 3.89 Hz. Na Figura \ref{fig:teste1_acel_grafico} está explicitada uma comparação (produzida a partir desse mesmo teste) das acelerações lineares obtidas com os encoders e com o eixo Y do acelerômetro. Vê-se que há grandes diferenças entre as acelerações, e que o acelerômetro provê medidas bastante discrepantes. No escopo do projeto (tendo em vista as limitações de tempo) não foi possível trabalhar mais à fundo com os dados do acelerômetro. Porém, deixa-se a possibilidade para trabalhos futuros. Como alternativa de tratamento desses dados, possivelmente possa ser utilizada uma taxa de amostragem maior para o acelerômetro, utilizando um processo de filtragem para reduzir os ruídos da aceleração. Na Figura \ref{fig:teste1_mapa_acelerometro} está presente um mapa que foi gerado somente a partir das amostras do acelerômetro e giroscópio, exposto para fins de comparação. A trilha em azul representa o caminho calculado que o robô supostamente percorreu de acordo com esses sensores. É visível que os resultados obtidos fogem muito da realidade.
+O acelerômetro, por outro lado, não se provou eficaz para o fim de correção de erros, ao menos não da forma como os dados estão sendo atualmente obtidos e tratados. A obtenção de dados é feita a partir de amostras instantâneas a 3.89 Hz. Na Figura \ref{fig:teste1_acel_grafico} está explicitada uma comparação (produzida a partir desse mesmo teste) das acelerações lineares obtidas com os encoders e com o eixo Y do acelerômetro. Vê-se que há grandes diferenças entre as acelerações, e que o acelerômetro provê medidas bastante discrepantes. Na Figura \ref{fig:teste1_mapa_acelerometro} está presente um mapa que foi gerado somente a partir das amostras do acelerômetro e giroscópio, exposto para fins de comparação. A trilha em azul representa o caminho que o robô supostamente percorreu de acordo com esses sensores. É visível que os resultados obtidos com o acelerômetro estão longe da realidade.
 
 Um aspecto que vale ressaltar é que nos dois primeiros mapas foi utilizada uma filtragem de média móvel de 3 períodos para os sensores IR. No mapa da Figura \ref{fig:teste1_mapa_encoders_giro_media0}, exposto para comparação, não foi utilizada a filtragem por média móvel.
 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./figuras/testes/teste1/layout.png}
+	\caption{\textit{Layout} do ambiente do primeiro teste.}
+	\label{fig:teste1_layout}
+\end{figure}
 
 \begin{figure}[H]
 	\centering
@@ -491,7 +544,7 @@ Um aspecto que vale ressaltar é que nos dois primeiros mapas foi utilizada uma 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./figuras/testes/teste1/mapa_acelerometro.png}
-	\caption{Trilha do robô no primeiro teste calculada somente a partir dos dados dos acelerômetro e giroscópio.}
+	\caption{Trilha do robô (em azul) no primeiro teste calculada somente a partir dos dados do acelerômetro e do giroscópio.}
 	\label{fig:teste1_mapa_acelerometro}
 \end{figure}
 
@@ -517,7 +570,7 @@ O segundo teste foi realizado em um corredor de 2,25m de largura, no ambiente da
 
 Nos mapas das Figuras \ref{fig:teste2_mapa_encoders} e \ref{fig:teste2_mapa_encoders_giro}, não foi utilizado nenhum tipo de filtragem (além do passa-faixa de 30 a 150cm) para os sensores infra-vermelhos. O uso de média móvel de 3 períodos (Figura \ref{fig:teste2_mapa_encoders_giro_media3}) não resultou em diferenças muito consideráveis, e a de 8 períodos (Figura \ref{fig:teste2_mapa_encoders_giro_media8}) gerou resultados visivelmente piores.
 
-Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como no teste anterior, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste2_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se que os resultados obtidos fogem muito da realidade.
+Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como no teste anterior, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste2_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se que os resultados obtidos com o acelerômetro saem bastante da realidade.
 
 \begin{figure}[H]
 	\centering
@@ -557,7 +610,7 @@ Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas mediçõ
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./figuras/testes/teste2/mapa_acelerometro.png}
-	\caption{Trilha do robô no segundo teste calculada somente a partir dos dados dos acelerômetro e giroscópio.}
+	\caption{Trilha do robô (em azul) no segundo teste calculada somente a partir dos dados do acelerômetro e do giroscópio.}
 	\label{fig:teste2_mapa_acelerometro}
 \end{figure}
 
@@ -581,7 +634,7 @@ O terceiro teste foi realizado partindo-se de um corredor de 2,25m de largura (�
 
 Nos mapas das Figuras \ref{fig:teste3_mapa_encoders} e \ref{fig:teste3_mapa_encoders_giro}, não foi utilizado nenhum tipo de filtragem (além do passa-faixa de 30 a 150cm) para os sensores infra-vermelhos. O uso de média móvel de 5 períodos (Figura \ref{fig:teste3_mapa_encoders_giro_media5}), a melhor configuração encontrada, resultou em leves melhorias na qualidade do mapa.
 
-Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como nos testes anteriores, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste3_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se novamente que os resultados obtidos fogem muito da realidade.
+Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como nos testes anteriores, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste3_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se novamente que os resultados obtidos com o acelerômetro fogem bastante da realidade.
 
 \begin{figure}[H]
 	\centering
@@ -614,7 +667,7 @@ Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas mediçõ
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./figuras/testes/teste3/mapa_acelerometro.png}
-	\caption{Trilha do robô no terceiro teste calculada somente a partir dos dados dos acelerômetro e giroscópio.}
+	\caption{Trilha do robô (em azul) no terceiro teste calculada somente a partir dos dados do acelerômetro e do giroscópio.}
 	\label{fig:teste3_mapa_acelerometro}
 \end{figure}
 
@@ -634,11 +687,11 @@ Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas mediçõ
 
 \section{Quarto teste}
 
-O quarto teste foi realizado na extensão do corredor principal do terceiro andar dos blocos A, B, C e D da UTFPR campus Curitiba. O ambiente está representado na Figura \ref{fig:teste4_foto}. Na Figura \ref{fig:teste4_mapa_encoders}, está presente o mapa produzido apenas com dados dos encoders. Vê-se que eles sofreram erros de medição, pois o mapa aparece com a forma curvada. Na Figura \ref{fig:teste4_mapa_encoders_giro}, pode-se ver um mapa produzido com correções desses erros pelo giroscópio, usando um limiar $L_\omega = 0.0025 \unit{rad/s}$.
+O quarto teste foi realizado na extensão do corredor principal do terceiro andar dos blocos A, B, C e D da UTFPR campus Curitiba. O ambiente está representado na Figura \ref{fig:teste4_foto}. Um mapa produzido apenas com dados dos encoders está explicitado na Figura \ref{fig:teste4_mapa_encoders}. Vê-se que os encoders sofreram erros de medição, pois o mapa aparece de forma curvada. Na Figura \ref{fig:teste4_mapa_encoders_giro}, pode-se ver um mapa produzido com correções desses erros pelo giroscópio, usando um limiar $L_\omega = 0.003 \unit{rad/s}$.
 
-Nos mapas das Figuras \ref{fig:teste4_mapa_encoders} e \ref{fig:teste4_mapa_encoders_giro}, não foi utilizado nenhum tipo de filtragem (além do passa-faixa de 30 a 150cm) para os sensores infra-vermelhos. O uso de média móvel de 5 períodos (Figura \ref{fig:teste4_mapa_encoders_giro_media4}), a melhor configuração encontrada, resultou em leves melhorias na qualidade do mapa.
+Nos mapas das Figuras \ref{fig:teste4_mapa_encoders} e \ref{fig:teste4_mapa_encoders_giro}, não foi utilizado nenhum tipo de filtragem (além do passa-faixa de 30 a 150cm) para os sensores infra-vermelhos. O uso de média móvel de 4 períodos (Figura \ref{fig:teste4_mapa_encoders_giro_media4}), a melhor configuração encontrada, resultou em leves melhorias na qualidade do mapa.
 
-Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como nos testes anteriores, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste4_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se novamente que os resultados obtidos fogem muito da realidade.
+Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como nos testes anteriores, não pôde ser utilizado para correção de erros pelos mesmos motivos já apresentados. %A Figura \ref{fig:teste4_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se novamente que os resultados obtidos fogem muito da realidade.
 
 \begin{figure}[H]
 	\centering
@@ -657,14 +710,14 @@ Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas mediçõ
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{./figuras/testes/teste4/mapa_encoders_giro.png}
-	\caption{Mapa gerado no quarto teste a partir dos dados dos encoders, com correção de erros pelo giroscópio ($L_\omega = 0.0025 \unit{rad/s}$).}
+	\caption{Mapa gerado no quarto teste a partir dos dados dos encoders, com correção de erros pelo giroscópio ($L_\omega = 0.003 \unit{rad/s}$).}
 	\label{fig:teste4_mapa_encoders_giro}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{./figuras/testes/teste4/mapa_encoders_giro_media4.png}
-	\caption{Mapa gerado no primeiro teste a partir dos dados dos encoders, com correção de erros pelo giroscópio ($L_\omega = 0.0025 \unit{rad/s}$) e filtragem por média móvel de 5 períodos para sensores IR.}
+	\caption{Mapa gerado no primeiro teste a partir dos dados dos encoders, com correção de erros pelo giroscópio ($L_\omega = 0.003 \unit{rad/s}$) e filtragem por média móvel de 4 períodos para sensores IR.}
 	\label{fig:teste4_mapa_encoders_giro_media4}
 \end{figure}
 
@@ -682,10 +735,28 @@ Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas mediçõ
 	\label{fig:teste4_acel_grafico}
 \end{figure}
 
+\chapter{Conclusões}
+
+Pôde ser visto nos testes apresentados que os encoders sofreram falhas nas medidas, sobretudo na realização de curvas. Outro aspecto percebido também pela equipe é que erros de medição ocorrem frequentemente quando o robô inicia o movimento de uma roda parada, ou quando inverte o sentido de rotação abruptamente. Uma das possíveis causas dos erros podem ser os discos dos encoders, que estão visivelmente danificados em certos pontos. Eles deveriam gerar, nominalmente, 1800 pulsos por volta, mas geram na prática aproximadamente 1600 pulsos.
+Outra causa provável é que a correia utilizada para fazer o acoplamento do eixo da roda com o eixo do encoder é de borracha, e frequentemente está sujeita a escorregamentos. A equipe efetou tentativas de reduzir esse problema utilizando uma polia maior (e com mais aderência) no eixo dos encoders, e aumentando a aderência do eixo das rodas aplicando a ele uma fita de borracha. Porém, ainda sim os problemas persistiram. 
+
+Uma alternativa viável seria utilizar outro disco para os encoders, com menos pulsos por volta e que sejam menos sucetíveis a falhas de leitura. Além disso, para acoplar o encoder às rodas, uma solução pode ser a utilização de uma correia dentada, que é menos sujeita a escorregamentos que uma correia de borracha. Outra opção seria acoplar os discos dos encoders diretamente ao eixo das rodas, dessa maneira eliminando o problema das correias.
+
+Um aspecto que foi bem-sucedido nos testes foi a utilização do giroscópio para a correção de erros dos encoders. Sobretudo o giroscópio foi de grande valia para determinar com maior exatidão a orientação do robô na realização de curvas. Um aspecto interessante que pode ser trabalhado em projetos futuros é a determinação do limiar $L_\omega$ para cada caso específico. Nos testes aqui apresentados, o valor foi determinado empiricamente em cada teste, mas seria interessante que houvesse um trabalho no desenvolvimento de um algoritmo para determinar dinamicamente o valor de $L_\omega$, adequando-o a cada caso. Possivelmente o filto de Kalman seja outra opção para corrigir os erros dinamicamente. Porém, conhecidamente, a complexidade de utilização dele na prática é considerável.
+
+Percebeu-se que o acelerômetro não foi eficaz para o fim de correção de erros de odometria, ao menos não da forma como os dados estão sendo atualmente obtidos e tratados. A obtenção de dados é feita a partir de amostras instantâneas a 3.89 Hz. No escopo do projeto (tendo em vista as limitações de tempo) não foi possível trabalhar mais à fundo com os dados do acelerômetro. Porém, deixa-se a possibilidade para trabalhos futuros. Como alternativa de tratamento desses dados, possivelmente possa ser utilizada uma taxa de amostragem maior para o acelerômetro, utilizando um processo de filtragem para reduzir os ruídos da aceleração.
+
+Do ponto de vista dos objetivos, percebe-se que a maioria deles foram alcançados. Foi implementado com sucesso um \textit{software} com interface gráfica para geração e visualização de mapas, visualização de imagens da \textit{webcam} do robô e controle do robô por meio do teclado. A comunicação foi implementada satisfatoriamente, tanto entre a estação base e a placa TS-7260 (via Wi-Fi) quanto entre a TS e a placa de baixo nível, via porta serial. Uma \textit{webcam} USB foi instalada e configurada com sucesso no robô para a transmissão de imagens ao usuário. O giroscópio foi utilizado satisfatoriamente na prática para corrigir erros de leituras dos encoders e escorregamento das rodas. Uma placa de circuito impresso, de tamanho reduzido, foi desenvolvida de forma a integrar as funções de baixo nível do robô: interface com os encoders, sensores infra-vermelhos, acelerômetro e giroscópio, e geração de PWM para os motores.
+
+Como última consideração, enfatiza-se que este projeto não chegou ao seu fim, mas pelo contrário, um novo caminho foi aberto para pesquisas mais aprofundadas no que tange o mapeamento 2D de ambientes. A possibilidade está aberta a novas equipes para utilizarem a plataforma de mapeamento desenvolvida para o Bellator -- o que envolve tanto o \textit{hardware} quanto o \textit{software}. Apesar deste trabalho ter sido consideravelmente extenso e demandar muito tempo e energia de todos os membros da equipe, pode-se dizer que com ele o ponta-pé inicial foi dado, e que ainda existem muitas possibilidades a serem pensadas e realizadas para o futuro.
+
+
+\apendice
 
 \chapter{Medidas do robô}
+\label{cap:medidas_robo}
 
-Na Tabela \ref{tab:medidas_robo} estão presentes as medidas do robô.
+% Na Tabela \ref{tab:medidas_robo} estão presentes as medidas do robô.
 
 \begin{table}[h]
   \caption{Medidas do robô.}
