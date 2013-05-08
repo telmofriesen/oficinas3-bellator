@@ -252,7 +252,7 @@ Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma compar
   \centering
   \begin{tabular}{p{3cm}|p{2.2cm}p{1.7cm}p{2.2cm}p{2.2cm}p{2.2cm}}
     \toprule
-    \textbf{Característica} & \textbf{Encoder} & \textbf{GPS} & \textbf{Acelerômetro} & \textbf{Giroscópio} & \textbf{Bussola} \\
+    \textbf{Característica} & \textbf{Encoder} & \textbf{GPS} & \textbf{Acelerômetro} & \textbf{Giroscópio} & \textbf{Bússola} \\
     \hline
     Sujeito a influencias externas & Deslizamentos & Não & Não & Não & Ruídos de campos magnéticos diversos \\
     \hline
@@ -260,7 +260,7 @@ Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma compar
     \hline
     Posicionamento & Relativo & Absoluto & Relativo & Relativo & Absoluto \\
     \hline
-    Acumulo de erro para calculo da posição & Sim & Não & Sim (duas integrações) & Sim (duas integrações) & Sim \\
+    Acumulo de erro para calculo da posição & Sim & Não & Sim (duas integrações) & Sim (uma integração) & Não \\
     \bottomrule
   \end{tabular}
   \label{tab:alternativas_tecnologias_odometria}

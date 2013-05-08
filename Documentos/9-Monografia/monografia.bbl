@@ -1,0 +1,142 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{1.53 }
+
+\bibitem[AGILENTTECHNOLOGIES 2002]{heds9700}
+\abntrefinfo{AGILENTTECHNOLOGIES}{AGILENTTECHNOLOGIES}{2002}
+{AGILENTTECHNOLOGIES. \textbf{Small Optical Encoder Modules HEDS-9700 Series}.
+  2002.
+Dispon{\'\i}vel em:
+  $<$http://www.digchip.com/datasheets/parts/datasheet/021/QEDS-9871-pdf.php$>%
+$. Acesso em: 28 de Fevereiro de 2013.}
+
+\bibitem[Bot 2013]{patrol_bot}
+\abntrefinfo{Bot}{BOT}{2013}
+{BOT, P. 2013.
+Dispon{\'\i}vel em:
+  $<$http://www.mobilerobots.com/researchrobots/researchpatrolbot.aspx$>$.}
+
+\bibitem[Cairo 2013]{cairo}
+\abntrefinfo{Cairo}{CAIRO}{2013}
+{CAIRO. 2013.
+Dispon{\'\i}vel em: $<$http://www.cairographics.org/$>$.}
+
+\bibitem[Corporation 2013]{digikey}
+\abntrefinfo{Corporation}{CORPORATION}{2013}
+{CORPORATION, D. \textbf{DigiKey Corporation}. 2013.
+Dispon{\'\i}vel em: $<$http://www.digikey.com$>$. Acesso em: 18 de Fevereiro de
+  2013.}
+
+\bibitem[Eclipse 2013]{eclipse}
+\abntrefinfo{Eclipse}{ECLIPSE}{2013}
+{ECLIPSE. 2013.
+Dispon{\'\i}vel em: $<$http://eclipse.org/$>$.}
+
+\bibitem[eSysTech 2013]{esystech}
+\abntrefinfo{eSysTech}{ESYSTECH}{2013}
+{ESYSTECH, S. \textbf{eSysTech Embedded Systems}. 2013.
+Dispon{\'\i}vel em: $<$http://www.esystech.com.br$>$. Acesso em: 18 de
+  Fevereiro de 2013.}
+
+\bibitem[EvenSense 2013]{mpu6050}
+\abntrefinfo{EvenSense}{EVENSENSE}{2013}
+{EVENSENSE. 2013.
+Dispon{\'\i}vel em: $<$http://www.invensense.com/mems/gyro/mpu6050.html$>$.}
+
+\bibitem[GCC 2013]{gcc}
+\abntrefinfo{GCC}{GCC}{2013}
+{GCC. 2013.
+Dispon{\'\i}vel em: $<$http://gcc.gnu.org/$>$. Acesso em: 18 de Fevereiro de
+  2013.}
+
+\bibitem[gEDA 2013]{geda}
+\abntrefinfo{gEDA}{GEDA}{2013}
+{GEDA. 2013.
+Dispon{\'\i}vel em: $<$http://www.gpleda.org$>$.}
+
+\bibitem[Genius 2013]{genius-islim-1300}
+\abntrefinfo{Genius}{GENIUS}{2013}
+{GENIUS. 2013.
+Dispon{\'\i}vel em:
+  $<$http://geniusnet.com/wSite/ct?xItem=16764\&ctNode=161$>$.}
+
+\bibitem[Impressos 2013]{stick}
+\abntrefinfo{Impressos}{IMPRESSOS}{2013}
+{IMPRESSOS, S.~C. \textbf{Stick Circuitos Impressos}. 2013.
+Dispon{\'\i}vel em: $<$http://www.stick.ind.br$>$. Acesso em: 18 de Fevereiro
+  de 2013.}
+
+\bibitem[Java 2013]{java}
+\abntrefinfo{Java}{JAVA}{2013}
+{JAVA. 2013.
+Dispon{\'\i}vel em: $<$www.java.com$>$.}
+
+\bibitem[lpc21isp 2013]{lpc21isp}
+\abntrefinfo{lpc21isp}{LPC21ISP}{2013}
+{LPC21ISP. 2013.
+Dispon{\'\i}vel em: $<$http://sourceforge.net/projects/lpc21isp/$>$. Acesso em:
+  18 de Fevereiro de 2013.}
+
+\bibitem[Marin et al. 2012]{bellator_2012}
+\abntrefinfo{Marin et al.}{MARIN et al.}{2012}
+{MARIN, A.~J.; BORGES, J. C.~N.; WERGRZN, Y.~A. \textbf{Desenvolvimento de
+  robô móvel e análise qualitativa de algoritmos de navegação fuzzy}.
+  Curitiba, 2012.}
+
+\bibitem[NetBeans 2013]{netbeans}
+\abntrefinfo{NetBeans}{NETBEANS}{2013}
+{NETBEANS. 2013.
+Dispon{\'\i}vel em: $<$http://netbeans.org/$>$.}
+
+\bibitem[NXP 2013]{lpc2103}
+\abntrefinfo{NXP}{NXP}{2013}
+{NXP. \textbf{LPC2103 Overview}. 2013.
+Dispon{\'\i}vel em:
+  $<$http://www.nxp.com/products/microcontrollers/arm7/LPC2103FBD48.html$>$.
+  Acesso em: 28 de Fevereiro de 2013.}
+
+\bibitem[PCB 2013]{pcb}
+\abntrefinfo{PCB}{PCB}{2013}
+{PCB. 2013.
+Dispon{\'\i}vel em: $<$http://pcb.gpleda.org$>$.}
+
+\bibitem[Processing 2013]{processing}
+\abntrefinfo{Processing}{PROCESSING}{2013}
+{PROCESSING. 2013.
+Dispon{\'\i}vel em: $<$www.processing.org$>$.}
+
+\bibitem[resolution 2013]{webcam_resolution}
+\abntrefinfo{resolution}{RESOLUTION}{2013}
+{RESOLUTION, M.~C. digital~camera. 2013.
+Dispon{\'\i}vel em:
+  $<$http://web.forret.com/tools/megapixel.asp?width=640\&height=480$>$.}
+
+\bibitem[Sato 2013]{wii}
+\abntrefinfo{Sato}{SATO}{2013}
+{SATO, B. N.~W. K. 2 dimensional infrared robotic mapping system.
+2013.
+Dispon{\'\i}vel em:
+  $<$http://www-sens.sys.es.osaka-u.ac.jp/research/thesis/10/tech-rep/brad/the%
+sis.pdf$>$.}
+
+\bibitem[SHARPCORPORATION 2006]{ir_sensor}
+\abntrefinfo{SHARPCORPORATION}{SHARPCORPORATION}{2006}
+{SHARPCORPORATION. \textbf{GP2Y0A02F98YK Datasheet}. 2006.
+Dispon{\'\i}vel em:
+  $<$http://www.mindsensors.com/index.php?module=documents\&JAS\_DocumentManag%
+er\_op= \\ downloadFile\&JAS\_File\_id=335$>$. Acesso em: 1 de Agosto de 2011.}
+
+\bibitem[tools 2013]{uvc-linux}
+\abntrefinfo{tools}{TOOLS}{2013}
+{TOOLS, L.~U. driver . 2013.
+Dispon{\'\i}vel em: $<$http://www.ideasonboard.org/uvc$>$.}
+
+\bibitem[VideoLAN 2013]{vlc}
+\abntrefinfo{VideoLAN}{VIDEOLAN}{2013}
+{VIDEOLAN. 2013.
+Dispon{\'\i}vel em: $<$http://www.videolan.org/vlc/$>$.}
+
+\end{thebibliography}
