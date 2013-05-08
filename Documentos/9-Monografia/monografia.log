@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  8 MAY 2013 16:52
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  8 MAY 2013 18:39
 entering extended mode
  %&-line parsing enabled.
 **monografia
@@ -1739,11 +1739,37 @@ Cap\'{\i }tulo 17.
 
 ]
 Apendice A.
-(./monografia.bbl [126
+[126
 
-] [127
+]
+Apendice B.
+<./figuras/robo/fotos/foto1.jpg, id=564, 642.4pt x 481.8pt>
+File: ./figuras/robo/fotos/foto1.jpg Graphic file (type jpg)
 
-]) AED: lastpage setting LastPage [128]
+<use ./figuras/robo/fotos/foto1.jpg>
+<./figuras/robo/fotos/foto2.jpg, id=565, 642.4pt x 481.8pt>
+File: ./figuras/robo/fotos/foto2.jpg Graphic file (type jpg)
+
+<use ./figuras/robo/fotos/foto2.jpg> [127
+
+ <./figuras/robo/fotos/foto1.jpg>]
+<./figuras/robo/fotos/foto3.jpg, id=569, 642.4pt x 481.8pt>
+File: ./figuras/robo/fotos/foto3.jpg Graphic file (type jpg)
+
+<use ./figuras/robo/fotos/foto3.jpg>
+<./figuras/robo/fotos/foto4.jpg, id=570, 642.4pt x 481.8pt>
+File: ./figuras/robo/fotos/foto4.jpg Graphic file (type jpg)
+
+<use ./figuras/robo/fotos/foto4.jpg> [128 <./figuras/robo/fotos/foto2.jpg> <./f
+iguras/robo/fotos/foto3.jpg>]
+<./figuras/robo/fotos/foto5.jpg, id=574, 642.4pt x 481.8pt>
+File: ./figuras/robo/fotos/foto5.jpg Graphic file (type jpg)
+
+<use ./figuras/robo/fotos/foto5.jpg> (./monografia.bbl [129 <./figuras/robo/fot
+os/foto4.jpg> <./figuras/robo/fotos/foto5.jpg>] [130
+
+])
+AED: lastpage setting LastPage [131]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
@@ -1754,10 +1780,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7489 strings out of 495041
- 120981 string characters out of 1181897
+ 7520 strings out of 495041
+ 121822 string characters out of 1181897
  194052 words of memory out of 3000000
- 10315 multiletter control sequences out of 15000+50000
+ 10340 multiletter control sequences out of 15000+50000
  59936 words of font info for 131 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
  61i,16n,96p,1240b,487s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1769,9 +1795,9 @@ cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/shar
 e/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/texmf-texlive/fonts
 /type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utm
 r8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on monografia.pdf (129 pages, 6474531 bytes).
+Output written on monografia.pdf (132 pages, 6822768 bytes).
 PDF statistics:
- 604 PDF objects out of 1000 (max. 8388607)
+ 618 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 396 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 421 words of extra memory for PDF output out of 10000 (max. 10000000)
 

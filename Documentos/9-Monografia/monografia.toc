@@ -76,4 +76,5 @@
 \contentsline {chapter}{\numberline {16}\MakeUppercase {Conclus\IeC {\~o}es}}{124}
 \contentsline {chapter}{\numberline {17}\MakeUppercase {Trabalhos futuros}}{125}
 \contentsline {chapter}{Ap\^endice{} A{} -$\tmspace -\thinmuskip {.1667em}$-{} \MakeUppercase {Medidas do rob\IeC {\^o}}}{126}
-\contentsline {chapter}{REFER\^ENCIAS}{127}
+\contentsline {chapter}{Ap\^endice{} B{} -$\tmspace -\thinmuskip {.1667em}$-{} \MakeUppercase {Fotos do rob\IeC {\^o}}}{127}
+\contentsline {chapter}{REFER\^ENCIAS}{130}
