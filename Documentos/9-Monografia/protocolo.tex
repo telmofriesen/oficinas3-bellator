@@ -34,7 +34,7 @@ Na Figura \ref{fig:diagrama_estados_amostragem_sensores_sist_embarcado} está ex
 
 Nas Figuras \ref{fig:diagrama_estados_webcam_estacao_base} e \ref{fig:diagrama_estados_webcam_sist_embarcado} estão presentes os diagramas de estados da captura e recebimento de imagens da webcam. Foi utilizada a biblioteca externa \textit{libVLC} \cite{vlc} -- a componente de baixo nível do \textit{player} de mídia VLC -- tanto na estação base como no Linux embarcado para efetuar o processo de transmissão e visualização de imagens. No Linux embarcado, quando um comando de início de webcam é dado pelo usuário, uma \textit{stream} HTTP de imagens é aberta pela \textit{libVLC}, e a estação base é posteriormente notificada sobre o fato. Na estação base, quando ocorre a notificação de que a stream foi aberta, a componente de \textit{player} da \textit{libVLC} da janela principal é ativada (conectando dessa forma, na stream HTTP de imagens).
 
-
+Na Figura \ref{fig:diagrama_estados_baixo_nivel} está exposto o diagrama de estados do software de baixo nível que é responsável por efetuar as leituras dos sensores (\textit{encoders}, acelerômetro, giroscópio e infra-vermelhos) e reportar os valores lidos ao Linux embarcado quando requisitado pelo comando SYNC. O software de baixo nível também é responsável por alterar a velocidade das rodas alterando o valor do PWM e responder ao Linux embarcado com o comando ENGINES\_ACK.
 
 \begin{figure}[H]
   \centering
@@ -99,6 +99,12 @@ Nas Figuras \ref{fig:diagrama_estados_webcam_estacao_base} e \ref{fig:diagrama_e
   \label{fig:diagrama_estados_webcam_sist_embarcado}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth, keepaspectratio]{./figuras/statemachine_LowLevel.jpg}
+  \caption{Diagrama de estados do envio e recebimento de comandos (sistema de baixo nível).}
+  \label{fig:diagrama_estados_baixo_nivel}
+\end{figure}
 
 
 \subsection{Diagramas de sequência}

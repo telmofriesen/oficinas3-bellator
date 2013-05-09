@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.6.22)  8 MAY 2013 18:39
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.17)  8 MAY 2013 22:11
 entering extended mode
  %&-line parsing enabled.
 **monografia
@@ -829,19 +829,19 @@ read \OT1/ptm/m/n/12 re-cep-tora de men-sa-gens (igual para esta[][]ao
 [3
 
 ]
-Overfull \hbox (13.81993pt too wide) in paragraph at lines 38--38
+Overfull \hbox (13.81993pt too wide) in paragraph at lines 39--39
  []\OT1/ptm/m/n/12 --[] FI-GURA []Representa[][]ao do rob[]o e um sen-sor infra
 -vermelho de-tec-tando um obst[]aculo 
  []
 
 [4]
-Overfull \hbox (5.30017pt too wide) in paragraph at lines 63--63
+Overfull \hbox (5.30017pt too wide) in paragraph at lines 64--64
  []\OT1/ptm/m/n/12 --[] FI-GURA []Mapa ge-rado no quarto teste a par-tir dos da
 -dos dos en-co-ders, com corre[][]ao 
  []
 
 
-Overfull \hbox (2.91084pt too wide) in paragraph at lines 64--64
+Overfull \hbox (2.91084pt too wide) in paragraph at lines 65--65
  \OT1/ptm/m/n/12 corre[][]ao de er-ros pelo gi-rosc[]opio ($\OML/ztmcm/m/it/12 
 L[] \OT1/ztmcm/m/n/12 = 0\OML/ztmcm/m/it/12 :\OT1/ztmcm/m/n/12 003 []$\OT1/ptm/
 m/n/12 ) e fil-tra-gem por m[]edia 
@@ -1455,49 +1455,54 @@ e (type jpg)
 
 <use ./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg> [75 <./figu
 ras/estacaoBase/statemachine_webcam_estacaoBase.jpg>]
-<./figuras/estacaoBase/sequence_motores_estacaoBase.jpg, id=346, 805.50937pt x 
+<./figuras/statemachine_LowLevel.jpg, id=346, 1231.60126pt x 765.6103pt>
+File: ./figuras/statemachine_LowLevel.jpg Graphic file (type jpg)
+
+<use ./figuras/statemachine_LowLevel.jpg> [76 <./figuras/sistEmbarcado/statemac
+hine_webcam_sistEmbarcado.jpg>]
+<./figuras/estacaoBase/sequence_motores_estacaoBase.jpg, id=350, 805.50937pt x 
 460.72125pt>
 File: ./figuras/estacaoBase/sequence_motores_estacaoBase.jpg Graphic file (type
  jpg)
  <use ./figuras/estacaoBase/sequence_motores_estacaoBase.jpg>
-[76 <./figuras/sistEmbarcado/statemachine_webcam_sistEmbarcado.jpg>]
-<./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg, id=350, 1238.37656
+[77 <./figuras/statemachine_LowLevel.jpg>]
+<./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg, id=354, 1238.37656
 pt x 530.73282pt>
 File: ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg Graphic file (
 type jpg)
 
 <use ./figuras/sistEmbarcado/sequence_motores_sistEmbarcado.jpg>
-<./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg, id=351, 916.92563
+<./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg, id=355, 916.92563
 pt x 548.0475pt>
 File: ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg Graphic file 
 (type jpg)
 
-<use ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> [77 <./figura
+<use ./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> [78 <./figura
 s/estacaoBase/sequence_motores_estacaoBase.jpg> <./figuras/sistEmbarcado/sequen
 ce_motores_sistEmbarcado.jpg>]
-<./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg, id=355, 1307.63531pt 
+<./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg, id=360, 1307.63531pt 
 x 554.07pt>
 File: ./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg Graphic file (typ
 e jpg)
  <use ./figuras/estacaoBase/sequence_sensores_estacaoBase.jpg>
-<./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg, id=356, 1669.73813pt x 
+<./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg, id=361, 1669.73813pt x 
 561.59813pt>
 File: ./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg Graphic file (type 
 jpg)
  <use ./figuras/estacaoBase/sequence_webcam_estacaoBase.jpg>
-[78 <./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> <./figuras/es
+[79 <./figuras/sistEmbarcado/sequence_sensores_sistEmbarcado.jpg> <./figuras/es
 tacaoBase/sequence_sensores_estacaoBase.jpg>]
-<./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg, id=361, 1172.12906p
+<./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg, id=365, 1172.12906p
 t x 536.0025pt>
 File: ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg Graphic file (t
 ype jpg)
 
 <use ./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg>)
-(./diagrama_hardware.tex [79 <./figuras/estacaoBase/sequence_webcam_estacaoBase
+(./diagrama_hardware.tex [80 <./figuras/estacaoBase/sequence_webcam_estacaoBase
 .jpg> <./figuras/sistEmbarcado/sequence_webcam_sistEmbarcado.jpg>]
 Cap\'{\i }tulo 12.
 
-<./figuras/hardware/diagrama_blocos_hardware.jpg, id=365, 712.91344pt x 595.474
+<./figuras/hardware/diagrama_blocos_hardware.jpg, id=369, 712.91344pt x 595.474
 69pt>
 File: ./figuras/hardware/diagrama_blocos_hardware.jpg Graphic file (type jpg)
  <use ./figuras/hardware/diagrama_blocos_hardware.jpg>
@@ -1506,270 +1511,270 @@ Overfull \hbox (4.01436pt too wide) in paragraph at lines 17--18
 [][]ao do pro-to-colo de comunica[][]ao
  []
 
-[80
+[81
 
  <./figuras/hardware/diagrama_blocos_hardware.jpg>]
-<./figuras/hardware/hardware2_2.pdf, id=369, 1690.315pt x 2392.94pt>
+<./figuras/hardware/hardware2_2.pdf, id=373, 1690.315pt x 2392.94pt>
 File: ./figuras/hardware/hardware2_2.pdf Graphic file (type pdf)
 
-<use ./figuras/hardware/hardware2_2.pdf> [81] [82 <./figuras/hardware/hardware2
-_2.pdf>] <./figuras/hardware/pcb_cima.jpg, id=380, 654.445pt x 605.26125pt>
+<use ./figuras/hardware/hardware2_2.pdf> [82] [83 <./figuras/hardware/hardware2
+_2.pdf>] <./figuras/hardware/pcb_cima.jpg, id=384, 654.445pt x 605.26125pt>
 File: ./figuras/hardware/pcb_cima.jpg Graphic file (type jpg)
 
-<use ./figuras/hardware/pcb_cima.jpg> [83]
-<./figuras/hardware/pcb_baixo.jpg, id=384, 618.31pt x 604.2575pt>
+<use ./figuras/hardware/pcb_cima.jpg> [84]
+<./figuras/hardware/pcb_baixo.jpg, id=389, 618.31pt x 604.2575pt>
 File: ./figuras/hardware/pcb_baixo.jpg Graphic file (type jpg)
 
 <use ./figuras/hardware/pcb_baixo.jpg>
-<./figuras/hardware/pcb_pronta.jpg, id=385, 886.31125pt x 598.235pt>
+<./figuras/hardware/pcb_pronta.jpg, id=390, 886.31125pt x 598.235pt>
 File: ./figuras/hardware/pcb_pronta.jpg Graphic file (type jpg)
 
-<use ./figuras/hardware/pcb_pronta.jpg> [84 <./figuras/hardware/pcb_cima.jpg> <
+<use ./figuras/hardware/pcb_pronta.jpg> [85 <./figuras/hardware/pcb_cima.jpg> <
 ./figuras/hardware/pcb_baixo.jpg>]
-<./figuras/hardware/conexoes_hardware.jpg, id=390, 602.25pt x 576.65437pt>
+<./figuras/hardware/conexoes_hardware.jpg, id=394, 602.25pt x 576.65437pt>
 File: ./figuras/hardware/conexoes_hardware.jpg Graphic file (type jpg)
 
-<use ./figuras/hardware/conexoes_hardware.jpg> [85 <./figuras/hardware/pcb_pron
-ta.jpg>]) (./interface_estacao_base.tex [86 <./figuras/hardware/conexoes_hardwa
+<use ./figuras/hardware/conexoes_hardware.jpg> [86 <./figuras/hardware/pcb_pron
+ta.jpg>]) (./interface_estacao_base.tex [87 <./figuras/hardware/conexoes_hardwa
 re.jpg>]
 Cap\'{\i }tulo 13.
 
-<./figuras/estacaoBase/interface_estacao_base1.png, id=397, 775.89874pt x 573.1
+<./figuras/estacaoBase/interface_estacao_base1.png, id=401, 775.89874pt x 573.1
 4125pt>
 File: ./figuras/estacaoBase/interface_estacao_base1.png Graphic file (type png)
 
  <use ./figuras/estacaoBase/interface_estacao_base1.png>
-<./figuras/estacaoBase/interface_estacao_base2.png, id=398, 978.65625pt x 571.1
+<./figuras/estacaoBase/interface_estacao_base2.png, id=402, 978.65625pt x 571.1
 3374pt>
 File: ./figuras/estacaoBase/interface_estacao_base2.png Graphic file (type png)
 
- <use ./figuras/estacaoBase/interface_estacao_base2.png> [87
+ <use ./figuras/estacaoBase/interface_estacao_base2.png> [88
 
 ])
-(./teoria_mapa.tex [88 <./figuras/estacaoBase/interface_estacao_base1.png> <./f
+(./teoria_mapa.tex [89 <./figuras/estacaoBase/interface_estacao_base1.png> <./f
 iguras/estacaoBase/interface_estacao_base2.png (PNG copy)>]
 Cap\'{\i }tulo 14.
-<./figuras/robo/robo.png, id=406, 602.25pt x 451.6875pt>
+<./figuras/robo/robo.png, id=410, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo.png Graphic file (type png)
 
-<use ./figuras/robo/robo.png> [89
+<use ./figuras/robo/robo.png> [90
 
 ]
-<./figuras/robo/roda_encoder.png, id=410, 481.8pt x 361.35pt>
+<./figuras/robo/roda_encoder.png, id=415, 481.8pt x 361.35pt>
 File: ./figuras/robo/roda_encoder.png Graphic file (type png)
 
-<use ./figuras/robo/roda_encoder.png> [90 <./figuras/robo/robo.png (PNG copy)>]
-[91 <./figuras/robo/roda_encoder.png (PNG copy)>] [92] [93] [94] [95] [96]
+<use ./figuras/robo/roda_encoder.png> [91 <./figuras/robo/robo.png (PNG copy)>]
+[92 <./figuras/robo/roda_encoder.png (PNG copy)>] [93] [94] [95] [96] [97]
 Overfull \hbox (4.59846pt too wide) in paragraph at lines 291--292
 []\OT1/ptm/m/n/12 A ve-lo-ci-dade e acelera[][]ao an-gu-la-res po-dem ser tamb[
 ]em ob-ti-das por deriva[][]ao num[]erica,
  []
 
-[97] <./figuras/hardware/eixos_mpu.png, id=439, 461.725pt x 398.48875pt>
+[98] <./figuras/hardware/eixos_mpu.png, id=443, 461.725pt x 398.48875pt>
 File: ./figuras/hardware/eixos_mpu.png Graphic file (type png)
 
-<use ./figuras/hardware/eixos_mpu.png> [98]
+<use ./figuras/hardware/eixos_mpu.png> [99]
 Overfull \hbox (7.31091pt too wide) in paragraph at lines 338--339
 []\OT1/ptm/m/n/12 Para de-ter-mi-nar a ve-lo-ci-dade e des-lo-ca-mento li-ne-a-
 res a par-tir dos da-dos do ace-ler[]ometro,
  []
 
-[99 <./figuras/hardware/eixos_mpu.png (PNG copy)>] [100]
-<./figuras/robo/robo_ir.png, id=449, 602.25pt x 451.6875pt>
+[100 <./figuras/hardware/eixos_mpu.png (PNG copy)>] [101]
+<./figuras/robo/robo_ir.png, id=453, 602.25pt x 451.6875pt>
 File: ./figuras/robo/robo_ir.png Graphic file (type png)
 
-<use ./figuras/robo/robo_ir.png> [101] [102 <./figuras/robo/robo_ir.png (PNG co
-py)>] [103]
+<use ./figuras/robo/robo_ir.png> [102] [103 <./figuras/robo/robo_ir.png (PNG co
+py)>] [104]
 Cap\'{\i }tulo 15.
-<figuras/robo/robo_cor_transp_cortado.png, id=460, 455.7025pt x 383.4325pt>
+<figuras/robo/robo_cor_transp_cortado.png, id=464, 455.7025pt x 383.4325pt>
 File: figuras/robo/robo_cor_transp_cortado.png Graphic file (type png)
 
-<use figuras/robo/robo_cor_transp_cortado.png> [104
+<use figuras/robo/robo_cor_transp_cortado.png> [105
 
  <./figuras/robo/robo_cor_transp_cortado.png>]
-<./figuras/testes/teste1/layout.png, id=465, 448.074pt x 302.44995pt>
+<./figuras/testes/teste1/layout.png, id=469, 448.074pt x 302.44995pt>
 File: ./figuras/testes/teste1/layout.png Graphic file (type png)
 
 <use ./figuras/testes/teste1/layout.png>
-<./figuras/testes/teste1/mapa_encoders.png, id=466, 699.61375pt x 497.86pt>
+<./figuras/testes/teste1/mapa_encoders.png, id=470, 699.61375pt x 497.86pt>
 File: ./figuras/testes/teste1/mapa_encoders.png Graphic file (type png)
 
-<use ./figuras/testes/teste1/mapa_encoders.png> [105 <./figuras/testes/teste1/l
+<use ./figuras/testes/teste1/mapa_encoders.png> [106 <./figuras/testes/teste1/l
 ayout.png>]
-<./figuras/testes/teste1/mapa_encoders_giro.png, id=471, 668.4975pt x 488.82625
+<./figuras/testes/teste1/mapa_encoders_giro.png, id=475, 668.4975pt x 488.82625
 pt>
 File: ./figuras/testes/teste1/mapa_encoders_giro.png Graphic file (type png)
  <use ./figuras/testes/teste1/mapa_encoders_giro.png>
-<./figuras/testes/teste1/mapa_encoders_giro_media0.png, id=472, 599.23875pt x 4
+<./figuras/testes/teste1/mapa_encoders_giro_media0.png, id=476, 599.23875pt x 4
 29.605pt>
 File: ./figuras/testes/teste1/mapa_encoders_giro_media0.png Graphic file (type 
 png)
- <use ./figuras/testes/teste1/mapa_encoders_giro_media0.png> [106 <./figuras/te
+ <use ./figuras/testes/teste1/mapa_encoders_giro_media0.png> [107 <./figuras/te
 stes/teste1/mapa_encoders.png (PNG copy)> <./figuras/testes/teste1/mapa_encoder
 s_giro.png (PNG copy)>]
-<./figuras/testes/teste1/mapa_acelerometro.png, id=476, 548.0475pt x 450.68375p
+<./figuras/testes/teste1/mapa_acelerometro.png, id=480, 548.0475pt x 450.68375p
 t>
 File: ./figuras/testes/teste1/mapa_acelerometro.png Graphic file (type png)
  <use ./figuras/testes/teste1/mapa_acelerometro.png>
-<./figuras/testes/teste1/grafico_giro.png, id=477, 1127.21124pt x 618.31pt>
+<./figuras/testes/teste1/grafico_giro.png, id=481, 1127.21124pt x 618.31pt>
 File: ./figuras/testes/teste1/grafico_giro.png Graphic file (type png)
 
-<use ./figuras/testes/teste1/grafico_giro.png> [107 <./figuras/testes/teste1/ma
+<use ./figuras/testes/teste1/grafico_giro.png> [108 <./figuras/testes/teste1/ma
 pa_encoders_giro_media0.png (PNG copy)> <./figuras/testes/teste1/mapa_acelerome
 tro.png (PNG copy)>]
-<./figuras/testes/teste1/grafico_acel.png, id=481, 1152.305pt x 726.715pt>
+<./figuras/testes/teste1/grafico_acel.png, id=486, 1152.305pt x 726.715pt>
 File: ./figuras/testes/teste1/grafico_acel.png Graphic file (type png)
 
-<use ./figuras/testes/teste1/grafico_acel.png> [108 <./figuras/testes/teste1/gr
+<use ./figuras/testes/teste1/grafico_acel.png> [109 <./figuras/testes/teste1/gr
 afico_giro.png (PNG copy)> <./figuras/testes/teste1/grafico_acel.png (PNG copy)
->] <./figuras/testes/teste2/foto_ambiente.jpg, id=486, 803.0pt x 1071.00125pt>
+>] <./figuras/testes/teste2/foto_ambiente.jpg, id=490, 803.0pt x 1071.00125pt>
 File: ./figuras/testes/teste2/foto_ambiente.jpg Graphic file (type jpg)
 
-<use ./figuras/testes/teste2/foto_ambiente.jpg> [109]
-<./figuras/testes/teste2/mapa_encoders.png, id=490, 701.62125pt x 466.74374pt>
+<use ./figuras/testes/teste2/foto_ambiente.jpg> [110]
+<./figuras/testes/teste2/mapa_encoders.png, id=494, 701.62125pt x 466.74374pt>
 File: ./figuras/testes/teste2/mapa_encoders.png Graphic file (type png)
 
-<use ./figuras/testes/teste2/mapa_encoders.png> [110 <./figuras/testes/teste2/f
+<use ./figuras/testes/teste2/mapa_encoders.png> [111 <./figuras/testes/teste2/f
 oto_ambiente.jpg>]
-<./figuras/testes/teste2/mapa_encoders_giro.png, id=494, 646.415pt x 454.69875p
+<./figuras/testes/teste2/mapa_encoders_giro.png, id=498, 646.415pt x 454.69875p
 t>
 File: ./figuras/testes/teste2/mapa_encoders_giro.png Graphic file (type png)
  <use ./figuras/testes/teste2/mapa_encoders_giro.png>
-<./figuras/testes/teste2/mapa_encoders_giro_media3.png, id=495, 660.4675pt x 48
+<./figuras/testes/teste2/mapa_encoders_giro_media3.png, id=499, 660.4675pt x 48
 3.8075pt>
 File: ./figuras/testes/teste2/mapa_encoders_giro_media3.png Graphic file (type 
 png)
- <use ./figuras/testes/teste2/mapa_encoders_giro_media3.png> [111 <./figuras/te
+ <use ./figuras/testes/teste2/mapa_encoders_giro_media3.png> [112 <./figuras/te
 stes/teste2/mapa_encoders.png (PNG copy)> <./figuras/testes/teste2/mapa_encoder
 s_giro.png (PNG copy)>]
-<./figuras/testes/teste2/mapa_encoders_giro_media8.png, id=499, 648.4225pt x 42
+<./figuras/testes/teste2/mapa_encoders_giro_media8.png, id=503, 648.4225pt x 42
 4.58624pt>
 File: ./figuras/testes/teste2/mapa_encoders_giro_media8.png Graphic file (type 
 png)
  <use ./figuras/testes/teste2/mapa_encoders_giro_media8.png>
-<./figuras/testes/teste2/mapa_acelerometro.png, id=500, 568.1225pt x 424.58624p
+<./figuras/testes/teste2/mapa_acelerometro.png, id=504, 568.1225pt x 424.58624p
 t>
 File: ./figuras/testes/teste2/mapa_acelerometro.png Graphic file (type png)
- <use ./figuras/testes/teste2/mapa_acelerometro.png> [112 <./figuras/testes/tes
+ <use ./figuras/testes/teste2/mapa_acelerometro.png> [113 <./figuras/testes/tes
 te2/mapa_encoders_giro_media3.png (PNG copy)> <./figuras/testes/teste2/mapa_enc
 oders_giro_media8.png (PNG copy)>]
-<./figuras/testes/teste2/grafico_giro.png, id=504, 775.89874pt x 414.54875pt>
+<./figuras/testes/teste2/grafico_giro.png, id=508, 775.89874pt x 414.54875pt>
 File: ./figuras/testes/teste2/grafico_giro.png Graphic file (type png)
 
 <use ./figuras/testes/teste2/grafico_giro.png>
-<./figuras/testes/teste2/grafico_acel.png, id=505, 1029.8475pt x 661.47125pt>
+<./figuras/testes/teste2/grafico_acel.png, id=509, 1029.8475pt x 661.47125pt>
 File: ./figuras/testes/teste2/grafico_acel.png Graphic file (type png)
 
-<use ./figuras/testes/teste2/grafico_acel.png> [113 <./figuras/testes/teste2/ma
+<use ./figuras/testes/teste2/grafico_acel.png> [114 <./figuras/testes/teste2/ma
 pa_acelerometro.png (PNG copy)> <./figuras/testes/teste2/grafico_giro.png (PNG 
 copy)>]
-<./figuras/testes/teste3/foto_ambiente.jpg, id=509, 803.0pt x 602.25pt>
+<./figuras/testes/teste3/foto_ambiente.jpg, id=514, 803.0pt x 602.25pt>
 File: ./figuras/testes/teste3/foto_ambiente.jpg Graphic file (type jpg)
 
-<use ./figuras/testes/teste3/foto_ambiente.jpg> [114 <./figuras/testes/teste2/g
+<use ./figuras/testes/teste3/foto_ambiente.jpg> [115 <./figuras/testes/teste2/g
 rafico_acel.png (PNG copy)>]
-<./figuras/testes/teste3/mapa_encoders.png, id=514, 580.1675pt x 512.91624pt>
+<./figuras/testes/teste3/mapa_encoders.png, id=518, 580.1675pt x 512.91624pt>
 File: ./figuras/testes/teste3/mapa_encoders.png Graphic file (type png)
 
 <use ./figuras/testes/teste3/mapa_encoders.png>
-<./figuras/testes/teste3/mapa_encoders_giro.png, id=515, 631.35875pt x 482.8037
+<./figuras/testes/teste3/mapa_encoders_giro.png, id=519, 631.35875pt x 482.8037
 6pt>
 File: ./figuras/testes/teste3/mapa_encoders_giro.png Graphic file (type png)
- <use ./figuras/testes/teste3/mapa_encoders_giro.png> [115 <./figuras/testes/te
+ <use ./figuras/testes/teste3/mapa_encoders_giro.png> [116 <./figuras/testes/te
 ste3/foto_ambiente.jpg> <./figuras/testes/teste3/mapa_encoders.png (PNG copy)>]
 
-<./figuras/testes/teste3/mapa_encoders_giro_media5.png, id=519, 622.325pt x 451
+<./figuras/testes/teste3/mapa_encoders_giro_media5.png, id=523, 622.325pt x 451
 .6875pt>
 File: ./figuras/testes/teste3/mapa_encoders_giro_media5.png Graphic file (type 
 png)
  <use ./figuras/testes/teste3/mapa_encoders_giro_media5.png>
-<./figuras/testes/teste3/mapa_acelerometro.png, id=520, 472.76625pt x 514.92375
+<./figuras/testes/teste3/mapa_acelerometro.png, id=524, 472.76625pt x 514.92375
 pt>
 File: ./figuras/testes/teste3/mapa_acelerometro.png Graphic file (type png)
- <use ./figuras/testes/teste3/mapa_acelerometro.png> [116 <./figuras/testes/tes
+ <use ./figuras/testes/teste3/mapa_acelerometro.png> [117 <./figuras/testes/tes
 te3/mapa_encoders_giro.png (PNG copy)> <./figuras/testes/teste3/mapa_encoders_g
 iro_media5.png (PNG copy)>]
-<./figuras/testes/teste3/grafico_giro.png, id=524, 863.225pt x 466.74374pt>
+<./figuras/testes/teste3/grafico_giro.png, id=528, 863.225pt x 466.74374pt>
 File: ./figuras/testes/teste3/grafico_giro.png Graphic file (type png)
 
-<use ./figuras/testes/teste3/grafico_giro.png> [117 <./figuras/testes/teste3/ma
+<use ./figuras/testes/teste3/grafico_giro.png> [118 <./figuras/testes/teste3/ma
 pa_acelerometro.png (PNG copy)>]
-<./figuras/testes/teste3/grafico_acel.png, id=528, 1030.85126pt x 666.49pt>
+<./figuras/testes/teste3/grafico_acel.png, id=532, 1030.85126pt x 666.49pt>
 File: ./figuras/testes/teste3/grafico_acel.png Graphic file (type png)
 
-<use ./figuras/testes/teste3/grafico_acel.png> [118 <./figuras/testes/teste3/gr
+<use ./figuras/testes/teste3/grafico_acel.png> [119 <./figuras/testes/teste3/gr
 afico_giro.png (PNG copy)> <./figuras/testes/teste3/grafico_acel.png (PNG copy)
->] <./figuras/testes/teste4/foto_ambiente.jpg, id=532, 803.0pt x 602.25pt>
+>] <./figuras/testes/teste4/foto_ambiente.jpg, id=536, 803.0pt x 602.25pt>
 File: ./figuras/testes/teste4/foto_ambiente.jpg Graphic file (type jpg)
 
 <use ./figuras/testes/teste4/foto_ambiente.jpg>
-<./figuras/testes/teste4/mapa_encoders.png, id=533, 702.625pt x 426.59375pt>
+<./figuras/testes/teste4/mapa_encoders.png, id=537, 702.625pt x 426.59375pt>
 File: ./figuras/testes/teste4/mapa_encoders.png Graphic file (type png)
 
-<use ./figuras/testes/teste4/mapa_encoders.png> [119 <./figuras/testes/teste4/f
+<use ./figuras/testes/teste4/mapa_encoders.png> [120 <./figuras/testes/teste4/f
 oto_ambiente.jpg>]
-<./figuras/testes/teste4/mapa_encoders_giro.png, id=537, 816.04875pt x 414.5487
+<./figuras/testes/teste4/mapa_encoders_giro.png, id=542, 816.04875pt x 414.5487
 5pt>
 File: ./figuras/testes/teste4/mapa_encoders_giro.png Graphic file (type png)
  <use ./figuras/testes/teste4/mapa_encoders_giro.png>
-<./figuras/testes/teste4/mapa_encoders_giro_media4.png, id=538, 732.7375pt x 36
+<./figuras/testes/teste4/mapa_encoders_giro_media4.png, id=543, 732.7375pt x 36
 1.35pt>
 File: ./figuras/testes/teste4/mapa_encoders_giro_media4.png Graphic file (type 
 png)
- <use ./figuras/testes/teste4/mapa_encoders_giro_media4.png> [120 <./figuras/te
+ <use ./figuras/testes/teste4/mapa_encoders_giro_media4.png> [121 <./figuras/te
 stes/teste4/mapa_encoders.png (PNG copy)> <./figuras/testes/teste4/mapa_encoder
 s_giro.png (PNG copy)>]
-<./figuras/testes/teste4/grafico_giro.png, id=543, 774.895pt x 417.56pt>
+<./figuras/testes/teste4/grafico_giro.png, id=547, 774.895pt x 417.56pt>
 File: ./figuras/testes/teste4/grafico_giro.png Graphic file (type png)
 
 <use ./figuras/testes/teste4/grafico_giro.png>
-<./figuras/testes/teste4/grafico_acel.png, id=544, 1031.855pt x 663.47874pt>
+<./figuras/testes/teste4/grafico_acel.png, id=548, 1031.855pt x 663.47874pt>
 File: ./figuras/testes/teste4/grafico_acel.png Graphic file (type png)
 
-<use ./figuras/testes/teste4/grafico_acel.png> [121 <./figuras/testes/teste4/ma
+<use ./figuras/testes/teste4/grafico_acel.png> [122 <./figuras/testes/teste4/ma
 pa_encoders_giro_media4.png (PNG copy)> <./figuras/testes/teste4/grafico_giro.p
-ng (PNG copy)>] [122 <./figuras/testes/teste4/grafico_acel.png (PNG copy)>]
-[123]
+ng (PNG copy)>] [123 <./figuras/testes/teste4/grafico_acel.png (PNG copy)>]
+[124]
 Cap\'{\i }tulo 16.
-) (./trabalhos_futuros.tex [124
+) (./trabalhos_futuros.tex [125
 
 ]
 Cap\'{\i }tulo 17.
-) [125
+) [126
 
 ]
 Apendice A.
-[126
+[127
 
 ]
 Apendice B.
-<./figuras/robo/fotos/foto1.jpg, id=564, 642.4pt x 481.8pt>
+<./figuras/robo/fotos/foto1.jpg, id=568, 642.4pt x 481.8pt>
 File: ./figuras/robo/fotos/foto1.jpg Graphic file (type jpg)
 
 <use ./figuras/robo/fotos/foto1.jpg>
-<./figuras/robo/fotos/foto2.jpg, id=565, 642.4pt x 481.8pt>
+<./figuras/robo/fotos/foto2.jpg, id=569, 642.4pt x 481.8pt>
 File: ./figuras/robo/fotos/foto2.jpg Graphic file (type jpg)
 
-<use ./figuras/robo/fotos/foto2.jpg> [127
+<use ./figuras/robo/fotos/foto2.jpg> [128
 
  <./figuras/robo/fotos/foto1.jpg>]
-<./figuras/robo/fotos/foto3.jpg, id=569, 642.4pt x 481.8pt>
+<./figuras/robo/fotos/foto3.jpg, id=573, 642.4pt x 481.8pt>
 File: ./figuras/robo/fotos/foto3.jpg Graphic file (type jpg)
 
 <use ./figuras/robo/fotos/foto3.jpg>
-<./figuras/robo/fotos/foto4.jpg, id=570, 642.4pt x 481.8pt>
+<./figuras/robo/fotos/foto4.jpg, id=574, 642.4pt x 481.8pt>
 File: ./figuras/robo/fotos/foto4.jpg Graphic file (type jpg)
 
-<use ./figuras/robo/fotos/foto4.jpg> [128 <./figuras/robo/fotos/foto2.jpg> <./f
+<use ./figuras/robo/fotos/foto4.jpg> [129 <./figuras/robo/fotos/foto2.jpg> <./f
 iguras/robo/fotos/foto3.jpg>]
-<./figuras/robo/fotos/foto5.jpg, id=574, 642.4pt x 481.8pt>
+<./figuras/robo/fotos/foto5.jpg, id=578, 642.4pt x 481.8pt>
 File: ./figuras/robo/fotos/foto5.jpg Graphic file (type jpg)
 
-<use ./figuras/robo/fotos/foto5.jpg> (./monografia.bbl [129 <./figuras/robo/fot
-os/foto4.jpg> <./figuras/robo/fotos/foto5.jpg>] [130
+<use ./figuras/robo/fotos/foto5.jpg> (./monografia.bbl [130 <./figuras/robo/fot
+os/foto4.jpg> <./figuras/robo/fotos/foto5.jpg>] [131
 
 ])
-AED: lastpage setting LastPage [131]
+AED: lastpage setting LastPage [132]
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
@@ -1780,10 +1785,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7520 strings out of 495041
- 121822 string characters out of 1181897
+ 7526 strings out of 495041
+ 122040 string characters out of 1181897
  194052 words of memory out of 3000000
- 10340 multiletter control sequences out of 15000+50000
+ 10345 multiletter control sequences out of 15000+50000
  59936 words of font info for 131 fonts, out of 3000000 for 9000
  30 hyphenation exceptions out of 8191
  61i,16n,96p,1240b,487s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1795,9 +1800,9 @@ cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/shar
 e/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/texmf-texlive/fonts
 /type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utm
 r8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on monografia.pdf (132 pages, 6822768 bytes).
+Output written on monografia.pdf (133 pages, 6942174 bytes).
 PDF statistics:
- 618 PDF objects out of 1000 (max. 8388607)
+ 623 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 421 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 426 words of extra memory for PDF output out of 10000 (max. 10000000)
 
