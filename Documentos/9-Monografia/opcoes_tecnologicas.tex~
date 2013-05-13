@@ -73,9 +73,9 @@ Para a obtenção da aceleração, velocidade e posição do robô, diversas tec
 \begin{itemize}
   \item \textbf{Encoder:} Ligado ao eixo da roda do robô, efetua a contagem das rotações realizadas por ela, permitindo assim calcular a distancia percorrida. Se dois encoders forem instalados, um em cada roda, a direção do movimento poderá ser obtida a partir de cálculos baseados na contagem de voltas de cada roda.
   \item \textbf{GPS:} Utiliza sinais de satélites para obter as coordenadas geográficas do robô. A direção e o sentido do movimento podem ser obtidos a partir da comparação das leituras atuais com as anteriores.
-  \item 	\textbf{Acelerômetro:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração do componente. A velocidade e deslocamento lineares podem ser obtidos por integração numérica da aceleração.
-  \item 	\textbf{Giroscópio:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração angular do componente. A velocidade angular e ângulo de rotação podem ser obtidos por integração numérica da aceleração angular.
-  \item 	\textbf{Bússola:} Utiliza os campos magnéticos da terra para obter a orientação geográfica absoluta do robô.
+  \item \textbf{Acelerômetro:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração do componente. A velocidade e deslocamento lineares podem ser obtidos por integração numérica da aceleração.
+  \item \textbf{Giroscópio:} Pode utilizar a tecnologia chamada MEMS para medir a velocidade angular do componente. O ângulo de rotação pode ser obtido por integração numérica da velocidade angular. 
+  \item \textbf{Bússola:} Utiliza os campos magnéticos da terra para obter a orientação geográfica absoluta do robô.
 \end{itemize}
 
 Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma comparação entre as tecnologias apresentadas. 
@@ -87,21 +87,21 @@ Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma compar
     \toprule
     \textbf{Característica} & \textbf{Encoder} & \textbf{GPS} & \textbf{Acelerômetro} & \textbf{Giroscópio} & \textbf{Bússola} \\
     \hline
-    Sujeito a influencias externas & Deslizamentos & Não & Não & Não & Ruídos de campos magnéticos diversos \\
+    Sujeito a influências externas & Deslizamentos & Não & Não & Não & Ruídos de campos magnéticos diversos \\
     \hline
     Ambiente de operação & Interno / Externo & Externo & Interno / Externo & Interno / Externo & Interno / Externo \\
     \hline
     Posicionamento & Relativo & Absoluto & Relativo & Relativo & Absoluto \\
     \hline
-    Acumulo de erro para calculo da posição & Sim & Não & Sim (duas integrações) & Sim (duas integrações) & Sim \\
+    Acumulo de erro para calculo da posição & Sim & Não & Sim (duas integrações) & Sim (uma integração) & Sim \\
     \bottomrule
   \end{tabular}
   \label{tab:alternativas_tecnologias_odometria}
 \end{table}
 
-Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. O acelerômetro e o giroscópio por sua vez acumulam o erro de duas integrações\footnote{As acelerações linear e angular devem ser integradas duas vezes numericamente para cálculo da posição: A primeira para determinação das velocidades linear e angular; A segunda para determinação do deslocamento e ângulo de rotação atuais.} para obtenção da posição.
+Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. O acelerômetro e o giroscópio por sua vez acumulam o erro de duas integrações e uma integração respectivamente\footnote{A aceleração linear deve ser integrada duas vezes: a primeira para determinação da velocidade linear, e a outra para determinação do deslocamento. A velocidade angular deve ser integrada numericamente uma vez para obter o deslocamento angular.} para obtenção da posição. 
 
-\textbf{Escolha da equipe:} Os \textit{encoders} estão sujeito apenas aos erros de deslizamentos e acumulam menos erros na obtenção da posição do que os giroscópios e acelerômetros. Sendo assim eles foram a escolha como principal fonte de dados para odometria. O GPS não foi escolhido pois opera apenas em ambientes internos. A bússola por sua vez poderá sofrer influencias do campo magnético gerado pelos motores do robô. Como a utilização apenas dos \textit{encoders} pode levar a erros no posicionamento devido a deslizamentos, utilizaremos também um acelerômetro e um giroscópio como fonte de dados auxiliar para possibilitar o aumento da exatidão e confiabilidade dos dados obtidos dos \textit{encoders}. Caso discrepâncias consideráveis ocorram entre os dados obtidos pelos sensores, escorregamentos das rodas podem ser detectados e mitigados, atenuando dessa forma erros na determinação do posicionamento.
+\textbf{Escolha da equipe:} Os \textit{encoders} estão sujeito apenas aos erros de deslizamentos e acumulam menos erros na obtenção da posição do que os giroscópios e acelerômetros. Sendo assim eles foram a escolha como principal fonte de dados para odometria. O GPS não foi escolhido pois opera apenas em ambientes internos. A bússola por sua vez poderá sofrer influencias do campo magnético gerado pelos motores do robô. Como a utilização apenas dos \textit{encoders} pode levar a erros no posicionamento devido a deslizamentos, serão utilizados também um acelerômetro e um giroscópio como fonte de dados auxiliar para possibilitar o aumento da exatidão do posicionamento do robô. Caso discrepâncias consideráveis ocorram entre os dados obtidos pelos sensores, escorregamentos das rodas podem ser detectados e mitigados, atenuando dessa forma erros na determinação do posicionamento.
 
 Por exemplo, em caso de escorregamento roda, um \textit{encoder} fornece uma medição de velocidade maior do que a que corresponde à realidade do movimento do robô. O acelerômetro e o giroscópio, por sua vez, não sofrem influências do escorregamento das rodas, e tenderão a fornecer uma medida mais próxima à realidade. Discrepâncias nas medições podem ser dessa forma detectadas, e procedimentos de atenuação de erros (como por exemplo, descarte de certas medidas dos \textit{encoders}) poderão ser executados no \textit{software} da estação base.
 

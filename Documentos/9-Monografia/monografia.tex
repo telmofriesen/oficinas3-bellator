@@ -47,12 +47,12 @@
 \autortres{Ricardo Farah}
 \autorquatro{Stefan Campana Fuchs}
 \autorcinco{Telmo Friesen}
-\palavraschave{mapeamento de ambientes, robô, sensores infra-vermelho}
-\keywords{environment mapping, robot, infrared sensors}
+\palavraschave{mapeamento de ambientes, robô, sensor infra-vermelho, encoder, giroscópio, acelerômetro.}
+\keywords{environment mapping, robot, infrared sensor, encoder, gyroscope, accelerometer.}
 
 \cita{CAMARGO, L.G.M; BORBA, P.A.; FARAH, R.; FUCHS, S.C.; FRIESEN, T}
 
-\comentario{\UTFPRdocumentodata\ apresentado à Unidade Curricular de \UTFPRunidadedata\ do \UTFPRprogramadata\ da \ABNTinstituicaodata\ como requisito parcial para aprovação.}
+\comentario{\UTFPRdocumentodata\ apresentada à Unidade Curricular de \UTFPRunidadedata\ do \UTFPRprogramadata\ da \ABNTinstituicaodata\ como requisito parcial para aprovação.}
 
 \local{Curitiba}
 \data{\the\year}
@@ -64,17 +64,18 @@
 
 \begin{resumo}
 
-O objetivo desse projeto foi o desenvolvimento de um sistema de mapeamento bidimensional de ambientes composto por um robô de sensoriamento, um protocolo de comunicação e uma estação-base. O robô empregado é denominado Bellator e já existia anteriormente à realização desse projeto, sendo constituído de rodas, motores, textit{drivers} dos motores, \textit{encoders} ópticos, sensores infra-vermelho de distância e placa de linux embarcado. Ao hardware já existente foram acrescentadas uma \textit{webcam} e uma nova placa de controle embarcada desenvolvida pela equipe e que possui um acelerômetro e um giroscópio, com os quais se pretendeu corrigir eventuais erros de posicionamento do robô. A interface gráfica criada para a estação base permite ao usuário movimentar o robô e visualizar o mapa gerado bem como as imagens captadas pela \textit{webcam}.
+O objetivo desse projeto foi o desenvolvimento de um robô, uma estação base e um protocolo de comunicação para a realização de mapeamento bidimensional de ambientes em tempo real. Foi utilizado o robô Bellator, já existente e utilizado por outras equipes em anos anteriores. Ele possuia instalados e funcionando: rodas, motores DC com seus respectivos \textit{drivers}, \textit{encoders} ópticos, sensores infra-vermelhos de distância e uma placa com Linux embarcado. Ao \textit{hardware} já existente foram acrescentadas uma \textit{webcam} e uma nova placa de circuito impresso desenvolvida pela equipe. Essa placa foi desenvolvida com o objetivo de integrar as funções de baixo nível do robô. Ela foi equipada com um acelerômetro e um giroscópio, com os quais objetivou-se aumentar a exatidão do posicionamento do robô em caso de eventuais falhas de leitura dos \textit{encoders}. A interface gráfica criada para a estação base permite ao usuário movimentar o robô por comandos do teclado, além de visualizar o mapa gerado e as imagens captadas pela \textit{webcam} em tempo real.
 
-Ao final, verificou-se que o mapeamento de ambientes foi possível, embora em alguns casos sejam observadas distorções. Isto se deu devido à imprecisão dos \textit{encoders} ópticos e ao escorregamento das correias e rodas do robô. A correção desses problemas por meio do uso do acelerômetro mostrou-se inalcançável no escopo desse projeto, enquanto a utilização do giroscópio mostrou-se satisfatória.
+Ao final, verificou-se que a realização do mapeamento de ambientes controlados foi possível. Os \textit{encoders} frequentemente geraram leituras discrepantes durante os testes, mas o giroscópio mostrou-se bastante eficaz para corrigir os erros de posicionamento do robô nos mapas que foram produzidos. Já o acelerômetro, por outro lado, não mostrou-se confiável para a correção desses erros. De um ponto de vista geral, com a criação da plataforma do Bellator (de \textit{software} e \textit{hardware}) para mapeamento 2D de ambientes, inúmeras possibilidades se abrem a trabalhos futuros -- especialmente para aperfeiçoamento das técnicas de mapeamento e de correção de erros de odometria através da integração de vários sensores.
 
 \end{resumo}
 
 \begin{abstract}
 
-The aim of this project was the development of a two-dimensional environment mapping system composed of a sensing robot, a communication protocol and a base station. The robot used is denominated Bellator and it already existed prior to this project consisting of wheels, motors, motor drivers, optical encoders, infrared distance sensors and embedded linux board. To the existing hardware a webcam, and a new embedded control board designed by this team and having an accelerometer and a gyroscope were added, with the purpose of correcting eventual robot positioning errors. The graphical interface created for the base station allows the user to move the robot, and view the generated map as well as the images captured by the webcam.
+The goal of this project was the development of a robot, a base station and a communication protocol to perform two-dimensional, real-time environment mapping. The Bellator robot, which was already existent and used by other teams in past years, was used in this project. The robot had already installed and working: wheels, DC engines and their respective drivers, optical encoders, infra-red sensors and a board with embedded Linux. To the existing hardware were added a webcam and a new printed circuit board developed by the team. This board was conceived with the objective of integrating the low level functions of the robot. It was equiped with an accelerometer and a gyroscope, with the goal of increasing the accuracy of the robot position in case of eventual failures with the samples obtained from encoders. The user interface created for the base station allows the user to move the robot by keyboard commands, and, furthermore, visualize the generated map and the webcam images in real time.
 
-In the end, it was noted that environment mapping was achieved, although some distortion was observed in some cases. This was due to the lack of precision of the optical encoders and also to the slipping of the wheels and belt of the robot. A fix to these problems by means of employing the accelerometer was unachievable in the scope of this project, while the use of the gyroscope was satisfactory.
+At the end, it could be verified that the mapping of controlled ambients was possible. The encoders frequently generated dicrepant samples during the tests, however the gyroscope turned out to be very effective for the correction of these errors. The accelerometer, on the other hand, did not showed itself reliable for the correction of these errors. From a general point of view, with the creation of the Bellator platform (of software and hardware) for 2D ambient mapping, inumerous possibilities become open to future works -- especially for the perfectioning of the techniques of mapping and odometry error correction trough the integration of multiple sensors.
+
 
 \end{abstract}
 \listadefiguras

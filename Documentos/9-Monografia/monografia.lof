@@ -1,67 +1,66 @@
 \select@language {brazil}
-\contentsline {figure}{\numberline {1}{\ignorespaces \textit {Webcam} Genius iSlim 1300.\relax }}{39}
-\contentsline {figure}{\numberline {2}{\ignorespaces Disposi\IeC {\c c}\IeC {\~a}o dos itens no rob\IeC {\^o}\relax }}{40}
-\contentsline {figure}{\numberline {3}{\ignorespaces Placa de desenvolvimento contendo o chip MPU-6050\relax }}{43}
-\contentsline {figure}{\numberline {4}{\ignorespaces Forma de onda na sa\IeC {\'\i }da do encoder\relax }}{44}
-\contentsline {figure}{\numberline {5}{\ignorespaces Curva de resposta do sensor Infra Vermelho IR 2Y0A02F98\relax }}{45}
-\contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de casos de uso do \textit {software} da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{55}
-\contentsline {figure}{\numberline {7}{\ignorespaces Diagrama de casos de uso do \textit {software} para a placa TS-7260.\relax }}{55}
-\contentsline {figure}{\numberline {8}{\ignorespaces Diagrama de casos de uso do \textit {software} para a placa de baixo n\IeC {\'\i }vel.\relax }}{56}
-\contentsline {figure}{\numberline {9}{\ignorespaces Diagrama de classes da esta\IeC {\c c}\IeC {\~a}o base\relax }}{57}
-\contentsline {figure}{\numberline {10}{\ignorespaces Diagrama de classes do sistema embarcado (placa TS-7260).\relax }}{61}
-\contentsline {figure}{\numberline {11}{\ignorespaces Diagrama estados da \textit {thread} principal da conex\IeC {\~a}o da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{69}
-\contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de estados da \textit {thread} principal da conex\IeC {\~a}o do linux embarcado.\relax }}{70}
-\contentsline {figure}{\numberline {13}{\ignorespaces Diagrama de estados da \textit {thread} que envia mensagens (igual para esta\IeC {\c c}\IeC {\~a}o base e linux embarcado).\relax }}{71}
-\contentsline {figure}{\numberline {14}{\ignorespaces Diagrama de estados da \textit {thread} receptora de mensagens (igual para esta\IeC {\c c}\IeC {\~a}o base e linux embarcado).\relax }}{72}
-\contentsline {figure}{\numberline {15}{\ignorespaces Diagrama de estados da \textit {thread} que processa mensagens recebidas (igual para esta\IeC {\c c}\IeC {\~a}o base e linux embarcado).\relax }}{73}
-\contentsline {figure}{\numberline {16}{\ignorespaces Diagrama de estados da \textit {thread} respons\IeC {\'a}vel por gerenciar os comandos dos motores (linux embarcado).\relax }}{74}
-\contentsline {figure}{\numberline {17}{\ignorespaces Diagrama de estados da \textit {thread} respons\IeC {\'a}vel por efetuar a amostragem dos sensores (linux embarcado).\relax }}{74}
-\contentsline {figure}{\numberline {18}{\ignorespaces Diagrama de estados do visualiza\IeC {\c c}\IeC {\~a}o de imagens da \textit {webcam} (esta\IeC {\c c}\IeC {\~a}o base).\relax }}{75}
-\contentsline {figure}{\numberline {19}{\ignorespaces Diagrama de estados do envio de imagens da \textit {webcam} (linux embarcado).\relax }}{76}
-\contentsline {figure}{\numberline {20}{\ignorespaces Diagrama de estados do envio e recebimento de comandos (sistema de baixo n\IeC {\'\i }vel).\relax }}{77}
-\contentsline {figure}{\numberline {21}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para mudan\IeC {\c c}a de velocidade dos motores (representa comando dado pelo usu\IeC {\'a}rio).\relax }}{78}
-\contentsline {figure}{\numberline {22}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para mudan\IeC {\c c}a de velocidade dos motores (representa mensagem chegando no sistema embarcado).\relax }}{78}
-\contentsline {figure}{\numberline {23}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia da amostragem dos sensores (representa amostras saindo do sistema embarcado).\relax }}{79}
-\contentsline {figure}{\numberline {24}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia da amostragem dos sensores (representa mensagem chegando na esta\IeC {\c c}\IeC {\~a}o base).\relax }}{79}
-\contentsline {figure}{\numberline {25}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para ativa\IeC {\c c}\IeC {\~a}o da webcam (representa comando dado pelo usu\IeC {\'a}rio e o \textit {player} da \textit {libVLC} sendo ativado posteriormente).\relax }}{80}
-\contentsline {figure}{\numberline {26}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para ativa\IeC {\c c}\IeC {\~a}o da webcam (representa mensagem de ativa\IeC {\c c}\IeC {\~a}o da webcam chegando no sistema embarcado e esta\IeC {\c c}\IeC {\~a}o base sendo posteriormente notificada sobre o novo status).\relax }}{80}
-\contentsline {figure}{\numberline {27}{\ignorespaces Diagrama de blocos do hardware\relax }}{81}
-\contentsline {figure}{\numberline {28}{\ignorespaces Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico.\relax }}{83}
-\contentsline {figure}{\numberline {29}{\ignorespaces Projeto da PCB -- lado de cima.\relax }}{85}
-\contentsline {figure}{\numberline {30}{\ignorespaces Projeto da PCB -- lado de baixo.\relax }}{85}
-\contentsline {figure}{\numberline {31}{\ignorespaces PCB montada.\relax }}{86}
-\contentsline {figure}{\numberline {32}{\ignorespaces PCB montada.\relax }}{87}
-\contentsline {figure}{\numberline {33}{\ignorespaces Janela principal da interface gr\IeC {\'a}fica da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{89}
-\contentsline {figure}{\numberline {34}{\ignorespaces Esta\IeC {\c c}\IeC {\~a}o base em utiliza\IeC {\c c}\IeC {\~a}o na pr\IeC {\'a}tica.\relax }}{89}
-\contentsline {figure}{\numberline {35}{\ignorespaces Representa\IeC {\c c}\IeC {\~a}o b\IeC {\'a}sica do rob\IeC {\^o} em movimento circular uniforme (vis\IeC {\~a}o superior).\relax }}{91}
-\contentsline {figure}{\numberline {36}{\ignorespaces Representa\IeC {\c c}\IeC {\~a}o de uma roda acoplada a um encoder.\relax }}{92}
-\contentsline {figure}{\numberline {37}{\ignorespaces Eixos do aceler\IeC {\^o}metro e girosc\IeC {\'o}pio.\relax }}{100}
-\contentsline {figure}{\numberline {38}{\ignorespaces Representa\IeC {\c c}\IeC {\~a}o do rob\IeC {\^o} e um sensor infra-vermelho detectando um obst\IeC {\'a}culo (vis\IeC {\~a}o superior).\relax }}{103}
-\contentsline {figure}{\numberline {39}{\ignorespaces \textit {Layout} do ambiente do primeiro teste.\relax }}{106}
-\contentsline {figure}{\numberline {40}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders usando filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 3 per\IeC {\'\i }odos para sensores IR.\relax }}{107}
-\contentsline {figure}{\numberline {41}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 3 per\IeC {\'\i }odos para sensores IR.\relax }}{107}
-\contentsline {figure}{\numberline {42}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) sem filtragem por m\IeC {\'e}dia m\IeC {\'o}vel dos sensores IR.\relax }}{108}
-\contentsline {figure}{\numberline {43}{\ignorespaces Trilha do rob\IeC {\^o} (em azul) no primeiro teste calculada somente a partir dos dados do aceler\IeC {\^o}metro e do girosc\IeC {\'o}pio.\relax }}{108}
-\contentsline {figure}{\numberline {44}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no primeiro teste.\relax }}{109}
-\contentsline {figure}{\numberline {45}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no primeiro teste.\relax }}{109}
-\contentsline {figure}{\numberline {46}{\ignorespaces Ambiente utilizado no segundo teste.\relax }}{111}
-\contentsline {figure}{\numberline {47}{\ignorespaces Mapa gerado no segundo teste a partir dos dados dos encoders.\relax }}{112}
-\contentsline {figure}{\numberline {48}{\ignorespaces Mapa gerado no segundo teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$).\relax }}{112}
-\contentsline {figure}{\numberline {49}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 3 per\IeC {\'\i }odos para sensores IR.\relax }}{113}
-\contentsline {figure}{\numberline {50}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 8 per\IeC {\'\i }odos para sensores IR.\relax }}{113}
-\contentsline {figure}{\numberline {51}{\ignorespaces Trilha do rob\IeC {\^o} (em azul) no segundo teste calculada somente a partir dos dados do aceler\IeC {\^o}metro e do girosc\IeC {\'o}pio.\relax }}{114}
-\contentsline {figure}{\numberline {52}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no segundo teste.\relax }}{114}
-\contentsline {figure}{\numberline {53}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no segundo teste.\relax }}{115}
-\contentsline {figure}{\numberline {54}{\ignorespaces Ambiente utilizado no terceiro teste.\relax }}{116}
-\contentsline {figure}{\numberline {55}{\ignorespaces Mapa gerado no terceiro teste a partir dos dados dos encoders.\relax }}{116}
-\contentsline {figure}{\numberline {56}{\ignorespaces Mapa gerado no terceiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$).\relax }}{117}
-\contentsline {figure}{\numberline {57}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 5 per\IeC {\'\i }odos para sensores IR.\relax }}{117}
-\contentsline {figure}{\numberline {58}{\ignorespaces Trilha do rob\IeC {\^o} (em azul) no terceiro teste calculada somente a partir dos dados do aceler\IeC {\^o}metro e do girosc\IeC {\'o}pio.\relax }}{118}
-\contentsline {figure}{\numberline {59}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no terceiro teste.\relax }}{119}
-\contentsline {figure}{\numberline {60}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no terceiro teste.\relax }}{119}
-\contentsline {figure}{\numberline {61}{\ignorespaces Ambiente utilizado no quarto teste.\relax }}{120}
-\contentsline {figure}{\numberline {62}{\ignorespaces Mapa gerado no quarto teste a partir dos dados dos encoders.\relax }}{121}
-\contentsline {figure}{\numberline {63}{\ignorespaces Mapa gerado no quarto teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.003 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$).\relax }}{121}
-\contentsline {figure}{\numberline {64}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.003 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 4 per\IeC {\'\i }odos para sensores IR.\relax }}{122}
-\contentsline {figure}{\numberline {65}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no quarto teste.\relax }}{122}
-\contentsline {figure}{\numberline {66}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no quarto teste.\relax }}{123}
+\contentsline {figure}{\numberline {1}{\ignorespaces \textit {Webcam} Genius iSlim 1300.\relax }}{25}
+\contentsline {figure}{\numberline {2}{\ignorespaces Disposi\IeC {\c c}\IeC {\~a}o dos itens no rob\IeC {\^o}\relax }}{26}
+\contentsline {figure}{\numberline {3}{\ignorespaces Placa de desenvolvimento contendo o chip MPU-6050\relax }}{29}
+\contentsline {figure}{\numberline {4}{\ignorespaces Forma de onda na sa\IeC {\'\i }da do encoder\relax }}{30}
+\contentsline {figure}{\numberline {5}{\ignorespaces Curva de resposta do sensor Infra Vermelho IR 2Y0A02F98\relax }}{31}
+\contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de casos de uso do \textit {software} da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{49}
+\contentsline {figure}{\numberline {7}{\ignorespaces Diagrama de casos de uso do \textit {software} para a placa TS-7260.\relax }}{49}
+\contentsline {figure}{\numberline {8}{\ignorespaces Diagrama de casos de uso do \textit {software} para a placa de baixo n\IeC {\'\i }vel.\relax }}{50}
+\contentsline {figure}{\numberline {9}{\ignorespaces Diagrama de classes da esta\IeC {\c c}\IeC {\~a}o base\relax }}{51}
+\contentsline {figure}{\numberline {10}{\ignorespaces Diagrama de classes do sistema embarcado (placa TS-7260).\relax }}{55}
+\contentsline {figure}{\numberline {11}{\ignorespaces Diagrama estados da \textit {thread} principal da conex\IeC {\~a}o da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{63}
+\contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de estados da \textit {thread} principal da conex\IeC {\~a}o do linux embarcado.\relax }}{64}
+\contentsline {figure}{\numberline {13}{\ignorespaces Diagrama de estados da \textit {thread} que envia mensagens (igual para esta\IeC {\c c}\IeC {\~a}o base e linux embarcado).\relax }}{65}
+\contentsline {figure}{\numberline {14}{\ignorespaces Diagrama de estados da \textit {thread} receptora de mensagens (igual para esta\IeC {\c c}\IeC {\~a}o base e linux embarcado).\relax }}{66}
+\contentsline {figure}{\numberline {15}{\ignorespaces Diagrama de estados da \textit {thread} que processa mensagens recebidas (igual para esta\IeC {\c c}\IeC {\~a}o base e linux embarcado).\relax }}{67}
+\contentsline {figure}{\numberline {16}{\ignorespaces Diagrama de estados da \textit {thread} respons\IeC {\'a}vel por gerenciar os comandos dos motores (linux embarcado).\relax }}{68}
+\contentsline {figure}{\numberline {17}{\ignorespaces Diagrama de estados da \textit {thread} respons\IeC {\'a}vel por efetuar a amostragem dos sensores (linux embarcado).\relax }}{68}
+\contentsline {figure}{\numberline {18}{\ignorespaces Diagrama de estados do visualiza\IeC {\c c}\IeC {\~a}o de imagens da \textit {webcam} (esta\IeC {\c c}\IeC {\~a}o base).\relax }}{69}
+\contentsline {figure}{\numberline {19}{\ignorespaces Diagrama de estados do envio de imagens da \textit {webcam} (linux embarcado).\relax }}{70}
+\contentsline {figure}{\numberline {20}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para mudan\IeC {\c c}a de velocidade dos motores (representa comando dado pelo usu\IeC {\'a}rio).\relax }}{71}
+\contentsline {figure}{\numberline {21}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para mudan\IeC {\c c}a de velocidade dos motores (representa mensagem chegando no sistema embarcado).\relax }}{71}
+\contentsline {figure}{\numberline {22}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia da amostragem dos sensores (representa amostras saindo do sistema embarcado).\relax }}{72}
+\contentsline {figure}{\numberline {23}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia da amostragem dos sensores (representa mensagem chegando na esta\IeC {\c c}\IeC {\~a}o base).\relax }}{72}
+\contentsline {figure}{\numberline {24}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para ativa\IeC {\c c}\IeC {\~a}o da webcam (representa comando dado pelo usu\IeC {\'a}rio e o \textit {player} da \textit {libVLC} sendo ativado posteriormente).\relax }}{73}
+\contentsline {figure}{\numberline {25}{\ignorespaces Diagrama de sequ\IeC {\^e}ncia de comando para ativa\IeC {\c c}\IeC {\~a}o da webcam (representa mensagem de ativa\IeC {\c c}\IeC {\~a}o da webcam chegando no sistema embarcado e esta\IeC {\c c}\IeC {\~a}o base sendo posteriormente notificada sobre o novo status).\relax }}{73}
+\contentsline {figure}{\numberline {26}{\ignorespaces Diagrama de blocos do hardware\relax }}{74}
+\contentsline {figure}{\numberline {27}{\ignorespaces Diagrama el\IeC {\'e}trico/eletr\IeC {\^o}nico.\relax }}{76}
+\contentsline {figure}{\numberline {28}{\ignorespaces Projeto da PCB -- lado de cima.\relax }}{78}
+\contentsline {figure}{\numberline {29}{\ignorespaces Projeto da PCB -- lado de baixo.\relax }}{78}
+\contentsline {figure}{\numberline {30}{\ignorespaces PCB montada.\relax }}{79}
+\contentsline {figure}{\numberline {31}{\ignorespaces PCB montada.\relax }}{80}
+\contentsline {figure}{\numberline {32}{\ignorespaces Janela principal da interface gr\IeC {\'a}fica da esta\IeC {\c c}\IeC {\~a}o base.\relax }}{82}
+\contentsline {figure}{\numberline {33}{\ignorespaces Esta\IeC {\c c}\IeC {\~a}o base em utiliza\IeC {\c c}\IeC {\~a}o na pr\IeC {\'a}tica.\relax }}{82}
+\contentsline {figure}{\numberline {34}{\ignorespaces Representa\IeC {\c c}\IeC {\~a}o b\IeC {\'a}sica do rob\IeC {\^o} em movimento circular uniforme (vis\IeC {\~a}o superior).\relax }}{84}
+\contentsline {figure}{\numberline {35}{\ignorespaces Representa\IeC {\c c}\IeC {\~a}o de uma roda acoplada a um encoder.\relax }}{85}
+\contentsline {figure}{\numberline {36}{\ignorespaces Eixos do aceler\IeC {\^o}metro e girosc\IeC {\'o}pio.\relax }}{93}
+\contentsline {figure}{\numberline {37}{\ignorespaces Representa\IeC {\c c}\IeC {\~a}o do rob\IeC {\^o} e um sensor infra-vermelho detectando um obst\IeC {\'a}culo (vis\IeC {\~a}o superior).\relax }}{96}
+\contentsline {figure}{\numberline {38}{\ignorespaces \textit {Layout} do ambiente do primeiro teste.\relax }}{99}
+\contentsline {figure}{\numberline {39}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders usando filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 3 per\IeC {\'\i }odos para sensores IR.\relax }}{100}
+\contentsline {figure}{\numberline {40}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 3 per\IeC {\'\i }odos para sensores IR.\relax }}{100}
+\contentsline {figure}{\numberline {41}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) sem filtragem por m\IeC {\'e}dia m\IeC {\'o}vel dos sensores IR.\relax }}{101}
+\contentsline {figure}{\numberline {42}{\ignorespaces Trilha do rob\IeC {\^o} (em azul) no primeiro teste calculada somente a partir dos dados do aceler\IeC {\^o}metro e do girosc\IeC {\'o}pio.\relax }}{101}
+\contentsline {figure}{\numberline {43}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no primeiro teste.\relax }}{102}
+\contentsline {figure}{\numberline {44}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no primeiro teste.\relax }}{102}
+\contentsline {figure}{\numberline {45}{\ignorespaces Ambiente utilizado no segundo teste.\relax }}{104}
+\contentsline {figure}{\numberline {46}{\ignorespaces Mapa gerado no segundo teste a partir dos dados dos encoders.\relax }}{105}
+\contentsline {figure}{\numberline {47}{\ignorespaces Mapa gerado no segundo teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$).\relax }}{105}
+\contentsline {figure}{\numberline {48}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 3 per\IeC {\'\i }odos para sensores IR.\relax }}{106}
+\contentsline {figure}{\numberline {49}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 8 per\IeC {\'\i }odos para sensores IR.\relax }}{106}
+\contentsline {figure}{\numberline {50}{\ignorespaces Trilha do rob\IeC {\^o} (em azul) no segundo teste calculada somente a partir dos dados do aceler\IeC {\^o}metro e do girosc\IeC {\'o}pio.\relax }}{107}
+\contentsline {figure}{\numberline {51}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no segundo teste.\relax }}{107}
+\contentsline {figure}{\numberline {52}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no segundo teste.\relax }}{108}
+\contentsline {figure}{\numberline {53}{\ignorespaces Ambiente utilizado no terceiro teste.\relax }}{109}
+\contentsline {figure}{\numberline {54}{\ignorespaces Mapa gerado no terceiro teste a partir dos dados dos encoders.\relax }}{109}
+\contentsline {figure}{\numberline {55}{\ignorespaces Mapa gerado no terceiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$).\relax }}{110}
+\contentsline {figure}{\numberline {56}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.0025 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 5 per\IeC {\'\i }odos para sensores IR.\relax }}{110}
+\contentsline {figure}{\numberline {57}{\ignorespaces Trilha do rob\IeC {\^o} (em azul) no terceiro teste calculada somente a partir dos dados do aceler\IeC {\^o}metro e do girosc\IeC {\'o}pio.\relax }}{111}
+\contentsline {figure}{\numberline {58}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no terceiro teste.\relax }}{112}
+\contentsline {figure}{\numberline {59}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no terceiro teste.\relax }}{112}
+\contentsline {figure}{\numberline {60}{\ignorespaces Ambiente utilizado no quarto teste.\relax }}{113}
+\contentsline {figure}{\numberline {61}{\ignorespaces Mapa gerado no quarto teste a partir dos dados dos encoders.\relax }}{114}
+\contentsline {figure}{\numberline {62}{\ignorespaces Mapa gerado no quarto teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.003 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$).\relax }}{114}
+\contentsline {figure}{\numberline {63}{\ignorespaces Mapa gerado no primeiro teste a partir dos dados dos encoders, com corre\IeC {\c c}\IeC {\~a}o de erros pelo girosc\IeC {\'o}pio ($L_\omega = 0.003 \ensuremath {\tmspace +\thinmuskip {.1667em} \mathrm {~[rad/s]}}$) e filtragem por m\IeC {\'e}dia m\IeC {\'o}vel de 4 per\IeC {\'\i }odos para sensores IR.\relax }}{115}
+\contentsline {figure}{\numberline {64}{\ignorespaces Gr\IeC {\'a}fico comparativo de velocidades angulares obtidas no quarto teste.\relax }}{115}
+\contentsline {figure}{\numberline {65}{\ignorespaces Gr\IeC {\'a}fico comparativo de acelera\IeC {\c c}\IeC {\~o}es obtidas no quarto teste.\relax }}{116}
