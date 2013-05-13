@@ -1,0 +1,128 @@
+% \documentclass{report}
+% \usepackage[utf8]{inputenc}
+% \usepackage[brazil]{babel}
+
+\documentclass[oneside,a4paper,12pt]{normas-utf-tex}
+
+\usepackage{breakurl}
+\usepackage[alf,abnt-emphasize=bf,bibjustif,recuo=0cm, abnt-etal-cite=2]{abntcite}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx,subfig}
+\usepackage{times}
+\usepackage[plain]{fancyref}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{amssymb}
+\usepackage{empheq}
+\usepackage{bm}
+\usepackage{setspace}
+%\usepackage[loose]{units}
+
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{~[#1]}}}
+
+
+
+%%% Complemento para tabelas
+\usepackage{booktabs, multirow}
+\setlength{\heavyrulewidth}{0.1em}
+\renewcommand{\toprule}{\midrule[\heavyrulewidth]}
+\renewcommand{\arraystretch}{1.2}
+%%%
+
+\instituicao{Universidade Tecnológica Federal do Paraná}
+\departamento{Departamento Acadêmico de Eletrônica}
+\departamentodois{Departamento Acadêmico de Informática}
+\programa{Curso de Engenharia de Computação}
+\unidade{Oficina de Integração 3}
+
+\titulo{\MakeUppercase{Mapeamento de ambientes com o robô Bellator}}
+\documento{Monografia}
+
+\autor{Luis Guilherme Machado Camargo}
+\autordois{Pedro Alberto de Borba}
+\autortres{Ricardo Farah}
+\autorquatro{Stefan Campana Fuchs}
+\autorcinco{Telmo Friesen}
+\palavraschave{mapeamento de ambientes, robô, sensores infra-vermelho}
+\keywords{environment mapping, robot, infrared sensors}
+
+\cita{CAMARGO, L.G.M; BORBA, P.A.; FARAH, R.; FUCHS, S.C.; FRIESEN, T}
+
+\comentario{\UTFPRdocumentodata\ apresentado à Unidade Curricular de \UTFPRunidadedata\ do \UTFPRprogramadata\ da \ABNTinstituicaodata\ como requisito parcial para aprovação.}
+
+\local{Curitiba}
+\data{\the\year}
+
+\begin{document}
+
+\capa
+\folhaderosto
+
+\begin{resumo}
+
+O objetivo desse projeto foi o desenvolvimento de um sistema de mapeamento bidimensional de ambientes composto por um robô de sensoriamento, um protocolo de comunicação e uma estação-base. O robô empregado é denominado Bellator e já existia anteriormente à realização desse projeto, sendo constituído de rodas, motores, textit{drivers} dos motores, \textit{encoders} ópticos, sensores infra-vermelho de distância e placa de linux embarcado. Ao hardware já existente foram acrescentadas uma \textit{webcam} e uma nova placa de controle embarcada desenvolvida pela equipe e que possui um acelerômetro e um giroscópio, com os quais se pretendeu corrigir eventuais erros de posicionamento do robô. A interface gráfica criada para a estação base permite ao usuário movimentar o robô e visualizar o mapa gerado bem como as imagens captadas pela \textit{webcam}.
+
+Ao final, verificou-se que o mapeamento de ambientes foi possível, embora em alguns casos sejam observadas distorções. Isto se deu devido à imprecisão dos \textit{encoders} ópticos e ao escorregamento das correias e rodas do robô. A correção desses problemas por meio do uso do acelerômetro mostrou-se inalcançável no escopo desse projeto, enquanto a utilização do giroscópio mostrou-se satisfatória.
+
+\end{resumo}
+
+\begin{abstract}
+
+The aim of this project was the development of a two-dimensional environment mapping system composed of a sensing robot, a communication protocol and a base station. The robot used is denominated Bellator and it already existed prior to this project consisting of wheels, motors, motor drivers, optical encoders, infrared distance sensors and embedded linux board. To the existing hardware a webcam, and a new embedded control board designed by this team and having an accelerometer and a gyroscope were added, with the purpose of correcting eventual robot positioning errors. The graphical interface created for the base station allows the user to move the robot, and view the generated map as well as the images captured by the webcam.
+
+In the end, it was noted that environment mapping was achieved, although some distortion was observed in some cases. This was due to the lack of precision of the optical encoders and also to the slipping of the wheels and belt of the robot. A fix to these problems by means of employing the accelerometer was unachievable in the scope of this project, while the use of the gyroscope was satisfactory.
+
+\end{abstract}
+\listadefiguras
+\listadetabelas
+\sumario
+\input{project_charter}
+\input{trabalhos_correlatos}
+\input{analise_tecnologica}
+\input{plano_projeto}
+\input{custos}
+\input{modelagem_uml}
+\input{protocolo}
+\input{diagrama_hardware}
+\input{interface_estacao_base}
+\input{teoria_mapa}
+\input{trabalhos_futuros}
+
+\apendice
+
+\input{planejamento_de_riscos}
+
+\chapter{Medidas do robô}
+\label{cap:medidas_robo}
+
+% Na Tabela \ref{tab:medidas_robo} estão presentes as medidas do robô.
+
+\begin{table}[H]
+  \caption{Medidas do robô.}
+  \centering
+  \begin{tabular}{l|l}
+    \toprule
+    \textbf{Medida} & \textbf{Valor} \\
+    \midrule
+    Comprimento da carcaça & 50 cm \\ \hline
+    Largura da carcaça & 40 cm \\ \hline
+    Distância entre a parte da frente do robô e os eixos das rodas & 14 cm \\ \hline
+    Largura de cada roda & 4 cm \\ \hline
+    Circunferência de cada roda & 64 cm \\ \hline
+    Circunferência do eixo de cada roda & 7,5 cm \\ \hline
+    Circunferência do eixo de cada encoder & 22 cm \\ 
+    \bottomrule
+  \end{tabular}
+  \label{tab:medidas_robo}
+\end{table}
+
+
+\raggedright
+\bibliography{referencias}
+
+\end{document}
+

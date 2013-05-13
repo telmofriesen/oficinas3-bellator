@@ -2,180 +2,13 @@
 
 Nesta seção está apresentada a análise das opções tecnológicas plausíveis para o atendimento dos requisitos. As alternativas pesquisadas e as escolhidas para cada parte do projeto estão explicitadas a seguir.
 
-\subsection{Estação base}
-
-As alternativas pesquisadas para a estação base estão apresentadas nesta subseção.
-
-\subsubsection{Biblioteca para desenhos 2D}
-\label{subsec:alternativas_desenho}
-
-Tendo em vista que um dos requisitos é a geração de um mapa em duas dimensões na estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas em 2D (via código-fonte) e que possa ser integrada facilmente à interface gráfica. Ela deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
-
-Uma biblioteca interessante disponível em Java que possui o recurso de produzir desenhos dinâmicos com integração a interfaces gráficas é o Processing \cite{processing}, de código livre. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, na biblioteca existem recursos que permitem o recebimento de informações de posicionamento do mouse e de comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do Swing -- biblioteca de interface gráfica (GUI) do Java.
-
-
-Outra biblioteca para a confecção de desenhos em 2D é o Cairo \cite{cairo}, que é \textit{open-source}, disponível nas linguagens C e C++. Ele possui recursos em alto nível para renderização de formas e interação com o usuário, assim como o Processing. Nos aspectos gerais as duas ferramentas são muito semelhantes. A integração do Cairo com a interface gráfica, porém, é dependente na biblioteca externa de GUI utilizada.
-
-Um aspecto importante a notar é que ambas as bibliotecas foram desenvolvidas e otimizadas para terem bom desempenho em máquinas atuais -- o que é desejável tendo em vista os requisitos. Na Tabela \ref{tab:alternativas_desenho} está presente uma comparação entre as duas bibliotecas.
-
-
-\begin{table}[h]
-  \caption{Comparação entre Bibliotecas para desenhos 2D.}
-  \centering
-  \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
-    \toprule
-    \textbf{Característica} & \textbf{Cairo} & \textbf{Processing} \\
-    \midrule
-    Linguagem de programação & C e C++ & Java \\
-    \hline
-    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (com a biblioteca Swing do Java) \\
-    \hline
-    Ferramentas de interação com o usuário & Sim & Sim \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:alternativas_desenho}
-\end{table}
-
-\textbf{Escolha da equipe:} O Processing foi adotado como solução para desenhos 2D. Deve-se ressaltar que a escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação, tendo em vista a interdependência de ambas. Em razão dos motivos apresentados na próxima subseção -- que se constituem de principal argumento para a escolha do Processing -- o Java foi adotado. Um ponto interessante do Procesing é a simplicidade de integração a interfaces gráficas (Swing) do Java.
-
-\subsubsection{Linguagem de programação}
-
-Na etapa de avaliação das opções tecnológicas, a escolha de uma boa linguagem de programação que atenda aos requisitos é fundamental. Abaixo está presente uma lista dos aspectos desejáveis da linguagem a ser utilizada neste projeto:
-
-\begin{itemize}
-  \item Deve ser multiplataforma (ao menos compatível com Linux e Windows sem muitas modificações);
-  \item Deve possuir orientação a objetos;
-  \item Deve possuir recursos multiplataforma e de código livre para o desenvolvimento de interfaces gráficas;
-  \item Deve ter a disponibilidade de ferramentas de código livre e multiplataforma para a criação \textit{visual} da interface gráfica, dessa forma agilizando o processo de desenvolvimento;
-  \item Deve possuir recursos, integrados ou em bibliotecas externas de código livre, para o desenvolvimento de desenhos dinâmicos (para a geração do mapa 2D). Os desenhos devem ser facilmente integráveis à interface gráfica.
-\end{itemize}
-
-
-Abaixo está presente uma descrição de duas linguagens, o C++ e Java, atualmente utilizadas em inúmeras aplicações, e que são potenciais alternativas ao projeto -- tendo em vista a experiência e conhecimento dos integrantes a respeito de ambas. A Tabela \ref{tab:alternativas_linguagens} sumariza os recursos de cada uma.
-
-\textbf{Java}
-
-O Java \cite{java} é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que, muito facilmente, programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, e a manutenção dele pelos desenvolvedores é frequente.
-
-Há disponibilidade, na API do Java, da biblioteca Swing -- que contém recursos completos para a criação de interfaces gráficas (GUI) interativas. Existem ferramentas visuais de código aberto que consideravelmente agilizam o processo de desenvolvimento de interfaces Swing, entre elas o NetBeans \cite{netbeans} e o Eclipse \cite{eclipse}, através de plugins ou extensões. 
-
-Para o preenchimento do requisito de confecção de desenhos em 2D com integração à interface gráfica, a biblioteca do Processing (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) está disponível nessa linguagem.
-
-
-\textbf{C++}
-
-O C++ é uma linguagem orientada a objetos, que foi desenvolvida a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que um programa desenvolvido for utilizado. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
-
-Recursos para desenvolvimento visual de interfaces gráficas estão disponíveis através de bibliotecas e ferramentas externas. O C++ não possui recursos de interface gráfica na própria API e, portanto, deve-se notar que este é um aspecto complicador ao portar programas entre diferentes sistemas. 
-
-Para a confecção de desenhos 2D e incorporação dos mesmos à interface gráfica, a biblioteca Cairo (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) pode ser utilizada com essa linguagem. A possibilidade de haver integração com a interface, porém, é dependente da biblioteca de GUI utilizada.
-
-
-\begin{table}[h]
-  \caption{Comparação entre linguagens de programação.}
-  \centering
-  \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
-    \toprule
-    \textbf{Característica} & \textbf{C++} & \textbf{Java} \\
-    \hline
-    Multiplataforma (Linux e Windows) & Sim (com adaptação) & Sim (sem adaptação) \\
-    \hline
-    Orientação a objetos & Sim & Sim \\
-    \hline
-    Recursos multi-plataforma e \textit{open-source} para desenvolvimento de interface gráfica (GUI) & Sim (com bibliotecas externas) & Sim (integrado à API da linguagem) \\
-    \hline
-    Ferramentas \textit{open-source} e multiplataforma para criação visual de interface gráfica & Sim (ferramentas externas) & Sim (ferramentas externas) \\
-    \hline
-    Recursos \textit{open-source} para desenvolvimento de desenhos dinâmicos, facilmente integráveis à interface gráfica & Sim (biblitoeca externa, integração à interface gráfica dependente da GUI utilizada) & Sim (biblioteca externa) \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:alternativas_linguagens}
-\end{table}
-
-\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. Ressalta-se novamente que a escolha do Java foi feita em conjunto com a escolha da biblioteca do Processing. Notavelmente, no Java há a facilidade em portar, sem adaptações consideráveis na maioria dos casos, programas para diferentes plataformas -- processo este que é mais complexo no C++.  Com relação ao quesito de desempenho em computadores atuais, a linguagem escolhida é satisfatória, visto que há manutenção constante da implementação das bibliotecas e da máquina virtual do Java pelos desenvolvedores -- que buscam, entre outros aspectos, otimizar a linguagem para as tecnologias disponíveis atualmente.
-
-\subsubsection{Sistema operacional}
-
-Estando escolhida a linguagem de programação, o próximo passo é escolher um sistema operacional que seja compatível com ela e que satisfaça os requisitos da seção \ref{subsec:req_estacao-base}. Os aspectos desejáveis, portanto, são:
-
-\begin{itemize}
-  \item Deve ser compatível com o Java;
-  \item Deve ser compatível com ferramentas de desenvolvimento \textit{visual} de interface gráfica;
-  \item Deve ser gratuito e de código aberto.
-\end{itemize}
-
-A Tabela \ref{tab:alternativas_SO} apresenta uma comparação entre dois sistemas operacionais, Linux e Windows -- sobre os quais a equipe tem considerável experiência e possibilidade de uso nos próprios computadores pessoais.
-
-\begin{table}[h]
-  \caption{Comparação entre sistemas operacionais.}
-  \centering
-  \begin{tabular}{p{6cm}|p{2cm}p{2cm}}
-    \toprule
-    \textbf{Característica} & \textbf{Linux} & \textbf{Windows} \\
-    \hline
-    Compatível com Java & Sim & Sim \\
-    \hline
-    Compatível com ferramentas visuais de desenvolvimento & Sim & Sim \\
-    \hline
-    Gratuito e de código aberto & Sim & Não \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:alternativas_SO}
-\end{table}
-
-\textbf{Escolha da equipe:} Ambos os sistemas comparados são compatíveis com o Java e com ferramentas visuais de desenvolvimento de interface gráfica (NetBeans e Eclipse). Porém, o Linux é o único gratuito e de código aberto, e portanto foi o sistema operacional escolhido para o desenvolvimento do projeto da estação base.
-
-
-
-\subsection{Sistema de comunicação}
-
-Como foi explicitado nos requisitos, o sistema de comunicação ter as seguintes características:
-
-\begin{itemize}
-  \item Alcance de, no mínimo, 20 metros sem fios;
-  \item Velocidade suficiente para, simultaneamente, o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera;
-  \item Fluxo de dados bidirecional (\textit{full-duplex});
-  \item Utilização simples do protocolo TCP.
-\end{itemize}
-
-Para o cálculo da taxa de transmissão mínima necessária, faz-se uma estimativa inicial. Prevê-se que o envio de imagens da câmera é o que mais utilizará os recursos da conexão. Supondo serem usadas a máxima qualidade e taxa de amostragem suportadas por uma câmera VGA comum (resolução 640x480, RGB 24 bits, 30 FPS), além de uso de compressão JPEG com 90\% de qualidade, haverá uso de aproximadamente 2,4 MB/s ou 19,2 MBits/s \cite{webcam_resolution}. 
-
-O envio de comandos ao robô, supondo que cada comando tenha 2 KB e hajam 10 comandos por segundo (estimativa exaregada), gastará em torno de 160 KBits/s. O recebimento de informações do robô e leituras dos sensores, supondo que cada pacote tenha 2 KB (com exagero) e haja recebimento de 10 pacotes por segundo, utilizará 160 KBits/s na banda da conexão. Portanto, o valor mínimo desejável da taxa de transferência é de 19,2 + 0,16 + 0,16 = 19,52 MBits/s.
-
-Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação entre diferentes tecnologias de comunicação sem fios, que potencialmente podem satisfazer às necessidades do projeto. 
-
-
-\begin{table}[h]
-  \caption{Comparação entre tecnologias de comunicação sem fios.}
-  \centering
-  \begin{tabular}{p{4.5cm}|p{3cm}p{4cm}p{2cm}}
-    \toprule
-    \textbf{Característica} & \textbf{802.11g (Wi-Fi)} & \multicolumn{1}{l}{\textbf{Rádio Frequência (RF)}} & \textbf{Bluetooth}  \\
-    \hline
-    Distância máxima de alcance & 50-100 metros  & 30-100 metros & 10 metros \\
-    \hline
-    Velocidade de transmissão máxima & 54 Mbits/s & 2 Mbits/s & 1 Mbits/s \\
-    \hline
-    Fluxo de dados \textit{full-duplex} & Sim & Sim & Sim \\
-    \hline
-    Possibilidade e simplicidade de uso de TCP & Sim & Não & Não \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:alternativas_comunicacao}
-\end{table}
-
-\textbf{Escolha da equipe:} O Wi-Fi é o recurso mais atrativo em todos os aspectos que foram comparados, preenchendo satisfatoriamente os requisitos do sistema de comunicação. Sua velocidade e alcance são suficientes para satisfazer as necessidades do projeto, e o fluxo de dados pode ser \textit{full-duplex}. Notavelmente, o Wi-Fi é o único sistema comparado que oferece a possibilidade (com simplicidade) de uso do protocolo TCP -- o que é um requisito importante para o desenvolvimento ágil e satisfatório do projeto.
-
-É importante ressaltar que uma conexão Wi-Fi 802.11g dedicada será utilizada para a comunicação entre o robô e a estação base, de modo que a velocidade de conexão possa ser utilizada com maior eficiência sem interferências de outros utilizadores.
-
-
 \subsection{Sistema embarcado}
 \label{subsec:opcoes_sist-embarcado}
 Nesta seção serão apresentadas as alternativas pesquisadas para o sistema embarcado, levando-se em conta os requisitos da Seção \ref{subsec:req_sistema-embarcado}.
 
 \subsubsection{Imagens instantâneas do ambiente}
 
-Para a obtenção de imagens do ambiente onde o robô se encontra, optou-se por utilizar uma \textit{webcam} USB conectada à placa TS-7260 já presente no robô. Essa placa possuirá o \textit{hardware} de comunicação Wi-Fi do robô, e deve-se relembrar que um único canal sem fios será utilizado (como explicitado nos requisitos). Mostra-se adequada, portanto, a utilização de uma câmera que possa ser conectada por USB à placa, de modo que as imagens possam ser transmitidas por esse canal Wi-Fi. Abaixo estão listadas as características desejáveis da \textit{webcam}:
+Para a obtenção de imagens do ambiente onde o robô se encontra, optou-se por utilizar uma \textit{webcam} USB conectada à placa TS-7260 já presente no robô. Essa placa possuirá o \textit{hardware} de comunicação Wi-Fi do robô, e deve-se relembrar que um único canal sem fios será utilizado (como explicitado nos requisitos). Mostra-se adequada, portanto, a utilização de uma câmera que possa ser conectada por USB à placa, de modo que as imagens possam ser transmitidas por esse canal WI-FI. Abaixo estão listadas as características desejáveis da \textit{webcam}:
 
 \begin{itemize}
   \item Possuir conexão USB 2.0;
@@ -241,7 +74,7 @@ Para a obtenção da aceleração, velocidade e posição do robô, diversas tec
   \item \textbf{Encoder:} Ligado ao eixo da roda do robô, efetua a contagem das rotações realizadas por ela, permitindo assim calcular a distancia percorrida. Se dois encoders forem instalados, um em cada roda, a direção do movimento poderá ser obtida a partir de cálculos baseados na contagem de voltas de cada roda.
   \item \textbf{GPS:} Utiliza sinais de satélites para obter as coordenadas geográficas do robô. A direção e o sentido do movimento podem ser obtidos a partir da comparação das leituras atuais com as anteriores.
   \item 	\textbf{Acelerômetro:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração do componente. A velocidade e deslocamento lineares podem ser obtidos por integração numérica da aceleração.
-  \item 	\textbf{Giroscópio:} Pode utilizar a tecnologia chamada MEMS para medir a velocidade angular do componente. O ângulo de rotação pode ser obtido por integração numérica da velocidade angular.
+  \item 	\textbf{Giroscópio:} Pode utilizar a tecnologia chamada MEMS para medir a aceleração angular do componente. A velocidade angular e ângulo de rotação podem ser obtidos por integração numérica da aceleração angular.
   \item 	\textbf{Bússola:} Utiliza os campos magnéticos da terra para obter a orientação geográfica absoluta do robô.
 \end{itemize}
 
@@ -254,21 +87,21 @@ Na Tabela \ref{tab:alternativas_tecnologias_odometria} está presente uma compar
     \toprule
     \textbf{Característica} & \textbf{Encoder} & \textbf{GPS} & \textbf{Acelerômetro} & \textbf{Giroscópio} & \textbf{Bússola} \\
     \hline
-    Sujeito a influencias externas & Deslizamentos & Não & Não & Não & Ruídos de campos magnéticos diversos \\
+    Sujeito a influências externas & Deslizamentos & Não & Não & Não & Ruídos de campos magnéticos diversos \\
     \hline
     Ambiente de operação & Interno / Externo & Externo & Interno / Externo & Interno / Externo & Interno / Externo \\
     \hline
     Posicionamento & Relativo & Absoluto & Relativo & Relativo & Absoluto \\
     \hline
-    Acumulo de erro para calculo da posição & Sim & Não & Sim (duas integrações) & Sim (uma integração) & Sim \\
+    Acumulo de erro para calculo da posição & Sim & Não & Sim (duas integrações) & Sim (duas integrações) & Sim \\
     \bottomrule
   \end{tabular}
   \label{tab:alternativas_tecnologias_odometria}
 \end{table}
 
-Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. O acelerômetro e o giroscópio por sua vez acumulam o erro de duas integrações e uma integração respectivamente\footnote{A aceleração linear e velocidade angular devem ser integradas numericamente duas vezes e uma vez respectivamente para cálculo da posição: Uma vez para determinação da velocidade linear; E outra vez para determinação do deslocamento e ângulo de rotação atuais.} para obtenção da posição.
+Da Tabela \ref{tab:alternativas_tecnologias_odometria}, vê-se que \textit{encoders} estão sujeitos a erros causados por deslizamentos nas rodas, e que GPS apenas funciona em ambientes externos. A bússola pode ser influenciada por campos magnéticos diferentes do da terra -- como por exemplo o gerado pelos motores. O acelerômetro e o giroscópio por sua vez acumulam o erro de duas integrações\footnote{As acelerações linear e angular devem ser integradas duas vezes numericamente para cálculo da posição: A primeira para determinação das velocidades linear e angular; A segunda para determinação do deslocamento e ângulo de rotação atuais.} para obtenção da posição.
 
-\textbf{Escolha da equipe:} Os \textit{encoders} estão sujeito apenas aos erros de deslizamentos e acumulam menos erros na obtenção da posição do que os giroscópios e acelerômetros. Sendo assim eles foram a escolha como principal fonte de dados para odometria. O GPS não foi escolhido pois opera apenas em ambientes externos. A bússola por sua vez poderá sofrer influencias do campo magnético gerado pelos motores do robô. Como a utilização apenas dos \textit{encoders} pode levar a erros no posicionamento devido a deslizamentos, utilizaremos também um acelerômetro e um giroscópio como fonte de dados auxiliar para possibilitar o aumento da exatidão e confiabilidade dos dados obtidos dos \textit{encoders}. Caso discrepâncias consideráveis ocorram entre os dados obtidos pelos sensores, escorregamentos das rodas podem ser detectados e mitigados, atenuando dessa forma erros na determinação do posicionamento.
+\textbf{Escolha da equipe:} Os \textit{encoders} estão sujeito apenas aos erros de deslizamentos e acumulam menos erros na obtenção da posição do que os giroscópios e acelerômetros. Sendo assim eles foram a escolha como principal fonte de dados para odometria. O GPS não foi escolhido pois opera apenas em ambientes internos. A bússola por sua vez poderá sofrer influencias do campo magnético gerado pelos motores do robô. Como a utilização apenas dos \textit{encoders} pode levar a erros no posicionamento devido a deslizamentos, utilizaremos também um acelerômetro e um giroscópio como fonte de dados auxiliar para possibilitar o aumento da exatidão e confiabilidade dos dados obtidos dos \textit{encoders}. Caso discrepâncias consideráveis ocorram entre os dados obtidos pelos sensores, escorregamentos das rodas podem ser detectados e mitigados, atenuando dessa forma erros na determinação do posicionamento.
 
 Por exemplo, em caso de escorregamento roda, um \textit{encoder} fornece uma medição de velocidade maior do que a que corresponde à realidade do movimento do robô. O acelerômetro e o giroscópio, por sua vez, não sofrem influências do escorregamento das rodas, e tenderão a fornecer uma medida mais próxima à realidade. Discrepâncias nas medições podem ser dessa forma detectadas, e procedimentos de atenuação de erros (como por exemplo, descarte de certas medidas dos \textit{encoders}) poderão ser executados no \textit{software} da estação base.
 
@@ -311,7 +144,7 @@ Quanto ao acelerômetro e giroscópio, está apresentado a seguir, na Tabela \re
 
 \textbf{MPU-6050}
 
-Com base na Tabela \ref{tab:alternativas_componentes_odometria}, o modelo MPU-6050 da IvenSense foi escolhido, principalmente devido ao seu baixo custo: \$8.78. Este modelo possui um acelerômetro e um giroscópio (ambos de 3 eixos), além entradas para uma bussola externa de 3 eixos, tudo integrado a um único chip \cite{mpu6050}. A faixa de operação para o acelerômetro é de $ \pm 2g$ ou $\pm 4g $ e para o giroscópio é de $ \pm 250~ ^{o}/seg $ ou $ \pm 500~ ^{o}/seg $. A sensibilidade do acelerômetro é de $ 16384~ LSB/g $ ou $ 8192~ LSB/g $. A sensibilidade do giroscópio é de $ 131~ LSB/ (^{o} / seg) $ ou $ 65.5~ LSB/ (^{o} / seg) $. A interface de comunicação do módulo suporta o protocolo I2C. O módulo contendo o chip MPU-6050 e alguns componentes necessários para seu funcionamento pode ser visto na figura \ref{fig:mpu6050}.
+Com base na Tabela \ref{tab:alternativas_componentes_odometria}, o modelo MPU-6050 da IvenSense foi escolhido, principalmente devido ao seu baixo custo: \$8.78. Este modelo possui um acelerômetro e um giroscópio (ambos de 3 eixos), além entradas para uma bússola externa de 3 eixos, tudo integrado a um único chip \cite{mpu6050}. A faixa de operação para o acelerômetro é de $ \pm 2g$ ou $\pm 4g $ e para o giroscópio é de $ \pm 250~ ^{o}/seg $ ou $ \pm 500~ ^{o}/seg $. A sensibilidade do acelerômetro é de $ 16384~ LSB/g $ ou $ 8192~ LSB/g $. A sensibilidade do giroscópio é de $ 131~ LSB/ (^{o} / seg) $ ou $ 65.5~ LSB/ (^{o} / seg) $. A interface de comunicação do módulo suporta o protocolo I2C. O módulo contendo o chip MPU-6050 e alguns componentes necessários para seu funcionamento pode ser visto na figura \ref{fig:mpu6050}.
 
 \begin{figure}[H]
 \centering
@@ -450,3 +283,171 @@ Pode-se notar que o LPC2103, além de atender aos requisitos mandatórios da Tab
 A placa de circuito impresso será projetada utilizando ferramentas livres, como o gEDA \cite{geda} e PCB \cite{pcb}. Após o projeto da placa os arquivos \textit{Gerber} serão enviados à empresa Stick \cite{stick} para impressão. A soldagem dos componentes será realizada pela própria equipe.
 
 Deve-se ressaltar que como, em geral, na soldagem de um \textit{chip} com encapsulamento LQFP há complexidade e riscos consideráveis (como por exemplo, queima do \textit{chip} ou da placa), a equipe pesquisou informações sobre \textit{kits} de desenvolvimento que tenham o LPC2103 já soldado na placa. Em Curitiba, existe a empresa eSysTech \cite{esystech} que fabrica tais \textit{kits}. Através de contatos da UTFPR, confirmou-se que na universidade há algumas unidades (fabricadas por essa empresa) que podem ser emprestadas à equipe para a realização do projeto, caso haja necessidade.
+
+
+\subsection{Sistema de comunicação}
+
+Como foi explicitado nos requisitos, o sistema de comunicação ter as seguintes características:
+
+\begin{itemize}
+  \item Alcance de, no mínimo, 20 metros sem fios;
+  \item Velocidade suficiente para, simultaneamente, o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera;
+  \item Fluxo de dados bidirecional (\textit{full-duplex});
+  \item Utilização simples do protocolo TCP.
+\end{itemize}
+
+Para o cálculo da taxa de transmissão mínima necessária, faz-se uma estimativa inicial. Prevê-se que o envio de imagens da câmera é o que mais utilizará os recursos da conexão. Supondo serem usadas a máxima qualidade e taxa de amostragem suportadas por uma câmera VGA comum (resolução 640x480, RGB 24 bits, 30 FPS), além de uso de compressão JPEG com 90\% de qualidade, haverá uso de aproximadamente 2,4 MB/s ou 19,2 MBits/s \cite{webcam_resolution}. 
+
+O envio de comandos ao robô, supondo que cada comando tenha 2 KB e hajam 10 comandos por segundo (estimativa exagerada), gastará em torno de 160 KBits/s. O recebimento de informações do robô e leituras dos sensores, supondo que cada pacote tenha 2 KB (com exagero) e haja recebimento de 10 pacotes por segundo, utilizará 160 KBits/s na banda da conexão. Portanto, o valor mínimo desejável da taxa de transferência é de 19,2 + 0,16 + 0,16 = 19,52 MBits/s.
+
+Na Tabela \ref{tab:alternativas_comunicacao} está presente uma comparação entre diferentes tecnologias de comunicação sem fios, que potencialmente podem satisfazer às necessidades do projeto. 
+
+
+\begin{table}[h]
+  \caption{Comparação entre tecnologias de comunicação sem fios.}
+  \centering
+  \begin{tabular}{p{4.5cm}|p{3cm}p{4cm}p{2cm}}
+    \toprule
+    \textbf{Característica} & \textbf{802.11g (Wi-Fi)} & \multicolumn{1}{l}{\textbf{Rádio Frequência (RF)}} & \textbf{Bluetooth}  \\
+    \hline
+    Distância máxima de alcance & 50-100 metros  & 30-100 metros & 10 metros \\
+    \hline
+    Velocidade de transmissão máxima & 54 Mbits/s & 2 Mbits/s & 1 Mbits/s \\
+    \hline
+    Fluxo de dados \textit{full-duplex} & Sim & Sim & Sim \\
+    \hline
+    Possibilidade e simplicidade de uso de TCP & Sim & Não & Não \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_comunicacao}
+\end{table}
+
+\textbf{Escolha da equipe:} O Wi-Fi é o recurso mais atrativo em todos os aspectos que foram comparados, preenchendo satisfatoriamente os requisitos do sistema de comunicação. Sua velocidade e alcance são suficientes para satisfazer as necessidades do projeto, e o fluxo de dados pode ser \textit{full-duplex}. Notavelmente, o Wi-Fi é o único sistema comparado que oferece a possibilidade (com simplicidade) de uso do protocolo TCP -- o que é um requisito importante para o desenvolvimento ágil e satisfatório do projeto.
+
+É importante ressaltar que uma conexão Wi-Fi 802.11g dedicada será utilizada para a comunicação entre o robô e a estação base, de modo que a velocidade de conexão possa ser utilizada com maior eficiência sem interferências de outros utilizadores.
+
+\subsection{Estação base}
+
+As alternativas pesquisadas para a estação base estão apresentadas nesta subseção.
+
+\subsubsection{Biblioteca para desenhos 2D}
+\label{subsec:alternativas_desenho}
+
+Tendo em vista que um dos requisitos é a geração de um mapa em duas dimensões na estação base, deve-se escolher uma biblioteca que permita realizar o desenho de formas geométricas em 2D (via código-fonte) e que possa ser integrada facilmente à interface gráfica. Ela deve também possuir meios simples de obter informações do mouse e teclado, para interatividade com o usuário. 
+
+Uma biblioteca interessante disponível em Java que possui o recurso de produzir desenhos dinâmicos com integração a interfaces gráficas é o Processing \cite{processing}, de código livre. Essa biblioteca foi a principal encontrada que seria capaz de satisfazer as necessidades de desenho do mapa 2D de forma simples. Por possuir inúmeras funções de desenho em alto nível, o trabalho de renderização dos gráficos seria consideravelmente simplificado. Além disso, na biblioteca existem recursos que permitem o recebimento de informações de posicionamento do mouse e de comandos do teclado. Por ser constituído basicamente de um \textit{Applet} Java, o Processing pode facilmente ser integrado a componentes do Swing -- biblioteca de interface gráfica (GUI) do Java.
+
+
+Outra biblioteca para a confecção de desenhos em 2D é o Cairo \cite{cairo}, que é \textit{open-source}, disponível nas linguagens C e C++. Ele possui recursos em alto nível para renderização de formas e interação com o usuário, assim como o Processing. Nos aspectos gerais as duas ferramentas são muito semelhantes. A integração do Cairo com a interface gráfica, porém, é dependente na biblioteca externa de GUI utilizada.
+
+Um aspecto importante a notar é que ambas as bibliotecas foram desenvolvidas e otimizadas para terem bom desempenho em máquinas atuais -- o que é desejável tendo em vista os requisitos. Na Tabela \ref{tab:alternativas_desenho} está presente uma comparação entre as duas bibliotecas.
+
+
+\begin{table}[h]
+  \caption{Comparação entre Bibliotecas para desenhos 2D.}
+  \centering
+  \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
+    \toprule
+    \textbf{Característica} & \textbf{Cairo} & \textbf{Processing} \\
+    \midrule
+    Linguagem de programação & C e C++ & Java \\
+    \hline
+    Integração com interface gráfica & Sim (depende da biblioteca de GUI utilizada) & Sim (com a biblioteca Swing do Java) \\
+    \hline
+    Ferramentas de interação com o usuário & Sim & Sim \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_desenho}
+\end{table}
+
+\textbf{Escolha da equipe:} O Processing foi adotado como solução para desenhos 2D. Deve-se ressaltar que a escolha da biblioteca de desenhos foi feita em conjunto com a escolha de linguagem de programação, tendo em vista a interdependência de ambas. Em razão dos motivos apresentados na próxima subseção -- que se constituem de principal argumento para a escolha do Processing -- o Java foi adotado. Um ponto interessante do Procesing é a simplicidade de integração a interfaces gráficas (Swing) do Java.
+
+\subsubsection{Linguagem de programação}
+
+Na etapa de avaliação das opções tecnológicas, a escolha de uma boa linguagem de programação que atenda aos requisitos é fundamental. Abaixo está presente uma lista dos aspectos desejáveis da linguagem a ser utilizada neste projeto:
+
+\begin{itemize}
+  \item Deve ser multiplataforma (ao menos compatível com Linux e Windows sem muitas modificações);
+  \item Deve possuir orientação a objetos;
+  \item Deve possuir recursos multiplataforma e de código livre para o desenvolvimento de interfaces gráficas;
+  \item Deve ter a disponibilidade de ferramentas de código livre e multiplataforma para a criação \textit{visual} da interface gráfica, dessa forma agilizando o processo de desenvolvimento;
+  \item Deve possuir recursos, integrados ou em bibliotecas externas de código livre, para o desenvolvimento de desenhos dinâmicos (para a geração do mapa 2D). Os desenhos devem ser facilmente integráveis à interface gráfica.
+\end{itemize}
+
+
+Abaixo está presente uma descrição de duas linguagens, o C++ e Java, atualmente utilizadas em inúmeras aplicações, e que são potenciais alternativas ao projeto -- tendo em vista a experiência e conhecimento dos integrantes a respeito de ambas. A Tabela \ref{tab:alternativas_linguagens} sumariza os recursos de cada uma.
+
+\textbf{Java}
+
+O Java \cite{java} é uma linguagem concebida de início como sendo orientada a objetos. A maneira com que é feita a compilação e execução do código permite que, muito facilmente, programas sejam rodados em diferentes plataformas (Linux, Windows, Mac, entre outros). O processo de compilação do código gera os chamados \textit{bytecodes}, que são instruções a serem interpretadas pela \textit{Java Virtual Machine} (JVM). A grande vantagem é que o JVM possui disponibilidade multiplataforma, e a manutenção dele pelos desenvolvedores é frequente.
+
+Há disponibilidade, na API do Java, da biblioteca Swing -- que contém recursos completos para a criação de interfaces gráficas (GUI) interativas. Existem ferramentas visuais de código aberto que consideravelmente agilizam o processo de desenvolvimento de interfaces Swing, entre elas o NetBeans \cite{netbeans} e o Eclipse \cite{eclipse}, através de plugins ou extensões. 
+
+Para o preenchimento do requisito de confecção de desenhos em 2D com integração à interface gráfica, a biblioteca do Processing (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) está disponível nessa linguagem.
+
+
+\textbf{C++}
+
+O C++ é uma linguagem orientada a objetos, que foi desenvolvida a partir da linguagem C. A compilação de código no C++ deve ser feita especificamente para cada plataforma em que um programa desenvolvido for utilizado. De uma perspectiva prática, certas seções de código frequentemente necessitam de adaptações manuais para cada plataforma e sistema operacional, o que gera retrabalho e gastos de tempo adicionais. 
+
+Recursos para desenvolvimento visual de interfaces gráficas estão disponíveis através de bibliotecas e ferramentas externas. O C++ não possui recursos de interface gráfica na própria API e, portanto, deve-se notar que este é um aspecto complicador ao portar programas entre diferentes sistemas. 
+
+Para a confecção de desenhos 2D e incorporação dos mesmos à interface gráfica, a biblioteca Cairo (explicada anteriormente na Subseção \ref{subsec:alternativas_desenho}) pode ser utilizada com essa linguagem. A possibilidade de haver integração com a interface, porém, é dependente da biblioteca de GUI utilizada.
+
+
+\begin{table}[h]
+  \caption{Comparação entre linguagens de programação.}
+  \centering
+  \begin{tabular}{p{6cm}|p{4cm}p{4cm}}
+    \toprule
+    \textbf{Característica} & \textbf{C++} & \textbf{Java} \\
+    \hline
+    Multiplataforma (Linux e Windows) & Sim (com adaptação) & Sim (sem adaptação) \\
+    \hline
+    Orientação a objetos & Sim & Sim \\
+    \hline
+    Recursos multi-plataforma e \textit{open-source} para desenvolvimento de interface gráfica (GUI) & Sim (com bibliotecas externas) & Sim (integrado à API da linguagem) \\
+    \hline
+    Ferramentas \textit{open-source} e multiplataforma para criação visual de interface gráfica & Sim (ferramentas externas) & Sim (ferramentas externas) \\
+    \hline
+    Recursos \textit{open-source} para desenvolvimento de desenhos dinâmicos, facilmente integráveis à interface gráfica & Sim (biblitoeca externa, integração à interface gráfica dependente da GUI utilizada) & Sim (biblioteca externa) \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_linguagens}
+\end{table}
+
+\textbf{Escolha da equipe:} O Java foi a linguagem escolhida para o desenvolvimento do \textit{software} da estação base, uma vez que preenche satisfatoriamente os requisitos do projeto. Ressalta-se novamente que a escolha do Java foi feita em conjunto com a escolha da biblioteca do Processing. Notavelmente, no Java há a facilidade em portar, sem adaptações consideráveis na maioria dos casos, programas para diferentes plataformas -- processo este que é mais complexo no C++.  Com relação ao quesito de desempenho em computadores atuais, a linguagem escolhida é satisfatória, visto que há manutenção constante da implementação das bibliotecas e da máquina virtual do Java pelos desenvolvedores -- que buscam, entre outros aspectos, otimizar a linguagem para as tecnologias disponíveis atualmente.
+
+\subsubsection{Sistema operacional}
+
+Estando escolhida a linguagem de programação, o próximo passo é escolher um sistema operacional que seja compatível com ela e que satisfaça os requisitos da seção \ref{subsec:req_estacao-base}. Os aspectos desejáveis, portanto, são:
+
+\begin{itemize}
+  \item Deve ser compatível com o Java;
+  \item Deve ser compatível com ferramentas de desenvolvimento \textit{visual} de interface gráfica;
+  \item Deve ser gratuito e de código aberto.
+\end{itemize}
+
+A Tabela \ref{tab:alternativas_SO} apresenta uma comparação entre dois sistemas operacionais, Linux e Windows -- sobre os quais a equipe tem considerável experiência e possibilidade de uso nos próprios computadores pessoais.
+
+\begin{table}[h]
+  \caption{Comparação entre sistemas operacionais.}
+  \centering
+  \begin{tabular}{p{6cm}|p{2cm}p{2cm}}
+    \toprule
+    \textbf{Característica} & \textbf{Linux} & \textbf{Windows} \\
+    \hline
+    Compatível com Java & Sim & Sim \\
+    \hline
+    Compatível com ferramentas visuais de desenvolvimento & Sim & Sim \\
+    \hline
+    Gratuito e de código aberto & Sim & Não \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alternativas_SO}
+\end{table}
+
+\textbf{Escolha da equipe:} Ambos os sistemas comparados são compatíveis com o Java e com ferramentas visuais de desenvolvimento de interface gráfica (NetBeans e Eclipse). Porém, o Linux é o único gratuito e de código aberto, e portanto foi o sistema operacional escolhido para o desenvolvimento do projeto da estação base.
+
+
+

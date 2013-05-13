@@ -1,0 +1,83 @@
+\chapter{Or\c{c}amento Detalhado}
+
+\begin{table}[!h]\tiny
+  \centering
+  \caption{Pre\c{c}os individuais e totais dos componentes do projeto.}
+    \begin{tabular}{crrrrrr}
+    \toprule
+    n     & \multicolumn{1}{c}{quantidade} & \multicolumn{1}{c}{onde} & \multicolumn{1}{l}{item} & \multicolumn{1}{l}{descrição} & preço unitario & total \\
+    \midrule
+    1     & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{IC REG LDO 5V .95A SOT-223} & \multicolumn{1}{l}{REGULADOR 5V} & \$0,54 & \$2,16 \\
+    2     & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{IC REG LDO 3.3V .95A SOT-223} & \multicolumn{1}{l}{REGULADOR 3V3} & \$0,54 & \$1,62 \\
+    3     & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{IC REG LDO 1.8V .95A SOT-223} & \multicolumn{1}{l}{REGULADOR 1V8} & \$0,48 & \$1,92 \\
+    4     & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{IC BUFF/DVR TRI-ST DUAL 20SOIC} & \multicolumn{1}{l}{BUFFER P/ PWM} & \$0,99 & \$3,96 \\
+    5     & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{digikey} & \multicolumn{1}{l}{IC ARM7 MCU FLASH 32K 48-LQFP} & \multicolumn{1}{l}{LPC 2103} & \$6,16 & \$18,48 \\
+    6     & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{digikey} & \multicolumn{1}{l}{IC BUFF/DVR SCHM TRG 6BIT 14SOIC} & \multicolumn{1}{l}{SCHMITT TRIGGER} & \$1,52 & \$4,56 \\
+    7     & \multicolumn{1}{c}{25} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{RES 47.0K OHM 1/8W 1\% 0805} & \multicolumn{1}{l}{RESISTOR PULL-UP 47K} & \$0,01 & \$0,23 \\
+    8     & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{LED CHIPLED 645NM RED DIFF 0805} & \multicolumn{1}{l}{LED VERMELHO 1V8 20MA} & \$0,09 & \$0,36 \\
+    9     & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey} & \multicolumn{1}{l}{RES 20K OHM 1/8W 1\% 0805 SMD} & \multicolumn{1}{l}{RESISTOR LED 20K} & \$0,04 & \$0,16 \\
+    10    & \multicolumn{1}{c}{25} & \multicolumn{1}{c}{digikey} & \multicolumn{1}{l}{RES 22.0 OHM 1/8W 1\% 0805 SMD} & \multicolumn{1}{l}{22 HOMS P/ LIMITADOR DE VOLTAGEM} & \$0,01 & \$0,37 \\
+    11    & \multicolumn{1}{c}{12} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{DIODE ZENER DUAL 4.3V SOT-363} & \multicolumn{1}{l}{DUAL ZENER 4V3} & \$0,33 & \$4,01 \\
+    12    & \multicolumn{1}{c}{10} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{CAP CER 150PF 50V 1\% NP0 0805} & \multicolumn{1}{l}{CAPACITOR 150P FILTRO ENCODERS} & \$0,12 & \$1,24 \\
+    13    & \multicolumn{1}{c}{10} & \multicolumn{1}{c}{digikey} } & \multicolumn{1}{l}{RES 332 OHM 1/8W 1\% 0805 SMD} & \multicolumn{1}{l}{RESISTOR 332 FILTRO ENCODERS} & \$0,02 & \$0,19 \\
+    14    & \multicolumn{1}{c}{10} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{CAP CER 33PF 50V 5\% NP0 0805} & \multicolumn{1}{l}{33P CAPACITOR P/ CRISTAL} & \$0,05 & \$0,53 \\
+    15    & \multicolumn{1}{c}{50} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{CAP CER 0.1UF 50V 5\% X7R 0805} & \multicolumn{1}{l}{0.1U PARA MAX3232 E REGULADORES} & \$0,06 & \$3,16 \\
+    16    & \multicolumn{1}{c}{12} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{CAP CER 10UF 10V 10\% X5R 0805} & \multicolumn{1}{l}{10U PARA REGULADOR} & \$0,13 & \$1,56 \\
+    17    & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey}  & \multicolumn{1}{l}{IC DRVR/RCVR MULTCH RS232 16SOIC} & \multicolumn{1}{l}{MAX3232} & \$1,65 & \$6,60 \\
+    18    & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{digikey} & \multicolumn{1}{l}{CRYSTAL 14.7456 MHZ 18PF SMD} & \multicolumn{1}{l}{14.7456MHZ 10PPM 18pF} & \$0,57 & \$2,28 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       & 53,388 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Frete: & \$37,67 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & IOF (\$): & \$5,81 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Imposto (R\$) & R\$ 82,61 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 282,15} \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       &  \\
+    1     & 3     & \multicolumn{1}{c}{ebay} & MPU-6050 & Gyro e acelerometro de 3 eixos & \$8,78 & \$26,34 \\
+    1     & 1     & \multicolumn{1}{c}{ebay} & MPU-6050 & Gyro e acelerometro de 3 eixos & \$8,78 & \$8,78 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       & \$35,12 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Frete: & \$0,00 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Total (R\$): & R\$ 75,34 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & IOF (R\$): & R\$ 3,56 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 78,90} \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       &  \\
+    1     & 1     & sparkfun &MPU-6050 & Gyro e acelerometro de 3 eixos & \$39,95 & \$39,95 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       & 39,95 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Frete: & \$37,75 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & IOF (\$): & \$2,79 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Imposto (R\$) & R\$ 106,98 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 269,87} \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{} & \textbf{} \\
+    1     & 3     & 24 de maio & barra de pinos & \multicolumn{1}{l}{} & R\$ 0,55 & R\$ 1,65 \\
+    2     & 10    & 24 de maio & resistor & \multicolumn{1}{l}{} & R\$ 0,05 & R\$ 0,50 \\
+    3     & 10    & 24 de maio & resistor & \multicolumn{1}{l}{} & R\$ 0,05 & R\$ 0,50 \\
+    4     & 2     & 24 de maio & Max 3232 & \multicolumn{1}{l}{} & R\$ 7,70 & R\$ 15,40 \\
+    5     & 10    & 24 de maio & capacitor ceramico & \multicolumn{1}{l}{} & R\$ 0,10 & R\$ 1,00 \\
+    6     & 10    & 24 de maio & diodo zenner & \multicolumn{1}{l}{} & R\$ 0,25 & R\$ 2,50 \\
+    7     & 2     & 24 de maio & buffer 74hc244 & \multicolumn{1}{l}{} & R\$ 1,30 & R\$ 2,60 \\
+    7     & 3     & 24 de maio & Max 232 SMD & \multicolumn{1}{l}{} & R\$ 3,00 & R\$ 9,00 \\
+    8     & 3     & 24 de maio & power jack & \multicolumn{1}{l}{} & R\$ 0,80 & R\$ 2,40 \\
+    9     & 2     & 24 de maio & diodo & \multicolumn{1}{l}{} & R\$ 0,20 & R\$ 0,40 \\
+    10    & 4     & 24 de maio & conector serial & \multicolumn{1}{l}{} & R\$ 1,86 & R\$ 7,44 \\
+    11    & 1     & 24 de maio & conectores para fios & \multicolumn{1}{l}{} & R\$ 1,50 & R\$ 1,50 \\
+    12    & 2     & 24 de maio & jumper & \multicolumn{1}{l}{} & R\$ 0,76 & R\$ 1,52 \\
+    13    & 2     & 24 de maio & pushbutton & \multicolumn{1}{l}{} & R\$ 0,10 & R\$ 0,20 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       &  \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 46,61} \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{} & \textbf{} \\
+    13    & 1     & 24 de maio &  pendrive 4Gb & \multicolumn{1}{l}{} & R\$ 15,00 & R\$ 15,00 \\
+          &       & \multicolumn{1}{c}{} &  \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 15,00} \\
+          &       & \multicolumn{1}{c}{} &  \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       &  \\
+    1     & 4     & stik  & pcb   & \multicolumn{1}{l}{} & R\$ 53,47 & R\$ 235,25 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       & 235,25 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & Frete: & R\$ 30,00 \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 265,25} \\
+          &       & \multicolumn{1}{c}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       &  \\
+    1     & 1     & mercado livre &  webcam & \multicolumn{1}{l}{} & R\$ 34,99 & R\$ 34,99 \\
+          &       & \multicolumn{1}{c}{} &  \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 34,99} \\
+          &       & \multicolumn{1}{c}{} &  \multicolumn{1}{l}{} & \multicolumn{1}{l}{} &       &  \\
+          &       & \multicolumn{1}{c}{} &  \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \textbf{Total (R\$):} & \textbf{R\$ 899,28} \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:custos}%
+\end{table}%
+
+\footnotetext{Taxas de 60\% para importação.}

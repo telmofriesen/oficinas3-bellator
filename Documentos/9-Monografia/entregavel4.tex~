@@ -1,0 +1,123 @@
+% \documentclass{report}
+% \usepackage[utf8]{inputenc}
+% \usepackage[brazil]{babel}
+
+\documentclass[oneside,a4paper,12pt]{normas-utf-tex}
+
+\usepackage{breakurl}
+\usepackage[alf,abnt-emphasize=bf,bibjustif,recuo=0cm, abnt-etal-cite=2]{abntcite}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx,subfig}
+\usepackage{times}
+\usepackage[plain]{fancyref}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{amssymb}
+\usepackage{empheq}
+\usepackage{bm}
+\usepackage{setspace}
+%\usepackage[loose]{units}
+
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{~[#1]}}}
+
+
+
+%%% Complemento para tabelas
+\usepackage{booktabs, multirow}
+\setlength{\heavyrulewidth}{0.1em}
+\renewcommand{\toprule}{\midrule[\heavyrulewidth]}
+\renewcommand{\arraystretch}{1.2}
+%%%
+
+\instituicao{Universidade Tecnológica Federal do Paraná}
+\departamento{Departamento Acadêmico de Eletrônica}
+\departamentodois{Departamento Acadêmico de Informática}
+\programa{Curso de Engenharia de Computação}
+\unidade{Oficina de Integração 3}
+
+\titulo{\MakeUppercase{Mapeamento de ambientes com o robô Bellator}}
+\documento{Monografia}
+
+\autor{Luis Guilherme Machado Camargo}
+\autordois{Pedro Alberto de Borba}
+\autortres{Ricardo Farah}
+\autorquatro{Stefan Campana Fuchs}
+\autorcinco{Telmo Friesen}
+\palavraschave{mapeamento de ambientes, robô, infra-vermelho}
+\keywords{environment mapping, robot, infrared}
+
+\cita{CAMARGO, L.G.M; BORBA, P.A.; FARAH, R.; FUCHS, S.C.; FRIESEN, T}
+
+\comentario{\UTFPRdocumentodata\ apresentado à Unidade Curricular de \UTFPRunidadedata\ do \UTFPRprogramadata\ da \ABNTinstituicaodata\ como requisito parcial para aprovação.}
+
+\local{Curitiba}
+\data{\the\year}
+
+\begin{document}
+
+\capa
+\folhaderosto
+
+\begin{resumo}
+
+Este projeto pretende utilizar o já existente robô Bellator para o propósito de mapeamento de ambientes. Por meio da utilização de sensores infra-vermelhos acoplados ao robô, medidas da distância de obstáculos em relação ao robô podem ser obtidas. Ao se marcar os pontos obtidos em um plano bidimensional, mapas de uma grande variedade de ambientes podem ser construídos.
+
+\end{resumo}
+
+\begin{abstract}
+
+This project aims to use the already existing Bellator robot for the purpose of environment mapping. Using infrared sensors coupled to the robot, measurement of the distance of obstacles with reference to the robot can be acquired. By plotting these measurents onto a two dimensional grid, maps of a great variety of environments can be built.
+
+\end{abstract}
+\listadefiguras
+\listadetabelas
+\sumario
+\input{project_charter}
+\input{planejamento_de_riscos}
+\input{trabalhos_correlatos}
+\input{analise_tecnologica}
+\input{plano_projeto}
+\input{custos}
+\input{modelagem_uml}
+\input{protocolo}
+\input{diagrama_hardware}
+\input{interface_estacao_base}
+\input{teoria_mapa}
+\input{trabalhos_futuros}
+
+\apendice
+
+\chapter{Medidas do robô}
+\label{cap:medidas_robo}
+
+% Na Tabela \ref{tab:medidas_robo} estão presentes as medidas do robô.
+
+\begin{table}[h]
+  \caption{Medidas do robô.}
+  \centering
+  \begin{tabular}{l|l}
+    \toprule
+    \textbf{Medida} & \textbf{Valor} \\
+    \midrule
+    Comprimento da carcaça & 50 cm \\ \hline
+    Largura da carcaça & 40 cm \\ \hline
+    Distância entre a parte da frente do robô e os eixos das rodas & 14 cm \\ \hline
+    Largura de cada roda & 4 cm \\ \hline
+    Circunferência de cada roda & 64 cm \\ \hline
+    Circunferência do eixo de cada roda & 7,5 cm \\ \hline
+    Circunferência do eixo de cada encoder & 22 cm \\ 
+    \bottomrule
+  \end{tabular}
+  \label{tab:medidas_robo}
+\end{table}
+
+
+\raggedright
+\bibliography{referencias}
+
+\end{document}
+

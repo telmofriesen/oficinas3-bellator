@@ -1,0 +1,15 @@
+\chapter{Análise tecnológica}
+Nesta seção está explicitada, primeiramente, uma visão geral do projeto. Em seguida, há uma discussão detalhada a respeito dos requisitos de cada parte fundamental -- estação base, sistema de comunicação e sistema embarcado. Por fim há uma enumeração das alternativas tecnológicas pesquisadas e das escolhidas para o preenchimento dos requisitos.
+
+\section{Visão geral do projeto}
+
+O projeto, de um ponto de vista geral, consiste em um robô controlado manualmente e que seja capaz de efetuar mapeamento em duas dimensões de ambientes. Um usuário humano monitorará e controlará um computador -- a estação base -- a partir do qual poderão ser enviados comandos de movimentação, via teclado, ao robô. Informações sobre o posicionamento do robô e dos obstáculos detectados por ele serão recebidas na estação base em tempo real. Imagens instantâneas de uma câmera posicionada no robô -- aspecto explicado mais à frente -- poderão ser visualizadas pelo utilizador.
+
+O sistema de comunicação deverá ter, ao menos, alcance de 20 metros sem fios. Visto que toda a comunicação entre a estação base e o sistema embarcado será feita por um único canal, a velocidade e o tipo de fluxo de transmissão de dados devem ser adequados para, simultaneamente, o envio de comandos de movimentação ao robô, recebimento de dados de leituras de sensores e recebimento de imagens da câmera.
+
+O sistema embarcado é constituido, em suma, pelo robô. Ele deve ser capaz de se mover para frente e para trás e girar para a esquerda e direita. A visualização em tempo real do ambiente pelo utilizador, com o objetivo de facilitar o controle de movimentação manual, poderá ser feita através de imagens instantâneas geradas por uma câmera fixa instalada no robô. 
+
+O robô deve ser capaz de obter dados para cálculos (na estação base) de sua velocidade e deslocamento. Um aspecto desejável em relação a isso é a atenuação de erros em decorrência de escorregamento, giros em falso ou trepidação de rodas, visando, dessa forma, a utilização futura do robô em condições não ideais de terreno. Obstáculos próximos -- em uma distância mínima de 30 cm e máxima de 150 cm -- devem ser detectados de modo a possibilitar a confecção de um mapa 2D em tempo real na estação base.
+
+\input{requisitos}
+\input{opcoes_tecnologicas}

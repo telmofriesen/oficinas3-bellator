@@ -94,7 +94,7 @@ As medidas das circunferências $C_1$ (eixo da roda), $C_2$ (eixo do encoder) e 
 
 \subsection{Deslocamento do centro de movimento do robô}
 
-Como já explicitado anteriormente, o centro de movimento do robô considerado é o ponto médio entre as duas rodas. As duas variáveis para determinar em cada instante de tempo são o deslocamento linear (distância absoluta percorrida) e o angular (variação do ângulo de orientação do robô). Considerando-se que em cada instante o robô descreve um movimento circular uniforme (MCU), o raio da trajerória deve ser determinado para que os cálculos de posicionamento do robô possam ser feitos. Este raio depende do deslocamento das rodas em cada instante, e é uma importante variável que será estudada na próxima subseção.
+Como já explicitado anteriormente, o centro de movimento do robô considerado é o ponto médio entre as duas rodas. As duas variáveis para determinar em cada instante de tempo são o deslocamento linear (distância absoluta percorrida) e o angular (variação do ângulo de orientação do robô). Considerando-se que em cada instante o robô descreve um movimento circular uniforme (MCU), o raio da trajetória deve ser determinado para que os cálculos de posicionamento do robô possam ser feitos. Este raio depende do deslocamento das rodas em cada instante, e é uma importante variável que será estudada na próxima subseção.
 
 Nos cálculos que serão explicitados a seguir, utiliza-se o índice E para a roda esquerda, C para o centro de movimento do robô e D para a roda direita.
 
@@ -141,7 +141,7 @@ Portanto:
   \label{eq:R}
 \end{empheq}
 
-Vê-se que o raio $R$ do movimento circular uniforme em cada instante depende do deslocamento de cada roda ($\Delta x_E$ e $\Delta x_D$) e da distãncia $h$ entre as rodas e o centro de movimento do robô.
+Vê-se que o raio $R$ do movimento circular uniforme em cada instante depende do deslocamento de cada roda ($\Delta x_E$ e $\Delta x_D$) e da distância $h$ entre as rodas e o centro de movimento do robô.
 
 
 \subsubsection{Deslocamento linear} 
@@ -188,7 +188,7 @@ Multiplicando-se o numerador e denominador do segundo termo por $\frac{\Delta x_
   \label{eq:desloc_linear}
 \end{empheq}
 
-Notas-se que o deslocamento linear do centro de movimento do robô ($\Delta x_C$) é uma média simples dos dois deslocamentos lineares das rodas. Vê-se que ele não depende do raio de deslocamento nem da distância entre as duas rodas.
+Nota-se que o deslocamento linear do centro de movimento do robô ($\Delta x_C$) é uma média simples dos dois deslocamentos lineares das rodas. Vê-se que ele não depende do raio de deslocamento nem da distância entre as duas rodas.
 
 
 \subsubsection{Deslocamento angular}
@@ -206,7 +206,7 @@ Onde $\Delta x_C$ é o deslocamento linear do robô (equação \ref{eq:desloc_li
 
 \subsubsection{Casos especiais}
 
-Há dois casos especiais que devem ser considerados no cálculo do deslocamento (a partir dos dados dos encoders) do centro de movimento do robo. O primeiro é quando as duas rodas têm deslocamento igual ($\Delta x_E = \Delta x_D$). O raio do movimento circular (equação \ref{eq:R}) neste caso é:
+Há dois casos especiais que devem ser considerados no cálculo do deslocamento (a partir dos dados dos encoders) do centro de movimento do robô. O primeiro é quando as duas rodas têm deslocamento igual ($\Delta x_E = \Delta x_D$). O raio do movimento circular (equação \ref{eq:R}) neste caso é:
 
 \begin{equation}
   R = h \cdot \frac{\Delta x_E + \Delta x_D} {\Delta x_E - \Delta x_D} = h \cdot \frac{2 \cdot \Delta x_E}{0} \rightarrow \infty
@@ -230,7 +230,7 @@ Já o deslocamento linear (equação \ref{eq:desloc_linear}) é:
 
 Isso corresponde à realidade, uma vez que quando as rodas têm deslocamentos iguais o robô está se deslocando sem fazer curvas. Não há deslocamento angular, portanto, e o deslocamento linear do centro de movimento é igual ao deslocamento de cada roda.
 
-O segundo caso especial ocorre quando os deslocamento têm módulos iguais, porêm sentidos contrários (ou seja, $\Delta x_E = - \Delta x_D$). O raio nesse caso é:
+O segundo caso especial ocorre quando os deslocamento têm módulos iguais, porém sentidos contrários (ou seja, $\Delta x_E = - \Delta x_D$). O raio nesse caso é:
 
 \begin{equation}
   R = h \cdot \frac{\Delta x_E + \Delta x_D} {\Delta x_E - \Delta x_D} = h \cdot \frac{\Delta x_E - \Delta x_E}{\Delta x_E + \Delta x_E} = 0
@@ -245,7 +245,7 @@ O deslocamento linear (equação \ref{eq:desloc_linear}) é:
   \label{eq:caso_especial2_x}
 \end{equation}
 
-Esse valor corresponde à realidade, pois quando as rodas se deslocam em sentidos contários, e na mesma quantidade, o centro de movimento do robô não se desloca linearmente, mas apenas muda seu ângulo.
+Esse valor corresponde à realidade, pois quando as rodas se deslocam em sentidos contrários, e na mesma quantidade, o centro de movimento do robô não se desloca linearmente, mas apenas muda seu ângulo.
 Usando-se a equação \ref{eq:desloc_angular}, tenta-se calcular o valor do deslocamento angular:
 
 \begin{equation}
@@ -273,7 +273,7 @@ Outro aspecto presente no decorrer do texto, que vale ser ressaltado para que ha
 %
 %Sendo que $\Delta x_{(n)}$ é o deslocamento do robô do intervalo $(n-1)$ até $n$.
 
-\subsubsection{Velocidade e aceleraçao}
+\subsubsection{Velocidade e aceleração}
 
 A velocidade e aceleração lineares do centro de movimento do robô podem ser calculadas por derivação numérica do deslocamento e velocidade em cada intervalo de tempo. Em cada intervalo discreto $n$:
 
@@ -475,7 +475,7 @@ O vetor $\overrightarrow{P_1}$ é o vetor que vai do centro de movimento do rob�
 \end{equation}
 
 
-O vetor $\overrightarrow{P_2}$ é o vetor que vai do sensor infra-vermelho até o obstáculo. Sendo $d$ a distãncia detectada pelo sensor, $\theta_{IR}$ o ângulo em que o sensor infra-vermelho está posicionado relativamente ao robô (este ângulo é especificado nas configurações iniciais, supondo que o robô não esteja rotacionado), e tendo $\theta_{(n)}$ o mesmo significado que na equação anterior:
+O vetor $\overrightarrow{P_2}$ é o vetor que vai do sensor infra-vermelho até o obstáculo. Sendo $d$ a distância detectada pelo sensor, $\theta_{IR}$ o ângulo em que o sensor infra-vermelho está posicionado relativamente ao robô (este ângulo é especificado nas configurações iniciais, supondo que o robô não esteja rotacionado), e tendo $\theta_{(n)}$ o mesmo significado que na equação anterior:
 
 \begin{equation}
   |\overrightarrow{P_2}| = d
@@ -570,7 +570,7 @@ O segundo teste foi realizado em um corredor de 2,25m de largura, no ambiente da
 
 Nos mapas das Figuras \ref{fig:teste2_mapa_encoders} e \ref{fig:teste2_mapa_encoders_giro}, não foi utilizado nenhum tipo de filtragem (além do passa-faixa de 30 a 150cm) para os sensores infra-vermelhos. O uso de média móvel de 3 períodos (Figura \ref{fig:teste2_mapa_encoders_giro_media3}) não resultou em diferenças muito consideráveis, e a de 8 períodos (Figura \ref{fig:teste2_mapa_encoders_giro_media8}) gerou resultados visivelmente piores.
 
-Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como no teste anterior, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste2_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se que os resultados obtidos com o acelerômetro saem bastante da realidade.
+Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como no teste anterior, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste2_mapa_acelerometro} expõe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se que os resultados obtidos com o acelerômetro saem bastante da realidade.
 
 \begin{figure}[H]
 	\centering
@@ -634,7 +634,7 @@ O terceiro teste foi realizado partindo-se de um corredor de 2,25m de largura (�
 
 Nos mapas das Figuras \ref{fig:teste3_mapa_encoders} e \ref{fig:teste3_mapa_encoders_giro}, não foi utilizado nenhum tipo de filtragem (além do passa-faixa de 30 a 150cm) para os sensores infra-vermelhos. O uso de média móvel de 5 períodos (Figura \ref{fig:teste3_mapa_encoders_giro_media5}), a melhor configuração encontrada, resultou em leves melhorias na qualidade do mapa.
 
-Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como nos testes anteriores, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste3_mapa_acelerometro} expôe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se novamente que os resultados obtidos com o acelerômetro fogem bastante da realidade.
+Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas medições de velocidade angular. Já o acelerômetro, assim como nos testes anteriores, não pôde ser utilizado para correção de erros (pelos mesmos motivos já apresentados). A Figura \ref{fig:teste3_mapa_acelerometro} expõe a trilha do robô gerada apenas com os dados do acelerômetro e do giroscópio. Percebe-se novamente que os resultados obtidos com o acelerômetro fogem bastante da realidade.
 
 \begin{figure}[H]
 	\centering
@@ -735,22 +735,22 @@ Percebe-se nesse teste, novamente, que o giroscópio foi confiável nas mediçõ
 	\label{fig:teste4_acel_grafico}
 \end{figure}
 
-\section{Considerações sobre os testes}
+\chapter{Conclusões}
 
 Pôde ser visto nos testes apresentados que os encoders sofreram falhas nas medidas, sobretudo na realização de curvas. Outro aspecto percebido também pela equipe é que erros de medição ocorrem frequentemente quando o robô inicia o movimento de uma roda parada, ou quando inverte o sentido de rotação abruptamente. Uma das possíveis causas dos erros podem ser os discos dos encoders, que estão visivelmente danificados em certos pontos. Eles deveriam gerar, nominalmente, 1800 pulsos por volta, mas geram na prática aproximadamente 1600 pulsos.
-Outra causa provável é que a correia utilizada para fazer o acoplamento do eixo da roda com o eixo do encoder é de borracha, e frequentemente está sujeita a escorregamentos. A equipe efetou tentativas de reduzir esse problema utilizando uma polia maior (e com mais aderência) no eixo dos encoders, e aumentando a aderência do eixo das rodas aplicando a ele uma fita de borracha. Porém, ainda sim os problemas persistiram. 
+Outra causa provável é que a correia utilizada para fazer o acoplamento do eixo da roda com o eixo do encoder é de borracha, e frequentemente está sujeita a escorregamentos. A equipe efetuou tentativas de reduzir esse problema utilizando uma polia maior (e com mais aderência) no eixo dos encoders, e aumentando a aderência do eixo das rodas aplicando a ele uma fita de borracha. Porém, ainda sim os problemas persistiram. 
 
-Uma alternativa viável seria utilizar outro disco para os encoders, com menos pulsos por volta e que sejam menos sucetíveis a falhas de leitura. Além disso, para acoplar o encoder às rodas, uma solução pode ser a utilização de uma correia dentada, que é menos sujeita a escorregamentos que uma correia de borracha. Outra opção seria acoplar os discos dos encoders diretamente ao eixo das rodas, dessa maneira eliminando o problema das correias.
+Uma alternativa viável seria utilizar outro disco para os encoders, com menos pulsos por volta e que sejam menos suscetíveis a falhas de leitura. Além disso, para acoplar o encoder às rodas, uma solução pode ser a utilização de uma correia dentada, que é menos sujeita a escorregamentos que uma correia de borracha. Outra opção seria acoplar os discos dos encoders diretamente ao eixo das rodas, dessa maneira eliminando o problema das correias.
 
-Um aspecto que foi bem-sucedido nos testes foi a utilização do giroscópio para a correção de erros dos encoders. Sobretudo o giroscópio foi de grande valia para determinar com maior exatidão a orientação do robô na realização de curvas. Um aspecto interessante que pode ser trabalhado em projetos futuros é a determinação do limiar $L_\omega$ para cada caso específico. Nos testes aqui apresentados, o valor foi determinado empiricamente em cada teste, mas seria interessante que houvesse um trabalho no desenvolvimento de um algoritmo para determinar dinamicamente o valor de $L_\omega$, adequando-o a cada caso. Possivelmente o filto de Kalman seja outra opção para corrigir os erros dinamicamente. Porém, conhecidamente, a complexidade de utilização dele na prática é considerável.
+Um aspecto que foi bem-sucedido nos testes foi a utilização do giroscópio para a correção de erros dos encoders. Sobretudo o giroscópio foi de grande valia para determinar com maior exatidão a orientação do robô na realização de curvas. Um aspecto interessante que pode ser trabalhado em projetos futuros é a determinação do limiar $L_\omega$ para cada caso específico. Nos testes aqui apresentados, o valor foi determinado empiricamente em cada teste, mas seria interessante que houvesse um trabalho no desenvolvimento de um algoritmo para determinar dinamicamente o valor de $L_\omega$, adequando-o a cada caso. Possivelmente o filtro de Kalman seja outra opção para corrigir os erros dinamicamente. Porém, conhecidamente, a complexidade de utilização dele na prática é considerável.
 
 Percebeu-se que o acelerômetro não foi eficaz para o fim de correção de erros de odometria, ao menos não da forma como os dados estão sendo atualmente obtidos e tratados. A obtenção de dados é feita a partir de amostras instantâneas a 3.89 Hz. No escopo do projeto (tendo em vista as limitações de tempo) não foi possível trabalhar mais à fundo com os dados do acelerômetro. Porém, deixa-se a possibilidade para trabalhos futuros. Como alternativa de tratamento desses dados, possivelmente possa ser utilizada uma taxa de amostragem maior para o acelerômetro, utilizando um processo de filtragem para reduzir os ruídos da aceleração.
 
-\chapter{Conclusões}
-
 Do ponto de vista dos objetivos, percebe-se que a maioria deles foram alcançados. Foi implementado com sucesso um \textit{software} com interface gráfica para geração e visualização de mapas, visualização de imagens da \textit{webcam} do robô e controle do robô por meio do teclado. A comunicação foi implementada satisfatoriamente, tanto entre a estação base e a placa TS-7260 (via Wi-Fi) quanto entre a TS e a placa de baixo nível, via porta serial. Uma \textit{webcam} USB foi instalada e configurada com sucesso no robô para a transmissão de imagens ao usuário. O giroscópio foi utilizado satisfatoriamente na prática para corrigir erros de leituras dos encoders e escorregamento das rodas. Uma placa de circuito impresso, de tamanho reduzido, foi desenvolvida de forma a integrar as funções de baixo nível do robô: interface com os encoders, sensores infra-vermelhos, acelerômetro e giroscópio, e geração de PWM para os motores.
 
-Como última consideração, enfatiza-se que este projeto não chegou ao seu fim, mas pelo contrário, um novo caminho foi aberto para pesquisas mais aprofundadas no que tange o mapeamento 2D de ambientes. A possibilidade está aberta a novas equipes para utilizarem a plataforma de mapeamento desenvolvida para o Bellator -- o que envolve tanto o \textit{hardware} quanto o \textit{software}. Apesar deste trabalho ter sido consideravelmente extenso e demandar muito tempo e energia de todos os membros da equipe, pode-se dizer que com ele o ponta-pé inicial foi dado, e que ainda existem muitas possibilidades a serem pensadas e realizadas para o futuro.
+Quanto aos riscos, observou-se que três deles ocorreram. O primeiro foi a ``Não entrega de componentes ou entrega fora do prazo''. Uma unidade MPU-6050 (acelerômetro e giroscópio) encomendada no site eBay não foi entregue da maneira especificada e foi devolvida. Como a encomenda desse item havia sido adiantada, realizou-se uma nova encomenda no site Sparksfun, que chegou no prazo estabelecido não causando atraso no projeto. O segundo risco foi ``Taxação dos componentes comprados no exterior'', que gerou um aumento no preço dos componentes, mas não de forma que ultrapassasse o orçamento especificado. O terceiro e último risco foi ``Problemas Técnicos com o Hardware''. Como relatado, a imprecisão da leitura dos encoders ópticos interferiu na correta determinação da posição do robô. Como solução, buscou-se aumentar a aderência das rodas e correias do robô a fim de diminuir os escorregamentos e falsas leituras, além de utilizar o giroscópio para correção do posicionamento.
+
+Como última consideração, enfatiza-se que este projeto não chegou ao seu fim, mas pelo contrário, um novo caminho foi aberto para pesquisas mais aprofundadas no que tange ao mapeamento 2D de ambientes. A possibilidade está aberta a novas equipes para utilizarem a plataforma de mapeamento desenvolvida para o Bellator -- o que envolve tanto o \textit{hardware} quanto o \textit{software}. Apesar deste trabalho ter sido consideravelmente extenso e demandar muito tempo e energia de todos os membros da equipe, pode-se dizer que com ele o ponta-pé inicial foi dado, e que ainda existem muitas possibilidades a serem exploradas.
 
 
 %Em termos matemáticos:

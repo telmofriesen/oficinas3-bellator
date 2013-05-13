@@ -7,7 +7,7 @@
 	\begin{itemize}
 		
 	  \item \textbf{SYNC (0xA0)}\\
-	  Quando o microcontrolador LPC2103 recebe esta mensagem, responde com as leituras mais recentes dos encoders, de cada sensor de distância, do acelerômetro e do giroscópio (enviando a mensagem SENSORS, explicada abaixo).
+	  Quando o microcontrolador LPC2103 recebe esta mensagem, responde com as leituras mais recentes dos encoders, de cada sensor de distância, do acelerômetro e do giroscópio (enviando uma mensagem SENSORS, explicada abaixo).
 	  
 	  \item \textbf{ENGINES (0xB0)}\\
 	  \textit{(byte) vel\_roda\_esquerda}\\
@@ -30,7 +30,7 @@
 	  \textit{(byte) CHECKSUM\_L}\\
 	  Esta mensagem deve ser enviada toda vez que um comando de mudança de velocidade (ENGINES) for recebido na placa de baixo nível. A mensagem é usada no Linux embarcado para verificar se o comando foi corretamente recebido. Caso uma confirmação não seja recebida em certo intervalo de tempo, outro comando ENGINES é enviado para a placa de baixo nível.
 	 
-	  O checksum é tem função idêntica ao que já foi explicitado na mensagem ENGINES.
+	  O checksum tem função idêntica ao que já foi explicitado na mensagem ENGINES.
 	  
 	  \item \textbf{SENSORS (0xC0)}\\
 	  \textit{(byte) encoder\_esq\_H}, \textit{(byte) encoder\_esq\_L},\\
@@ -47,9 +47,9 @@
 	  \textit{(byte) CHECKSUM\_L}\\
 	  Representa a leitura de todos os sensores (encoders, infra-vermelhos, acelerômetro e giroscópio). 
 	  
-	  Os 4 primeiros bytes são os valores das leituras dos encoders esquerdo e direíto (cada um com um byte alto e um baixo). Os valores das leituras dos encoders representam a diferença entre a contagem atual a contagem anterior.
+	  Os 4 primeiros bytes são os valores das leituras dos encoders esquerdo e direito (cada um com um byte alto e um baixo). Os valores das leituras dos encoders representam a diferença entre a contagem atual a contagem anterior.
 	  
-	  Nos próximos 5 bytes, as leituras do sensores ópticos são enviadas em sequência. As distâncias que os sensores ópticos são capazes de mensurar são dividos em valores discretos de 0 a 255 \cite{bellator_2012}. 
+	  Nos próximos 5 bytes, as leituras do sensores ópticos são enviadas em sequência. As distâncias que os sensores ópticos são capazes de mensurar são divididos em valores discretos de 0 a 255 \cite{bellator_2012}. 
 	  
 	  Após isso, os 12 bytes que se seguem representam as leituras do acelerômetro e do giroscópio. Os bytes que começam com `A' representam a leitura de cada um dos eixos do acelerômetro. Aqueles que começam com `G' representam a leitura de cada um dos eixos do giroscópio.
 	  
@@ -60,7 +60,7 @@
 	  
 	\end{itemize}
 
-  \item Mensagens bidirecionais entre estação base e TS-7260 (via Wi-Fi):
+  \item Mensagens bidirecionais entre estação base e TS-7260 (via WI-Fi):
 
     \begin{itemize}
       \item \textbf{ECHO\_REQUEST (0x01)}\\
