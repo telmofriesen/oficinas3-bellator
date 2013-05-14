@@ -1,0 +1,11 @@
+Limiar acel encoders (m/s^2):
+10.0
+0.6757 -> mínimo para "zoar o mapa"
+
+Limiar dif giro encoders (rad/s):
+0.05
+
+
+
+Amostragem: 
+3.890945035 Hz -> 257 ms período

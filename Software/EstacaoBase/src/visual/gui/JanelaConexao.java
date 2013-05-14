@@ -54,7 +54,7 @@ public class JanelaConexao extends javax.swing.JFrame {
         setTitle("Bellator - Conexão");
 
         ipComboBox.setEditable(true);
-        ipComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "127.0.0.1" }));
+        ipComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "10.1.1.2", "127.0.0.1" }));
 
         portaComboBox.setEditable(true);
         portaComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "12312" }));
@@ -80,7 +80,6 @@ public class JanelaConexao extends javax.swing.JFrame {
         connectionLogTextArea.setEditable(false);
         connectionLogTextArea.setColumns(20);
         connectionLogTextArea.setRows(5);
-        connectionLogTextArea.setAutoscrolls(true);
         connectionLogScrollPane.setViewportView(connectionLogTextArea);
 
         statusLabel.setText("Status");

@@ -248,5 +248,7 @@ public class Robo {
         largura = 0;
         comprimento = 0;
         centroMovimento = null;
+        velocidadeAtual = 0;
+        velocidadeAngularAtual = 0;
     }
 }

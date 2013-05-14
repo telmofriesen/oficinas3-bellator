@@ -9,6 +9,7 @@ import processing.core.PVector;
 
 /**
  * Ponto cartesiano XY
+ *
  * @author stefan
  */
 public class Ponto {
@@ -31,10 +32,10 @@ public class Ponto {
 //    public float getXTranslated(float translation){
 //        return (float)X + translation;        
 //    }    
-    
-    public Ponto copy(){
+    public Ponto copy() {
         return new Ponto(x, y);
     }
+
     public int x() {
         return x;
     }
@@ -66,5 +67,14 @@ public class Ponto {
 
     public PVector getPVector() {
         return new PVector(x, y);
+    }
+
+    /**
+     * Retorna a distância euclideana entre este ponto e p2
+     * @param p2
+     * @return 
+     */
+    public float distEuclideana(Ponto p2) {
+        return PApplet.sqrt(PApplet.sq(x - p2.x) + PApplet.sq(y - p2.y));
     }
 }

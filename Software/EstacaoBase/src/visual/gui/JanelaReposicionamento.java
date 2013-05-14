@@ -78,6 +78,11 @@ public class JanelaReposicionamento extends javax.swing.JFrame {
                 xCoordinateTextFieldMouseClicked(evt);
             }
         });
+        xCoordinateTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xCoordinateTextFieldActionPerformed(evt);
+            }
+        });
         xCoordinateTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 xCoordinateTextFieldFocusGained(evt);
@@ -271,6 +276,10 @@ public class JanelaReposicionamento extends javax.swing.JFrame {
             }
         });
     }//GEN-LAST:event_angleTextFieldFocusGained
+
+    private void xCoordinateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCoordinateTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_xCoordinateTextFieldActionPerformed
 
     /**
      * @param args the command line arguments

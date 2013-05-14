@@ -71,7 +71,9 @@ public class AmostraSensores {
      * @return
      */
     public int transformedEncoderEsq() {
-        return Math.round(((float) (C2 * C3) / (float) (1800*C1)) * encoder_esq);
+//        return Math.round(((float) (C2 * C3) / (float) (1708*C1)) * encoder_esq);
+        return Math.round(((float) (C2 * C3) / (float) (1593*C1)) * encoder_esq * 2.50f);
+//        return Math.round(((float) (C2 * C3) / (float) (1800*C1)) * encoder_esq);
 //        return encoder_esq;
     }
 
@@ -81,12 +83,14 @@ public class AmostraSensores {
      * @return
      */
     public int transformedEncoderDir() {
-        return Math.round(((float) (C2 * C3) / (float) (1800*C1)) * encoder_dir);
+//        return Math.round(((float) (C2 * C3) / (float) (1627*C1)) * encoder_dir);
+        return Math.round(((float) (C2 * C3) / (float) (1580*C1)) * encoder_dir * 2.50f);
+//        return Math.round(((float) (C2 * C3) / (float) (1800*C1)) * encoder_dir);
 //        return encoder_dir;
     }
 
     /**
-     * Retorna a aceleração X em m/s^2
+     * Retorna a aceleração no eixo X em m/s^2
      *
      * @return
      */
@@ -131,7 +135,7 @@ public class AmostraSensores {
     }
 
     /**
-     * Retorna a aceleração angular Z em rad/s^2
+     * Retorna a aceleração angular no eixo Z em rad/s^2
      *
      * @return
      */
@@ -139,6 +143,10 @@ public class AmostraSensores {
         return (float) ((double) GZ * Math.PI / ((double) 131 * 180));
     }
 
+    /**
+     * Retorna um vetor de distâncias detectadas pelos sensores IR, em milímetros.
+     * @return 
+     */
     public int[] transformedIR() {
         int[] transformedIR = new int[IR.length];
         for (int i = 0; i < IR.length; i++) {

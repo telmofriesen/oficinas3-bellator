@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,13 +23,15 @@ import robo.gerenciamento.SensorsManager;
  *
  * @author Raphael Blatter (raphael@blatter.sg)
  */
-public class SerialCommunicator implements SerialNetwork_iface {
+public class SerialCommunicator extends Thread implements SerialNetwork_iface {
 
     // set the speed of the serial port
     public static int speed = 115200;
     private static SerialNetwork network;
     private static boolean resend_active = false;
     private Main main;
+    private ArrayList<SerialMessage> serialMessages = new ArrayList<SerialMessage>();
+    private boolean run = true;
 
     public SerialCommunicator(Main server) {
         this.main = server;
@@ -85,6 +88,8 @@ public class SerialCommunicator implements SerialNetwork_iface {
             System.exit(1);
         }
 
+        start();
+
         // asking whether user wants to mirror traffic
 //		System.out
 //				.println("do you want this tool to send back all the received messages?");
@@ -139,6 +144,65 @@ public class SerialCommunicator implements SerialNetwork_iface {
 //		}
     }
 
+    @Override
+    public void run() {
+        SerialMessage message;
+        int num_elementos = 0;
+        synchronized (this) {
+            run = true;
+        }
+        while (run) {
+            synchronized (this) {
+                num_elementos = serialMessages.size();
+            }
+            //Enquanto o vetor tiver elementos....
+            while (num_elementos > 0) {
+                synchronized (this) {
+                    message = serialMessages.get(0);
+                    //Interpreta a mensagem da posicao 0...
+
+                    //Imprime mensagem de debug
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < message.numBytes; i++) {
+                        sb.append(String.format("%X ", message.buffer[i]));
+                    }
+                    String str = sb.toString();
+                    System.out.printf("[SERIAL] received (%d): %s\n", message.numBytes, str);
+                    //--------------------------
+
+                    //Calcula o checksum
+                    int sum = 0;
+                    for (int i = 0; i < message.numBytes - 2; i++) {
+                        sum = (sum + ((short) (message.buffer[i]) & 0x00FF)) % 65536;
+                    }
+//        short sum_short = (short) sum;
+
+                    int checksum = (int) SensorsManager.bytesToShort(message.buffer[message.numBytes - 2], message.buffer[message.numBytes - 1]) & 0x0000FFFF;
+                    if (checksum != sum) {
+                        System.out.printf("[SERIAL] erro de checksum. sum=%d, checksum=%d, mensagem:%s \n", sum, checksum, str);
+                    } else {
+                        if (message.buffer[0] == ClientMessageProcessor.SENSORS) {
+                            System.out.println("[SERIAL] Sensors\n");
+                            main.getSensorsSampler().novaLeituraSensores(message.buffer);
+                        }
+                    }
+                    //Faz a fila andar....
+                    serialMessages.remove(0);
+                    num_elementos = serialMessages.size();
+                }
+            }
+            synchronized (this) {
+                while (serialMessages.isEmpty() && run) { //Enquanto a fila estiver vazia, espera até que hajam elementos.
+                    try {
+                        this.wait();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ServerMessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Implementing {@link net.Network_iface#networkDisconnected(int)}, which is
      * called when the connection has been closed. In this example, the program
@@ -151,12 +215,10 @@ public class SerialCommunicator implements SerialNetwork_iface {
     }
 
     /**
-     * Envia uma mensagem via serial até a placa de baixo nível
+     * Envia uma mensagem via serial para a placa de baixo nível
      *
      * @param message
      */
-    //TODO:
-    //- Usar bytes ao invés de inteiros
     public void sendMessage(byte[] message) {
         System.out.print("[SERIAL] enviando mensagem: ");
         for (int i = 0; i < message.length; i++) {
@@ -166,59 +228,18 @@ public class SerialCommunicator implements SerialNetwork_iface {
     }
 
     /**
-     * Interpreta mensagens recebidas da porta serial (mensagens vindas da placa de baixo nível)
+     * Adiciona em uma fila as mensagens recebidas da porta serial (mensagens vindas da placa de baixo nível)
      *
      *
-     * Implementing {@link net.Network_iface#parseInput(int, int, int[])} to
+     * Implementing {@link net.Network_iface#parseInput(int, SerialMessage)} to
      * handle messages received over the serial port.
      *
-     * Interpreta e executa os comandos recebidos da porta serial.
      *
      * @see net.Network_iface
      */
-    //TODO:
-    //- Usar bytes ao invés de inteiros
-    //- Implementar a interpretação de mensagens das leituras dos sensores: recebe leituras e manda elas para a estação base
-    public void parseInput(int id, int numBytes, byte[] message) {
-//        try {
-        //Imprime mensagem de debug
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < numBytes; i++) {
-            sb.append(String.format("%X ", message[i]));
-        }
-        String str = sb.toString();
-        System.out.printf("[SERIAL] received (%d): %s\n", numBytes, str);
-
-//        int sum = 0;
-//        //Calcula o checksum
-//        for (int i = 0; i < numBytes - 2; i++) {
-//            sum += message[i];
-//        }
-        int sum = 0;
-        for (int i = 0; i < numBytes - 2; i++) {
-            sum = (sum + ((short)(message[i]) & 0x00FF)) % 65536;
-        }
-//        short sum_short = (short) sum;
-
-        int checksum = (int) SensorsManager.bytesToShort(message[numBytes - 2], message[numBytes - 1]) & 0x0000FFFF;
-        if (checksum != sum) {
-            System.out.printf("[SERIAL] erro de checksum. sum=%d, checksum=%d, mensagem:%s \n", sum, checksum, str);
-        }
-
-        if (message[0] == ClientMessageProcessor.SENSORS) {
-            System.out.println("[SERIAL] Sensors");
-            main.getSensorsSampler().novaLeituraSensores(message);
-        }
-        //        }
-        //        String str = String.valueOf(message);
-//            String str = new String(message, "ISO-8859-1"); //Converte o array de bytes para string, usando a codificação ISO-8859-1 para preservar cada bit.
-//            if (main.getListener().getNumServerConnections() >= 1) {
-//                ServerConnection con = main.getListener().getServerConnection(0);
-//                con.sendMessage(str, false);
-//            }
-//        } catch (UnsupportedEncodingException ex) {
-//            Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+    public synchronized void parseInput(int id, SerialMessage message) {
+        serialMessages.add(message);
+        this.notifyAll();
     }
 
     /**

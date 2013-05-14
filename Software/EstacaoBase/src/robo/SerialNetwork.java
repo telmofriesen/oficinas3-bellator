@@ -99,7 +99,7 @@ public class SerialNetwork {
 //        if (this.divider < 0)
 //            this.divider = 0;
         this.id = id;
-        tempBytes = new byte[1024];
+        tempBytes = new byte[50];
     }
 
     /**
@@ -235,10 +235,10 @@ public class SerialNetwork {
     private class SerialReader implements Runnable {
 
         InputStream in;
-        //Comandos que podem ser recebidos
+        //Comandos que podem ser recebidos (SENSORS e ENGINES_ACK)
         private byte[] comandos = {(byte) 0xC0, (byte) 0XB1};
-        //Tamanho de cada comando (contando com o opcode)
-        private int[] comandos_tamanho = {26, 5};
+        //Tamanho de cada comando (SENSORS e ENGINES_ACK), contando com o primeiro byte que identifica o comando + checksum de 2 bytes.
+        private int[] comandos_tamanho = {18, 5};
         private int indice_comando_atual = -1;
 
         public SerialReader(InputStream in) {
@@ -247,7 +247,7 @@ public class SerialNetwork {
 //        private boolean sensors = false;
 
         public void run() {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[50];
             byte byte_atual;
             int len = -1, i;
             try {
@@ -276,9 +276,9 @@ public class SerialNetwork {
                                 }
 
                                 //Se já foram lidos todos os bytes do comando...
-                                if (numTempBytes == comandos_tamanho[indice_comando_atual]) {
+                                if (indice_comando_atual > -1 && numTempBytes == comandos_tamanho[indice_comando_atual]) {
                                     //Interpreta o comando
-                                    contact.parseInput(id, numTempBytes, tempBytes);
+                                    contact.parseInput(id, new SerialMessage(tempBytes, numTempBytes));
                                     //Reseta o buffer
                                     numTempBytes = 0;
                                     //Reseta o índice do comando atual
@@ -325,6 +325,7 @@ public class SerialNetwork {
                 contact.writeLog(id, "connection has been interrupted");
             } catch (ArrayIndexOutOfBoundsException ex) {
                 System.out.printf("Array out of bounds. %s\n", ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }

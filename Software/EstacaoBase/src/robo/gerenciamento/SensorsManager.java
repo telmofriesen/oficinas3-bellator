@@ -16,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import robo.Main;
+import robo.SerialMessage;
 
 /**
  *
@@ -29,8 +30,8 @@ public class SensorsManager extends Thread {
     private AmostraSensores currentSample;
     //Taxa de envios de syncs
     private float syncRate; //syncs/s
-    //Período de amostragem na placa de baixo nivel
-    private int lowLevelSamplePeriod = 1000;//Período de amostragem em milissegundos
+    //Período de amostragem da placa de baixo nível, em milissegundos
+    private int lowLevelSamplePeriod = 257;
     //Indica se o loop principal deve ser executado ou não.
     private boolean run = false;
     //Timestamp UNIX em milissegundos da última leitura.
@@ -82,13 +83,15 @@ public class SensorsManager extends Thread {
                 main.getSerialCommunicator().sendMessage(new byte[]{ClientMessageProcessor.SYNC});
                 System.out.println("[SensorsManager]: Comando SYNC enviado.");
             } else {
-                System.out.println("[SensorsManager]: Comando SYNC não enviado!");
+                System.out.println("[SensorsManager]: Comando SYNC não enviado! (main.getSerialCommunicator() == null)");
             }
-            //TESTES para simulação (comentar essa seção se for usar com o robô)
-//                        AmostraSensores a = gerarExemplo();
+            //TESTES para simulação (comentar essa seção se for usar o programa na prática com o robô)
+            //--------
+////                        AmostraSensores a = gerarExemplo();
 //            byte[] amostra = gerarExemploEmBytes();
+//            main.getSerialCommunicator().parseInput(1, new SerialMessage(amostra, amostra.length));
 //            novaLeituraSensores(amostra);
-            //----
+            //--------
 
 //                String str = new String(amostra, "ISO-8859-1");
 //                main.sendMessageToMainHost(str, false);
@@ -103,7 +106,7 @@ public class SensorsManager extends Thread {
         return bb.getShort(0);
     }
 
-    public void novaLeituraSensores(byte[] sensors) {
+    public synchronized void novaLeituraSensores(byte[] sensors) {
         try {
             if (sensors[0] != ClientMessageProcessor.SENSORS) {
                 return;
@@ -125,7 +128,7 @@ public class SensorsManager extends Thread {
 //        int GX = (int) bytesToShort(sensors[16], sensors[17]) & 0x0000ffff;
 //        int GY = (int) bytesToShort(sensors[18], sensors[19]) & 0x0000ffff;
 //        int GZ = (int) bytesToShort(sensors[20], sensors[21]) & 0x0000ffff;
-            int sequenceTimestamp = (int) bytesToShort(sensors[22], sensors[23]) & 0x0000ffff;
+            int sequenceTimestamp = (int) bytesToShort(sensors[14], sensors[15]) & 0x0000ffff;
 
             //
             // Calcular a UNIX timestamp a partir da Sequence timestamp
@@ -151,18 +154,25 @@ public class SensorsManager extends Thread {
             sb.append(new AmostraSensores((int) bytesToShort(sensors[1], sensors[2]),
                                           (int) bytesToShort(sensors[3], sensors[4]),
                                           new int[]{
-                        (int) bytesToShort((byte) 0, sensors[5]),
-                        (int) bytesToShort((byte) 0, sensors[6]),
-                        (int) bytesToShort((byte) 0, sensors[7]),
-                        (int) bytesToShort((byte) 0, sensors[8]),
-                        (int) bytesToShort((byte) 0, sensors[9])},
-                                          (int) bytesToShort(sensors[10], sensors[11]), //& 0x0000ffff,
-                                          (int) bytesToShort(sensors[12], sensors[13]), //& 0x0000ffff,
-                                          (int) bytesToShort(sensors[14], sensors[15]), //& 0x0000ffff,
-                                          (int) bytesToShort(sensors[16], sensors[17]), //& 0x0000ffff,
-                                          (int) bytesToShort(sensors[18], sensors[19]), //& 0x0000ffff,
-                                          (int) bytesToShort(sensors[20], sensors[21]), //& 0x0000ffff,
-                                          unixTimestamp).toString());
+                        (int) bytesToShort((byte) 0, sensors[5]), //IR1
+                        (int) bytesToShort((byte) 0, sensors[6]), //IR2
+                        (int) bytesToShort((byte) 0, sensors[7]), //IR3
+                        (int) bytesToShort((byte) 0, sensors[8]), //IR4
+                        (int) bytesToShort((byte) 0, sensors[9])},//IR5
+//                                          (int) bytesToShort(sensors[10], sensors[11]), //& 0x0000ffff,
+//                                          (int) bytesToShort(sensors[12], sensors[13]), //& 0x0000ffff,
+//                                          (int) bytesToShort(sensors[14], sensors[15]), //& 0x0000ffff,
+//                                          (int) bytesToShort(sensors[16], sensors[17]), //& 0x0000ffff,
+//                                          (int) bytesToShort(sensors[18], sensors[19]), //& 0x0000ffff,
+//                                          (int) bytesToShort(sensors[20], sensors[21]), //& 0x0000ffff,
+                                          0, //& 0x0000ffff, //Ax
+                                          (int) bytesToShort(sensors[10], sensors[11]), //& 0x0000ffff, //Ay
+                                          0, //& 0x0000ffff, //Az
+                                          0, //& 0x0000ffff, //Gx
+                                          0, //& 0x0000ffff, //Gy
+                                          (int) bytesToShort(sensors[12], sensors[13]), //& 0x0000ffff, //Gz
+                                          unixTimestamp)
+                    .toString());
             main.sendMessageToMainHost(sb.toString(), false);
         } catch (NullPointerException ex) {
             System.out.printf("[SensorsManager] Erro: %s\n", ex.getMessage());
@@ -212,7 +222,7 @@ public class SensorsManager extends Thread {
             Logger.getLogger(SensorsManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private int example_counter = 0;
+    private int counter1 = 0;
 
     /**
      * Gera leituras para teste.
@@ -221,21 +231,17 @@ public class SensorsManager extends Thread {
      */
     public byte[] gerarExemploEmBytes() {
 //        long time = System.currentTimeMillis();
-        ByteBuffer buf = ByteBuffer.allocate(24);
-        byte[] bytes = ByteBuffer.allocate(4).putInt(example_counter).array();
+        ByteBuffer buf = ByteBuffer.allocate(18);
+        byte[] bytes = ByteBuffer.allocate(4).putInt(counter1).array();
         buf.put(new byte[]{ClientMessageProcessor.SENSORS,
                            0, 20,
                            0, 15,
                            (byte) 50, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
-                           0, 0,
                            0, 10,
-                           0, 0,
-                           0, 0,
-                           0, 0,
                            0, 0,
                            bytes[2], bytes[3]});
 
-        example_counter = (example_counter + 1) % 65536;
+        counter1 = (counter1 + 1) % 65536;
 //        buf.putLong(System.currentTimeMillis());
         byte[] array = buf.array();
         return array;
@@ -297,6 +303,7 @@ public class SensorsManager extends Thread {
             sampling_enabled = true;
             this.notifyAll();
         }
+        main.getSerialCommunicator().sendMessage(new byte[]{(byte) 0xA1}); //Envia comando CLEAR_BUFF
         fireChangeEvent();
     }
 

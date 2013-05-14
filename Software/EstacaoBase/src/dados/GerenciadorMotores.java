@@ -101,13 +101,13 @@ public class GerenciadorMotores implements MyChangeListener {
             case GerenciadorMotores.BACKWARD:
                 return new EnginesSpeed(-1, -1);
             case GerenciadorMotores.BACKWARD_LEFT:
-                return new EnginesSpeed(-0.5f, -1);
+                return new EnginesSpeed(-0.7f, -1);
             case GerenciadorMotores.BACKWARD_RIGHT:
-                return new EnginesSpeed(-1, -0.5f);
+                return new EnginesSpeed(-1, -0.7f);
             case GerenciadorMotores.ROTATE_LEFT:
-                return new EnginesSpeed(-1, 1);
+                return new EnginesSpeed(-0.7f, 0.7f);
             case GerenciadorMotores.ROTATE_RIGHT:
-                return new EnginesSpeed(1, -1);
+                return new EnginesSpeed(0.7f, -0.7f);
             default:
                 return new EnginesSpeed(0, 0);
         }

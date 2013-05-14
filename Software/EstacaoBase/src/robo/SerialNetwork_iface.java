@@ -54,7 +54,7 @@ public interface SerialNetwork_iface {
 	 *            {@link net.Network#divider} is sent (without
 	 *            {@link net.Network#divider}s).
 	 */
-	public void parseInput(int id, int numBytes, byte[] message);
+	public void parseInput(int id, SerialMessage message);
 
 	/**
 	 * Is called when the network has been disconnected. This call can e.g. be

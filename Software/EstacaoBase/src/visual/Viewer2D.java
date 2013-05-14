@@ -325,9 +325,10 @@ public class Viewer2D extends PApplet {
      * @param step Quantidade a ser adicionada à escala
      */
     public synchronized void zoom_view(float step) {
-        if (step > 0 || escala > 0.02f) {
-            origemRealNaInterface.setMag(origemRealNaInterface.mag() * ((float) 1 + step / escala));
-            setEscala(escala + step);
+        if (step > 0 || escala > 0.0001f) {
+            float step_new = escala + step > 0.0001f ? step : 0.0001f - escala;
+            origemRealNaInterface.setMag(origemRealNaInterface.mag() * ((float) 1 + step_new / escala));
+            setEscala(escala + step_new);
         }
     }
 
@@ -429,10 +430,10 @@ public class Viewer2D extends PApplet {
     public void mouseWheel(int delta) {
         if (delta < 0) {
             if (controlPressed) rotate_view(angulo_step);
-            else zoom_view(escala_step);
+            else zoom_view(escala / 4);
         } else {
             if (controlPressed) rotate_view(-angulo_step);
-            else zoom_view(-escala_step);
+            else zoom_view(-escala / 4);
 
         }
     }

@@ -1,6 +1,5 @@
 //TODO:
 //Usar leituras do acelerômetro e giroscópio
-
 package robo;
 
 import robo.ServerListener;
@@ -283,6 +282,10 @@ public class Main extends Thread {
 
     public static void main(String args[]) {
         boolean enable_serial = true;
+        if (!enable_serial) {
+            System.out.printf("PORTA SERIAL NÂO HABILITADA! (Main.java:%d)\n", new Exception().getStackTrace()[0].getLineNumber());
+            
+        }
 //        if (args[0].equals("serial")) {
 //            enable_serial = true;
 //        }

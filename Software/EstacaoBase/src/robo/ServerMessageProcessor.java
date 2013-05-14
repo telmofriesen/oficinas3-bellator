@@ -36,6 +36,7 @@ public class ServerMessageProcessor extends Thread {
     public void run() {
         String command;
         int num_elementos = 0;
+        run = true;
         while (run) {
             synchronized (this) {
                 num_elementos = commandsList.size();

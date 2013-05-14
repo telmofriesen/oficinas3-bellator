@@ -98,6 +98,13 @@ public class Kalman {
         this.x_ = x_;
     }
 
+    public void reset() {
+        k = 0;
+        x = 0;
+
+        P = 1;
+    }
+
     /**
      * Teste do filtro
      *

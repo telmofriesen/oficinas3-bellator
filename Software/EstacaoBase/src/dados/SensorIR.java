@@ -71,9 +71,9 @@ public class SensorIR {
 
     /**
      * Retorna a distancia em milimetros a partir do valor lido da conversão A/D.
-     * Ver: monografia do Bellator de 2012 na página 42.
+     * Ver: monografia do Bellator (MARIN, et. al) de 2012 na página 42.
      * @param x Valor da conversão A/D
-     * @return Distância em milímetros.
+     * @return Distância em milímetros detectada pelo sensor IR.
      */
     public static int getDistFromByte(int x) {
         return (int) Math.round(10 * (3.6404e-7 * Math.pow(x, 4) - 2.4435e-4 * Math.pow(x, 3) + 6.0732e-2 * Math.pow(x, 2) - 6.8962 * x + 339.361));

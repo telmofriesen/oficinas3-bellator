@@ -11,14 +11,20 @@ import dados.NumIRException;
 import dados.TimestampException;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import visual.Ponto;
 
 /**
  *
@@ -30,6 +36,8 @@ public class JanelaAvancado extends javax.swing.JFrame {
     private final ClientMessageProcessor clientMessageProcessor;
     private final GerenciadorSensores gerenciadorSensores;
     private final CustomFileChooser fc;
+    private File lastSelectedFile;
+    private final Object lock;
 
     public JanelaAvancado(JanelaPrincipal janelaPrincipal, ClientMessageProcessor clientMessageProcessor, GerenciadorSensores gerenciadorSensores) {
         this.janelaPrincipal = janelaPrincipal;
@@ -37,7 +45,40 @@ public class JanelaAvancado extends javax.swing.JFrame {
         this.gerenciadorSensores = gerenciadorSensores;
         fc = new CustomFileChooser(new File("./testes").getAbsolutePath(), "csv");
         initComponents();
+        kalmanFatorR_TextField.setValue(new Float(gerenciadorSensores.getKalman_R()));
+        periodosTextField.setValue(new Integer(gerenciadorSensores.getNum_periodos_media_IR()));
+        kalmanMediaLimiarTextField.setValue(new Integer(gerenciadorSensores.getLimite_diferenca_kalman_media()));
+        acelEncodersLimiarTextfield.setValue(new Float(gerenciadorSensores.getLimite_diferenca_acel_encoders_acelerometro()));
+        giroEncodersLimiarTextfield.setValue(new Float(gerenciadorSensores.getLimite_diferenca_vel_angular_encoders_giro()));
+        kalmanCheckbox.setSelected(gerenciadorSensores.isKalman_IR_enabled());
 
+        kalmanCheckbox.setVisible(false);
+        jLabel3.setVisible(false);
+        kalmanFatorR_TextField.setVisible(false);
+        kalmanMediaLimiarTextField.setVisible(false);
+        jLabel5.setVisible(false);
+
+        mediaCheckbox.setSelected(gerenciadorSensores.isMedia_IR_enabled());
+        lock = new Object();
+
+//        kalmanFatorR_TextField.getDocument().addDocumentListener(new DocumentListener(){
+//
+//            @Override
+//            public void insertUpdate(DocumentEvent e) {
+//                throw new UnsupportedOperationException("Not supported yet.");
+//            }
+//
+//            @Override
+//            public void removeUpdate(DocumentEvent e) {
+//                throw new UnsupportedOperationException("Not supported yet.");
+//            }
+//
+//            @Override
+//            public void changedUpdate(DocumentEvent e) {
+//                throw new UnsupportedOperationException("Not supported yet.");
+//            }
+//            
+//        });
     }
 
     /**
@@ -57,8 +98,29 @@ public class JanelaAvancado extends javax.swing.JFrame {
         fileLoadButton = new javax.swing.JButton();
         robo_auxCheckbox = new javax.swing.JCheckBox();
         kalmanCheckbox = new javax.swing.JCheckBox();
+        mediaCheckbox = new javax.swing.JCheckBox();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        kalmanFatorR_TextField = new javax.swing.JFormattedTextField();
+        periodosTextField = new javax.swing.JFormattedTextField();
+        kalmanMediaLimiarTextField = new javax.swing.JFormattedTextField();
+        reloadButton = new javax.swing.JButton();
+        loadAnimationButton = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        acelEncodersLimiarTextfield = new javax.swing.JFormattedTextField();
+        jLabel10 = new javax.swing.JLabel();
+        giroEncodersLimiarTextfield = new javax.swing.JFormattedTextField();
+        loadGenerateGraphButton = new javax.swing.JButton();
 
-        recordCheckBox.setText("Gravar leituras dos sensores em arquivo");
+        setTitle("AVANÇADO");
+
+        recordCheckBox.setText("Gravar amostras dos sensores em arquivo");
         recordCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 recordCheckBoxActionPerformed(evt);
@@ -85,11 +147,95 @@ public class JanelaAvancado extends javax.swing.JFrame {
             }
         });
 
-        kalmanCheckbox.setSelected(true);
         kalmanCheckbox.setText("Usar filtro de Kalman para sensores IR");
         kalmanCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 kalmanCheckboxActionPerformed(evt);
+            }
+        });
+
+        mediaCheckbox.setText("Usar média móvel");
+        mediaCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mediaCheckboxActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Fator R:");
+
+        jLabel4.setText("Períodos:");
+
+        jLabel5.setText("Limiar diferença Kalman - média móvel (mm): ");
+
+        kalmanFatorR_TextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        kalmanFatorR_TextField.setMinimumSize(new java.awt.Dimension(50, 26));
+        kalmanFatorR_TextField.setName(""); // NOI18N
+        kalmanFatorR_TextField.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                kalmanFatorR_TextFieldPropertyChange(evt);
+            }
+        });
+
+        periodosTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+        periodosTextField.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                periodosTextFieldPropertyChange(evt);
+            }
+        });
+
+        kalmanMediaLimiarTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+        kalmanMediaLimiarTextField.setMinimumSize(new java.awt.Dimension(50, 26));
+        kalmanMediaLimiarTextField.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                kalmanMediaLimiarTextFieldPropertyChange(evt);
+            }
+        });
+
+        reloadButton.setText("Recarregar último arquivo");
+        reloadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reloadButtonActionPerformed(evt);
+            }
+        });
+
+        loadAnimationButton.setText("Carregar como animação");
+        loadAnimationButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadAnimationButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("- GRAVAR/CARREGAR AMOSTRAS -");
+
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setText("- SENSORES IR -");
+
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("- ACELERÔMETRO E GIROSCÓPIO -");
+
+        jLabel9.setText("Limiar diferença acelerômetro - encoders (m/s^2):");
+
+        acelEncodersLimiarTextfield.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.0000"))));
+        acelEncodersLimiarTextfield.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                acelEncodersLimiarTextfieldPropertyChange(evt);
+            }
+        });
+
+        jLabel10.setText("Limiar diferença giroscópio - encoders (rad/s):");
+
+        giroEncodersLimiarTextfield.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.0000"))));
+        giroEncodersLimiarTextfield.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                giroEncodersLimiarTextfieldPropertyChange(evt);
+            }
+        });
+
+        loadGenerateGraphButton.setText("Plotar limiares (graph.csv)");
+        loadGenerateGraphButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadGenerateGraphButtonActionPerformed(evt);
             }
         });
 
@@ -100,22 +246,65 @@ public class JanelaAvancado extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSeparator2)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(jLabel1)
+                        .addComponent(mediaCheckbox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fileNameJLabel))
-                    .addComponent(recordCheckBox)
-                    .addComponent(jLabel2)
-                    .addComponent(fileLoadButton)
-                    .addComponent(robo_auxCheckbox)
-                    .addComponent(kalmanCheckbox))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(periodosTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(kalmanCheckbox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(kalmanFatorR_TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(acelEncodersLimiarTextfield, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(giroEncodersLimiarTextfield, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(kalmanMediaLimiarTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(robo_auxCheckbox)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fileNameJLabel))
+                            .addComponent(recordCheckBox)
+                            .addComponent(jLabel2)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(fileLoadButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(reloadButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(loadAnimationButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(loadGenerateGraphButton)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(recordCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -124,11 +313,43 @@ public class JanelaAvancado extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fileLoadButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fileLoadButton)
+                    .addComponent(reloadButton)
+                    .addComponent(loadAnimationButton)
+                    .addComponent(loadGenerateGraphButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(periodosTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(mediaCheckbox))
+                .addGap(38, 38, 38)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
                 .addGap(18, 18, 18)
                 .addComponent(robo_auxCheckbox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(kalmanCheckbox)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(acelEncodersLimiarTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(giroEncodersLimiarTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(50, 50, 50)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kalmanCheckbox)
+                    .addComponent(jLabel3)
+                    .addComponent(kalmanFatorR_TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kalmanMediaLimiarTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -151,68 +372,87 @@ public class JanelaAvancado extends javax.swing.JFrame {
         new Thread() {
             @Override
             public void run() {
-
                 int returnVal = fc.showOpenDialog(fileLoadButton);
-                try {
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        File file = fc.getSelectedFile();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-//                janelaPrincipal.stopRecording();
-//                synchronized (gerenciadorSensores) {
-                        gerenciadorSensores.stopGravacaoLeiturasSensoresArquivo();
-                        clientMessageProcessor.setCarregandoLeiturasSensores(true);
-                        gerenciadorSensores.limpaFilaAmostras();
-                        gerenciadorSensores.startRecording();
-                        janelaPrincipal.getMapa().getRobo().clearPosInfos();
-                        janelaPrincipal.getMapa().getObstaculos().reset();
-                        janelaPrincipal.getMapa().getRobo_aux().clearPosInfos();
-                        String line;
-                        boolean first = true;
-                        while ((line = reader.readLine()) != null) {
-                            if (first) { //Pula a primeira linha do arquivo
-                                first = false;
-                                continue;
-                            }
-                            //line = line.replaceAll("^", "S ");
-                            String[] split = line.split(" ");
-                            long unixTimestamp = Long.parseLong(split[0]);
-                            int encoder_esq = Integer.parseInt(split[1]);
-                            int encoder_dir = Integer.parseInt(split[2]);
-                            int[] IR = {Integer.parseInt(split[3]),
-                                        Integer.parseInt(split[4]),
-                                        Integer.parseInt(split[5]),
-                                        Integer.parseInt(split[6]),
-                                        Integer.parseInt(split[7])};
-                            int AX = Integer.parseInt(split[8]);
-                            int AY = Integer.parseInt(split[9]);
-                            int AZ = Integer.parseInt(split[10]);
-                            int GX = Integer.parseInt(split[11]);
-                            int GY = Integer.parseInt(split[12]);
-                            int GZ = Integer.parseInt(split[13]);
-                            AmostraSensores amostra = new AmostraSensores(encoder_esq, encoder_dir, IR, AX, AY, AZ, GX, GY, GZ, unixTimestamp);
-                            try {
-                                gerenciadorSensores.processaAmostraSensores(amostra);
-                                //                        clientMessageProcessor.processCommand(line);
-                            } catch (NumIRException ex) {
-                                System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
-                            } catch (TimestampException ex) {
-                                System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
-                            }
-                        }
-                        reader.close();
-                        janelaPrincipal.getViewer2D().redraw();
-//                gerenciadorSensores.processaFilaInteiraAmostras();
-                        clientMessageProcessor.setCarregandoLeiturasSensores(false);
-//                }
-                    }
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    lastSelectedFile = fc.getSelectedFile();
+                    loadFromFile(lastSelectedFile, false);
                 }
             }
         }.start();
     }//GEN-LAST:event_fileLoadButtonActionPerformed
+
+    private void loadFromFile(File file, boolean animate) {
+        synchronized (lock) {
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+//                janelaPrincipal.stopRecording();
+//                synchronized (gerenciadorSensores) {
+                gerenciadorSensores.resetKalmanFilters();
+                gerenciadorSensores.setNum_periodos_media_IR(gerenciadorSensores.getNum_periodos_media_IR());
+//                gerenciadorSensores.stopGravacaoLeiturasSensoresArquivo();
+                clientMessageProcessor.setCarregandoLeiturasSensores(true);
+                gerenciadorSensores.limpaFilaAmostras();
+                gerenciadorSensores.startRecording();
+                janelaPrincipal.getMapa().getRobo().clearPosInfos();
+                janelaPrincipal.getMapa().getRobo().setVelocidadeAtual(0);
+                janelaPrincipal.getMapa().getRobo().setVelocidadeAngularAtual(0);
+                janelaPrincipal.getMapa().getRobo_aux().setVelocidadeAtual(0);
+                janelaPrincipal.getMapa().getRobo_aux().setVelocidadeAngularAtual(0);
+                janelaPrincipal.getMapa().getObstaculos().reset();
+                janelaPrincipal.getMapa().getRobo_aux().clearPosInfos();
+                String line;
+                boolean first = true;
+                while ((line = reader.readLine()) != null) {
+                    if (first) { //Pula a primeira linha do arquivo
+                        first = false;
+                        continue;
+                    }
+                    //line = line.replaceAll("^", "S ");
+                    String[] split = line.split(" ");
+                    long unixTimestamp = Long.parseLong(split[0]);
+                    int encoder_esq = Integer.parseInt(split[1]);
+                    int encoder_dir = Integer.parseInt(split[2]);
+                    int[] IR = {Integer.parseInt(split[3]),
+                                Integer.parseInt(split[4]),
+                                Integer.parseInt(split[5]),
+                                Integer.parseInt(split[6]),
+                                Integer.parseInt(split[7])};
+                    int AX = Integer.parseInt(split[8]);
+                    int AY = Integer.parseInt(split[9]);
+                    int AZ = Integer.parseInt(split[10]);
+                    int GX = Integer.parseInt(split[11]);
+                    int GY = Integer.parseInt(split[12]);
+                    int GZ = Integer.parseInt(split[13]);
+                    AmostraSensores amostra = new AmostraSensores(encoder_esq, encoder_dir, IR, AX, AY, AZ, GX, GY, GZ, unixTimestamp);
+                    try {
+                        gerenciadorSensores.processaAmostraSensores(amostra);
+                        //                        clientMessageProcessor.processCommand(line);
+                    } catch (NumIRException ex) {
+                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
+                    } catch (TimestampException ex) {
+                        System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
+                    }
+                    if (animate == true) {
+                        try {
+                            Thread.sleep(50);
+                            janelaPrincipal.getViewer2D().redraw();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                reader.close();
+                janelaPrincipal.getViewer2D().redraw();
+//                gerenciadorSensores.processaFilaInteiraAmostras();
+                clientMessageProcessor.setCarregandoLeiturasSensores(false);
+//                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     private void robo_auxCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_robo_auxCheckboxActionPerformed
         // TODO add your handling code here:
@@ -231,12 +471,128 @@ public class JanelaAvancado extends javax.swing.JFrame {
 
     private void kalmanCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalmanCheckboxActionPerformed
         // TODO add your handling code here:
-        if (kalmanCheckbox.isSelected()) {
-            gerenciadorSensores.setKalman_IR_enabled(true);
-        } else {
-            gerenciadorSensores.setKalman_IR_enabled(false);
-        }
+//        System.out.println(kalmanCheckbox.isSelected());
+        gerenciadorSensores.setKalman_IR_enabled(kalmanCheckbox.isSelected());
+        gerenciadorSensores.resetKalmanFilters();
     }//GEN-LAST:event_kalmanCheckboxActionPerformed
+
+    private void kalmanFatorR_TextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_kalmanFatorR_TextFieldPropertyChange
+        // TODO add your handling code here:
+        if (kalmanFatorR_TextField.isEditValid()) {
+            Number n = (Number) kalmanFatorR_TextField.getValue();
+            if (n != null) {
+                gerenciadorSensores.setKalman_R(n.floatValue());
+                gerenciadorSensores.resetKalmanFilters();
+            }
+        }
+    }//GEN-LAST:event_kalmanFatorR_TextFieldPropertyChange
+
+    private void periodosTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_periodosTextFieldPropertyChange
+        // TODO add your handling code here:
+        if (periodosTextField.isEditValid()) {
+            Number n = (Number) periodosTextField.getValue();
+            if (n != null) {
+                gerenciadorSensores.setNum_periodos_media_IR(n.intValue());
+                gerenciadorSensores.resetKalmanFilters();
+            }
+        }
+    }//GEN-LAST:event_periodosTextFieldPropertyChange
+
+    private void kalmanMediaLimiarTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_kalmanMediaLimiarTextFieldPropertyChange
+        // TODO add your handling code here:
+        if (kalmanMediaLimiarTextField.isEditValid()) {
+            Number n = (Number) kalmanMediaLimiarTextField.getValue();
+            if (n != null) {
+                gerenciadorSensores.setLimite_diferenca_kalman_media(n.intValue());
+                gerenciadorSensores.resetKalmanFilters();
+            }
+        }
+    }//GEN-LAST:event_kalmanMediaLimiarTextFieldPropertyChange
+
+    private void mediaCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mediaCheckboxActionPerformed
+        // TODO add your handling code here:
+        gerenciadorSensores.setMedia_IR_enabled(mediaCheckbox.isSelected());
+        gerenciadorSensores.resetKalmanFilters();
+    }//GEN-LAST:event_mediaCheckboxActionPerformed
+
+    private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
+        // TODO add your handling code here:
+        if (lastSelectedFile != null) {
+            new Thread() {
+                @Override
+                public void run() {
+                    loadFromFile(lastSelectedFile, false);
+                }
+            }.start();
+        }
+    }//GEN-LAST:event_reloadButtonActionPerformed
+
+    private void loadAnimationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadAnimationButtonActionPerformed
+        // TODO add your handling code here:
+        new Thread() {
+            @Override
+            public void run() {
+                int returnVal = fc.showOpenDialog(fileLoadButton);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    lastSelectedFile = fc.getSelectedFile();
+                    loadFromFile(lastSelectedFile, true);
+                }
+            }
+        }.start();
+    }//GEN-LAST:event_loadAnimationButtonActionPerformed
+
+    private void acelEncodersLimiarTextfieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_acelEncodersLimiarTextfieldPropertyChange
+        // TODO add your handling code here:
+        if (acelEncodersLimiarTextfield.isEditValid()) {
+            Number n = (Number) acelEncodersLimiarTextfield.getValue();
+            if (n != null) {
+                gerenciadorSensores.setLimite_diferenca_aceleracao_encoders_acelerometro(n.floatValue());
+            }
+        }
+    }//GEN-LAST:event_acelEncodersLimiarTextfieldPropertyChange
+
+    private void giroEncodersLimiarTextfieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_giroEncodersLimiarTextfieldPropertyChange
+        // TODO add your handling code here:
+        if (giroEncodersLimiarTextfield.isEditValid()) {
+            Number n = (Number) giroEncodersLimiarTextfield.getValue();
+            if (n != null) {
+                gerenciadorSensores.setLimite_diferenca_vel_angular_encoders_giro(n.floatValue());
+            }
+        }
+    }//GEN-LAST:event_giroEncodersLimiarTextfieldPropertyChange
+
+    private void loadGenerateGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadGenerateGraphButtonActionPerformed
+        // TODO add your handling code here:
+
+        if (lastSelectedFile != null) {
+            new Thread() {
+                @Override
+                public void run() {
+                    BufferedWriter writer;
+                    try {
+                        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("graph.csv"))));
+
+                        Ponto alvo = new Ponto(0, 0);
+                        for (float i = 0; i <= 0.9; i += 0.0001) {
+                            gerenciadorSensores.setLimite_diferenca_vel_angular_encoders_giro(i);
+                            loadFromFile(lastSelectedFile, false);
+                            janelaPrincipal.getViewer2D().redraw();
+                            Ponto ponto = gerenciadorSensores.getRobo().getUltimaPosicaoTrilhaAtual().getPonto();
+                            float dist = ponto.distEuclideana(alvo);
+                            String str = String.format("%f %f\n", i, dist);
+                            writer.write(str, 0, str.length());                            
+                        }
+                        writer.close();
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(JanelaAvancado.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                }
+            }.start();
+        }
+    }//GEN-LAST:event_loadGenerateGraphButtonActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -272,12 +628,31 @@ public class JanelaAvancado extends javax.swing.JFrame {
 //        });
 //    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFormattedTextField acelEncodersLimiarTextfield;
     private javax.swing.JButton fileLoadButton;
     private javax.swing.JLabel fileNameJLabel;
+    private javax.swing.JFormattedTextField giroEncodersLimiarTextfield;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JCheckBox kalmanCheckbox;
+    private javax.swing.JFormattedTextField kalmanFatorR_TextField;
+    private javax.swing.JFormattedTextField kalmanMediaLimiarTextField;
+    private javax.swing.JButton loadAnimationButton;
+    private javax.swing.JButton loadGenerateGraphButton;
+    private javax.swing.JCheckBox mediaCheckbox;
+    private javax.swing.JFormattedTextField periodosTextField;
     private javax.swing.JCheckBox recordCheckBox;
+    private javax.swing.JButton reloadButton;
     private javax.swing.JCheckBox robo_auxCheckbox;
     // End of variables declaration//GEN-END:variables
 }

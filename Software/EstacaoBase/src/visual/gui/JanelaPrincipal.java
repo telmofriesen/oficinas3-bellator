@@ -268,12 +268,20 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         //
         //Inicializa o Robo
         //
+//        Robo robo = new Robo(400, 500, new Ponto(-140, 200));
+//        robo.addSensorIR(new SensorIR(new Ponto(140, -160), PApplet.radians(-60), 300, 1300));
+//        robo.addSensorIR(new SensorIR(new Ponto(140, -80), PApplet.radians(-30), 300, 1300));
+//        robo.addSensorIR(new SensorIR(new Ponto(140, 0), PApplet.radians(0), 300, 1300));
+//        robo.addSensorIR(new SensorIR(new Ponto(140, 80), PApplet.radians(30), 300, 1300));
+//        robo.addSensorIR(new SensorIR(new Ponto(140, 160), PApplet.radians(60), 300, 1300));
+        //--------------------------
         Robo robo = new Robo(400, 500, new Ponto(-140, 200));
-        robo.addSensorIR(new SensorIR(new Ponto(140, -160), PApplet.radians(-60), 200, 1500));
-        robo.addSensorIR(new SensorIR(new Ponto(140, -80), PApplet.radians(-30), 20, 150));
-        robo.addSensorIR(new SensorIR(new Ponto(140, 0), PApplet.radians(0), 200, 1500));
-        robo.addSensorIR(new SensorIR(new Ponto(140, 80), PApplet.radians(30), 20, 150));
-        robo.addSensorIR(new SensorIR(new Ponto(140, 160), PApplet.radians(60), 200, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(-120, -180), PApplet.radians(-90), 300, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, -160), PApplet.radians(-60), 300, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 0), PApplet.radians(0), 300, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(140, 160), PApplet.radians(60), 300, 1500));
+        robo.addSensorIR(new SensorIR(new Ponto(-120, 180), PApplet.radians(90), 300, 1500));
+        //--------------------------
 
         RoboDrawable roboDrawable = new RoboDrawable(robo);
 

@@ -67,7 +67,25 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     private BufferedOutputStream streamArquivoLeituras;
     private BufferedOutputStream streamArquivoLeituras_valor_real;
     private final Object lockStreamArquivoLeituras;
+    private VetorMediaMovelFloat[] media_movel_IR;
+    private VetorMediaMovelFloat media_movel_acel;
+    private VetorMediaMovelFloat media_movel_giro;
+    private VetorMediaMovelFloat media_movel_vel_angular_encoders;
+    private VetorMediaMovelFloat media_movel_acel_encoders;
+    int num_periodos_media_acel = 5;
+    int num_periodos_media_giro = 5;
+//    private int distIR_leituras[][];//Vetor com dados das ultimas N leituras de cada sensor IR. Usado para calcular a média móvel.
+//    private int distIR_leituras_next = 0;//Proximo elemento do vetor distIR_leituras.
+    private float acel_zero; //"Tara" da aceleração do eixo Y.
+    private float giro_zero;
     private boolean kalman_IR_enabled = false;
+    private float kalman_R = 10; //Fator R (ruído) do filtro de kalman dos sensores IR.
+    private float kalman_initial_X = 500;
+    private boolean media_IR_enabled = false;
+    private int num_periodos_media_IR = 4; //Numero de periodos da media movel
+    private int limite_diferenca_kalman_media = 500;
+    private float limite_diferenca_acel_encoders_acelerometro = 100f;
+    private float limite_diferenca_vel_angular_encoders_giro = 0.0025f;
 
     /**
      *
@@ -82,8 +100,24 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
         //Inicializa o filtro de kalman de cada sensor IR
         this.kalman_IR = new Kalman[robo.getNumSensoresIR()];
         for (int i = 0; i < kalman_IR.length; i++) {
-            kalman_IR[i] = new Kalman(100);
+            kalman_IR[i] = new Kalman(kalman_R); //Inicializa os filtos de Kalman dos sensores IR
+            kalman_IR[i].setX(kalman_initial_X); //Inicializa o filtro com um valor padrão de distância
         }
+        media_movel_IR = new VetorMediaMovelFloat[robo.getNumSensoresIR()];
+        for (int i = 0; i < media_movel_IR.length; i++) {
+            media_movel_IR[i] = new VetorMediaMovelFloat(num_periodos_media_IR);
+        }
+        media_movel_acel = new VetorMediaMovelFloat(num_periodos_media_acel);
+        media_movel_giro = new VetorMediaMovelFloat(num_periodos_media_giro);
+        media_movel_acel_encoders= new  VetorMediaMovelFloat(5);
+        media_movel_vel_angular_encoders = new VetorMediaMovelFloat(5);
+//        distIR_leituras = new int[robo.getNumSensoresIR()][num_periodos_media_IR];
+//        distIR_leituras_next = 0;
+//        for (int i = 0; i < distIR_leituras.length; i++) {
+//            for (int j = 0; j < distIR_leituras[i].length; j++) {
+//                distIR_leituras[i][j] = 0;
+//            }
+//        }
 //        instant_time_window_start = System.currentTimeMillis();
         amostragemRobo = new ContadorAmostragem();
         amostragemEstacaoBase = new ContadorAmostragemTempoReal();
@@ -93,6 +127,9 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
         this.lockStreamArquivoLeituras = new Object();
     }
 
+    /**
+     * Método continuamente executado pela thread para checar se há amostras na fila de espera e para processá-las.
+     */
     @Override
     public void run() {
         run = true;
@@ -107,7 +144,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
                 synchronized (this) {
                     amostra = sampleList.get(0);
                     try {
-                        //Executa o comando da posicao 0...
+                        //Processa a amostra da posicao 0...
                         processaAmostraSensores(amostra);
                     } catch (NumIRException ex) {
                         System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
@@ -133,64 +170,27 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     }
 
     /**
-     * Aceleração do centro de moviemnto (encoders)
-     * Velocidade angular (encoders)
-     * Aceleração (acelerômetro)
-     * Velocidade angular (giroscópio)
+     * Recebe nova amostra dos sensores, inserindo-a na fila de amostras se a
+     * gravação do mapa estiver habilitada. 
+     * Atualiza também os valores de taxa de amostras por segundo.
      *
-     * @return
-     */
-//    public String valuesToString(){
-//        StringBuilder sb = new StringBuilder();
-//        int i = 0;
-//        
-//        Ponto posicaoAnterior = robo.getPosicaoTrilhaAtual(i).getPonto();
-//        float anguloAnterior = robo.getPosicaoTrilhaAtual(i).getAngulo();
-//        long timestampAnterior = robo.getPosicaoTrilhaAtual(i).getTimestamp();
-//        
-//        for(i = 1; i<robo.getNumPosicoesTrilhaAtual(); i++){
-//            Ponto posicao = robo.getPosicaoTrilhaAtual(i).getPonto();
-//            float angulo = robo.getPosicaoTrilhaAtual(i).getAngulo();
-//            long timestamp = robo.getPosicaoTrilhaAtual(i).getTimestamp();
-//            float delta_theta = angulo - anguloAnterior;
-//            
-//            
-//            
-//            posicaoAnterior = posicao;
-//            timestampAnterior = timestamp;
-//        }
-//    }
-    /**
-     * Recebe nova leitura dos sensores, armazenando as informações se a
-     * gravação estiver habilitada. Atualiza os valores de taxa de amostras por segundo.
-     *
-     * @param aceleracao Aceleracao em m/s^2, medida a partir do acelerômetro
-     * (posicionado no centro de movimento do robô).
-     * @param aceleracao_angular Aceleração angular em rad/s^2. Os ângulos
-     * começam em 0 e crescem no sentido HORÁRIO.
-     * @param distIR Vetor com cada distância detectada pelos sensores IR (em milímetros). O
-     * vetor deve obrigatoriamente conter um número de elementos igual ao número
-     * de sensores IR presentes no robô. Caso contrário uma exceção é lançada.
-     * @param timestamp Timestamp UNIX em milissegundos do horário da leitura.
+     * @param amostra A nova amostra dos sensores.
      * @throws Exception Caso timestamp seja menor que o último timestamp
      * recebido OU o número de sensores no vetor distIR diferir do número de
      * sensores presentes no robô.
      */
     public void novaLeituraSensores(AmostraSensores amostra) {
         synchronized (this) {
-//            if (!listener_added) {
-//                amostragemEstacaoBase.addMyChangeListener(this);
-//            }
+
+            //Atualiza os contadores de amostras/egundo
             amostragemRobo.novaAmostra(amostra.unixTimestamp);
             amostragemEstacaoBase.novaAmostra();
-//        amostragemEstacaoBase.novaAmostra(System.currentTimeMillis());
-//        if (amostragemRobo.isSample_rate_changed() || amostragemEstacaoBase.isSample_rate_changed())
-//            fireChangeEvent(); //Se houver mudanças no valor da taxa de amostragem, avisa os listeners.
+
             if (!recordEnabled) {
                 leituras_descartadas++;
-            } else {
-//                _novaLeituraSensores(aceleracao, aceleracao_angular, distIR, timestamp);
+            } else { //Se a gravação no mapa estiver habilitada...
                 leituras_gravadas++;
+                //Adiciona a amostra à fila de amostras a serem processadas
                 sampleList.add(amostra);
                 this.notifyAll();
             }
@@ -206,7 +206,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
      * @return Deslocamento do centro de movimento do robô (ponto médio entre as rodas), em milímetros.
      */
     public static int calculaDeslocamentoEncoders(int dist_encoder_esq, int dist_encoder_dir) {
-        return Math.round((float) dist_encoder_esq + (float) dist_encoder_dir / 2f);
+        return Math.round(((float) dist_encoder_esq + (float) dist_encoder_dir) / 2f);
     }
 
     /**
@@ -264,7 +264,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
         while (num_elementos > 0) {
             AmostraSensores amostra = sampleList.get(0);
             try {
-                //Executa o comando da posicao 0...
+                //Processa a amostra da posicao 0...
                 processaAmostraSensores(amostra);
             } catch (NumIRException ex) {
                 System.out.printf("[GerenciadorSensores] %s \"%s\"\n", ex.getMessage(), amostra);
@@ -279,17 +279,10 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     }
 
     /**
-     * Recebe nova leitura dos sensores. À partir dos dados, atualiza a posição
+     * Processa nova amostra dos sensores. A partir dos dados, atualiza a posição
      * do robô e insere os obstáculos que forem detectados.
      *
-     * @param aceleracao Aceleracao em m/s^2, medida a partir do acelerômetro
-     * (posicionado no centro de movimento do robô).
-     * @param aceleracao_angular Aceleração angular em rad/s^2. Os ângulos
-     * começam em 0 e crescem no sentido HORÁRIO.
-     * @param distIR Vetor com cada distância detectada pelos sensores IR. O
-     * vetor deve obrigatoriamente conter um número de elementos igual ao número
-     * de sensores IR presentes no robô. Caso contrário uma exceção é lançada.
-     * @param timestamp Timestamp UNIX em milissegundos do horário da leitura.
+     * @param amostra A nova amostra dos sensores.
      * @throws Exception Caso timestamp seja menor que o último timestamp
      * recebido OU o número de sensores no vetor distIR diferir do número de
      * sensores presentes no robô.
@@ -297,6 +290,9 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
     public synchronized void processaAmostraSensores(AmostraSensores amostra) throws NumIRException, TimestampException {
         int dist_encoder_esq = amostra.transformedEncoderEsq();
         int dist_encoder_dir = amostra.transformedEncoderDir();
+        float acel_acelerometro = -amostra.transformedAY();
+        float vel_angular_giro = -amostra.transformedGZ();
+
         if (Math.abs(dist_encoder_dir) > 120 || Math.abs(dist_encoder_esq) > 120) {
             System.out.printf("[GerenciadorSensores] Distância muito grande\n");
             return;
@@ -309,15 +305,24 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
         PosInfo novaPosicao;
         //Se o robo tiver apenas uma posicao armazenada, com timestamp 0 significa que ele acabou de ser inicializado.
         if (robo.getNumPosicoesTrilhaAtual() == 1 && robo.getUltimaPosicaoTrilhaAtual().getTimestamp() == 0) {
+            acel_zero = acel_acelerometro;
+            giro_zero = vel_angular_giro;
+            //Configura os valores iniciais do filtro de Kalman
+            int[] transformed_IR = amostra.transformedIR();
+            for (int i = 0; i < kalman_IR.length; i++) {
+                kalman_IR[i].setX(transformed_IR[i]);
+            }
             //Apenas muda a timestamp para a hora atual.
             robo.getUltimaPosicaoTrilhaAtual().setTimestamp(amostra.unixTimestamp);
             robo_aux.getUltimaPosicaoTrilhaAtual().setTimestamp(amostra.unixTimestamp);
             novaPosicao = robo.getUltimaPosicaoTrilhaAtual();
             //Calcula o deslocamento no centro de movimento a partir dos deslocamentos de cada roda.
             //É uma média simples das duas medidas, uma vez que o centro de movimento é o ponto médio entre as duas rodas.
-//            ultimoDeslocamentoEncoders = calculaDeslocamentoEncoders(dist_encoder_esq, dist_encoder_dir);
-//            ultimoDeslocamentoAngularEncoders = calculaDeslocamentoAngularEncoders(dist_encoder_esq, dist_encoder_dir, robo.getLargura());
         } else { //Adiciona uma nova posição
+            media_movel_acel.insereValor(acel_acelerometro - acel_zero);
+            media_movel_giro.insereValor(vel_angular_giro - giro_zero);
+            float media_acel_acelerometro = media_movel_acel.getMedia();
+            float media_vel_angular_giro = media_movel_giro.getMedia();
             PosInfo ultimaPosicao = robo.getUltimaPosicaoTrilhaAtual(); //É a ultima posicao do robô.
             PosInfo ultimaPosicao_aux = robo_aux.getUltimaPosicaoTrilhaAtual();
 
@@ -345,6 +350,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             float ultimoAngulo = ultimaPosicao.getAngulo();
             float ultimoAngulo_aux = ultimaPosicao_aux.getAngulo();
             long difftime = amostra.unixTimestamp - ultimaPosicao.getTimestamp(); //(ms) Diferença de tempo entre a última e penútlima timestamps. 
+            if (difftime == 0) return;
 
             //
             // Determinar aceleração linear e velocidade angular medida pelos encoders
@@ -362,38 +368,36 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             ultimaVelocidadeEncoders = novaVelocidadeEncoders;
 //            ultimaVelocidadeAngularEncoders = novaVelocidadeAngularEncoders;
 
+            
+            //Calcula médias móveis (usado apenas para testes se for desejado)
+            media_movel_acel_encoders.insereValor(acelEncoders);
+            media_movel_vel_angular_encoders.insereValor(novaVelocidadeAngularEncoders);
+            float media_acel_encoders = media_movel_acel_encoders.getMedia();
+            float media_vel_angular_encoders = media_movel_vel_angular_encoders.getMedia();
+
 
             //
             // Comparar com aceleração linear e velocidade angular do acelerômetro e giroscópio e calcular pesos de cada um (encoders vs. acel&gyro).
             //
+            float peso_acel_encoders = 1;
+            float peso_acelerometro = 0;
+            if (PApplet.abs(media_acel_acelerometro - acelEncoders) > limite_diferenca_acel_encoders_acelerometro) {
+                peso_acel_encoders = 0;
+                peso_acelerometro = 1;
+            }
+
+            float peso_vel_angular_encoders = 1;
+            float peso_giroscopio = 0;
+            if (PApplet.abs(vel_angular_giro - novaVelocidadeAngularEncoders) > limite_diferenca_vel_angular_encoders_giro) {
+                peso_vel_angular_encoders = 0;
+                peso_giroscopio = 1;
+            }
 
             //
             //  Calcular a aceleracao final
             //TODO: utilizar valores do acelerometro e giroscopio
-            float aceleracao = acelEncoders;
-            float velocidadeAngular = novaVelocidadeAngularEncoders;
-//            float aceleracaoAngular = acelAngularEncoders;
-
-//            String str = String.format("%d %f %f %f %f %f %f %f %f\n",
-//                                       amostra.unixTimestamp,
-//                                       acelEncoders,
-//                                       novaVelocidadeAngularEncoders,
-//                                       amostra.transformedAX(),
-//                                       amostra.transformedAY(),
-//                                       amostra.transformedAZ(),
-//                                       amostra.transformedGX(),
-//                                       amostra.transformedGY(),
-//                                       -amostra.transformedGZ() //Inverte no eixo Z pois na convenção deste projeto os angulos crescem no sentido HORÀRIO
-//                    );
-//            try {
-//                streamArquivoLeituras_plotagem.write(str.getBytes("UTF-8"));
-//                streamArquivoLeituras_plotagem.flush();
-//                //            streamArquivoLeiturasGrafico.write();
-//            } catch (UnsupportedEncodingException ex) {
-//                Logger.getLogger(GerenciadorSensores.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (IOException ex) {
-//                Logger.getLogger(GerenciadorSensores.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+            float aceleracao = peso_acelerometro * (media_acel_acelerometro) + peso_acel_encoders * acelEncoders;
+            float velocidadeAngular = peso_giroscopio * (vel_angular_giro - giro_zero) + peso_vel_angular_encoders * novaVelocidadeAngularEncoders;
 
             //
             // Calcular velocidades linear e angular a partir da aceleracao calculada anteriormente
@@ -402,7 +406,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             //Efetua as integrações numéricas para calcular as novas posições a partir das acelerações
             float velocidade = robo.getVelocidadeAtual() + (aceleracao * difftime) / 1000; //(m/s) + (m/s^2)*(ms)/1000 = (m/s)
 
-            float velocidadeAcelerometro = robo_aux.getVelocidadeAtual() + (amostra.transformedAY() * difftime) / 1000;
+            float velocidadeAcelerometro = robo_aux.getVelocidadeAtual() + ((acel_acelerometro - acel_zero) * difftime) / 1000;
 //            robo.setVelocidadeAtual(velocidade);
 //            float velocidadeAngular = robo.getVelocidadeAngularAtual() + aceleracaoAngular * difftime / 1000; // (rad/s)
 
@@ -414,7 +418,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             float deslocamentoAngular = (velocidadeAngular * difftime / 1000) % PApplet.TWO_PI;
 
             float deslocamentoAcelerometro = velocidadeAcelerometro * difftime;
-            float deslocamentoAngularGiroscopio = (-amostra.transformedGZ() * difftime / 1000) % PApplet.TWO_PI;
+            float deslocamentoAngularGiroscopio = ((vel_angular_giro) * difftime / 1000) % PApplet.TWO_PI;
 
             //Calcula as novas posições x e y. O cálculo é feito levando-se em conta o ângulo da ultima posição (armazenada) do robo e a a nova velocidade (calculada) do robo.
             int newX = ultimoPonto.x() + PApplet.round(deslocamento * PApplet.cos(ultimoAngulo));
@@ -438,7 +442,7 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
             PosInfo novaPosicao_aux = new PosInfo(new Ponto(newX_aux, newY_aux), novoAngulo_aux, amostra.unixTimestamp);
             robo_aux.addPosicao(novaPosicao_aux);
             robo_aux.setVelocidadeAtual(velocidadeAcelerometro);
-            robo_aux.setVelocidadeAngularAtual(-amostra.transformedGZ());
+            robo_aux.setVelocidadeAngularAtual(vel_angular_giro);
 
 
 
@@ -461,8 +465,6 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
                             //
                             // Calcula os erros (encoders vs. acel&giro)
                             //
-
-
                             float erro_deslocamento = 0;
                             if (novoDeslocamentoEncoders != deslocamentoAcelerometro) {
                                 if (novoDeslocamentoEncoders == 0 && deslocamentoAcelerometro != 0) {
@@ -484,21 +486,21 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
                             erro_desloc_angular = erro_desloc_angular * 100;
 
                             float erro_aceleracao = 0;
-                            if (acelEncoders != amostra.transformedAY()) {
-                                if (acelEncoders == 0 && acelEncoders != 0) {
+                            if (acelEncoders != acel_acelerometro - acel_zero) {
+                                if (acelEncoders == 0 && acel_acelerometro - acel_zero != 0) {
                                     erro_aceleracao = 1;
                                 } else {
-                                    erro_aceleracao = PApplet.abs((acelEncoders - amostra.transformedAY()) / acelEncoders);
+                                    erro_aceleracao = PApplet.abs((acelEncoders - (acel_acelerometro - acel_zero)) / acelEncoders);
                                 }
                             }
                             erro_aceleracao = erro_aceleracao * 100;
 
                             float erro_vel_angular = 0;
-                            if (velocidadeAngular != (-amostra.transformedGZ())) {
-                                if (velocidadeAngular == 0 && (-amostra.transformedGZ()) != 0) {
+                            if (novaVelocidadeAngularEncoders != (vel_angular_giro)) {
+                                if (novaVelocidadeAngularEncoders == 0 && (vel_angular_giro) != 0) {
                                     erro_vel_angular = 1;
                                 } else {
-                                    erro_vel_angular = PApplet.abs((velocidadeAngular - (-amostra.transformedGZ())) / velocidadeAngular);
+                                    erro_vel_angular = PApplet.abs((novaVelocidadeAngularEncoders - (vel_angular_giro)) / velocidadeAngular);
                                 }
                             }
                             erro_vel_angular = erro_vel_angular * 100;
@@ -524,6 +526,9 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
                             }
                             erro_angulo = erro_angulo * 100;
 
+                            //
+                            // Imprime os valores para plotagem
+                            //
                             String str = String.format("%d %d %d %f %f %f %f %f %f %f %f %f %f %d %d %d %d %f %f %f %f\n",
                                                        amostra.unixTimestamp,
                                                        PApplet.round(novoDeslocamentoEncoders),
@@ -535,11 +540,11 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
                                                        //Erro deslocamento angular
                                                        erro_desloc_angular,
                                                        acelEncoders,
-                                                       amostra.transformedAY(),
+                                                       acel_acelerometro - acel_zero,
                                                        //Erro Aceleracao (a condição acelEncoders!=0 evita divisão por zero)
                                                        erro_aceleracao,
-                                                       velocidadeAngular,
-                                                       -amostra.transformedGZ(),
+                                                       novaVelocidadeAngularEncoders,
+                                                       vel_angular_giro,
                                                        //Erro velocidade angular
                                                        erro_vel_angular,
                                                        newX, newY, newX_aux, newY_aux,
@@ -564,20 +569,70 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
         //Interpreta leituras dos sensores IR
         //
         int[] distIR = amostra.transformedIR();
-        //Detecta diferenças entre o número de medidas no vetor distIR e o número de sensores do robô.
-        if ((robo.getNumSensoresIR() > 0 && distIR.length != robo.getNumSensoresIR()) || (robo.getNumSensoresIR() == 0 && distIR != null)) {
+        //Detecta diferenças entre o número de valores no vetor distIR e o número de sensores do robô.
+        if ((robo.getNumSensoresIR() > 0 && distIR.length != robo.getNumSensoresIR())
+            || (robo.getNumSensoresIR() == 0 && distIR != null)) {
+            //Lança uma exceção caso haja diferença.
             throw new NumIRException(distIR.length, robo.getNumSensoresIR(),
                                      String.format("Número de sensores no vetor distIR (%d) difere do número de sensores presentes no robô (%d).",
                                                    distIR.length, robo.getNumSensoresIR()));
         }
+        //Para cada sensor IR...
         for (int i = 0; i < distIR.length; i++) {
+            if (i == 2) continue;
             SensorIR sensor = robo.getSensor(i);
             //Se a distância detectada estiver entre a mínima e a máxima (30cm a 150cm)...
             if (distIR[i] > sensor.getMin_detec() && distIR[i] < sensor.getMax_detec()) {
                 float d = distIR[i];
-                if (kalman_IR_enabled) {
-                    d = kalman_IR[i].nextX((float) distIR[i]); //Aplica o filtro de kalman na medida de distância
+
+                //Indere ruído aleatório
+                //------------------
+                // FIXME remover para usa na prática.
+//                d = d  + (int) ((Math.random() - 0.5) * 400);
+                //---------------------------
+//                if (kalman_IR_enabled) { //Filtro de Kalman
+//                    d = kalman_IR[i].nextX((float) distIR[i]); //Aplica o filtro de kalman na medida de distância
+//                } else { //Media movel
+//                    this.distIR_leituras[i][distIR_leituras_next] = (int) d;
+//                    distIR_leituras_next = (distIR_leituras_next + 1) % distIR_leituras[i].length;
+//                    int sum = 0;
+//                    for (int j = 0; j < this.distIR_leituras[i].length; j++) {
+//                        sum += this.distIR_leituras[i][j];
+//                    }
+//                    float media = (float) sum / (float) this.distIR_leituras[i].length;
+//                    d = media;
+//                }
+                //--------------------------
+                if (kalman_IR_enabled) { //Filtro de Kalman
+                    float d_flitrado = kalman_IR[i].nextX(d); //Aplica o filtro de kalman na medida de distância
+                    if (media_IR_enabled) { //Média móvel junto com filtro de Kalman
+                        //Atualiza o próximo elemento do vetor do histórico de medidas, para cálculo da média móvel
+                        if (media_movel_IR[i].getMedia() == 0) {
+                            media_movel_IR[i].setValores(d);
+                        }
+                        media_movel_IR[i].insereValor(d);
+                        float media = media_movel_IR[i].getMedia();
+
+                        //Se houverem diferenças significativas entre a média móvel e o filtro de Kalman, muda o valor de X do filtro de Kalman e muda o valor filtrado para refletirem o valor da média.
+                        if (PApplet.abs(media - d_flitrado) > limite_diferenca_kalman_media) {
+                            kalman_IR[i].reset();
+                            kalman_IR[i].setX(media);
+                            d_flitrado = media;
+                        }
+                    }
+                    //Salva o valor filtrado
+                    d = d_flitrado;
+                } else if (media_IR_enabled) { //Média móvel simples sem filtro de Kalman
+                    //Atualiza o próximo elemento do vetor do histórico de medidas, para cálculo da média móvel
+                    if (media_movel_IR[i].getMedia() == 0) {
+                        media_movel_IR[i].setValores(d);
+                    }
+                    media_movel_IR[i].insereValor(d);
+                    float media = media_movel_IR[i].getMedia();
+                    //Salva o valor filtrado
+                    d = media;
                 }
+                //----------------------------------
 //                else {
 //                    float d = distIR[i];
 //                }
@@ -752,6 +807,77 @@ public class GerenciadorSensores extends Thread implements MyChangeListener {
 
     public synchronized void setKalman_IR_enabled(boolean kalman_IR_enabled) {
         this.kalman_IR_enabled = kalman_IR_enabled;
+    }
+
+    public synchronized boolean isMedia_IR_enabled() {
+        return media_IR_enabled;
+    }
+
+    public synchronized void setMedia_IR_enabled(boolean media_IR_enabled) {
+        this.media_IR_enabled = media_IR_enabled;
+    }
+
+    public synchronized float getKalman_R() {
+        return kalman_R;
+    }
+
+    public synchronized void setKalman_R(float kalman_R) {
+        this.kalman_R = kalman_R;
+    }
+
+    public synchronized int getNum_periodos_media_IR() {
+        return num_periodos_media_IR;
+    }
+
+    public synchronized void setNum_periodos_media_IR(int num_periodos_media_IR) {
+        this.num_periodos_media_IR = num_periodos_media_IR;
+        for (int i = 0; i < media_movel_IR.length; i++) {
+            media_movel_IR[i].setNumPeriodos(num_periodos_media_IR);
+        }
+    }
+
+    public synchronized int getLimite_diferenca_kalman_media() {
+        return limite_diferenca_kalman_media;
+    }
+
+    public synchronized void setLimite_diferenca_kalman_media(int limite_diferenca_kalman_media) {
+        this.limite_diferenca_kalman_media = limite_diferenca_kalman_media;
+    }
+
+    public synchronized float getLimite_diferenca_acel_encoders_acelerometro() {
+        return limite_diferenca_acel_encoders_acelerometro;
+    }
+
+    public synchronized void setLimite_diferenca_aceleracao_encoders_acelerometro(float limite_diferenca_acel_encoders_acelerometro) {
+        this.limite_diferenca_acel_encoders_acelerometro = limite_diferenca_acel_encoders_acelerometro;
+    }
+
+    public synchronized float getLimite_diferenca_vel_angular_encoders_giro() {
+        return limite_diferenca_vel_angular_encoders_giro;
+    }
+
+    public synchronized void setLimite_diferenca_vel_angular_encoders_giro(float limite_diferenca_vel_angular_encoders_giro) {
+        this.limite_diferenca_vel_angular_encoders_giro = limite_diferenca_vel_angular_encoders_giro;
+    }
+
+    public synchronized void resetKalmanFilters() {
+        for (int i = 0; i < kalman_IR.length; i++) {
+            kalman_IR[i].reset();
+            kalman_IR[i].setR(kalman_R);
+            kalman_IR[i].setX(kalman_initial_X);
+        }
+    }
+
+    public Robo getRobo() {
+        return robo;
+    }
+
+    public Robo getRobo_aux() {
+        return robo_aux;
+    }
+
+    public Obstaculos getObstaculos() {
+        return obstaculos;
     }
 
     @Override
