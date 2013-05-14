@@ -1,43 +1,26 @@
-Git hub:
-para baixar o repositorio e comecar a fazer commits seguir:
-http://myprogrammingblog.com/2012/01/20/github-how-clone-github-repo-how-to-push-to-github-how-to-get-files-from-github-ubuntu/
-e esse quando pedido no anterior:
-https://help.github.com/articles/set-up-git
-e ir aqui para adicionar uma chave ssh:
-https://help.github.com/articles/generating-ssh-keys
-
-
-Fazer update do repositorio local:
-git pull
-
-criar branch:
-git checkout -b nome
-
-Adicionar arquivos:
-git add . -A
-
-Fazer commit:
-git commit -m "Changes in the schematic and component list."
-
-remover ultimo commit local:
-git reset --soft HEAD^
-
-fazer merge do branch criado com o master:
-git checkout master
-git merge nome
-(caso houverem conflitos basta editar o arquivo em conflito, adiciona-lo novamente e fazer o commit já no branch master)
-
-deletar branch
-git branch -d nome
-
-enviar commits
-git push
-
-Moodle:
-http://ead.ct.utfpr.edu.br/moodle/course/view.php?id=258
+Repositório também disponivel em:
+https://github.com/telmofriesen/oficinas3-bellator
 
 ----------------------------------------------------------------------------------
-Ambiente de desenvolvimento:
+Estrutura de arquivos:
+
+Ambiente de Desenvolvimento ARM
+- Gravador-GUI-flpcui: gravador para o lpc2103
+- Gravador-Terminal-lpc21isp_185: gravador para o lpc2103, sem interface grafica.
+- Compilador: arm-2011.03-41-arm-none-linux-gnueabi.bin: Compilador usado
+Documentos
+- Documentos entregues na disciplina
+KnowHow
+- Datasheets: Datasheets de todos os componentes de hardware e User Manual do lpc210x;
+- Old: Dados de trabalhos anteriores; 
+- getting-started-arm-2009q-203.pdf: conhecimentos gerais sobre o compilador;
+- GitHub: comandos básicos para uso do GitHub;
+- ReadMe: este arquivo.
+Placa: Arquivos relativos ao projeto da placa;
+Software: código fonte dos softwares desenvolvidos.
+
+----------------------------------------------------------------------------------
+Ambiente de desenvolvimento para baixo nivel:
 
 - instalar eclipse-cdt (pelo synaptic)
 - instalar compilador:
