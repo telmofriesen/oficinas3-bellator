@@ -1,9 +1,0 @@
-Diagrama de classes.
-
-Protocolo de comunicação entre estação base e robô.
-Programa de simulação de conexão com o robô. Simulador de robô.
-
-Interface gráfica para webcam.
-Comunicação com a webcam do robô.
-
-Status da conexão:___; Taxa de amostragem: ___ amostras/seg; Amostras gravadas: ____; Amostras descartadas: ____
