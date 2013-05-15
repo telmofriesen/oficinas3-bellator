@@ -1,0 +1,65 @@
+\chapter{Planejamento}
+
+\section{Cronograma}
+O cronograma do projeto está presente em anexo, em um arquivo do OpenProj denominado ``Bellator.pod''.
+
+\section{Orçamento}
+
+
+\section{Deliverables}
+
+Na Tabela \ref{tab:deliverables1} estão expostos os \textit{deliverables} previstos ao longo do projeto.
+
+\begin{table}[h]
+  \centering
+  \caption{Relação dos entregáveis com seus respectivos responsáveis e prazos}
+  \begin{tabular}{|p{3cm}|p{4cm}|p{7cm}|}
+    \toprule
+    \textbf{Dia}   & \textbf{Auxiliar de Gerenciamento} & \textbf{Deliverables} \\
+    \hline
+    13/03/2013 & Stefan Campana Fuchs & 
+    \begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+      \item Versões iniciais dos diagramas de casos de uso e de classes (estação base).
+      \item Versão inicial do diagrama em blocos (hardware).
+      \item Explicação inicial de cada bloco (hardware).
+    \end{enumerate}\\
+    \hline
+    27/03/2013 & Telmo Friesen & 
+    \begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+      \item Versão inicial do diagrama de casos de uso (software embarcado).
+      \item Versão inicial do diagrama de fluxo de dados (software embarcado).
+      \item Versão inicial dos diagramas de estados (sistema de comunicação).
+      \item Versão inicial da descrição das mensagens e codificações dos comandos (sistema de comunicação).
+      \item Versão inicial do diagrama elétrico/eletrônico (hardware).
+    \end{enumerate}\\
+  \end{tabular}%
+  \label{tab:deliverables1}%
+\end{table}%
+
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|p{3cm}|p{4cm}|p{7cm}|}
+    10/04/2013 & Ricardo Farah & 
+    \begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+      \item Diagrama de casos de uso e de classes (estação base).
+      \item Diagrama de casos de uso (software embarcado).
+      \item Diagrama em blocos (hardware).
+      \item Explicação detalhada de cada bloco (hardware).
+      \item Diagrama elétrico/eletrônico (hardware).
+    \end{enumerate}\\
+    \hline
+    24/04/2013 & Stefan Campana Fuchs & 
+    \begin{enumerate}[topsep=0pt, partopsep=0pt, itemsep=0pt]
+      \item Projeto da PCB (Printed Circuit Board) (hardware).
+      \item Lista de componentes para confecção da PCB completa (hardware).
+      \item Diagramas de estados (sistema de comunicação).
+      \item Descrição das mensagens e codificações dos comandos (sistema de comunicação).
+      \item Descrição do uso do Software (Manual do Usuário)
+      \item Mapa de conexão da PCB com a alimentação e outros elementos (hardware).
+      \item Guia de montagem (hardware).
+    \end{enumerate}\\
+    \bottomrule
+  \end{tabular}%
+  \label{tab:deliverables2}%
+\end{table}%
