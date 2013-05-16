@@ -1,0 +1,37 @@
+\chapter{Introdução}
+
+\section{Motivação}
+
+O projeto apresentado neste documento trata-se do “Mapeamento de Ambientes com o robô Bellator” e é uma extensão do projeto “Bellator”. Ele teve sua última alteração em 2012 quando foi utilizado por Alexandre Jacques Marin, Júlio Cesar Nardelli Borges e Yuri Antin Wergrzn como plataforma de experimentos para o projeto final de conclusão de curso. O projeto para a disciplina de Oficina de Integração 3 foi desenvolvido com base nesse robô. Na versão anterior dele, estava presente um conjunto de circuitos (com um microcontrolador) que gerenciava as operações de baixo nível. Além disso, estava presente um PC embarcado (executando o sistema Linux), que efetuava as operações de alto nível.
+
+A equipe deste projeto propôs modificar o robô Bellator para efetuar o mapeamento 2D de ambientes controlados como, por exemplo, labirintos construídos para fins de teste do robô. Posteriormente, em trabalhos futuros, ajustes finos poderão ser feitos para o uso em ambientes diversos, como escritórios, salas e quartos.
+
+\section{Trabalhos correlatos}
+
+O mapeamento de ambientes realizado por robôs visa ao desenvolvimento de software e hardware que permitam a construção de um mapa a partir de dados captados por um ou mais sensores. Há diversas tecnologias que podem ser empregadas para alcançar tal objetivo, como o processamento de digital de imagens captadas de uma câmera ou a utilização de sensores de proximidade tais como sensores de ultrassom ou sensores de ondas eletromagnéticas.
+
+Esta última opção mostra-se bastante adequada para a maioria dos projetos, pois garante uma medição satisfatória da distância de objetos próximos ao robô a um custo não muito elevado. Um dos sensores mais populares deste tipo é o sensor de proximidade de infravermelho. Quando integrado ao robô permite a obtenção várias medidas discretas da distância do robô a objetos, um dos elementos básicos que permitem a geração do mapa do ambiente.
+
+\subsection{PatrolBot}
+O PatrolBot \cite{patrol_bot} é um robô configurável desenvolvido com interesses comerciais. Ele pode criar uma planta do interior de construções. Utilizando a tecnologia WI-FI ele pode ser controlado remotamente ou se movimentar de forma autônoma, sendo apenas monitorado pela estação base. Tal comunicação é feita por Wi-Fi.
+
+Ele permite a inclusão de acessórios adicionais tais como uma câmera e microfones que permitirão ver e ouvir o que se passa no ambiente que está sendo mapeado. Há diversos outros periféricos que podem ser incluídos no robô, que também oferece a opção de ser programado, por meio de um kit de desenvolvimento próprio.
+
+\subsection{Sistema de mapeamento robótico bidimensional por infravermelho}
+
+Nesta implementação \cite{wii}, um telêmetro infravermelho é utilizado para obter a distância de objetos próximos. A câmera infravermelha do Nintendo Wii é utilizada juntamente com sinalizadores (LEDs) para triangular a posição do robô e sua direção.
+
+Como hardware, foram utilizados: um Arduino Mini Pro, um cartão microSD, telêmetro inframervelho, câmera do Wii. Não há comunicação em tempo real com a estação base. Isto significa que os dados são obtidos e armazenados no cartão microSD. Para leitura, o cartão deve ser inserido em um computador e, então, carregado na estação base. Os resultados são visualizados em um arquivo textual simples, no qual a letra "O" simboliza a posição do robô e a letra "X" os obtáculos detectados.
+
+\section{Objetivos}
+
+\begin{itemize}
+  \item Implementar um software para comunicação de uma estação base (computador) com o robô, de forma que ela possa enviar comandos de movimentação ao robô, além de receber imagens da câmera e leituras dos sensores. Os comandos de movimentação (mover para frente, para trás, girar para esquerda/direita, parar) serão especificados por um utilizador humano através do teclado da estação base. 
+  \item O meio de comunicação entre a estação base e o robô deverá ter alcance máximo de 20 m (se não houverem paredes ou obstáculos entre a estação base e o robô). Para isso a tecnologia WI-FI mostra-se adequada e, portanto, ela será utilizada.
+  \item Inserir uma \textit{webcam} USB no robô, de modo que imagens do ambiente possam ser transmitidas à estação base. O propósito das imagens será unicamente permitir a visualização (pelo usuário da estação base, em tempo real) do ambiente no qual o robô está localizado. A câmera será conectada na porta USB do computador embarcado, e a transmissão de imagens será feita pelo canal Wi-Fi entre a estação base e o robô (o mesmo canal utilizado para a transmissão de dados dos sensores e comandos de movimentação).
+  \item Implementar, no software utilizado na estação base, a geração de uma mapa em 2D com o caminho estimado percorrido pelo robô e os obstáculos detectados pelo mesmo. Os obstáculos serão representados a partir dos pontos em que houve detecção pelos sensores.
+  \item Instalar novos sensores (acelerômetro e giroscópio) para efetuar as medições de velocidade e posicionamento do robô com maior exatidão do que pode ser feito atualmente com os \textit{encoders}. Ambos os sensores serão posicionados na carcaça do robô. Caso discrepâncias de medição entre os \textit{encoders}, acelerômetro e giroscópio sejam detectadas (por exemplo, em caso de escorregamento de rodas), atenuações de erros poderão ser feitas no \textit{software} da estação base.
+%  A velocidade e deslocamento lineares instantâneos serão determinados a partir da integração numérica da aceleração linear (cujas amostras serão obtidas com o acelerômetro em intervalos de tempo discretos). A velocidade e deslocamento angular instantâneos serão determinados a partir da integração numérica da aceleração angular (cujas amostras serão obtidas com o giroscópio em intervalos de tempo discretos). A posição atual do robô será gradualmente atualizada na representação do mapa à medida em que as amostras de aceleração linear e angular forem recebidas na estação base.
+  \item Desenvolver uma placa de circuito impresso que realize a função de interface com os sensores e que seja acoplada ao microcontroldador. Este microcontrolador pode ser usado diretamente na forma encapsulada de circuito integrado (sendo soldado diretamente na nova placa) ou integrado a um kit de desenvolvimento (acoplado como \textit{shield} na nova placa).
+  \item Em caso de falha de comunicação entre o robô e a estação base, o robô deverá permanecer parado e aguardando a conexão ser reestabelecida.
+\end{itemize}

@@ -1,0 +1,29 @@
+\apendice
+
+\input{planejamento_de_riscos}
+
+\chapter{Medidas do robô}
+\label{cap:medidas_robo}
+% Na Tabela \ref{tab:medidas_robo} estão presentes as medidas do robô.
+
+\begin{table}[H]
+  \caption{Medidas do robô.}
+  \centering
+  \begin{tabular}{l|l}
+    \toprule
+    \textbf{Medida} & \textbf{Valor} \\
+    \midrule
+    Comprimento da carcaça & 50 cm \\ \hline
+    Largura da carcaça & 40 cm \\ \hline
+    Distância entre a parte da frente do robô e os eixos das rodas & 14 cm \\ \hline
+    Largura de cada roda & 4 cm \\ \hline
+    Circunferência de cada roda & 64 cm \\ \hline
+    Circunferência do eixo de cada roda & 7,5 cm \\ \hline
+    Circunferência do eixo de cada encoder & 22 cm \\ 
+    \bottomrule
+  \end{tabular}
+  \label{tab:medidas_robo}
+\end{table}
+
+
+\raggedright

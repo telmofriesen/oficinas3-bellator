@@ -1,0 +1,32 @@
+\chapter{Conclusões}
+
+\section{Análise do desenvolvimento}
+
+Do ponto de vista dos objetivos, percebe-se que a maioria deles foram alcançados. Foi implementado com sucesso um \textit{software} com interface gráfica para geração e visualização de mapas, visualização de imagens da \textit{webcam} do robô e controle do robô por meio do teclado. A comunicação foi implementada satisfatoriamente, tanto entre a estação base e a placa TS-7260 (via Wi-Fi) quanto entre a TS e a placa de baixo nível, via porta serial. Uma \textit{webcam} USB foi instalada e configurada com sucesso no robô para a transmissão de imagens ao usuário. O giroscópio foi utilizado satisfatoriamente na prática para corrigir erros de leituras dos encoders e escorregamento das rodas. Uma placa de circuito impresso, de tamanho reduzido, foi desenvolvida de forma a integrar as funções de baixo nível do robô: interface com os encoders, sensores infra-vermelhos, acelerômetro e giroscópio, e geração de PWM para os motores.
+
+Observou-se que três riscos previstos no planejamento de riscos ocorreram. O primeiro foi a ``Não entrega de componentes ou entrega fora do prazo''. Uma unidade MPU-6050 (acelerômetro e giroscópio) encomendada no site eBay não foi entregue da maneira especificada e foi devolvida. Como a encomenda desse item havia sido adiantada, realizou-se uma nova encomenda no site Sparksfun, que chegou no prazo estabelecido não causando atraso no projeto. O segundo risco foi ``Taxação dos componentes comprados no exterior'', que gerou um aumento no preço dos componentes, mas não de forma que ultrapassasse o orçamento especificado. O terceiro e último risco foi ``Problemas Técnicos com o Hardware''. Como relatado, a imprecisão da leitura dos encoders ópticos interferiu na correta determinação da posição do robô. Como solução, buscou-se aumentar a aderência das rodas e correias do robô a fim de diminuir os escorregamentos e falsas leituras, além de utilizar o giroscópio para correção do posicionamento.
+
+Em termos de déficts de conhecimento, pode-se citar a dificuldade em se utilizar o acelerômetro da placa, devido a seus problemas de leitura. Idealmente, o filtro de Kalman poderia ser utilizado para produzir melhores estimativas do posicionamento do robô, houve falta de tempo e base acadêmica para implementação desse filtro, que, na prática mostrou-se complexo de complexa interpretação e aplicação.
+
+Por último, devido a um bom planejamento do cronograma, da execução da equipe e da baixa ocorrência de riscos, não houve atrasos dentro do cronograma planejado. As atividades foram concluídas dentro do prazo previsto pela equipe.
+
+\section{Integração}
+
+Para o desenvolvimento do projeto, da matéria de Oficinas de Integração 3, foram necessários diversos conhecimentos adquiridos durante o curso. Foram utilizados, principalmente, os conhecimentos nas áreas de Eletrônica Geral, Programação, Engenharia de Software e Comunicação de Dados.
+
+O projeto foi dividido em três seções cada uma com sua gama de conhecimentos específicos:
+
+Planejamento do Projeto: Nesta seção foram utilizados conhecimentos como Gerenciamento de Risco, Custo, Cronograma, Análise Tecnológica, entre outros, adquiridos nas matérias de Análise de Projeto de Sistemas, Engenharia de Software, Oficinas de Integração 1 e 2. Esses conhecimentos foram aplicados para criar o cronograma do projeto considerando a possibilidade de riscos e os custos e trabalho necessário para concluí-lo.
+
+Hardware: Nesta seção foram utilizados conhecimentos como Microcontroladores, Sensores, Filtros, Sinais, Circuitos Digitais , entre outros, adquiridos nas matérias de Eletrônica, Microcontrolados, Controle, Sinais e Sistemas. Esses conhecimentos foram aplicados no desenvolvimento e na confecção da placa de circuito impresso, no uso e controle do robô, etc.
+
+Software: Nesta seção foram utilizados conhecimentos como Programação, Comunicação de Dados, Estrutura de Dados. Esses conhecimentos foram aplicados para criar o programa da estação base, assim como possibilitar toda a estrutura de comunicação entre as partes do projeto.
+
+\section{Trabalhos futuros}
+Há inúmeros modos de se prosseguir com o projeto do robô Bellator, pois muitas melhorias podem ser efetuadas a fim de se atingir resultados mais precisos em termos de mapeamentos de ambientes.
+
+No que diz respeito ao sensoriamento, é importante melhorar a confiabilidades dos dados dos encoders. Uma das formas de se fazer isso é utilizando um \textit{timing belt}, que é uma roda dentada acoplada a um sensor. Dessa forma, problemas de escorregamento da correia em relação à polias do robô seriam eliminados.
+
+Quanto ao uso do acelerômetro, a técnica do filtro de Kalman poderia ser explorada se forma a se realizar a fusão de dados dos três sensores do robô: encoder, acelerômetro e giroscópio. Se desenvolvida corretamente, em tese, a utilização desta técnica permitiria a compensação automática de erros dos sensores o que permitiria uma estimativa muito melhor do posicionamento do robô. As dificuldades de se utilizar esta técnica são: correta determinação da margem de erro de cada sensor, criação de um modelo matemático da movimentação do robô e complexidade do entendimento e implementação do filtro.
+
+Em relação à câmera, há dois aspectos a serem melhorados: a redução do atraso do sinal de vídeo (que é da ordem de segundos) e a interação do usuário com a câmera. O primeiro problema poderia ser resolvido com a substituição da \textit{webcam} atual por outra que possua menos latência, ou pelo desenvolvimentos de software que faça a leitura dos dados brutos da câmera e faça o envio instantâneo desses dados à estação base, procurando reduzir ou eliminar a utilização de \textit{buffers} de vídeo. Em termos de interatividade, pode-se construir um dispositivo de rotação que permita ao usuário girar a câmera 360 graus em torno do eixo vertical, possibilitando maior flexibilidade e autonomia durante a utilização do robô.

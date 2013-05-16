@@ -1,0 +1,18 @@
+\chapter{Conclusões}
+
+\section{Análise do desenvolvimento}
+
+Observou-se que três riscos previstos no planejamento de riscos ocorreram. O primeiro foi a ``Não entrega de componentes ou entrega fora do prazo''. Uma unidade MPU-6050 (acelerômetro e giroscópio) encomendada no site eBay não foi entregue da maneira especificada e foi devolvida. Como a encomenda desse item havia sido adiantada, realizou-se uma nova encomenda no site Sparksfun, que chegou no prazo estabelecido não causando atraso no projeto. O segundo risco foi ``Taxação dos componentes comprados no exterior'', que gerou um aumento no preço dos componentes, mas não de forma que ultrapassasse o orçamento especificado. O terceiro e último risco foi ``Problemas Técnicos com o Hardware''. Como relatado, a imprecisão da leitura dos encoders ópticos interferiu na correta determinação da posição do robô. Como solução, buscou-se aumentar a aderência das rodas e correias do robô a fim de diminuir os escorregamentos e falsas leituras, além de utilizar o giroscópio para correção do posicionamento.
+
+Em termos de déficts de conhecimento, pode-se citar a dificuldade em se utilizar o acelerômetro da placa, devido a seus problemas de leitura. Idealmente, o filtro de Kalman poderia ser utilizado em conjunto para seleciona, houve falta de tempo e base acadêmica para implementação desse filtro, que, na prática mostrou-se complexo em sua aplicação.
+
+\section{Integração}
+
+\section{Trabalhos futuros}
+Há inúmeros modos de se prosseguir com o projeto do robô Bellator, pois muitas melhorias podem ser efetuadas a fim de se atingir resultados mais precisos em termos de mapeamentos de ambientes.
+
+No que diz respeito ao sensoriamento, é importante melhorar a confiabilidades dos dados dos encoders. Uma das formas de se fazer isso é utilizando um \textit{timing belt}, que é uma roda dentada acoplada a um sensor. Dessa forma, problemas de escorregamento da correia em relação à polias do robô seriam eliminados.
+
+Quanto ao uso do acelerômetro, a técnica do filtro de Kalman poderia ser explorada se forma a se realizar a fusão de dados dos três sensores do robô: encoder, acelerômetro e giroscópio. Se desenvolvida corretamente, em tese, a utilização desta técnica permitiria a compensação automática de erros dos sensores o que permitiria uma estimativa muito melhor do posicionamento do robô. As dificuldades de se utilizar esta técnica são: correta determinação da margem de erro de cada sensor, criação de um modelo matemático da movimentação do robô e complexidade do entendimento e implementação do filtro.
+
+Em relação à câmera, há dois aspectos a serem melhorados: a redução do atraso do sinal de vídeo (que é da ordem de segundos) e a interação do usuário com a câmera. O primeiro problema poderia ser resolvido com a substituição da \textit{webcam} atual por outra que possua menos latência, ou pelo desenvolvimentos de software que faça a leitura dos dados brutos da câmera e faça o envio instantâneo desses dados à estação base, procurando reduzir ou eliminar a utilização de \textit{buffers} de vídeo. Em termos de interatividade, pode-se construir um dispositivo de rotação que permita ao usuário girar a câmera 360 graus em torno do eixo vertical, possibilitando maior flexibilidade e autonomia durante a utilização do robô.
