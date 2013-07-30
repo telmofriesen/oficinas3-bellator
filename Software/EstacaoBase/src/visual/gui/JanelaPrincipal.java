@@ -100,7 +100,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         gerenciadorMotores = new GerenciadorMotores();
         maxSpeedSlider.setF_min(0.2f);
         maxSpeedSlider.setF_max(1f);
-        maxSpeedSlider.setFloatValue(1);
+        maxSpeedSlider.setFloatValue(0.4f);
         maxSpeedTextField.setText(String.format("%.1f", maxSpeedSlider.getFloatValue()));
 
         ClientMessageProcessor processor = new ClientMessageProcessor(connector, gerenciadorSensores, gerenciadorCamera);
@@ -1150,9 +1150,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                                 icon = "/visual/gui/icons/arrows/rotate_right.png";
                                 break;
                         }
-                        if (connector.isConnected()) {
+//                        if (connector.isConnected()) {
                             movementImagePanel.changeImageFromRelativePath(icon);
-                        }
+//                        }
                         lastMovType = movType;
                     }
                     if (newEngineSpeed != lastEngineSpeed) {

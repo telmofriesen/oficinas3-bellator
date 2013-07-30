@@ -105,20 +105,24 @@ public class MovementKeyboardListener implements KeyboardListener {
                     fireChangeEvent();
                 }
             };
-            timer.schedule(timerTask, TIMER_DELAY);
-            switch (keyCode) {
-                case PApplet.UP:
-                    up_new = true;
-                    break;
-                case PApplet.DOWN:
-                    down_new = true;
-                    break;
-                case PApplet.LEFT:
-                    left_new = true;
-                    break;
-                case PApplet.RIGHT:
-                    right_new = true;
-                    break;
+            try {
+                timer.schedule(timerTask, TIMER_DELAY);
+            } catch (Exception e) {
+            } finally {
+                switch (keyCode) {
+                    case PApplet.UP:
+                        up_new = true;
+                        break;
+                    case PApplet.DOWN:
+                        down_new = true;
+                        break;
+                    case PApplet.LEFT:
+                        left_new = true;
+                        break;
+                    case PApplet.RIGHT:
+                        right_new = true;
+                        break;
+                }
             }
         }
     }
@@ -146,21 +150,26 @@ public class MovementKeyboardListener implements KeyboardListener {
                     fireChangeEvent();
                 }
             };
-            timer.schedule(timerTask, TIMER_DELAY);
-            synchronized (lock) {
-                switch (keyCode) {
-                    case PApplet.UP:
-                        up_new = false;
-                        break;
-                    case PApplet.DOWN:
-                        down_new = false;
-                        break;
-                    case PApplet.LEFT:
-                        left_new = false;
-                        break;
-                    case PApplet.RIGHT:
-                        right_new = false;
-                        break;
+            try {
+                timer.schedule(timerTask, TIMER_DELAY);
+            } catch (Exception e) {
+            } finally {
+
+                synchronized (lock) {
+                    switch (keyCode) {
+                        case PApplet.UP:
+                            up_new = false;
+                            break;
+                        case PApplet.DOWN:
+                            down_new = false;
+                            break;
+                        case PApplet.LEFT:
+                            left_new = false;
+                            break;
+                        case PApplet.RIGHT:
+                            right_new = false;
+                            break;
+                    }
                 }
             }
         }

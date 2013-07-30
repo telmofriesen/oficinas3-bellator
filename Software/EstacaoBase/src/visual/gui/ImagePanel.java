@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -46,12 +48,10 @@ public class ImagePanel extends JPanel {
     public synchronized void changeImageFromRelativePath(String path) {
         BufferedImage img;
         try {
-//            System.out.println(getClass().getResource(path).toString());
-            img = ImageIO.read(new File(getClass().getResource(path).toURI()));
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        } catch (IOException ex) {
+            InputStream in = getClass().getResourceAsStream(path);
+            img = ImageIO.read(in);
+        }
+        catch (IOException ex) {
             Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
             return;
         } catch (NullPointerException ex){
